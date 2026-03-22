@@ -1,0 +1,55 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}My Devices — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<h1 class="text-2xl font-bold">My Devices</h1>
+{% endblock %}
+
+{% block page_content %}
+{% if devices %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for device in devices %}
+  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-3">
+        {% include "components/_icon.html" with name="smartphone" size="20" %}
+        <div>
+          <p class="font-medium">{{ device.name|default:device.device_type|default:"Unknown Device" }}</p>
+          <p class="text-xs text-[var(--color-text-muted)]">{{ device.os|default:"" }} {{ device.os_version|default:"" }}</p>
+        </div>
+      </div>
+      {% if device.is_trusted %}
+      {% include "components/_badge.html" with text="Trusted" variant="success" %}
+      {% else %}
+      {% include "components/_badge.html" with text="Untrusted" variant="warning" %}
+      {% endif %}
+    </div>
+    <div class="mt-3 space-y-1 text-sm text-[var(--color-text-muted)]">
+      {% if device.browser %}<p>Browser: {{ device.browser }}</p>{% endif %}
+      {% if device.last_seen %}<p>Last seen: {{ device.last_seen|timesince }} ago</p>{% endif %}
+      {% if device.ip_address %}<p>IP: {{ device.ip_address }}</p>{% endif %}
+    </div>
+    <div class="mt-4 flex gap-2">
+      <form method="post" action="{% url 'users:device_eviction' %}"
+            x-data x-on:submit.prevent="
+              $store.confirm.show({
+                title: 'Remove this device?',
+                message: 'This device will be unlinked from your account. You can re-register it later.',
+                confirmText: 'Remove Device',
+                danger: true,
+                onConfirm: () => $el.submit()
+              })
+            ">
+        {% csrf_token %}
+        <input type="hidden" name="device_id" value="{{ device.pk }}">
+        <button class="text-xs text-[var(--color-error)] hover:underline">Remove</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="smartphone" title="No devices" description="No devices have been registered to your account yet." %}
+{% endif %}
+{% endblock %}

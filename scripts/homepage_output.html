@@ -1,0 +1,473 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="⚠ Missing: LANGUAGE_CODE ⚠" data-theme="dark">
+<head>
+  
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="description" content="Firmware Platform — Enterprise firmware distribution platform">
+<title>Firmware Platform</title>
+
+
+<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/static/css/dist/main.css">
+
+
+<style>[x-cloak] { display: none !important; }</style>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"
+        nonce="Ew65-7Io2w46mcRpwBvpWw"
+        crossorigin="anonymous"></script>
+
+
+
+<script nonce="Ew65-7Io2w46mcRpwBvpWw">
+  (function(){
+    var t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
+  
+</head>
+<body class="bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] min-h-screen flex flex-col antialiased"
+      hx-headers='{"X-CSRFToken": "rFF8cwWOu7fTW8hIw9MEklVT8MXWksjcYFyr2lWD7IEqnFV0szXvsUH9witnIXV8"}'>
+
+  
+
+<nav class="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] sticky top-0 z-50"
+     x-data="{ mobileOpen: false }">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <a href="/" class="flex items-center gap-2 text-[var(--color-accent)] font-bold text-xl">
+        <i data-lucide="cpu" class="w-6 h-6"></i>
+        Firmware Platform
+      </a>
+
+      
+      <div class="hidden md:flex items-center gap-6">
+        <a href="/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <a href="/devices/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Devices</a>
+        <a href="/blog/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Blog</a>
+
+        
+        
+<div x-data class="relative">
+  <button @click="$store.theme.cycle()" class="p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)] transition-colors" title="Switch theme">
+    <template x-if="$store.theme.current === 'dark'"><i data-lucide="moon" class="w-5 h-5"></i></template>
+    <template x-if="$store.theme.current === 'light'"><i data-lucide="sun" class="w-5 h-5"></i></template>
+    <template x-if="$store.theme.current === 'contrast'"><i data-lucide="eye" class="w-5 h-5"></i></template>
+  </button>
+</div>
+
+
+        
+        
+        <a href="/users/login/" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors text-sm font-medium">
+          Sign In
+        </a>
+        
+      </div>
+
+      
+      <button @click="mobileOpen = !mobileOpen" class="md:hidden text-[var(--color-text-secondary)]">
+        <i x-show="!mobileOpen" data-lucide="menu" class="w-6 h-6"></i>
+        <i x-show="mobileOpen" x-cloak data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+  </div>
+
+  
+    <div x-show="mobileOpen" x-cloak x-transition class="md:hidden border-t border-[var(--color-border)]">
+    <div class="px-4 py-3 space-y-2">
+      <a href="/" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Home</a>
+      <a href="/devices/" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Devices</a>
+      <a href="/blog/" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Blog</a>
+      
+      <a href="/users/login/" class="block py-2 text-[var(--color-accent)]">Sign In</a>
+      
+    </div>
+  </div>
+</nav>
+
+  
+
+
+
+<div id="toast-container"
+     class="fixed top-20 right-4 z-[60] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+     x-data
+     x-init="if (!Alpine.store('notify')) { Alpine.store('notify', { items: [], icon() { return 'info'; } }) }">
+
+  
+  
+
+  
+  <template x-for="toast in $store.notify.items" :key="toast.id">
+    <div x-show="toast.visible"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-x-full"
+         x-transition:enter-end="opacity-100 translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-x-0"
+         x-transition:leave-end="opacity-0 translate-x-full"
+         class="pointer-events-auto rounded-lg shadow-lg border overflow-hidden bg-[var(--color-bg-secondary)]"
+         :class="{
+           'border-[var(--color-success)]/30': toast.type === 'success',
+           'border-[var(--color-error)]/30': toast.type === 'error',
+           'border-[var(--color-warning)]/30': toast.type === 'warning',
+           'border-[var(--color-info)]/30': toast.type === 'info'
+         }"
+         role="alert">
+      <div class="flex items-start gap-3 px-4 py-3">
+        
+        <span class="shrink-0 mt-0.5"
+              :class="{
+                'text-[var(--color-success)]': toast.type === 'success',
+                'text-[var(--color-error)]': toast.type === 'error',
+                'text-[var(--color-warning)]': toast.type === 'warning',
+                'text-[var(--color-info)]': toast.type === 'info'
+              }">
+          <i :data-lucide="$store.notify.icon(toast.type)" class="w-5 h-5"></i>
+        </span>
+        
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold uppercase tracking-wide"
+             :class="{
+               'text-[var(--color-success)]': toast.type === 'success',
+               'text-[var(--color-error)]': toast.type === 'error',
+               'text-[var(--color-warning)]': toast.type === 'warning',
+               'text-[var(--color-info)]': toast.type === 'info'
+             }"
+             x-text="toast.title"></p>
+          <p class="text-sm text-[var(--color-text-primary)] mt-0.5" x-text="toast.message"></p>
+        </div>
+        
+        <button @click="$store.notify.dismiss(toast.id)"
+                class="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+                aria-label="Dismiss notification">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      
+      <div class="h-0.5"
+           :class="{
+             'bg-[var(--color-success)]/20': toast.type === 'success',
+             'bg-[var(--color-error)]/20': toast.type === 'error',
+             'bg-[var(--color-warning)]/20': toast.type === 'warning',
+             'bg-[var(--color-info)]/20': toast.type === 'info'
+           }">
+        <div class="h-full toast-progress"
+             :class="{
+               'bg-[var(--color-success)]': toast.type === 'success',
+               'bg-[var(--color-error)]': toast.type === 'error',
+               'bg-[var(--color-warning)]': toast.type === 'warning',
+               'bg-[var(--color-info)]': toast.type === 'info'
+             }"
+             :style="'width:' + toast.progress + '%'"></div>
+      </div>
+    </div>
+  </template>
+</div>
+
+
+  <main class="flex-1">
+    
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  
+  
+
+<section class="text-center py-12 lg:py-16">
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4 text-[var(--color-text-primary)]">
+    Firmware Distribution <span class="text-[var(--color-accent)]">Platform</span>
+  </h1>
+  <p class="text-lg text-[var(--color-text-secondary)] mb-8 max-w-2xl mx-auto">
+    Download official, engineering, and modified firmware for thousands of devices. Fast, secure, and always up to date.
+  </p>
+
+  
+  <div class="flex justify-center mb-12">
+    
+<div class="relative w-full max-w-xl" x-data="{ focused: false }">
+  <div class="relative">
+    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-secondary)]"></i>
+    <input type="search"
+           name="q"
+           placeholder="Search firmware, devices, brands..."
+           class="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition"
+           hx-get="⚠ Missing: search_url ⚠"
+           hx-trigger="keyup changed delay:300ms"
+           hx-target="#search-results"
+           hx-indicator="#search-spinner"
+           @focus="focused = true"
+           @blur="setTimeout(() => focused = false, 200)"
+           autocomplete="off">
+  </div>
+  <div id="search-spinner" class="htmx-indicator absolute right-3 top-1/2 -translate-y-1/2">
+    
+{#
+  Params:
+    size    — 'xs' | 'sm' (default) | 'md' | 'lg'
+    variant — 'spinner' (default) | 'dots' | 'skeleton' | 'overlay'
+    text    — Optional loading text
+#}
+
+
+<div class="flex items-center justify-center
+  p-4
+  ">
+  <svg class="animate-spin text-[var(--color-accent)]
+    h-5 w-5"
+    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+  </svg>
+  
+</div>
+
+
+  </div>
+  <div id="search-results" x-show="focused" x-cloak class="absolute top-full left-0 right-0 mt-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto"></div>
+</div>
+
+  </div>
+
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-4xl mx-auto">
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 text-center">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">0</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-1">Brands</div>
+    </div>
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 text-center">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">0</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-1">Models</div>
+    </div>
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 text-center">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">0</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-1">Firmwares</div>
+    </div>
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 text-center">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">0</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-1">Downloads</div>
+    </div>
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 text-center">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">0</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-1">Auto Blogs</div>
+    </div>
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 text-center">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">0</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-1">Manual Blogs</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+</div>
+
+  </main>
+
+  
+<footer class="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border)] mt-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <div>
+        <h3 class="font-bold text-lg mb-3 text-[var(--color-text-primary)]">Firmware Platform</h3>
+        <p class="text-[var(--color-text-secondary)] text-sm">Enterprise firmware distribution platform. Download official, engineering, and modified firmware files.</p>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold mb-3 text-[var(--color-text-primary)]">Quick Links</h4>
+        <ul class="space-y-1 text-sm">
+          <li><a href="/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Home</a></li>
+          <li><a href="/devices/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Devices</a></li>
+          <li><a href="/blog/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Blog</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 class="font-semibold mb-3 text-[var(--color-text-primary)]">Legal</h4>
+        <ul class="space-y-1 text-sm">
+          <li><a href="/about/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">About</a></li>
+          <li><a href="/terms/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Terms</a></li>
+          <li><a href="/privacy/" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-[var(--color-border)] mt-6 pt-6 text-center text-xs text-[var(--color-text-secondary)]">
+      &copy; 2026 Firmware Platform. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+
+  
+  
+
+<div x-data
+     x-init="if (!Alpine.store('confirm')) { Alpine.store('confirm', { open: false, title: '', message: '', confirmText: 'OK', cancelText: 'Cancel', danger: false, onConfirm: null, show(opts) { Object.assign(this, opts, { open: true }); }, cancel() { this.open = false; }, accept() { if (this.onConfirm) this.onConfirm(); this.open = false; } }) }"
+     x-show="$store.confirm.open" x-cloak
+     class="fixed inset-0 z-[70] flex items-center justify-center p-4"
+     @keydown.escape.window="$store.confirm.cancel()">
+  
+  <div class="absolute inset-0 bg-black/60"
+       x-show="$store.confirm.open"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       @click="$store.confirm.cancel()"></div>
+
+  
+  <div class="relative bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] shadow-2xl w-full max-w-md"
+       x-show="$store.confirm.open"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 scale-95"
+       x-transition:enter-end="opacity-100 scale-100"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100 scale-100"
+       x-transition:leave-end="opacity-0 scale-95"
+       @click.stop
+       role="alertdialog"
+       aria-modal="true"
+       :aria-label="$store.confirm.title">
+
+    
+    <div class="p-5 pb-0">
+      <div class="flex items-center gap-3">
+        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+             :class="$store.confirm.danger
+               ? 'bg-[var(--color-error)]/10 text-[var(--color-error)]'
+               : 'bg-[var(--color-info)]/10 text-[var(--color-info)]'">
+          <i :data-lucide="$store.confirm.danger ? 'alert-triangle' : 'help-circle'" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-[var(--color-text-primary)]" x-text="$store.confirm.title"></h3>
+      </div>
+    </div>
+
+    
+    <div class="px-5 py-4">
+      <p class="text-sm text-[var(--color-text-secondary)]" x-text="$store.confirm.message"></p>
+    </div>
+
+    
+    <div class="flex justify-end gap-3 px-5 py-4 border-t border-[var(--color-border)]">
+      <button @click="$store.confirm.cancel()"
+              class="px-4 py-2 text-sm font-medium rounded-lg border border-[var(--color-border)]
+                     text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] transition-colors"
+              x-text="$store.confirm.cancelText"></button>
+      <button @click="$store.confirm.confirm()"
+              class="px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors"
+              :class="$store.confirm.danger
+                ? 'bg-[var(--color-error)] hover:bg-red-600'
+                : 'bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)]'"
+              x-text="$store.confirm.confirmText"></button>
+    </div>
+  </div>
+</div>
+
+
+  
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js"
+        nonce="Ew65-7Io2w46mcRpwBvpWw"
+        crossorigin="anonymous"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"
+        nonce="Ew65-7Io2w46mcRpwBvpWw"
+        crossorigin="anonymous"></script>
+
+
+<script nonce="Ew65-7Io2w46mcRpwBvpWw">
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+  });
+  document.addEventListener('htmx:afterSwap', function() {
+    if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+  });
+</script>
+
+
+
+
+<script nonce="Ew65-7Io2w46mcRpwBvpWw">
+(function() {
+  var currentNonce = document.currentScript.nonce || document.currentScript.getAttribute('nonce');
+  function loadFallback(testFn, urls) {
+    if (testFn()) return;
+    for (var i = 0; i < urls.length; i++) {
+      var s = document.createElement('script');
+      s.src = urls[i];
+      if (currentNonce) s.nonce = currentNonce;
+      s.crossOrigin = 'anonymous';
+      s.onload = function() { if (typeof lucide !== 'undefined') lucide.createIcons(); };
+      document.head.appendChild(s);
+      break;
+    }
+  }
+  // HTMX fallback
+  loadFallback(
+    function() { return typeof htmx !== 'undefined'; },
+    [
+      'https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js',
+      'https://unpkg.com/htmx.org@2/dist/htmx.min.js',
+      '/static/vendor/htmx/htmx.min.js'
+    ]
+  );
+  // Alpine.js fallback (deferred check)
+  setTimeout(function() {
+    loadFallback(
+      function() { return typeof Alpine !== 'undefined'; },
+      [
+        'https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.9/cdn.min.js',
+        'https://unpkg.com/alpinejs@3/dist/cdn.min.js',
+        '/static/vendor/alpinejs/alpine.min.js'
+      ]
+    );
+  }, 2000);
+  // Lucide fallback
+  loadFallback(
+    function() { return typeof lucide !== 'undefined'; },
+    [
+      'https://unpkg.com/lucide@latest/dist/umd/lucide.min.js',
+      '/static/vendor/lucide/lucide.min.js'
+    ]
+  );
+})();
+</script>
+
+
+
+<script src="/static/js/src/theme-switcher.js"
+        nonce="Ew65-7Io2w46mcRpwBvpWw" defer></script>
+<script src="/static/js/src/notifications.js"
+        nonce="Ew65-7Io2w46mcRpwBvpWw" defer></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"
+        nonce="Ew65-7Io2w46mcRpwBvpWw"
+        crossorigin="anonymous"></script>
+
+  
+</body>
+</html>

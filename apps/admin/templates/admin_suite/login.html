@@ -1,0 +1,61 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}Admin Login — {{ settings.site_name }}{% endblock %}
+
+{% block auth_header %}
+<div class="text-center mb-2">
+  <i data-lucide="shield" class="w-10 h-10 text-[var(--color-accent)] mx-auto mb-2"></i>
+  <h1 class="text-2xl font-bold">Admin Panel</h1>
+  <p class="text-sm text-[var(--color-text-muted)] mt-1">Staff access only</p>
+</div>
+{% endblock %}
+
+{% block auth_content %}
+{% if messages %}
+{% for message in messages %}
+<div class="rounded-lg bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 p-3 mb-4">
+  <p class="text-sm text-[var(--color-error)]">{{ message }}</p>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if form.non_field_errors %}
+<div class="rounded-lg bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 p-3 mb-4">
+  {% for error in form.non_field_errors %}
+  <p class="text-sm text-[var(--color-error)]">{{ error }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+<form method="post" class="space-y-4">
+  {% csrf_token %}
+
+  <div>
+    <label for="id_username" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Username or Email</label>
+    <input type="text" name="username" id="id_username" required autofocus
+           class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+           placeholder="admin@{{ settings.site_name|lower }}.com">
+    {% if form.username.errors %}<p class="text-xs text-[var(--color-error)] mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div>
+    <label for="id_password" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Password</label>
+    <input type="password" name="password" id="id_password" required
+           class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+           placeholder="••••••••">
+    {% if form.password.errors %}<p class="text-xs text-[var(--color-error)] mt-1">{{ form.password.errors.0 }}</p>{% endif %}
+  </div>
+
+  {% if next %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% endif %}
+
+  <button type="submit" class="w-full rounded-lg bg-[var(--color-accent)] py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] active:scale-[0.98] transition-all">
+    Sign In
+  </button>
+</form>
+
+<p class="text-center text-xs text-[var(--color-text-muted)] mt-6">
+  This area is restricted to staff members only.
+</p>
+{% endblock %}

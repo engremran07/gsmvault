@@ -1,0 +1,13 @@
+{# templates/errors/403.html — Forbidden #}
+{% extends "layouts/minimal.html" %}
+
+{% block title %}403 — Forbidden{% endblock %}
+
+{% block error_content %}
+<div class="text-6xl font-bold text-[var(--color-error)] mb-4">403</div>
+<h1 class="text-2xl font-semibold mb-2">Access Denied</h1>
+<p class="text-[var(--color-text-secondary)] mb-6">You don't have permission to access this resource.</p>
+<a href="{% url 'home' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition-colors">
+  <i data-lucide="home" class="w-4 h-4"></i> Go Home
+</a>
+{% endblock %}

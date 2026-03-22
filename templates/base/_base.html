@@ -1,0 +1,29 @@
+{% load static %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}" data-theme="dark">
+<head>
+  {% include "base/_head.html" %}
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="m-0 p-0 bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] min-h-screen flex flex-col antialiased"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-boost="true"
+      hx-push-url="true"
+      hx-swap="innerHTML transition:true settle:0">{% block site_nav %}{% include "base/_nav.html" %}{% endblock %}{% include "base/_messages.html" %}
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>{% block site_footer %}{% include "base/_footer.html" %}{% endblock %}
+
+  {# Global dialogs (always present, hidden until triggered) #}
+  {% include "components/_confirm_dialog.html" %}
+
+  {# Cookie consent banner — public pages only, hidden when user has consented #}
+  {% block consent_banner %}
+  {% if not has_cookie_consent %}
+  {% include "consent/includes/banner.html" %}
+  {% endif %}
+  {% endblock consent_banner %}
+
+  {% include "base/_scripts.html" %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

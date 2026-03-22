@@ -1,0 +1,50 @@
+{# templates/components/_loading.html — Loading indicator with variants #}
+{% comment %}
+  Params:
+    size    — 'xs' | 'sm' (default) | 'md' | 'lg'
+    variant — 'spinner' (default) | 'dots' | 'skeleton' | 'overlay'
+    text    — Optional loading text
+{% endcomment %}
+{% if variant == 'overlay' %}
+{# Full-area overlay with centered spinner #}
+<div class="absolute inset-0 z-40 flex items-center justify-center bg-[var(--color-bg-primary)]/80 rounded-lg">
+  <div class="flex flex-col items-center gap-3">
+    <svg class="animate-spin h-8 w-8 text-[var(--color-accent)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+    {% if text %}<p class="text-sm text-[var(--color-text-secondary)]">{{ text }}</p>{% endif %}
+  </div>
+</div>
+
+{% elif variant == 'skeleton' %}
+{# Skeleton placeholder lines #}
+<div class="space-y-3 animate-pulse">
+  <div class="h-4 bg-[var(--color-bg-tertiary)] rounded w-3/4"></div>
+  <div class="h-4 bg-[var(--color-bg-tertiary)] rounded w-full"></div>
+  <div class="h-4 bg-[var(--color-bg-tertiary)] rounded w-5/6"></div>
+</div>
+
+{% elif variant == 'dots' %}
+{# Bouncing dots #}
+<div class="flex items-center justify-center gap-1.5 p-2">
+  <span class="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-bounce" style="animation-delay: 0ms"></span>
+  <span class="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-bounce" style="animation-delay: 150ms"></span>
+  <span class="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-bounce" style="animation-delay: 300ms"></span>
+  {% if text %}<span class="text-sm text-[var(--color-text-secondary)] ml-2">{{ text }}</span>{% endif %}
+</div>
+
+{% else %}
+{# Default spinner #}
+<div class="flex items-center justify-center
+  {% if size == 'xs' %}p-1{% elif size == 'md' %}p-6{% elif size == 'lg' %}p-8{% else %}p-4{% endif %}
+  {% if text %}gap-3{% endif %}">
+  <svg class="animate-spin text-[var(--color-accent)]
+    {% if size == 'xs' %}h-3 w-3{% elif size == 'md' %}h-8 w-8{% elif size == 'lg' %}h-12 w-12{% else %}h-5 w-5{% endif %}"
+    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+  </svg>
+  {% if text %}<span class="text-sm text-[var(--color-text-secondary)]">{{ text }}</span>{% endif %}
+</div>
+{% endif %}

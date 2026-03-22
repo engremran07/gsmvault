@@ -1,0 +1,12 @@
+{# components/_admin_kpi_card.html — Reusable admin KPI stat card #}
+{# Usage: {% include "components/_admin_kpi_card.html" with icon="file-text" color="blue" value=stats.total label="Total Posts" stagger=0 %} #}
+{# Params: icon (lucide name), color (tailwind color), value (number), label (text), stagger (int, default 0) #}
+<div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: {{ stagger|default:'0' }}"
+     x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="w-10 h-10 rounded-xl bg-{{ color|default:'blue' }}-500/15 flex items-center justify-center mb-3">
+    <i data-lucide="{{ icon|default:'activity' }}" class="w-5 h-5 text-{{ color|default:'blue' }}-400"></i>
+  </div>
+  <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+       x-data="animatedCounter({{ value|default:'0' }})" x-text="display.toLocaleString()">{{ value|default:"0" }}</div>
+  <p class="text-xs text-[var(--color-text-muted)] mt-1">{{ label|default:"—" }}</p>
+</div>

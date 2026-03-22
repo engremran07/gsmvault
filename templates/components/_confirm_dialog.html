@@ -1,0 +1,65 @@
+{# templates/components/_confirm_dialog.html — Global confirmation dialog (replaces browser confirm()) #}
+{# Driven by Alpine.js $store.confirm — always present in DOM, hidden until triggered #}
+<div x-data
+     x-init="if (!Alpine.store('confirm')) { Alpine.store('confirm', { open: false, title: '', message: '', confirmText: 'OK', cancelText: 'Cancel', danger: false, _onConfirm: null, _onCancel: null, show(opts) { Object.assign(this, opts); this.open = true; }, cancel() { this.open = false; if (this._onCancel) this._onCancel(); }, confirm() { this.open = false; if (this._onConfirm) this._onConfirm(); } }) }"
+     x-show="$store.confirm.open" x-cloak
+     class="fixed inset-0 z-[70] flex items-center justify-center p-4"
+     @keydown.escape.window="$store.confirm.cancel()">
+  {# Backdrop #}
+  <div class="absolute inset-0 bg-black/60"
+       x-show="$store.confirm.open"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       @click="$store.confirm.cancel()"></div>
+
+  {# Dialog #}
+  <div class="relative bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] shadow-2xl w-full max-w-md"
+       x-show="$store.confirm.open"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 scale-95"
+       x-transition:enter-end="opacity-100 scale-100"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100 scale-100"
+       x-transition:leave-end="opacity-0 scale-95"
+       @click.stop
+       role="alertdialog"
+       aria-modal="true"
+       :aria-label="$store.confirm.title">
+
+    {# Header #}
+    <div class="p-5 pb-0">
+      <div class="flex items-center gap-3">
+        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+             :class="$store.confirm.danger
+               ? 'bg-[var(--color-error)]/10 text-[var(--color-error)]'
+               : 'bg-[var(--color-info)]/10 text-[var(--color-info)]'">
+          <i :data-lucide="$store.confirm.danger ? 'alert-triangle' : 'help-circle'" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-[var(--color-text-primary)]" x-text="$store.confirm.title"></h3>
+      </div>
+    </div>
+
+    {# Body #}
+    <div class="px-5 py-4">
+      <p class="text-sm text-[var(--color-text-secondary)]" x-text="$store.confirm.message"></p>
+    </div>
+
+    {# Footer #}
+    <div class="flex justify-end gap-3 px-5 py-4 border-t border-[var(--color-border)]">
+      <button @click="$store.confirm.cancel()"
+              class="px-4 py-2 text-sm font-medium rounded-lg border border-[var(--color-border)]
+                     text-[var(--color-text-primary)] hover:bg-[var(--color-bg-tertiary)] transition-colors"
+              x-text="$store.confirm.cancelText"></button>
+      <button @click="$store.confirm.confirm()"
+              class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              :class="$store.confirm.danger
+                ? 'bg-[var(--color-error)] hover:bg-red-600 text-white'
+                : 'bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--color-accent-text)]'"
+              x-text="$store.confirm.confirmText"></button>
+    </div>
+  </div>
+</div>

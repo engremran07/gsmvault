@@ -1,0 +1,15 @@
+{% if posts %}
+<aside class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+  <h3 class="text-sm font-semibold uppercase tracking-wider mb-3">Related Posts</h3>
+  <ul class="space-y-3">
+    {% for post in posts %}
+    <li>
+      <a href="{% url 'blog:post_detail' slug=post.slug %}" class="group block">
+        <span class="text-sm font-medium text-[var(--color-accent)] group-hover:underline line-clamp-2">{{ post.title }}</span>
+        <span class="text-xs text-[var(--color-text-muted)] block mt-0.5">{{ post.publish_date|date:"M d, Y" }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</aside>
+{% endif %}

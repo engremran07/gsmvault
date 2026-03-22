@@ -1,0 +1,23 @@
+{# templates/forum/fragments/reply_edit_form.html — Inline edit form (HTMX) #}
+<div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-accent)]/30 p-5">
+  <form hx-post="{% url 'forum:reply_edit' pk=reply.pk %}"
+        hx-target="#reply-{{ reply.pk }}"
+        hx-swap="outerHTML">
+    {% csrf_token %}
+    <textarea name="content" rows="4"
+              class="w-full px-4 py-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none resize-y"
+              >{{ form.content.value }}</textarea>
+    <div class="flex items-center gap-2 mt-3">
+      <button type="submit"
+              class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:opacity-90 text-sm">
+        Save Edit
+      </button>
+      <a hx-get="{% url 'forum:topic_detail' pk=reply.topic.pk slug=reply.topic.slug %}?fragment=replies"
+         hx-target="#replies-list"
+         hx-swap="innerHTML"
+         class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] cursor-pointer text-sm">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>

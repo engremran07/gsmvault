@@ -1,0 +1,17 @@
+{# templates/pages/about.html — About page #}
+{% extends "layouts/default.html" %}
+
+{% block title %}About — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<h1 class="text-2xl md:text-3xl font-bold mb-2">About {{ settings.site_name }}</h1>
+{% include "components/_breadcrumb.html" with items=breadcrumbs %}
+{% endblock %}
+
+{% block page_content %}
+<div class="prose prose-invert max-w-3xl">
+  <p class="text-[var(--color-text-secondary)] text-lg">
+    {{ settings.site_name }} is an enterprise-grade firmware distribution platform serving thousands of devices across hundreds of brands. Our mission is to make firmware access fast, secure, and reliable.
+  </p>
+</div>
+{% endblock %}

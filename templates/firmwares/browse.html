@@ -1,0 +1,90 @@
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Browse Firmwares — {{ settings.site_name }}{% endblock %}
+{% block meta_description %}Browse and download firmware files for all devices. Official, engineering, readback, and custom firmware available.{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-3xl font-bold">Browse Firmwares</h1>
+    {% include "components/_breadcrumb.html" with label="Firmwares" %}
+  </div>
+  {% include "components/_search_bar.html" with placeholder="Search firmwares..." action_url="?q=" %}
+</div>
+{% endblock %}
+
+{% block page_content %}
+{# Filters #}
+<div class="flex flex-wrap gap-3 mb-6" x-data="{ showFilters: false }">
+  <div class="flex flex-wrap gap-2">
+    {% for type_key, type_label in firmware_types %}
+    <a href="?type={{ type_key }}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+       class="rounded-full px-4 py-1.5 text-sm border transition
+              {% if selected_type == type_key %}bg-[var(--color-accent)] text-[var(--color-accent-text)] border-[var(--color-accent)]{% else %}border-[var(--color-border)] hover:border-[var(--color-accent)] text-[var(--color-text-secondary)]{% endif %}">
+      {{ type_label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <button @click="showFilters = !showFilters" class="ml-auto rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+    <i data-lucide="filter" class="w-4 h-4 inline"></i> Filters
+  </button>
+
+  {# Expanded Filters #}
+  <div x-show="showFilters" x-cloak x-transition class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Brand</label>
+      <select onchange="location.href='?brand='+this.value+'{% if selected_type %}&type={{ selected_type }}{% endif %}'"
+              class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm">
+        <option value="">All Brands</option>
+        {% for brand in brands %}
+        <option value="{{ brand.slug }}" {% if brand.slug == selected_brand %}selected{% endif %}>{{ brand.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Chipset</label>
+      <select onchange="location.href='?chipset='+this.value+'{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}'"
+              class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm">
+        <option value="">All Chipsets</option>
+        {% for cs in chipsets %}
+        <option value="{{ cs }}" {% if cs == selected_chipset %}selected{% endif %}>{{ cs }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+{# Firmware Grid #}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="firmware-list">
+  {% for fw in firmwares %}
+  <article class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 hover:border-[var(--color-accent)] transition">
+    <div class="flex items-start justify-between mb-2">
+      <div>
+        <h3 class="font-semibold text-sm">
+          <a href="{% url 'firmwares:firmware_detail' firmware_type=fw.firmware_type firmware_id=fw.id %}" class="hover:text-[var(--color-accent)]">
+            {{ fw.original_file_name|truncatewords:8 }}
+          </a>
+        </h3>
+        <p class="text-xs text-[var(--color-text-secondary)]">{{ fw.brand.name }} — {{ fw.model.name }}</p>
+      </div>
+      {% include "components/_badge.html" with text=fw.firmware_type_display variant="accent" %}
+    </div>
+    <div class="flex items-center gap-3 text-xs text-[var(--color-text-muted)] mt-3">
+      {% if fw.chipset %}<span><i data-lucide="cpu" class="w-3 h-3 inline"></i> {{ fw.chipset }}</span>{% endif %}
+      <span><i data-lucide="calendar" class="w-3 h-3 inline"></i> {{ fw.created_at|date:"M d, Y" }}</span>
+      <span><i data-lucide="download" class="w-3 h-3 inline"></i> {{ fw.download_count|default:0 }}</span>
+    </div>
+  </article>
+  {% empty %}
+  {% include "components/_empty_state.html" with message="No firmwares found matching your criteria." icon="search" %}
+  {% endfor %}
+</div>
+
+{# Pagination #}
+{% if firmwares.has_other_pages %}
+{% include "components/_pagination.html" with page_obj=firmwares %}
+{% endif %}
+{% endblock %}

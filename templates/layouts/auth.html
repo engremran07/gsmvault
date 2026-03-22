@@ -1,0 +1,28 @@
+{# templates/layouts/auth.html — Centered card for login/register #}
+{% extends "base/_base.html" %}
+
+{# Auth pages have their own branding — hide public nav and footer #}
+{% block site_nav %}{% endblock %}
+{% block site_footer %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-screen px-4 py-8" hx-boost="false">
+  <div class="w-full max-w-md">
+    {# Logo / branding link #}
+    <div class="text-center mb-6">
+      <a href="{% url 'home' %}" class="inline-flex items-center gap-2 text-[var(--color-accent)] font-bold text-xl">
+        <i data-lucide="cpu" class="w-6 h-6"></i>
+        {{ settings.site_name }}
+      </a>
+    </div>
+    <div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-8 shadow-lg">
+      {% block auth_header %}{% endblock %}
+      {% block auth_content %}{% endblock %}
+    </div>
+    {# Footer link back #}
+    <div class="text-center mt-4">
+      {% include "components/_theme_switcher.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}

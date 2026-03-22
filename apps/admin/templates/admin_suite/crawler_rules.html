@@ -1,0 +1,53 @@
+{% extends "layouts/admin.html" %}
+{% block title %}Crawler Rules — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Crawler Rules</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:security' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Security</a>
+</div>
+{% endblock %}
+{% block page_content %}
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<div x-data="{ tab: 'rules' }" class="animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
+    <button @click="tab='rules'" :class="tab==='rules' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Rules</button>
+    <button @click="tab='logs'" :class="tab==='logs' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Recent Logs</button>
+  </div>
+  <div x-show="tab==='rules'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden mb-6">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name / Pattern</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Action</th><th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">RPM</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th><th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"></th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for r in rules %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <td class="py-3 px-4"><div><span class="font-medium text-[var(--color-text-primary)]">{{ r.name|default:r.user_agent_pattern }}</span><p class="font-mono text-[10px] text-[var(--color-text-muted)] mt-0.5">{{ r.path_pattern|default:r.user_agent_pattern|default:"-" }}</p></div></td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if r.action == 'block' %}bg-red-500/10 text-red-400{% elif r.action == 'throttle' %}bg-amber-500/10 text-amber-400{% elif r.action == 'challenge' %}bg-violet-500/10 text-violet-400{% else %}bg-emerald-500/10 text-emerald-400{% endif %}">{{ r.action }}</span></td>
+            <td class="py-3 px-4 text-right font-mono text-xs text-[var(--color-text-secondary)]">{{ r.requests_per_minute|default:"-" }}</td>
+            <td class="py-3 px-4 text-center">{% if r.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
+            <td class="py-3 px-4 text-right"><form method="post" class="inline">{% csrf_token %}<input type="hidden" name="rule_id" value="{{ r.id }}"><button type="submit" name="action" value="delete_rule" class="text-xs text-red-400 hover:underline btn-press" onclick="return confirm('Delete?')">×</button></form></td>
+          </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]">No crawler rules defined</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="glass rounded-xl p-6">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="plus" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>Add Rule</h3>
+      <form method="post" class="grid sm:grid-cols-4 gap-4">{% csrf_token %}
+        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Pattern</label><input type="text" name="pattern" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" required></div>
+        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Action</label><select name="action" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><option value="allow">Allow</option><option value="throttle">Throttle</option><option value="block">Block</option><option value="challenge">Challenge</option></select></div>
+        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">RPM</label><input type="number" name="requests_per_minute" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" placeholder="60"></div>
+        <div class="flex items-end"><button type="submit" name="action" value="create_rule" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all w-full">Add</button></div>
+      </form>
+    </div>
+  </div>
+  <div x-show="tab==='logs'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">User Agent</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Path</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Action</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">When</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for log in recent_logs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 text-xs text-[var(--color-text-primary)] truncate max-w-xs">{{ log.user_agent|truncatewords:8 }}</td><td class="py-3 px-4 font-mono text-xs text-[var(--color-text-muted)]">{{ log.path|truncatechars:40 }}</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if log.action_taken == 'block' %}bg-red-500/10 text-red-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{{ log.action_taken }}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ log.created_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No crawler events</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

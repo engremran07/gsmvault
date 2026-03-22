@@ -1,0 +1,40 @@
+{# templates/forum/forum_index.html — Forum homepage: category listing #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Forum — Community Discussion{% endblock %}
+{% block meta_description %}Join the community forum. Discuss firmware, devices, flashing, and get help from fellow enthusiasts.{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+      <i data-lucide="message-circle" class="w-8 h-8 text-[var(--color-accent)]"></i>
+      Forum
+    </h1>
+    <p class="text-[var(--color-text-secondary)] mt-1">Community discussion board</p>
+  </div>
+  <div class="flex items-center gap-3">
+    <a href="{% url 'forum:search' %}"
+       class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-2">
+      <i data-lucide="search" class="w-4 h-4"></i> Search
+    </a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'forum:private_topics' %}"
+       class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-2">
+      <i data-lucide="lock" class="w-4 h-4"></i> Messages
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div id="category-list"
+     hx-get="{% url 'forum:index' %}"
+     hx-trigger="load delay:0s"
+     hx-swap="innerHTML"
+     hx-headers='{"HX-Request": "true"}'>
+  {% include "forum/fragments/category_cards.html" %}
+</div>
+{% endblock %}

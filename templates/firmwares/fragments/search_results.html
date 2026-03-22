@@ -1,0 +1,53 @@
+{# templates/firmwares/fragments/search_results.html — Universal search results dropdown #}
+{% load device_tags %}
+{% if results %}
+<div class="py-2">
+  {% regroup results by brand as brand_groups %}
+  {% for group in brand_groups %}
+  <div class="px-3 py-1.5">
+    <p class="text-[10px] uppercase tracking-wider font-bold text-[var(--color-text-muted)] mb-1 flex items-center gap-1.5">
+      {% brand_logo_svg group.grouper.name size=14 logo_url=group.grouper.logo_url %}
+      {{ group.grouper.name }}
+    </p>
+    {% for model in group.list %}
+    <a href="{% url 'firmwares:model_detail' brand_slug=model.brand.slug model_slug=model.slug %}"
+       class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-[var(--color-bg-tertiary)] transition-colors no-underline group">
+      {# Device image or icon #}
+      <div class="w-8 h-8 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
+        {% if model.image_url %}
+        <img src="{{ model.image_url }}" alt="" class="w-6 h-6 object-contain" loading="lazy">
+        {% else %}
+        <i data-lucide="smartphone" class="w-4 h-4 text-[var(--color-accent)]"></i>
+        {% endif %}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] truncate">
+          {{ model.name }}
+          {% if model.codename %}<span class="text-[var(--color-text-muted)] font-normal">({{ model.codename }})</span>{% endif %}
+        </p>
+        <p class="text-[10px] text-[var(--color-text-muted)] truncate">
+          {% if model.marketing_name and model.marketing_name != model.name %}{{ model.marketing_name }} · {% endif %}
+          {% if model.model_code %}{{ model.model_code }}{% endif %}
+          {% if model.chipset %} · {{ model.chipset }}{% endif %}
+        </p>
+      </div>
+      {# Region/status badges #}
+      <div class="flex items-center gap-1 shrink-0">
+        {% if model.status == "upcoming" %}
+        <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-bold">UPCOMING</span>
+        {% endif %}
+        {% for region in model.regions|slice:":3" %}
+        <span class="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">{{ region }}</span>
+        {% endfor %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% if not forloop.last %}
+  <hr class="border-[var(--color-border)] mx-3">
+  {% endif %}
+  {% endfor %}
+</div>
+{% else %}
+<div class="p-4 text-center text-sm text-[var(--color-text-muted)]">No results found</div>
+{% endif %}

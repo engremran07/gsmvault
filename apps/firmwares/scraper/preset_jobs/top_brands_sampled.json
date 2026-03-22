@@ -1,0 +1,22 @@
+{
+  "_comment": "Top 10 brands (Samsung, Apple, Xiaomi…) sampled 10 devices each",
+  "_strategy": "brand_walk",
+  "job_id": "top_brands_sampled",
+  "description": "Top 10 brands (Samsung, Apple, Xiaomi…) sampled 10 devices each",
+  "version": "6.0",
+  "strategy": "brand_walk",
+  "brands_include": [
+    "samsung",
+    "apple",
+    "xiaomi",
+    "huawei",
+    "oppo",
+    "vivo",
+    "realme",
+    "motorola",
+    "oneplus",
+    "google"
+  ],
+  "sample_size": 10,
+  "sort_by_popularity": true
+}

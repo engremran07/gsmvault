@@ -1,0 +1,57 @@
+{# templates/account/email.html — Manage email addresses #}
+{% extends "layouts/auth.html" %}
+
+{% block title %}Email Addresses — {{ settings.site_name }}{% endblock %}
+
+{% block auth_header %}
+<div class="text-center">
+  <i data-lucide="mail" class="w-12 h-12 text-[var(--color-accent)] mx-auto mb-3"></i>
+  <h1 class="text-2xl font-bold">Email Addresses</h1>
+  <p class="text-[var(--color-text-secondary)] text-sm mt-2">Manage your email addresses</p>
+</div>
+{% endblock %}
+
+{% block auth_content %}
+<div class="mt-4 space-y-4">
+  {% if emailaddresses %}
+  <div class="space-y-2">
+    {% for emailaddress in emailaddresses %}
+    <div class="flex items-center justify-between p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)]">
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-[var(--color-text-primary)]">{{ emailaddress.email }}</span>
+        {% if emailaddress.primary %}
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">Primary</span>
+        {% endif %}
+        {% if emailaddress.verified %}
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)]">Verified</span>
+        {% else %}
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-warning)]/10 text-[var(--color-warning)]">Unverified</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-sm text-[var(--color-text-muted)] text-center py-4">No email addresses configured.</p>
+  {% endif %}
+
+  {# Add email form #}
+  <form method="post" class="space-y-3 pt-4 border-t border-[var(--color-border)]">
+    {% csrf_token %}
+    <label for="id_email" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Add Email Address</label>
+    <div class="flex gap-2">
+      <input type="email" name="email" id="id_email" required
+             class="flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition text-sm"
+             placeholder="new@example.com">
+      <button type="submit" name="action_add"
+              class="rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition text-sm">
+        Add
+      </button>
+    </div>
+  </form>
+
+  <p class="text-center text-sm text-[var(--color-text-secondary)] mt-4">
+    <a href="{% url 'users:dashboard' %}" class="text-[var(--color-accent)] hover:underline">Back to Dashboard</a>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "layouts/dashboard.html" %}
+{% load static %}
+
+{% block title %}Dashboard — {{ settings.site_name }}{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+  {# Welcome Section #}
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">Welcome back, {{ display_name }}</h1>
+      {% if not profile_completed %}
+      <p class="text-sm text-[var(--color-warning)] mt-1">
+        <i data-lucide="alert-triangle" class="w-4 h-4 inline"></i>
+        Complete your profile to unlock all features.
+        <a href="{% url 'users:tell_us_about_you' %}" class="underline font-medium">Complete now</a>
+      </p>
+      {% elif profile_missing_fields %}
+      <p class="text-sm text-[var(--color-warning)] mt-1">
+        <i data-lucide="alert-triangle" class="w-4 h-4 inline"></i>
+        Complete your profile: {{ profile_missing_fields|join:", " }}
+        <a href="{% url 'users:tell_us_about_you' %}" class="underline">Complete now</a>
+      </p>
+      {% endif %}
+    </div>
+    <div class="flex gap-3">
+      {% if can_watch_ad %}
+      <span class="text-sm text-[var(--color-text-secondary)] flex items-center gap-1">
+        <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Balance: <strong>{{ wallet_balance }} {{ wallet_currency }}</strong>
+      </span>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Unlocked Features — shown after profile completion #}
+  {% if unlocked_features %}
+  <div class="rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/5 p-6">
+    <div class="flex items-center gap-2 mb-4">
+      <i data-lucide="unlock" class="w-5 h-5 text-[var(--color-success)]"></i>
+      <h2 class="text-lg font-semibold text-[var(--color-success)]">Your Unlocked Features</h2>
+      <span class="ml-auto text-xs font-medium rounded-full bg-[var(--color-success)]/15 text-[var(--color-success)] px-2.5 py-0.5">
+        {{ unlocked_features|length }} features
+      </span>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {% for feature in unlocked_features %}
+      <a href="{{ feature.url }}" class="flex items-start gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-secondary)] p-3 transition hover:border-[var(--color-success)]/50 hover:bg-[var(--color-success)]/5 group">
+        <span class="shrink-0 mt-0.5 text-[var(--color-success)] group-hover:scale-110 transition-transform">
+          <i data-lucide="{{ feature.icon }}" class="w-4 h-4"></i>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-[var(--color-text-primary)] leading-tight group-hover:text-[var(--color-success)] transition-colors">{{ feature.title }}</p>
+          <p class="text-xs text-[var(--color-text-muted)] mt-0.5 line-clamp-2">{{ feature.description }}</p>
+        </div>
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[var(--color-text-muted)] shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% comment %}Referral Code — share section{% endcomment %}
+  {% if user_referral_code %}
+  <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6"
+       x-data="{ copied: false }">
+    <div class="flex items-center gap-2 mb-3">
+      <i data-lucide="users" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      <h2 class="text-lg font-semibold">Your Referral Code</h2>
+    </div>
+    <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+      Share your code with friends. When they sign up, you both earn rewards!
+    </p>
+    <div class="flex items-center gap-3">
+      <div class="flex-1 flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5">
+        <code class="text-sm font-mono font-bold text-[var(--color-accent)] tracking-wider select-all">{{ user_referral_code }}</code>
+      </div>
+      <button type="button"
+              @click="navigator.clipboard.writeText('{{ user_referral_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
+              class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-sm font-medium text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition-all active:scale-[0.97]">
+        <i x-show="!copied" data-lucide="copy" class="w-4 h-4"></i>
+        <i x-show="copied" data-lucide="check" class="w-4 h-4" x-cloak></i>
+        <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+      </button>
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-3">
+      Or share this link:
+      <code class="text-[var(--color-accent)] select-all">{{ request.scheme }}://{{ request.get_host }}/ref/{{ user_referral_code }}/</code>
+    </p>
+  </div>
+  {% endif %}
+
+  {# Stats Grid #}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.posts_count }}</div>
+      <div class="text-sm text-[var(--color-text-secondary)]">Posts</div>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.comments_count }}</div>
+      <div class="text-sm text-[var(--color-text-secondary)]">Comments</div>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+      <div class="text-2xl font-bold text-[var(--color-accent)]">{{ unread_notifications }}</div>
+      <div class="text-sm text-[var(--color-text-secondary)]">Unread Notifications</div>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+      <div class="flex items-center gap-2 mb-1">
+        <i data-lucide="wallet" class="w-4 h-4 text-[var(--color-accent)]"></i>
+        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ wallet_balance }}</div>
+      </div>
+      <div class="text-sm text-[var(--color-text-secondary)]">Wallet Balance</div>
+      {% if wallet_locked %}
+      <div class="text-xs text-[var(--color-text-muted)] mt-1">
+        <i data-lucide="lock" class="w-3 h-3 inline"></i> {{ wallet_locked }} locked
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Current Device #}
+  {% if current_device %}
+  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+    <h2 class="text-lg font-semibold mb-3">
+      <i data-lucide="monitor" class="w-5 h-5 inline text-[var(--color-accent)]"></i>
+      Current Device
+    </h2>
+    <p class="text-sm text-[var(--color-text-secondary)]">
+      {{ current_device.display_name|default:"Unknown device" }}
+      {% if current_device.is_trusted %}
+      <span class="inline-flex items-center gap-1 text-xs text-[var(--color-success)] ml-2">
+        <i data-lucide="shield-check" class="w-3 h-3"></i> Trusted
+      </span>
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+  {# Announcements #}
+  {% if announcements %}
+  <div class="space-y-3">
+    <h2 class="text-lg font-semibold">Announcements</h2>
+    {% for ann in announcements %}
+    <div class="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/5 p-4">
+      <h3 class="font-medium">{{ ann.title }}</h3>
+      <p class="text-sm text-[var(--color-text-secondary)] mt-1">{{ ann.content|truncatewords:40 }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Recent Notifications #}
+  {% if notifications %}
+  <div class="space-y-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold">Recent Notifications</h2>
+      <a href="{% url 'users:notification_settings' %}" class="text-sm text-[var(--color-accent)] hover:underline">Settings</a>
+    </div>
+    {% for notif in notifications %}
+    <div class="flex items-start gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-3 {% if not notif.is_read %}border-l-4 border-l-[var(--color-accent)]{% endif %}">
+      <i data-lucide="bell" class="w-4 h-4 mt-0.5 text-[var(--color-text-secondary)] shrink-0"></i>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm {% if not notif.is_read %}font-medium{% endif %}">{{ notif.message|truncatewords:20 }}</p>
+        <p class="text-xs text-[var(--color-text-muted)] mt-0.5">{{ notif.created_at|timesince }} ago</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

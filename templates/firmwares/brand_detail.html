@@ -1,0 +1,50 @@
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}{{ brand.name }} Firmwares — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<div class="mb-6">
+  <h1 class="text-3xl font-bold">{{ brand.name }}</h1>
+  {% include "components/_breadcrumb.html" with label="Brands" %}
+  <p class="text-[var(--color-text-secondary)] mt-2">
+    {{ models|length }} models &middot; {{ total_firmwares }} firmwares
+  </p>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+  {# Models Grid #}
+  <div class="lg:col-span-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {% for model in models %}
+      <a href="{% url 'firmwares:model_detail' brand_slug=brand.slug model_slug=model.slug %}"
+         class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 hover:border-[var(--color-accent)] transition group">
+        <h3 class="font-semibold group-hover:text-[var(--color-accent)]">{{ model.name }}</h3>
+        <p class="text-sm text-[var(--color-text-muted)] mt-1">{{ model.firmware_count }} firmwares</p>
+      </a>
+      {% empty %}
+      {% include "components/_empty_state.html" with message="No models found for this brand." icon="smartphone" %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Sidebar - Other Brands #}
+  <div class="lg:col-span-1">
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+      <h3 class="font-semibold mb-3">Other Brands</h3>
+      <div class="space-y-2">
+        {% for ob in other_brands %}
+        <a href="{% url 'firmwares:brand_detail' slug=ob.slug %}" class="block text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">
+          {{ ob.name }}
+        </a>
+        {% endfor %}
+      </div>
+      <a href="{% url 'firmwares:brand_list' %}" class="block text-sm text-[var(--color-accent)] hover:underline mt-3">
+        View all brands &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

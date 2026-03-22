@@ -1,0 +1,37 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Content Report — {{ settings.site_name }} Analytics{% endblock %}
+
+{% block page_header %}
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-bold">Content Report</h1>
+  <a href="{% url 'analytics:dashboard' %}" class="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+    Back to Dashboard
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <h2 class="text-lg font-semibold mb-4">Top Posts</h2>
+    <div class="h-64 flex items-center justify-center text-[var(--color-text-muted)]">
+      {% include "components/_empty_state.html" with icon="file-text" title="Coming soon" description="Most viewed posts, most commented articles, and content performance metrics will appear here." %}
+    </div>
+  </section>
+
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <h2 class="text-lg font-semibold mb-4">Content by Category</h2>
+    <div class="h-48 flex items-center justify-center text-[var(--color-text-muted)]">
+      {% include "components/_empty_state.html" with icon="folder" title="No data yet" description="Content breakdown by category with performance comparisons." %}
+    </div>
+  </section>
+
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <h2 class="text-lg font-semibold mb-4">Author Leaderboard</h2>
+    <div class="h-48 flex items-center justify-center text-[var(--color-text-muted)]">
+      {% include "components/_empty_state.html" with icon="users" title="No data yet" description="Top contributing authors ranked by posts, views, and engagement." %}
+    </div>
+  </section>
+</div>
+{% endblock %}

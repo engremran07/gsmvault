@@ -1,0 +1,11 @@
+{
+  "_comment": "Complete iPhone / Apple iOS device catalogue",
+  "_strategy": "brand_walk",
+  "job_id": "ios_all",
+  "description": "Complete iPhone / Apple iOS device catalogue",
+  "version": "6.0",
+  "strategy": "brand_walk",
+  "brands_include": [
+    "apple"
+  ]
+}

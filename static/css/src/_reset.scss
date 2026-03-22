@@ -1,0 +1,37 @@
+/* static/css/src/_reset.scss — CSS reset / normalize
+   Wrapped in @layer base — NO universal margin/padding reset.
+   Tailwind v4 preflight handles element-level resets.
+   We only set box-sizing and minimal normalization. */
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    margin: 0;
+    padding: 0;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+  }
+
+  /* Smooth scroll only if user hasn't opted out */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  img, svg, video {
+    display: block;
+    max-width: 100%;
+  }
+
+  input, button, textarea, select {
+    font: inherit;
+  }
+}

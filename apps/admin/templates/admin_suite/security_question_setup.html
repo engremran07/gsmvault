@@ -1,0 +1,62 @@
+{# admin_suite/security_question_setup.html — Setup security question for admin accounts #}
+{% extends "layouts/admin.html" %}
+
+{% block title %}Security Question Setup — Admin{% endblock %}
+
+{% block page_header %}
+{% include "admin_suite/_page_header.html" with page_title="Security Question Setup" %}
+{% endblock %}
+
+{% block page_content %}
+<div class="max-w-lg">
+  <div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-6">
+    {% if existing %}
+    <div class="mb-4 px-4 py-3 rounded-lg border text-sm bg-green-500/10 border-green-500/30 text-green-400">
+      <i data-lucide="check-circle" class="w-4 h-4 inline-block mr-1"></i> Security question already configured. You can update it below.
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {% if form.question_key %}
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Question</label>
+        <select name="question_key"
+                class="w-full px-4 py-2.5 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          {% for choice in form.question_key.field.choices %}
+          <option value="{{ choice.0 }}" {% if form.question_key.value == choice.0|stringformat:"s" %}selected{% endif %}>{{ choice.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if form.custom_question %}
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Custom Question (optional)</label>
+        <input type="text" name="custom_question" value="{{ form.custom_question.value|default:'' }}"
+               class="w-full px-4 py-2.5 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]"
+               placeholder="Write your own question">
+      </div>
+      {% endif %}
+
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Answer</label>
+        <input type="text" name="answer" required
+               class="w-full px-4 py-2.5 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]"
+               placeholder="Your answer">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Confirm Answer</label>
+        <input type="text" name="confirm" required
+               class="w-full px-4 py-2.5 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]"
+               placeholder="Confirm your answer">
+      </div>
+
+      <button type="submit" class="w-full py-2.5 rounded-lg bg-[var(--color-accent)] text-white font-medium hover:opacity-90 transition-opacity">
+        Save Security Question
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

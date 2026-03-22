@@ -1,0 +1,18 @@
+{# templates/devices/fragments/brand_list.html — HTMX fragment: brand grid #}
+{% load device_tags %}
+{% if brands %}
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 stagger-children">
+  {% for brand in brands %}
+  <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
+     class="group bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover:border-[var(--color-accent)] hover-lift animate-fade-in flex flex-col items-center gap-3 no-underline">
+    {% brand_logo_svg brand.name size=56 logo_url=brand.logo_url %}
+    <div>
+      <h3 class="font-semibold text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{{ brand.name }}</h3>
+      <p class="text-xs text-[var(--color-text-muted)] mt-1">{{ brand.model_count }} model{{ brand.model_count|pluralize }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="search" message="No brands found" %}
+{% endif %}

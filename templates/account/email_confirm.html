@@ -1,0 +1,37 @@
+{# templates/account/email_confirm.html — Email confirmation from link click #}
+{% extends "layouts/auth.html" %}
+
+{% block title %}Confirm Email — {{ settings.site_name }}{% endblock %}
+
+{% block auth_header %}
+<div class="text-center">
+  <i data-lucide="mail-check" class="w-12 h-12 text-[var(--color-accent)] mx-auto mb-3"></i>
+  <h1 class="text-2xl font-bold">Confirm Email Address</h1>
+</div>
+{% endblock %}
+
+{% block auth_content %}
+<div class="mt-4">
+  {% if confirmation %}
+  <p class="text-[var(--color-text-secondary)] text-center mb-6">
+    Please confirm that <strong class="text-[var(--color-text-primary)]">{{ confirmation.email_address.email }}</strong> is your email address.
+  </p>
+  <form method="post" action="{{ action_url }}">
+    {% csrf_token %}
+    <button type="submit"
+            class="w-full rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] active:scale-[0.98] transition-all">
+      Confirm Email
+    </button>
+  </form>
+  {% else %}
+  <div class="rounded-lg bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 p-4 text-center">
+    <p class="text-sm text-[var(--color-error)]">
+      This confirmation link is invalid or has expired.
+    </p>
+  </div>
+  {% endif %}
+  <p class="text-center text-sm text-[var(--color-text-secondary)] mt-6">
+    <a href="{% url 'users:account_login' %}" class="text-[var(--color-accent)] hover:underline">Back to Sign In</a>
+  </p>
+</div>
+{% endblock %}

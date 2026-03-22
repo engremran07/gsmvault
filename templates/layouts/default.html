@@ -1,0 +1,14 @@
+{# templates/layouts/default.html — Standard page layout (nav + content + footer) #}
+{% extends "base/_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dist/enduser.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  {% block page_header %}{% endblock %}
+  {% block page_content %}{% endblock %}
+</div>
+{% endblock %}

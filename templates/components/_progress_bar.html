@@ -1,0 +1,33 @@
+{# templates/components/_progress_bar.html — Progress indicator #}
+{% comment %}
+  Params:
+    percent — Current progress (0-100)
+    label   — Optional text label
+    variant — 'default' | 'success' | 'warning' | 'error'
+    size    — 'sm' | 'md' (default)
+    striped — Show animated stripes (truthy)
+{% endcomment %}
+<div class="w-full">
+  {% if label %}
+  <div class="flex justify-between items-center mb-1.5">
+    <span class="text-xs font-medium text-[var(--color-text-secondary)]">{{ label }}</span>
+    <span class="text-xs font-medium text-[var(--color-text-muted)]">{{ percent|default:"0" }}%</span>
+  </div>
+  {% endif %}
+  <div class="w-full rounded-full overflow-hidden
+    {% if size == 'sm' %}h-1.5{% else %}h-2.5{% endif %}
+    bg-[var(--color-bg-tertiary)]">
+    <div class="h-full rounded-full transition-all duration-500 ease-out
+      {% if variant == 'success' %}bg-[var(--color-success)]
+      {% elif variant == 'warning' %}bg-[var(--color-warning)]
+      {% elif variant == 'error' %}bg-[var(--color-error)]
+      {% else %}bg-[var(--color-accent)]{% endif %}
+      {% if striped %}bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:1rem_100%] animate-[shimmer_1s_infinite]{% endif %}"
+      x-data="{ pct: {{ percent|default:'0' }} }"
+      :style="'width:' + pct + '%'"
+      role="progressbar"
+      :aria-valuenow="pct"
+      aria-valuemin="0"
+      aria-valuemax="100"></div>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Download {{ firmware.original_file_name }} — {{ settings.site_name }}{% endblock %}
+
+{% block page_content %}
+<div class="max-w-2xl mx-auto text-center space-y-8 py-8">
+  <div>
+    <i data-lucide="download-cloud" class="w-16 h-16 text-[var(--color-accent)] mx-auto mb-4"></i>
+    <h1 class="text-2xl font-bold">Download Firmware</h1>
+    <p class="text-[var(--color-text-secondary)] mt-2">{{ firmware.original_file_name }}</p>
+  </div>
+
+  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+      <div>
+        <span class="text-[var(--color-text-muted)]">Brand</span>
+        <p class="font-medium">{{ firmware.brand.name }}</p>
+      </div>
+      <div>
+        <span class="text-[var(--color-text-muted)]">Model</span>
+        <p class="font-medium">{{ firmware.model.name }}</p>
+      </div>
+      <div>
+        <span class="text-[var(--color-text-muted)]">Type</span>
+        <p class="font-medium">{{ firmware_type_display }}</p>
+      </div>
+      <div>
+        <span class="text-[var(--color-text-muted)]">Size</span>
+        <p class="font-medium">{{ file_size_display }}</p>
+      </div>
+    </div>
+  </div>
+
+  {# Download gate — server-controlled countdown + ad gate #}
+  <div x-data="{
+    countdown: {{ countdown_seconds }},
+    countdownDone: {% if countdown_seconds == 0 %}true{% else %}false{% endif %},
+    adGateEnabled: {{ ad_gate_enabled|yesno:'true,false' }},
+    adGateSeconds: {{ ad_gate_seconds }},
+    adGateTimer: {{ ad_gate_seconds }},
+    adGateActive: false,
+    adGateDone: false,
+    ready: false,
+    token: '{{ download_token }}',
+    sig: '{{ download_signature }}'
+  }"
+  x-init="
+    if (countdown > 0) {
+      let timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          countdownDone = true;
+          clearInterval(timer);
+          if (!adGateEnabled) { ready = true; }
+        }
+      }, 1000);
+    } else if (!adGateEnabled) {
+      ready = true;
+    }
+  ">
+
+    {# Phase 1: Countdown timer #}
+    <div x-show="!countdownDone" x-cloak class="space-y-4">
+      <div class="relative inline-flex items-center justify-center w-24 h-24 mx-auto">
+        <svg class="absolute inset-0 w-24 h-24 -rotate-90">
+          <circle cx="48" cy="48" r="40" fill="none" stroke="var(--color-border)" stroke-width="4" opacity="0.3"></circle>
+          <circle cx="48" cy="48" r="40" fill="none" stroke="var(--color-accent)" stroke-width="4"
+                  stroke-dasharray="251.2" :stroke-dashoffset="251.2 * (1 - countdown / {{ countdown_seconds }})"
+                  stroke-linecap="round" class="transition-all duration-1000 ease-linear"></circle>
+        </svg>
+        <span class="text-3xl font-bold text-[var(--color-accent)]" x-text="countdown"></span>
+      </div>
+      <p class="text-[var(--color-text-secondary)]">Your download will be ready shortly...</p>
+      {% include "components/_loading.html" %}
+    </div>
+
+    {# Phase 2: Ad gate (if enabled) #}
+    <div x-show="countdownDone && adGateEnabled && !adGateDone" x-cloak x-transition class="space-y-4">
+      <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+        <h3 class="text-lg font-semibold mb-2">
+          <i data-lucide="tv" class="w-5 h-5 inline mr-1 text-[var(--color-accent)]"></i>
+          Support Us
+        </h3>
+        <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+          Please wait while we prepare your download. This helps keep our service free.
+        </p>
+
+        {# Ad gate countdown #}
+        <template x-if="!adGateActive">
+          <button @click="
+            adGateActive = true;
+            let at = setInterval(() => {
+              adGateTimer--;
+              if (adGateTimer <= 0) {
+                clearInterval(at);
+                adGateDone = true;
+                ready = true;
+                fetch('{% url 'firmwares:firmware_ad_gate_complete' firmware_type=firmware_type firmware_id=firmware.id %}', {
+                  method: 'POST',
+                  headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value, 'Content-Type': 'application/x-www-form-urlencoded'},
+                  body: 'token=' + encodeURIComponent(token) + '&sig=' + encodeURIComponent(sig) + '&ad_type=video'
+                });
+              }
+            }, 1000);
+          " class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-6 py-2.5 text-white font-medium hover:bg-amber-600 transition">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            Start Ad Gate
+          </button>
+        </template>
+
+        <template x-if="adGateActive && !adGateDone">
+          <div class="space-y-3">
+            <div class="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2.5">
+              <div class="bg-[var(--color-accent)] h-2.5 rounded-full transition-all duration-1000 ease-linear"
+                   :style="'width: ' + (100 - (adGateTimer / adGateSeconds * 100)) + '%'"></div>
+            </div>
+            <p class="text-sm text-[var(--color-text-muted)]">
+              Please wait <span class="font-bold text-[var(--color-accent)]" x-text="adGateTimer"></span> seconds...
+            </p>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    {# Phase 3: Download ready #}
+    <div x-show="ready" x-cloak x-transition class="space-y-4">
+      <div class="rounded-lg border-2 border-emerald-500/30 bg-emerald-500/5 p-6">
+        <i data-lucide="check-circle" class="w-10 h-10 text-emerald-500 mx-auto mb-3"></i>
+        <p class="text-emerald-400 font-medium mb-4">Your download is ready!</p>
+        <a :href="'{% url 'firmwares:firmware_download_start' firmware_type=firmware_type firmware_id=firmware.id %}?token=' + encodeURIComponent(token) + '&sig=' + encodeURIComponent(sig)"
+           class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-8 py-3 text-[var(--color-accent-text)] font-medium text-lg hover:bg-[var(--color-accent-hover)] transition shadow-lg shadow-[var(--color-accent)]/20">
+          <i data-lucide="download" class="w-5 h-5"></i>
+          Download Now
+        </a>
+      </div>
+      <p class="text-xs text-[var(--color-text-muted)]">
+        This download link expires in {{ download_config.token_expiry_minutes|default:"30" }} minutes. By downloading, you agree to our terms of service.
+      </p>
+    </div>
+
+    {% csrf_token %}
+  </div>
+
+  <div class="text-sm">
+    <a href="{% url 'firmwares:firmware_detail' firmware_type=firmware_type firmware_id=firmware.id %}"
+       class="text-[var(--color-accent)] hover:underline">&larr; Back to firmware details</a>
+  </div>
+</div>
+{% endblock %}

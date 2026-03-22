@@ -1,0 +1,32 @@
+{% extends "layouts/admin.html" %}
+{% block title %}Features — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Feature Flags</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+</div>
+{% endblock %}
+{% block page_content %}
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<form method="post">{% csrf_token %}
+<div class="space-y-3 stagger-children">
+  {% for field in feature_fields %}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:{{ forloop.counter0 }}" x-data="{ on: {{ field.value|yesno:'true,false' }} }" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between">
+      <div class="flex-1 min-w-0 pr-4">
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">{{ field.verbose_name }}</h3>
+        {% if field.help_text %}<p class="text-xs text-[var(--color-text-muted)] mt-1">{{ field.help_text }}</p>{% endif %}
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer shrink-0">
+        <input type="checkbox" name="{{ field.name }}" class="sr-only peer" :checked="on" @change="on = !on" {% if field.value %}checked{% endif %}>
+        <div class="w-11 h-6 bg-[var(--color-bg-tertiary)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--color-text-muted)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)] peer-checked:after:bg-[var(--color-accent-text)]"></div>
+      </label>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="mt-6 flex justify-end animate-in" style="--stagger:{{ feature_fields|length }}" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <button type="submit" name="action" value="save_features" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save Changes</button>
+</div>
+</form>
+{% endblock %}

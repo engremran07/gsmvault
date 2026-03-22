@@ -1,0 +1,3 @@
+# blog app init
+
+

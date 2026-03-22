@@ -1,0 +1,28 @@
+{% extends "layouts/admin.html" %}
+{% block title %}App Registry — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">App Registry</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+</div>
+{% endblock %}
+{% block page_content %}
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<div class="space-y-3 stagger-children">
+  {% for flag in flags %}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:{{ forloop.counter0 }}" x-data="{ on: {{ flag.value|yesno:'true,false' }} }" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">{{ flag.name }}</h3>
+        {% if flag.description %}<p class="text-xs text-[var(--color-text-muted)] mt-1">{{ flag.description }}</p>{% endif %}
+      </div>
+      <form method="post" class="shrink-0">{% csrf_token %}<input type="hidden" name="flag_name" value="{{ flag.name }}">
+        <button type="submit" name="action" value="toggle_flag" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors btn-press" :class="on ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bg-tertiary)]'" @click="on = !on">
+          <span class="inline-block h-5 w-5 rounded-full transition-transform" :class="on ? 'translate-x-5 bg-[var(--color-accent-text)]' : 'translate-x-0.5 bg-[var(--color-text-muted)]'"></span>
+        </button>
+      </form>
+    </div>
+  </div>
+  {% empty %}<div class="glass rounded-xl p-8 text-center text-[var(--color-text-muted)] animate-in animate-in-visible"><i data-lucide="toggle-left" class="w-8 h-8 mx-auto mb-3 opacity-40"></i><p class="text-sm">No registry flags</p></div>{% endfor %}
+</div>
+{% endblock %}

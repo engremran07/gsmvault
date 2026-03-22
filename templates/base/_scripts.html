@@ -1,0 +1,47 @@
+{# JS includes: Alpine, HTMX, Lucide, custom — all deferred for non-blocking render #}
+{% load static %}
+
+{# HTMX — deferred, executes before DOMContentLoaded so hx-boost works #}
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js"
+        nonce="{{ request.csp_nonce }}"
+        crossorigin="anonymous" defer></script>
+
+{# Lucide Icons — deferred, initialized on DOMContentLoaded below #}
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"
+        nonce="{{ request.csp_nonce }}"
+        crossorigin="anonymous" defer></script>
+
+{# Initialize Lucide icons + HTMX config after DOM ready #}
+<script nonce="{{ request.csp_nonce }}">
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof htmx !== 'undefined') {
+      htmx.config.inlineScriptNonce = '{{ request.csp_nonce }}';
+      htmx.config.defaultSettleDelay = 0;
+      htmx.config.defaultSwapDelay = 0;
+      htmx.config.scrollIntoViewOnBoost = false;
+    }
+  });
+  document.addEventListener('htmx:afterSwap', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
+
+{# Multi-CDN fallback — checks after DOMContentLoaded when deferred scripts have run #}
+{% include "base/_cdn_fallback.html" %}
+
+{# Alpine stores — MUST be deferred BEFORE Alpine.js so alpine:init listeners register first #}
+<script src="{% static 'js/src/theme-switcher.js' %}"
+        nonce="{{ request.csp_nonce }}" defer></script>
+<script src="{% static 'js/src/notifications.js' %}"
+        nonce="{{ request.csp_nonce }}" defer></script>
+
+{# Alpine.js Intersect plugin — entrance animations on scroll (before Alpine core) #}
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3/dist/cdn.min.js"
+        nonce="{{ request.csp_nonce }}"
+        crossorigin="anonymous"></script>
+
+{# Alpine.js — MUST be last deferred script so all stores are registered when it auto-initializes #}
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"
+        nonce="{{ request.csp_nonce }}"
+        crossorigin="anonymous"></script>

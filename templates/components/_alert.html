@@ -1,0 +1,50 @@
+{# templates/components/_alert.html — Inline alert/notification banner #}
+{% comment %}
+  Params:
+    type        — 'success' | 'error' | 'warning' | 'info' (default)
+    message     — Alert text content
+    title       — Optional bold heading
+    dismissible — Show close button (default: false)
+    icon        — Override Lucide icon name (optional)
+{% endcomment %}
+<div x-data="{ visible: true }" x-show="visible"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="flex items-start gap-3 p-4 rounded-lg border
+       {% if type == 'success' %}border-[var(--color-success)]/30 bg-[var(--color-success)]/10
+       {% elif type == 'error' %}border-[var(--color-error)]/30 bg-[var(--color-error)]/10
+       {% elif type == 'warning' %}border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10
+       {% else %}border-[var(--color-info)]/30 bg-[var(--color-info)]/10{% endif %}"
+     role="alert">
+  {# Icon #}
+  <span class="shrink-0 mt-0.5
+    {% if type == 'success' %}text-[var(--color-success)]
+    {% elif type == 'error' %}text-[var(--color-error)]
+    {% elif type == 'warning' %}text-[var(--color-warning)]
+    {% else %}text-[var(--color-info)]{% endif %}">
+    {% if icon %}
+    <i data-lucide="{{ icon }}" class="w-5 h-5"></i>
+    {% elif type == 'success' %}<i data-lucide="check-circle" class="w-5 h-5"></i>
+    {% elif type == 'error' %}<i data-lucide="alert-circle" class="w-5 h-5"></i>
+    {% elif type == 'warning' %}<i data-lucide="alert-triangle" class="w-5 h-5"></i>
+    {% else %}<i data-lucide="info" class="w-5 h-5"></i>{% endif %}
+  </span>
+  {# Content #}
+  <div class="flex-1 min-w-0
+    {% if type == 'success' %}text-[var(--color-success)]
+    {% elif type == 'error' %}text-[var(--color-error)]
+    {% elif type == 'warning' %}text-[var(--color-warning)]
+    {% else %}text-[var(--color-info)]{% endif %}">
+    {% if title %}<p class="text-sm font-semibold">{{ title }}</p>{% endif %}
+    <p class="text-sm {% if title %}mt-0.5 opacity-90{% endif %}">{{ message }}</p>
+  </div>
+  {# Dismiss button #}
+  {% if dismissible %}
+  <button @click="visible = false"
+          class="shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+          aria-label="Dismiss alert">
+    <i data-lucide="x" class="w-4 h-4"></i>
+  </button>
+  {% endif %}
+</div>

@@ -1,0 +1,57 @@
+{% extends "layouts/admin.html" %}
+{% block title %}{{ provider.name }} — Storage — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">{{ provider.name }}</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:storage_providers' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Providers</a>
+</div>
+{% endblock %}
+{% block page_content %}
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<div class="grid md:grid-cols-3 gap-6 mb-8">
+  <div class="md:col-span-2 glass rounded-xl p-6 animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Provider Details</h3>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Type</p><p class="text-sm font-medium text-[var(--color-text-primary)]">{{ provider.provider_type|default:"-" }}</p></div>
+      <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Auth</p><p class="text-sm font-medium text-[var(--color-text-primary)]">{{ provider.auth_type|default:"-" }}</p></div>
+      <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Bucket / Path</p><p class="text-sm font-medium text-[var(--color-text-primary)]">{{ provider.bucket_name|default:provider.base_url|default:"-" }}</p></div>
+      <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Status</p>{% if provider.is_active %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Active</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">Inactive</span>{% endif %}</div>
+    </div>
+  </div>
+  <div class="glass rounded-xl p-6 animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Quick Actions</h3>
+    <div class="space-y-2">
+      <form method="post" class="inline-block w-full">{% csrf_token %}<button type="submit" name="action" value="test_connection" class="w-full px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all text-left"><i data-lucide="wifi" class="w-3.5 h-3.5 inline mr-2"></i>Test Connection</button></form>
+      <form method="post" class="inline-block w-full">{% csrf_token %}<button type="submit" name="action" value="sync_drives" class="w-full px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all text-left"><i data-lucide="refresh-cw" class="w-3.5 h-3.5 inline mr-2"></i>Sync Drives</button></form>
+    </div>
+  </div>
+</div>
+
+<div x-data="{ tab: 'drives' }" class="animate-in" style="--stagger:2" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
+    <button @click="tab='drives'" :class="tab==='drives' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Shared Drives</button>
+    <button @click="tab='accounts'" :class="tab==='accounts' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Service Accounts</button>
+  </div>
+  <div x-show="tab==='drives'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Drive ID</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for d in shared_drives %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 text-[var(--color-text-primary)]">{{ d.name }}</td><td class="py-3 px-4 font-mono text-xs text-[var(--color-text-muted)]">{{ d.drive_id }}</td><td class="py-3 px-4 text-center">{% if d.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td></tr>{% empty %}<tr><td colspan="3" class="py-8 text-center text-[var(--color-text-muted)]">No shared drives</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div x-show="tab==='accounts'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Email</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for sa in service_accounts %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ sa.email }}</td><td class="py-3 px-4 text-center">{% if sa.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td></tr>{% empty %}<tr><td colspan="2" class="py-8 text-center text-[var(--color-text-muted)]">No service accounts</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "layouts/admin.html" %}
+{% block title %}{{ user_obj.email }} — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div class="flex items-center gap-4">
+    <div class="w-16 h-16 rounded-2xl bg-[var(--color-accent)]/20 flex items-center justify-center text-2xl font-bold text-[var(--color-accent)]">{{ user_obj.email|first|upper }}</div>
+    <div>
+      <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">{{ user_obj.first_name }} {{ user_obj.last_name }}</h1>
+      <p class="text-sm text-[var(--color-text-muted)]">{{ user_obj.email }}</p>
+      <div class="flex gap-2 mt-1">
+        {% if user_obj.is_staff %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">Staff</span>{% endif %}
+        {% if user_obj.is_superuser %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">Superuser</span>{% endif %}
+        {% if user_obj.is_active %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Active</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">Inactive</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  <a href="{% url 'admin_suite:users' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Users</a>
+</div>
+{% endblock %}
+{% block page_content %}
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
+  <div class="glass rounded-xl p-4 animate-in" style="--stagger:0" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <p class="text-xs text-[var(--color-text-muted)]">Joined</p>
+    <p class="text-sm font-semibold text-[var(--color-text-primary)] mt-1">{{ user_obj.date_joined|date:"M d, Y" }}</p>
+  </div>
+  <div class="glass rounded-xl p-4 animate-in" style="--stagger:1" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <p class="text-xs text-[var(--color-text-muted)]">Last Login</p>
+    <p class="text-sm font-semibold text-[var(--color-text-primary)] mt-1">{% if user_obj.last_login %}{{ user_obj.last_login|timesince }} ago{% else %}Never{% endif %}</p>
+  </div>
+  <div class="glass rounded-xl p-4 animate-in" style="--stagger:2" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <p class="text-xs text-[var(--color-text-muted)]">Devices</p>
+    <p class="text-sm font-semibold text-[var(--color-text-primary)] mt-1">{{ devices|length }}</p>
+  </div>
+  <div class="glass rounded-xl p-4 animate-in" style="--stagger:3" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <p class="text-xs text-[var(--color-text-muted)]">Risk Insights</p>
+    <p class="text-sm font-semibold text-[var(--color-text-primary)] mt-1">{{ risk_insights|length }}</p>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-6 mb-6">
+  <div class="animate-in" style="--stagger:4" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="glass rounded-xl p-6">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="shield" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>Quick Actions</h3>
+      <div class="space-y-2">
+        <form method="post">{% csrf_token %}<button name="action" value="{% if user_obj.is_active %}deactivate{% else %}activate{% endif %}" class="w-full px-4 py-2 rounded-lg text-xs font-semibold btn-press transition-all {% if user_obj.is_active %}bg-red-500/10 text-red-400 hover:bg-red-500/20{% else %}bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20{% endif %}">{% if user_obj.is_active %}Deactivate User{% else %}Activate User{% endif %}</button></form>
+        <form method="post">{% csrf_token %}<button name="action" value="toggle_staff" class="w-full px-4 py-2 rounded-lg text-xs font-semibold bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 btn-press transition-all">{% if user_obj.is_staff %}Remove Staff{% else %}Grant Staff{% endif %}</button></form>
+        <div x-data="{ showPw: false }">
+          <button @click="showPw = !showPw" class="w-full px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 btn-press transition-all" x-text="showPw ? 'Cancel' : 'Change Password'"></button>
+          <form method="post" x-show="showPw" x-cloak x-transition class="mt-2 space-y-2">
+            {% csrf_token %}
+            <input type="password" name="new_password" placeholder="New password" required minlength="8" class="w-full px-3 py-2 rounded-lg text-xs bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]">
+            <input type="password" name="confirm_password" placeholder="Confirm password" required minlength="8" class="w-full px-3 py-2 rounded-lg text-xs bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]">
+            <button name="action" value="change_password" class="w-full px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 btn-press transition-all">Set New Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="animate-in" style="--stagger:5" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="glass rounded-xl p-6">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="mail" class="w-4 h-4 inline mr-2 text-blue-400"></i>Email Addresses</h3>
+      <div class="space-y-2">
+        {% for e in email_addresses %}<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)]/50"><span class="text-xs text-[var(--color-text-primary)]">{{ e.email }}</span><div class="flex gap-1">{% if e.verified %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Verified</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">Unverified</span>{% endif %}{% if e.primary %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">Primary</span>{% endif %}</div></div>{% empty %}<p class="text-xs text-[var(--color-text-muted)]">No email addresses</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="glass rounded-xl p-6">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="link" class="w-4 h-4 inline mr-2 text-violet-400"></i>Social Accounts</h3>
+      <div class="space-y-2">
+        {% for sa in social_accounts %}<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)]/50"><span class="text-xs text-[var(--color-text-primary)]">{{ sa.provider }}</span><span class="text-xs text-[var(--color-text-muted)]">{{ sa.uid|truncatechars:20 }}</span></div>{% empty %}<p class="text-xs text-[var(--color-text-muted)]">No social accounts linked</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div x-data="{ tab: 'devices' }" class="animate-in" style="--stagger:7" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex gap-1 mb-4 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
+    <button @click="tab='devices'" :class="tab==='devices' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Devices</button>
+    <button @click="tab='events'" :class="tab==='events' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Events</button>
+    <button @click="tab='risk'" :class="tab==='risk' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Risk</button>
+  </div>
+  <div x-show="tab==='devices'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Device</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">OS</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">IP</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Last Seen</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for d in devices %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 text-[var(--color-text-primary)] text-xs">{{ d.device_type|default:"Unknown" }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ d.os|default:"-" }}</td><td class="py-3 px-4 text-xs font-mono text-[var(--color-text-muted)]">{{ d.ip_address|default:"-" }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ d.last_seen|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No devices</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div x-show="tab==='events'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Event</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Details</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Time</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for ev in device_events %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 text-xs font-medium text-[var(--color-text-primary)]">{{ ev.event_type }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)] truncate max-w-[200px]">{{ ev.details|default:"-" }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ ev.created_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="3" class="py-8 text-center text-[var(--color-text-muted)]">No events</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div x-show="tab==='risk'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Insight</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Severity</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for ri in risk_insights %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 text-xs text-[var(--color-text-primary)]">{{ ri.summary|default:ri.insight_type }}</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if ri.severity == 'critical' %}bg-red-500/10 text-red-400{% elif ri.severity == 'high' %}bg-amber-500/10 text-amber-400{% elif ri.severity == 'medium' %}bg-yellow-500/10 text-yellow-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ ri.severity }}</span></td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if ri.status == 'open' %}bg-red-500/10 text-red-400{% elif ri.status == 'resolved' %}bg-emerald-500/10 text-emerald-400{% else %}bg-zinc-500/10 text-zinc-400{% endif %}">{{ ri.status }}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ ri.created_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No risk insights</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{# templates/bounty/bounty_list.html — Bounty hub: firmware requests + support forum #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Bounty Board — Firmware Requests & Support Forum{% endblock %}
+{% block meta_description %}Browse firmware bounty requests and support forum. Request firmware or get help with flashing and unlocking problems.{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+      <i data-lucide="trophy" class="w-8 h-8 text-[var(--color-accent)]"></i>
+      Bounty Board
+    </h1>
+    <p class="text-[var(--color-text-secondary)] mt-1">Request firmware or get help — earn rewards by contributing solutions</p>
+  </div>
+  <a href="{% url 'bounty:bounty_create' %}"
+     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition-colors">
+    <i data-lucide="plus" class="w-4 h-4"></i> Create Bounty
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{# ── Tab Navigation ── #}
+<div class="flex gap-1 mb-6 border-b border-[var(--color-border)]">
+  <a href="{% url 'bounty:bounty_list' %}?tab=all{% if search_query %}&q={{ search_query }}{% endif %}"
+     class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors {% if active_tab == 'all' %}border-[var(--color-accent)] text-[var(--color-accent)]{% else %}border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]{% endif %}">
+    All Bounties
+  </a>
+  <a href="{% url 'bounty:bounty_list' %}?tab=firmware{% if search_query %}&q={{ search_query }}{% endif %}"
+     class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors {% if active_tab == 'firmware' %}border-[var(--color-accent)] text-[var(--color-accent)]{% else %}border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]{% endif %}">
+    <i data-lucide="hard-drive-download" class="w-4 h-4 inline"></i> Firmware Requests
+  </a>
+  <a href="{% url 'forum:index' %}"
+     class="px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors">
+    <i data-lucide="message-circle" class="w-4 h-4 inline"></i> Community Forum &rarr;
+  </a>
+</div>
+
+{# ── Search + Filters ── #}
+<div class="flex flex-col sm:flex-row gap-3 mb-6">
+  <form method="get" action="{% url 'bounty:bounty_list' %}" class="flex-1 flex gap-2">
+    <input type="hidden" name="tab" value="{{ active_tab }}">
+    <div class="relative flex-1">
+      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]"></i>
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Search bounties..."
+             class="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-sm">
+    </div>
+    <select name="status" onchange="this.form.submit()"
+            class="px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm">
+      <option value="">All Status</option>
+      {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit"
+            class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-medium hover:bg-[var(--color-accent-hover)] transition-colors">
+      Search
+    </button>
+  </form>
+</div>
+
+{# ── Bounty Cards ── #}
+<div id="bounty-cards">
+  {% include "bounty/fragments/bounty_cards.html" %}
+</div>
+{% endblock %}

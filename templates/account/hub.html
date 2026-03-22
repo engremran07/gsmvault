@@ -1,0 +1,36 @@
+{% extends "layouts/default.html" %}
+
+{% block title %}Account Hub — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<h1 class="text-3xl font-bold mb-2">Account Hub</h1>
+<p class="text-[var(--color-text-secondary)]">Manage your account settings and preferences</p>
+{% endblock %}
+
+{% block page_content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+  <a href="{% url 'users:dashboard' %}" class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)] transition group">
+    <i data-lucide="layout-dashboard" class="w-8 h-8 text-[var(--color-accent)] mb-3"></i>
+    <h3 class="text-lg font-semibold group-hover:text-[var(--color-accent)]">Dashboard</h3>
+    <p class="text-sm text-[var(--color-text-secondary)] mt-1">Overview of your activity and stats</p>
+  </a>
+
+  <a href="{% url 'users:profile' %}" class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)] transition group">
+    <i data-lucide="user" class="w-8 h-8 text-[var(--color-accent)] mb-3"></i>
+    <h3 class="text-lg font-semibold group-hover:text-[var(--color-accent)]">Profile</h3>
+    <p class="text-sm text-[var(--color-text-secondary)] mt-1">Edit your profile information</p>
+  </a>
+
+  <a href="{% url 'users:devices' %}" class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)] transition group">
+    <i data-lucide="smartphone" class="w-8 h-8 text-[var(--color-accent)] mb-3"></i>
+    <h3 class="text-lg font-semibold group-hover:text-[var(--color-accent)]">Devices</h3>
+    <p class="text-sm text-[var(--color-text-secondary)] mt-1">Manage your trusted devices</p>
+  </a>
+
+  <a href="{% url 'users:notification_settings' %}" class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)] transition group">
+    <i data-lucide="bell" class="w-8 h-8 text-[var(--color-accent)] mb-3"></i>
+    <h3 class="text-lg font-semibold group-hover:text-[var(--color-accent)]">Notifications</h3>
+    <p class="text-sm text-[var(--color-text-secondary)] mt-1">Configure notification preferences</p>
+  </a>
+</div>
+{% endblock %}

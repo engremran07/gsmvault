@@ -1,0 +1,11 @@
+{# templates/components/_theme_switcher.html — Theme toggle button #}
+{# All 3 icons rendered at load (Lucide inits once). x-show toggles visibility without DOM rebuild. #}
+<div x-data class="relative">
+  <button @click="$store.theme.cycle()"
+          class="p-2 rounded-lg text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-bg-primary)] transition-colors"
+          :title="'Theme: ' + $store.theme.current">
+    <i data-lucide="moon" class="w-5 h-5" x-show="$store.theme.current === 'dark'" x-cloak></i>
+    <i data-lucide="sun" class="w-5 h-5" x-show="$store.theme.current === 'light'" x-cloak></i>
+    <i data-lucide="eye" class="w-5 h-5" x-show="$store.theme.current === 'contrast'" x-cloak></i>
+  </button>
+</div>

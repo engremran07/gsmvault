@@ -1,0 +1,157 @@
+# =============================================================================
+# GSMVault — .gitignore
+# =============================================================================
+
+#######################################
+# PYTHON
+#######################################
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*$py.class
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+.eggs/
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+
+#######################################
+# VIRTUAL ENVIRONMENTS
+#######################################
+.venv/
+venv/
+env/
+ENV/
+.Python
+
+#######################################
+# DJANGO
+#######################################
+*.sqlite3
+*.db
+*.log
+logs/
+local_settings.py
+media/
+uploads/
+staticfiles/
+static_root/
+appdb
+
+#######################################
+# ENVIRONMENT & SECRETS
+#######################################
+.env
+.env.*
+!.env.sample
+*.secret
+*.key
+*.pem
+*.crt
+*.gpg
+id_rsa
+id_rsa.pub
+secrets/
+storage_credentials/
+
+#######################################
+# SCRAPER DATA & BROWSER PROFILES
+#######################################
+checkpoints/
+output/
+
+#######################################
+# TESTING & COVERAGE
+#######################################
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.nox/
+.cache/
+.pytest_cache/
+nosetests.xml
+
+#######################################
+# TYPE CHECKER CACHES
+#######################################
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+#######################################
+# NODE / NPM
+#######################################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+#######################################
+# BUILD ARTIFACTS
+#######################################
+dist/
+build/
+*.min.css
+*.min.js
+
+#######################################
+# EDITOR / IDE
+#######################################
+.vscode/
+*.code-workspace
+.idea/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+\#*\#
+.\#*
+
+#######################################
+# OS JUNK
+#######################################
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+#######################################
+# JUPYTER / CELERY / MISC
+#######################################
+.ipynb_checkpoints
+*.ipynb
+celerybeat-schedule
+celerybeat.pid
+
+#######################################
+# TEMP / BACKUP FILES
+#######################################
+*.old
+*.bak
+*.backup
+*.tmp
+*.orig
+
+#######################################
+# WELL-KNOWN / SERVICE WORKER
+#######################################
+.well-known/
+sw.js

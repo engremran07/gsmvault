@@ -1,0 +1,451 @@
+{# Model specs + firmware download — MiFirm/SamFW-quality multi-brand page #}
+{% extends "layouts/default.html" %}
+{% load static device_tags %}
+
+{% block title %}{{ brand.name }} {{ model.display_name }}{% if model.codename %} ({{ model.codename }}){% endif %} Firmware Download — {{ settings.site_name }}{% endblock %}
+{% block meta_description %}Download {{ brand.name }} {{ model.display_name }} firmware.{% if model.codename %} Codename: {{ model.codename }}.{% endif %} {{ firmware_count }} file{{ firmware_count|pluralize }} available. Official, engineering, and custom firmware for all variants and regions.{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">{% endblock %}
+
+{% block og_title %}{{ brand.name }} {{ model.display_name }} Firmware Download{% endblock %}
+{% block og_description %}Download {{ brand.name }} {{ model.display_name }} firmware. {{ firmware_count }} file{{ firmware_count|pluralize }} available.{% endblock %}
+{% if image_url %}{% block og_image %}{{ image_url }}{% endblock %}{% block twitter_image %}{{ image_url }}{% endblock %}{% endif %}
+
+{% block structured_data %}
+<script type="application/ld+json" nonce="{{ request.csp_nonce }}">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ brand.name|escapejs }} {{ model.display_name|escapejs }}",
+  "brand": {"@type": "Brand", "name": "{{ brand.name|escapejs }}"},
+  "description": "Firmware downloads for {{ brand.name|escapejs }} {{ model.display_name|escapejs }}{% if model.codename %} ({{ model.codename|escapejs }}){% endif %}"{% if image_url %},
+  "image": "{{ image_url|escapejs }}"{% endif %},
+  "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"{% if model.model_code %},
+  "mpn": "{{ model.model_code|escapejs }}"{% endif %}{% if chipset %},
+  "additionalProperty": [{"@type": "PropertyValue", "name": "Chipset", "value": "{{ chipset|escapejs }}"}]{% endif %}
+}
+</script>
+<script type="application/ld+json" nonce="{{ request.csp_nonce }}">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ request.scheme }}://{{ request.get_host }}/"},
+    {"@type": "ListItem", "position": 2, "name": "Devices", "item": "{{ request.scheme }}://{{ request.get_host }}/devices/"},
+    {"@type": "ListItem", "position": 3, "name": "{{ brand.name|escapejs }}", "item": "{{ request.scheme }}://{{ request.get_host }}/devices/{{ brand.slug }}/"},
+    {"@type": "ListItem", "position": 4, "name": "{{ model.display_name|escapejs }}"}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block page_content %}
+<section class="space-y-8" x-data="{ activeRegion: 'all', activeType: 'all' }" x-cloak>
+  {# Breadcrumb #}
+  {% include "components/_breadcrumb.html" with items=breadcrumb label=model.name %}
+
+  {# ━━━ Device Header Card ━━━ #}
+  <div class="bg-[var(--color-bg-secondary)] rounded-2xl border border-[var(--color-border)] p-6 sm:p-8">
+    <div class="flex flex-col md:flex-row items-start gap-6">
+      {# Device Image #}
+      <div class="shrink-0 self-center md:self-start">
+        {% if image_url %}
+        <div class="w-36 h-44 rounded-xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] p-3 flex items-center justify-center overflow-hidden">
+          <img src="{{ image_url }}" alt="{{ brand.name }} {{ model.display_name }}"
+               class="max-w-full max-h-full object-contain" loading="lazy" decoding="async"
+               onerror="this.parentElement.innerHTML='<i data-lucide=\'smartphone\' class=\'w-14 h-14 text-[var(--color-text-muted)]\'></i>'">
+        </div>
+        {% else %}
+        <div class="w-36 h-44 rounded-xl bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] flex items-center justify-center">
+          {% brand_logo_svg brand.name size=64 logo_url=brand.logo_url %}
+        </div>
+        {% endif %}
+      </div>
+
+      {# Device Info #}
+      <div class="flex-1 min-w-0 space-y-3">
+        {# Brand link #}
+        <div class="flex items-center gap-2">
+          {% brand_logo_svg brand.name size=24 logo_url=brand.logo_url %}
+          <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
+             class="text-sm text-[var(--color-accent)] hover:underline font-medium">{{ brand.name }}</a>
+        </div>
+
+        {# Model name + codename #}
+        <div>
+          <h1 class="text-2xl lg:text-3xl font-bold text-[var(--color-text-primary)]">
+            {{ model.display_name }}
+          </h1>
+          {% if model.codename %}
+          <p class="text-[var(--color-text-muted)] text-sm mt-0.5 font-mono">
+            codename: <strong class="text-[var(--color-text-secondary)]">{{ model.codename }}</strong>
+          </p>
+          {% endif %}
+          {% if model.marketing_name and model.marketing_name != model.name and model.marketing_name != model.display_name %}
+          <p class="text-[var(--color-text-secondary)] text-sm">{{ model.marketing_name }}</p>
+          {% endif %}
+        </div>
+
+        {# Device identifiers (model codes, also known as) #}
+        {% if device_names %}
+        <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+          {% for dn in device_names %}
+          <span class="text-[var(--color-text-muted)]">
+            <span class="font-semibold">{{ dn.label }}:</span>
+            <span class="text-[var(--color-text-secondary)] {% if dn.label == 'Model Code' or dn.label == 'Model Numbers' %}font-mono{% endif %}">{{ dn.value }}</span>
+          </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {# All variant model codes display #}
+        {% if model.all_model_codes_display %}
+        <div class="text-xs text-[var(--color-text-muted)]">
+          <span class="font-semibold">Variant Codes:</span>
+          <span class="text-[var(--color-text-secondary)] font-mono">{{ model.all_model_codes_display }}</span>
+        </div>
+        {% endif %}
+
+        {# Quick spec badges #}
+        <div class="flex flex-wrap gap-2 pt-1">
+          {% if model.release_date %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 font-medium">
+            <i data-lucide="calendar" class="w-3 h-3 inline mr-1"></i>{{ model.release_date|date:"M Y" }}
+          </span>
+          {% endif %}
+          {% if chipset %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-400 font-medium">
+            <i data-lucide="cpu" class="w-3 h-3 inline mr-1"></i>{{ chipset }}
+          </span>
+          {% endif %}
+          {% if os_version %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-medium">
+            <i data-lucide="layers" class="w-3 h-3 inline mr-1"></i>{{ os_version }}
+          </span>
+          {% endif %}
+          {% if model.network_technology %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 font-medium">
+            <i data-lucide="signal" class="w-3 h-3 inline mr-1"></i>{{ model.network_technology }}
+          </span>
+          {% endif %}
+          {% if model.display_size %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-pink-500/10 text-pink-400 font-medium">
+            <i data-lucide="monitor-smartphone" class="w-3 h-3 inline mr-1"></i>{{ model.display_size }}
+          </span>
+          {% endif %}
+          {% if model.battery %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 font-medium">
+            <i data-lucide="battery-full" class="w-3 h-3 inline mr-1"></i>{{ model.battery }}
+          </span>
+          {% endif %}
+          {% if firmware_count %}
+          <span class="text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 font-medium">
+            <i data-lucide="download" class="w-3 h-3 inline mr-1"></i>{{ firmware_count }} file{{ firmware_count|pluralize }}
+          </span>
+          {% endif %}
+        </div>
+
+        {# Region availability badges (MiFirm-style) #}
+        {% if model.regions %}
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          {% for region in model.regions %}
+          <span class="text-[10px] px-2 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium bg-[var(--color-bg-tertiary)]">{{ region }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# ━━━ Hardware Specs Overview ━━━ #}
+  {% if model.ram_options or model.storage_options or model.colors or model.cpu or model.gpu or model.dimensions or model.weight %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+    {% if model.ram_options %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="memory-stick" class="w-4 h-4 text-violet-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">RAM</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.ram_options|join:", " }}</p>
+    </div>
+    {% endif %}
+    {% if model.storage_options %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="hard-drive" class="w-4 h-4 text-blue-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">Storage</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.storage_options|join:", " }}</p>
+    </div>
+    {% endif %}
+    {% if model.colors %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="palette" class="w-4 h-4 text-pink-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">Colors</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.colors|join:", " }}</p>
+    </div>
+    {% endif %}
+    {% if model.cpu %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="cpu" class="w-4 h-4 text-emerald-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">CPU</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.cpu }}</p>
+    </div>
+    {% endif %}
+    {% if model.gpu %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="monitor" class="w-4 h-4 text-orange-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">GPU</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.gpu }}</p>
+    </div>
+    {% endif %}
+    {% if model.dimensions %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="ruler" class="w-4 h-4 text-amber-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">Dimensions</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.dimensions }}</p>
+    </div>
+    {% endif %}
+    {% if model.weight %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-3 text-center">
+      <i data-lucide="scale" class="w-4 h-4 text-cyan-400 mx-auto mb-1"></i>
+      <p class="text-[10px] text-[var(--color-text-muted)] uppercase font-bold mb-0.5">Weight</p>
+      <p class="text-xs text-[var(--color-text-primary)] font-medium">{{ model.weight }}</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ━━━ Firmware Downloads — Region + Type Tab System (MiFirm-style) ━━━ #}
+  {% if firmwares %}
+  <div class="space-y-4">
+    <h2 class="text-lg font-bold text-[var(--color-text-primary)]">
+      <i data-lucide="download" class="w-5 h-5 inline mr-2 text-[var(--color-accent)]"></i>
+      Firmware Downloads
+      <span class="text-sm font-normal text-[var(--color-text-muted)] ml-1">({{ firmware_count }})</span>
+    </h2>
+
+    {# Region tabs (MiFirm-style: China, Global, EEA, etc.) #}
+    {% if region_names %}
+    {% if region_names|length > 1 %}
+    <div class="flex flex-wrap gap-1.5">
+      <button @click="activeRegion = 'all'"
+              :class="activeRegion === 'all' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]' : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+        All Regions
+      </button>
+      {% for region in region_names %}
+      <button @click="activeRegion = '{{ region|escapejs }}'"
+              :class="activeRegion === '{{ region|escapejs }}' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]' : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+        {{ region }}
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {# Type tabs (Official, Engineering, Modified, etc.) #}
+    {% if type_names %}
+    {% if type_names|length > 1 %}
+    <div class="flex flex-wrap gap-1.5">
+      <button @click="activeType = 'all'"
+              :class="activeType === 'all' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]' : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+        All Types
+      </button>
+      {% for type_name in type_names %}
+      <button @click="activeType = '{{ type_name|escapejs }}'"
+              :class="activeType === '{{ type_name|escapejs }}' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)]' : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'"
+              class="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+        {{ type_name }}
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {# Firmware table #}
+    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+          <tr>
+            <th class="px-4 py-3">Type</th>
+            <th class="px-4 py-3">File</th>
+            <th class="px-4 py-3 hidden md:table-cell">Region</th>
+            <th class="px-4 py-3 hidden lg:table-cell">Android</th>
+            <th class="px-4 py-3 hidden lg:table-cell">Build</th>
+            <th class="px-4 py-3 hidden sm:table-cell">Size</th>
+            <th class="px-4 py-3 text-center">Status</th>
+            <th class="px-4 py-3 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--color-border)]">
+          {% for fw in firmwares %}
+          <tr class="bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors"
+              x-show="(activeRegion === 'all' || activeRegion === '{{ fw.variant_region|default:"Unknown"|escapejs }}') && (activeType === 'all' || activeType === '{{ fw.type|default:"Other"|escapejs }}')"
+              x-cloak>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full
+                {% if fw.type == 'Official' %}bg-emerald-500/10 text-emerald-400
+                {% elif fw.type == 'Engineering' %}bg-amber-500/10 text-amber-400
+                {% elif fw.type == 'Modified' %}bg-violet-500/10 text-violet-400
+                {% elif fw.type == 'Readback' %}bg-blue-500/10 text-blue-400
+                {% else %}bg-slate-500/10 text-slate-400{% endif %}">
+                {{ fw.type }}
+              </span>
+            </td>
+            <td class="px-4 py-3 max-w-[200px]">
+              <span class="font-mono text-xs text-[var(--color-text-primary)] truncate block" title="{{ fw.file_name }}">{{ fw.file_name }}</span>
+              {% if fw.chipset %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ fw.chipset }}</span>{% endif %}
+            </td>
+            <td class="px-4 py-3 hidden md:table-cell">
+              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+                <i data-lucide="globe" class="w-3 h-3"></i>{{ fw.variant_region|default:"Unknown" }}
+              </span>
+            </td>
+            <td class="px-4 py-3 hidden lg:table-cell text-[var(--color-text-secondary)] text-xs">
+              {% if fw.android_version %}{{ fw.android_version }}{% else %}<span class="text-[var(--color-text-muted)]">—</span>{% endif %}
+            </td>
+            <td class="px-4 py-3 hidden lg:table-cell font-mono text-[10px] text-[var(--color-text-muted)]">
+              {% if fw.build_number %}{{ fw.build_number }}{% else %}—{% endif %}
+            </td>
+            <td class="px-4 py-3 hidden sm:table-cell text-xs text-[var(--color-text-secondary)]">
+              {% if fw.file_size %}
+                {% widthratio fw.file_size 1048576 1 as size_mb %}
+                {{ size_mb }} MB
+              {% else %}<span class="text-[var(--color-text-muted)]">—</span>{% endif %}
+            </td>
+            <td class="px-4 py-3 text-center">
+              {% if fw.is_verified %}
+              <span class="text-emerald-400" title="Verified"><i data-lucide="shield-check" class="w-4 h-4 inline"></i></span>
+              {% elif fw.is_password_protected %}
+              <span class="text-amber-400" title="Password protected"><i data-lucide="lock" class="w-4 h-4 inline"></i></span>
+              {% else %}
+              <span class="text-blue-400" title="Available"><i data-lucide="check-circle" class="w-4 h-4 inline"></i></span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-right">
+              <a href="/firmwares/{{ fw.type|lower }}/{{ fw.id }}/"
+                 class="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg
+                        bg-[var(--color-accent)] text-[var(--color-accent-text)]
+                        hover:bg-[var(--color-accent-hover)] transition-colors">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>Get
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)]">
+      <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+      Always back up your data before flashing firmware. Verify your variant and region match.
+    </p>
+  </div>
+  {% endif %}
+
+  {# ━━━ Specifications (from GSMArena) ━━━ #}
+  {% if specs %}
+  <div class="space-y-4">
+    <h2 class="text-lg font-bold text-[var(--color-text-primary)]">
+      <i data-lucide="list" class="w-5 h-5 inline mr-2 text-[var(--color-accent)]"></i>Full Specifications
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {% for key, value in specs.items %}
+      {% if value and key != "url" and key != "brand" and key != "full_name" and key != "brand_slug" and key != "scraped_at" and key != "image_url" and key != "review_url" %}
+      <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] px-4 py-3 flex gap-3">
+        <span class="text-xs font-semibold text-[var(--color-text-muted)] uppercase min-w-[120px] shrink-0">{{ key|cut:"_"|title }}</span>
+        <span class="text-sm text-[var(--color-text-primary)] break-words">
+          {% if value == True %}Yes{% elif value == False %}No{% else %}{{ value }}{% endif %}
+        </span>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <p class="text-[10px] text-[var(--color-text-muted)]">
+      Specs sourced from GSMArena. We cannot guarantee 100% accuracy.
+    </p>
+  </div>
+  {% endif %}
+
+  {# ━━━ GSMArena enriched fields ━━━ #}
+  {% if gsm_device %}
+  {% if gsm_device.marketed_as or gsm_device.model_codes or gsm_device.os_upgradeable_to %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    {% if gsm_device.marketed_as %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4">
+      <h3 class="text-xs font-semibold text-[var(--color-text-muted)] uppercase mb-2">Also Known As</h3>
+      <p class="text-sm text-[var(--color-text-primary)]">{{ gsm_device.marketed_as }}</p>
+    </div>
+    {% endif %}
+    {% if gsm_device.model_codes %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4">
+      <h3 class="text-xs font-semibold text-[var(--color-text-muted)] uppercase mb-2">Model Numbers</h3>
+      <p class="text-sm text-[var(--color-text-primary)] font-mono">{{ gsm_device.model_codes }}</p>
+    </div>
+    {% endif %}
+    {% if gsm_device.os_upgradeable_to %}
+    <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4">
+      <h3 class="text-xs font-semibold text-[var(--color-text-muted)] uppercase mb-2">Upgradeable To</h3>
+      <p class="text-sm text-[var(--color-text-primary)]">{{ gsm_device.os_upgradeable_to }}</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% endif %}
+
+  {# ━━━ Variants & Regions ━━━ #}
+  {% if variants %}
+  <div class="space-y-4">
+    <h2 class="text-lg font-bold text-[var(--color-text-primary)]">
+      <i data-lucide="git-branch" class="w-5 h-5 inline mr-2 text-[var(--color-accent)]"></i>Variants &amp; Regions
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for variant in variants %}
+      <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4">
+        <h3 class="font-semibold text-sm text-[var(--color-text-primary)] mb-2">{{ variant.name }}</h3>
+        {% if variant.region %}<p class="text-xs text-[var(--color-text-muted)]"><i data-lucide="globe" class="w-3 h-3 inline mr-1"></i>{{ variant.region }}</p>{% endif %}
+        {% if variant.board_id %}<p class="text-xs text-[var(--color-text-muted)]"><i data-lucide="circuit-board" class="w-3 h-3 inline mr-1"></i>{{ variant.board_id }}</p>{% endif %}
+        {% if variant.chipset %}<p class="text-xs text-[var(--color-text-muted)]"><i data-lucide="cpu" class="w-3 h-3 inline mr-1"></i>{{ variant.chipset }}</p>{% endif %}
+        {% if variant.ram_options %}<p class="text-xs text-[var(--color-text-muted)]">RAM: {{ variant.ram_options|join:", " }} GB</p>{% endif %}
+        {% if variant.storage_options %}<p class="text-xs text-[var(--color-text-muted)]">Storage: {{ variant.storage_options|join:", " }} GB</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# No data fallback #}
+  {% if not specs and not variants and not firmwares %}
+  {% include "components/_empty_state.html" with icon="file-question" message="Specifications and firmware are being gathered for this device. Check back soon!" %}
+  {% endif %}
+
+  {# ━━━ Share + Navigation ━━━ #}
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-[var(--color-border)]">
+    <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
+       class="inline-flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      Back to {{ brand.name }} models
+    </a>
+    {# Share buttons #}
+    <div class="flex items-center gap-2 text-[var(--color-text-muted)]">
+      <span class="text-xs">Share:</span>
+      <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text=Download%20{{ brand.name|urlencode }}%20{{ model.name|urlencode }}%20Firmware"
+         target="_blank" rel="noopener noreferrer"
+         class="w-7 h-7 rounded-lg bg-[var(--color-bg-tertiary)] flex items-center justify-center hover:bg-[var(--color-accent)]/20 transition-colors"
+         title="Share on X">
+        <i data-lucide="twitter" class="w-3.5 h-3.5"></i>
+      </a>
+      <a href="https://t.me/share/url?url={{ request.build_absolute_uri|urlencode }}"
+         target="_blank" rel="noopener noreferrer"
+         class="w-7 h-7 rounded-lg bg-[var(--color-bg-tertiary)] flex items-center justify-center hover:bg-[var(--color-accent)]/20 transition-colors"
+         title="Share on Telegram">
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+      </a>
+      <a href="https://api.whatsapp.com/send?text={{ request.build_absolute_uri|urlencode }}"
+         target="_blank" rel="noopener noreferrer"
+         class="w-7 h-7 rounded-lg bg-[var(--color-bg-tertiary)] flex items-center justify-center hover:bg-[var(--color-accent)]/20 transition-colors"
+         title="Share on WhatsApp">
+        <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

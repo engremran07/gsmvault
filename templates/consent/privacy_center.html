@@ -1,0 +1,156 @@
+{# templates/consent/privacy_center.html — Privacy / Consent Management Center #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block extra_css %}
+{{ block.super }}
+{% endblock %}
+
+{% block page_header %}
+{% include "components/_section_header.html" with title="Privacy Center" subtitle="Manage your cookie and data preferences" icon="shield-check" %}
+
+{% include "components/_breadcrumb.html" with items=breadcrumbs %}
+{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+
+  {# ── Active Policy ── #}
+  {% if policy %}
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+      <i data-lucide="file-text" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      Current Privacy Policy
+    </h2>
+    <div class="space-y-3">
+      <div class="flex items-center gap-3">
+        {% include "components/_badge.html" with text=policy.version variant="info" %}
+        <span class="text-sm text-[var(--color-text-muted)]">Version {{ policy.version }}</span>
+      </div>
+      {% if policy.banner_text %}
+      <p class="text-sm text-[var(--color-text-secondary)]">{{ policy.banner_text }}</p>
+      {% endif %}
+      {% if policy.effective_from %}
+      <p class="text-xs text-[var(--color-text-muted)]">
+        Effective from: {{ policy.effective_from|date:"N j, Y" }}
+      </p>
+      {% endif %}
+      {% if policy_url %}
+      <a href="{{ policy_url }}" class="inline-flex items-center gap-1.5 text-sm text-[var(--color-accent)] hover:underline">
+        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        Read Full Privacy Policy
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+  {# ── Consent Categories ── #}
+  {% if policy.categories_snapshot %}
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+      <i data-lucide="sliders-horizontal" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      Cookie Categories
+    </h2>
+    <div class="space-y-3">
+      {% for slug, meta in policy.categories_snapshot.items %}
+      <div class="flex items-center justify-between py-2 border-b border-[var(--color-border)]/30 last:border-0">
+        <div>
+          <span class="text-sm font-medium text-[var(--color-text-primary)]">
+            {% if meta.label %}{{ meta.label }}{% else %}{{ slug|title }}{% endif %}
+          </span>
+          {% if meta.required %}
+          <span class="ml-2 text-xs text-[var(--color-text-muted)]">(Required)</span>
+          {% endif %}
+        </div>
+        <div>
+          {% if meta.required %}
+          {% include "components/_badge.html" with text="Always On" variant="success" %}
+          {% else %}
+          {% include "components/_badge.html" with text="Optional" variant="default" %}
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ── Update Preferences ── #}
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6"
+           x-data="{ saving: false }">
+    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+      <i data-lucide="settings" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      Update Preferences
+    </h2>
+    <div class="flex flex-wrap gap-3">
+      <form method="post" action="{% url 'consent:accept_all' %}" @submit.prevent="
+        fetch($el.action, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          redirect: 'follow'
+        }).then(() => { window.location.reload(); })
+      ">
+        {% csrf_token %}
+        <button type="submit" class="rounded-lg bg-[var(--color-accent)] px-5 py-2 text-sm text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+          Accept All
+        </button>
+      </form>
+      <form method="post" action="{% url 'consent:reject_all' %}" @submit.prevent="
+        fetch($el.action, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          redirect: 'follow'
+        }).then(() => { window.location.reload(); })
+      ">
+        {% csrf_token %}
+        <button type="submit" class="rounded-lg border border-[var(--color-border)] px-5 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)] transition">
+          Reject Optional
+        </button>
+      </form>
+    </div>
+  </section>
+  {% else %}
+  {# ── No Active Policy ── #}
+  {% include "components/_empty_state.html" with icon="shield-off" title="No Active Privacy Policy" description="There is currently no active privacy policy configured. Please check back later." %}
+  {% endif %}
+
+  {# ── Recent Consent Decisions ── #}
+  {% if decisions %}
+  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+      <i data-lucide="history" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      Your Consent History
+    </h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--color-border)]">
+            <th class="text-left py-2 px-3 text-xs font-medium text-[var(--color-text-muted)] uppercase">Date</th>
+            <th class="text-left py-2 px-3 text-xs font-medium text-[var(--color-text-muted)] uppercase">Categories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for decision in decisions %}
+          <tr class="border-b border-[var(--color-border)]/30 last:border-0">
+            <td class="py-2 px-3 text-[var(--color-text-secondary)]">{{ decision.created_at|date:"N j, Y H:i" }}</td>
+            <td class="py-2 px-3">
+              <div class="flex flex-wrap gap-1">
+                {% for cat, accepted in decision.categories.items %}
+                {% if accepted %}
+                {% include "components/_badge.html" with text=cat variant="success" %}
+                {% else %}
+                {% include "components/_badge.html" with text=cat variant="danger" %}
+                {% endif %}
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

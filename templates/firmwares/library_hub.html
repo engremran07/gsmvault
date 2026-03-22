@@ -1,0 +1,134 @@
+{# templates/firmwares/library_hub.html — Multi-brand firmware library hub #}
+{% extends "layouts/default.html" %}
+{% load static device_tags %}
+
+{% block title %}Firmware Library — Download Firmware for All Brands — {{ settings.site_name }}{% endblock %}
+{% block meta_description %}Download firmware for {{ total_brands }}+ brands and {{ total_models }}+ device models. Official, engineering, and custom ROM. Free and fast downloads.{% endblock %}
+
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">{% endblock %}
+
+{% block og_title %}Firmware Library — {{ settings.site_name }}{% endblock %}
+{% block og_description %}The largest firmware library. {{ total_brands }}+ brands, {{ total_models }}+ models, {{ total_firmwares }}+ firmware files. Free downloads.{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json" nonce="{{ request.csp_nonce }}">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Firmware Library",
+  "description": "Download firmware for {{ total_brands }}+ brands and {{ total_models }}+ device models",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}",
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": {{ total_brands }},
+    "itemListElement": [
+      {% for brand in featured_brands %}{% if forloop.counter <= 10 %}
+      {"@type": "ListItem", "position": {{ forloop.counter }}, "name": "{{ brand.name|escapejs }}", "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'firmwares:brand_detail' slug=brand.slug %}"}{% if not forloop.last and forloop.counter < 10 %},{% endif %}
+      {% endif %}{% endfor %}
+    ]
+  }
+}
+</script>
+{% endblock %}
+
+{% block page_content %}
+<section class="space-y-10">
+
+  {# ━━━ Hero Header ━━━ #}
+  <div class="text-center space-y-4 py-6">
+    <h1 class="text-3xl lg:text-4xl font-bold text-[var(--color-text-primary)]">
+      <i data-lucide="database" class="w-8 h-8 inline mr-2 text-[var(--color-accent)]"></i>
+      Firmware Library
+    </h1>
+    <p class="text-[var(--color-text-secondary)] text-lg max-w-2xl mx-auto">
+      Download firmware for <strong class="text-[var(--color-text-primary)]">{{ total_brands }}+</strong> brands and
+      <strong class="text-[var(--color-text-primary)]">{{ total_models }}+</strong> device models.
+      Official, engineering, and custom ROM — free and fast.
+    </p>
+  </div>
+
+  {# ━━━ Aggregate Stats ━━━ #}
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    {% include "components/_stat_card.html" with icon="building-2" color="cyan" value=total_brands label="Brands" %}
+    {% include "components/_stat_card.html" with icon="smartphone" color="blue" value=total_models label="Models" %}
+    {% include "components/_stat_card.html" with icon="download" color="emerald" value=total_firmwares label="Firmwares" %}
+    {% include "components/_stat_card.html" with icon="database" color="violet" value=total_specs label="With Specs" %}
+  </div>
+
+  {# ━━━ Universal Search ━━━ #}
+  <div class="max-w-2xl mx-auto" x-data="{ query: '{{ search_query|escapejs }}', focused: false }" x-cloak>
+    <div class="relative">
+      <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+      <input type="text"
+             name="q"
+             x-model="query"
+             @focus="focused = true"
+             @blur="setTimeout(() => focused = false, 200)"
+             placeholder="Search any brand, model, codename, or chipset..."
+             hx-get="{% url 'firmwares:universal_search' %}"
+             hx-trigger="keyup changed delay:300ms"
+             hx-target="#universal-search-results"
+             hx-swap="innerHTML"
+             class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-input)] text-[var(--color-text-primary)] text-base placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition shadow-sm">
+      {# Search results dropdown #}
+      <div id="universal-search-results"
+           x-show="focused && query.length >= 2"
+           x-cloak
+           class="absolute z-50 left-0 right-0 top-full mt-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl shadow-2xl max-h-96 overflow-y-auto">
+      </div>
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] text-center mt-2">
+      Try: Samsung Galaxy S24, Pixel 9, Redmi Note 15, spinel, SM-S926B, Snapdragon...
+    </p>
+  </div>
+
+  {# ━━━ Featured Brands ━━━ #}
+  {% if featured_brands %}
+  <div class="space-y-4">
+    {% include "components/_section_header.html" with title="Featured Brands" subtitle="Most popular firmware collections" %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {% for brand in featured_brands %}
+      <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
+         class="group bg-[var(--color-bg-secondary)] rounded-xl border-2 border-[var(--color-accent)]/20 p-5 text-center hover:border-[var(--color-accent)] transition-all flex flex-col items-center gap-3 no-underline">
+        {% brand_logo_svg brand.name size=52 logo_url=brand.logo_url %}
+        <div>
+          <h3 class="font-bold text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{{ brand.name }}</h3>
+          <p class="text-xs text-[var(--color-text-muted)] mt-0.5">{{ brand.model_count }} model{{ brand.model_count|pluralize }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ━━━ All Brands Section ━━━ #}
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      {% include "components/_section_header.html" with title="All Brands" subtitle="Browse firmware by manufacturer" %}
+    </div>
+
+    {# Brand filter bar #}
+    <div class="flex items-center gap-3">
+      <div class="flex-1 relative">
+        <i data-lucide="filter" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+        <input type="text"
+               name="q"
+               value="{{ search_query }}"
+               placeholder="Filter brands..."
+               hx-get="{% url 'firmwares:library_hub' %}"
+               hx-trigger="keyup changed delay:300ms"
+               hx-target="#brand-grid"
+               hx-swap="innerHTML"
+               class="w-full pl-9 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
+      </div>
+      <span class="text-xs text-[var(--color-text-muted)] whitespace-nowrap">{{ brands|length }} brand{{ brands|length|pluralize }}</span>
+    </div>
+
+    {# Brand grid #}
+    <div id="brand-grid">
+      {% include "firmwares/fragments/brand_list.html" %}
+    </div>
+  </div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,562 @@
+{# admin_suite/index.html — Analytics Command Center Dashboard #}
+{% extends "layouts/admin.html" %}
+{% load static %}
+
+{% block title %}Dashboard — Admin Panel{% endblock %}
+
+{% block page_header %}
+{# Welcome Hero #}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">
+      Welcome back{% if request.user.email %}, <span class="text-gradient">{{ request.user.email|truncatechars:20 }}</span>{% endif %}
+    </h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Here's your platform analytics at a glance.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="{% url 'admin_suite:pending_approval' %}" class="btn btn-primary btn-press">
+      <i data-lucide="clock" class="w-4 h-4"></i>
+      Review Pending
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+{# ═══ KPI Cards Row ═══ #}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger-children">
+  {# Users KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 0"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center">
+        <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+      </div>
+      <span class="badge badge-accent text-[10px]">
+        +{{ kpi.new_users_7d }} this week
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.total_users }})" x-text="display.toLocaleString()">
+      {{ kpi.total_users }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Total Users</p>
+  </div>
+
+  {# Posts KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+        <i data-lucide="file-text" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+      <span class="badge badge-success text-[10px]">
+        {{ kpi.published_posts }} live
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.total_posts }})" x-text="display.toLocaleString()">
+      {{ kpi.total_posts }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Blog Posts</p>
+  </div>
+
+  {# Firmwares KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
+        <i data-lucide="hard-drive" class="w-5 h-5 text-amber-400"></i>
+      </div>
+      <span class="badge badge-warning text-[10px]">
+        {{ kpi.total_brands }} brands
+      </span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.total_firmwares }})" x-text="display.toLocaleString()">
+      {{ kpi.total_firmwares }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Active Firmwares</p>
+  </div>
+
+  {# Security KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+        <i data-lucide="shield-alert" class="w-5 h-5 text-red-400"></i>
+      </div>
+      {% if kpi.security_events_24h > 0 %}
+      <span class="badge badge-error text-[10px]">
+        {{ kpi.security_events_24h }} events
+      </span>
+      {% else %}
+      <span class="badge badge-success text-[10px]">All clear</span>
+      {% endif %}
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.security_events_24h }})" x-text="display.toLocaleString()">
+      {{ kpi.security_events_24h }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Security Events (24h)</p>
+  </div>
+</div>
+
+{# ═══ Charts Row ═══ #}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  {# User Registrations Chart (2/3 width) #}
+  <div class="lg:col-span-2 glass rounded-xl p-6 animate-in" style="--stagger: 4"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">User Registrations</h3>
+        <p class="text-xs text-[var(--color-text-muted)]">Last 7 days</p>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+        <i data-lucide="trending-up" class="w-4 h-4 text-blue-400"></i>
+      </div>
+    </div>
+    <div class="h-56" x-data="adminChart({
+      type: 'line',
+      labels: {{ chart_users_labels|safe }},
+      datasets: [{
+        label: 'New Users',
+        data: {{ chart_users_data|safe }}
+      }]
+    })" x-init="init($refs.canvas)">
+      <canvas x-ref="canvas"></canvas>
+    </div>
+  </div>
+
+  {# Content Breakdown Doughnut (1/3 width) #}
+  <div class="glass rounded-xl p-6 animate-in" style="--stagger: 5"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Content Status</h3>
+        <p class="text-xs text-[var(--color-text-muted)]">Post distribution</p>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+        <i data-lucide="pie-chart" class="w-4 h-4 text-violet-400"></i>
+      </div>
+    </div>
+    <div class="h-56" x-data="adminChart({
+      type: 'doughnut',
+      labels: {{ content_labels|safe }},
+      datasets: [{
+        data: {{ content_data|safe }}
+      }],
+      options: {
+        plugins: { legend: { display: true, position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'circle' } } }
+      }
+    })" x-init="init($refs.canvas)">
+      <canvas x-ref="canvas"></canvas>
+    </div>
+  </div>
+</div>
+
+{# ═══ Activity Feed + Security Chart + Quick Stats ═══ #}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  {# Recent Activity Feed #}
+  <div class="glass rounded-xl p-6 animate-in" style="--stagger: 6"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Recent Activity</h3>
+      <a href="{% url 'admin_suite:security' %}" class="text-xs text-[var(--color-accent)] hover:underline">View all</a>
+    </div>
+    <div class="space-y-3">
+      {% for item in recent_activity %}
+      <div class="flex items-start gap-3 group">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5
+          {% if item.color == 'error' %}bg-red-500/10
+          {% elif item.color == 'warning' %}bg-amber-500/10
+          {% elif item.color == 'success' %}bg-emerald-500/10
+          {% else %}bg-blue-500/10{% endif %}">
+          <i data-lucide="{{ item.icon }}" class="w-3.5 h-3.5
+            {% if item.color == 'error' %}text-red-400
+            {% elif item.color == 'warning' %}text-amber-400
+            {% elif item.color == 'success' %}text-emerald-400
+            {% else %}text-blue-400{% endif %}"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ item.text }}</p>
+          <p class="text-[10px] text-[var(--color-text-muted)]">{{ item.time }}</p>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-6">
+        <i data-lucide="inbox" class="w-8 h-8 text-[var(--color-text-muted)] mx-auto mb-2"></i>
+        <p class="text-xs text-[var(--color-text-muted)]">No recent activity</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Security Events Chart #}
+  <div class="glass rounded-xl p-6 animate-in" style="--stagger: 7"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Security Events</h3>
+        <p class="text-xs text-[var(--color-text-muted)]">Last 7 days</p>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+        <i data-lucide="shield" class="w-4 h-4 text-red-400"></i>
+      </div>
+    </div>
+    <div class="h-48" x-data="adminChart({
+      type: 'bar',
+      labels: {{ chart_security_labels|safe }},
+      datasets: [{
+        label: 'Events',
+        data: {{ chart_security_data|safe }}
+      }]
+    })" x-init="init($refs.canvas)">
+      <canvas x-ref="canvas"></canvas>
+    </div>
+  </div>
+
+  {# Quick Stats Sidebar #}
+  <div class="glass rounded-xl p-6 animate-in" style="--stagger: 8"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Platform Overview</h3>
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="download" class="w-4 h-4 text-blue-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Total Downloads</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]"
+              x-data="animatedCounter({{ kpi.total_downloads }})" x-text="display.toLocaleString()">
+          {{ kpi.total_downloads }}
+        </span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Active Users</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]"
+              x-data="animatedCounter({{ kpi.active_users }})" x-text="display.toLocaleString()">
+          {{ kpi.active_users }}
+        </span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="message-circle" class="w-4 h-4 text-amber-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Pending Comments</span>
+        </div>
+        <span class="text-sm font-semibold {% if kpi.pending_comments > 0 %}text-[var(--color-warning)]{% else %}text-[var(--color-text-primary)]{% endif %}">
+          {{ kpi.pending_comments }}
+        </span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="megaphone" class="w-4 h-4 text-pink-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Active Campaigns</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.active_campaigns }}</span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="layout" class="w-4 h-4 text-violet-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Published Pages</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.total_pages }}</span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Storage Providers</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.storage_providers }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ═══ Content Widgets (3-4 entries + See More) ═══ #}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+  {# Recent Blog Posts #}
+  <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 9"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i> Recent Posts
+      </h3>
+      <span class="text-[10px] text-[var(--color-text-muted)]">{{ kpi.total_posts }} total</span>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]/40">
+      {% for post in widget_posts %}
+      <div class="px-5 py-2.5 hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
+        <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ post.title }}</p>
+        <div class="flex items-center justify-between mt-0.5">
+          <span class="text-[10px] text-[var(--color-text-muted)] capitalize">{{ post.subtitle }}</span>
+          {% if post.date %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ post.date }}</span>{% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="px-5 py-6 text-center">
+        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
+        <p class="text-[10px] text-[var(--color-text-muted)]">No posts yet</p>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'admin_suite:blog' %}"
+       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+      See all posts →
+    </a>
+  </div>
+
+  {# Blog Categories #}
+  <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 10"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="tags" class="w-4 h-4 text-violet-400"></i> Blog Categories
+      </h3>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]/40">
+      {% for cat in widget_categories %}
+      <div class="px-5 py-2.5 flex items-center justify-between hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
+        <span class="text-xs text-[var(--color-text-secondary)] truncate">{{ cat.title }}</span>
+        <span class="text-[10px] text-[var(--color-text-muted)] shrink-0 ml-2">{{ cat.subtitle }}</span>
+      </div>
+      {% empty %}
+      <div class="px-5 py-6 text-center">
+        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
+        <p class="text-[10px] text-[var(--color-text-muted)]">No categories yet</p>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'admin_suite:blog' %}"
+       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+      See all categories →
+    </a>
+  </div>
+
+  {# Device Brands #}
+  <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 11"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="hard-drive" class="w-4 h-4 text-amber-400"></i> Device Brands
+      </h3>
+      <span class="text-[10px] text-[var(--color-text-muted)]">{{ kpi.total_brands }} total</span>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]/40">
+      {% for brand in widget_brands %}
+      <div class="px-5 py-2.5 flex items-center justify-between hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
+        <span class="text-xs text-[var(--color-text-secondary)] truncate">{{ brand.title }}</span>
+        <span class="text-[10px] text-[var(--color-text-muted)] shrink-0 ml-2">{{ brand.subtitle }}</span>
+      </div>
+      {% empty %}
+      <div class="px-5 py-6 text-center">
+        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
+        <p class="text-[10px] text-[var(--color-text-muted)]">No brands yet</p>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'admin_suite:firmwares' %}"
+       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+      See all brands →
+    </a>
+  </div>
+
+  {# Scraper Runs #}
+  <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 12"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="radar" class="w-4 h-4 text-cyan-400"></i> Scraper Runs
+      </h3>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]/40">
+      {% for run in widget_scraper_runs %}
+      <div class="px-5 py-2.5 hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
+        <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ run.title }}</p>
+        <div class="flex items-center justify-between mt-0.5">
+          <span class="text-[10px] text-[var(--color-text-muted)]">{{ run.subtitle }}</span>
+          {% if run.date %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ run.date }}</span>{% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="px-5 py-6 text-center">
+        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
+        <p class="text-[10px] text-[var(--color-text-muted)]">No scraper runs yet</p>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'admin_suite:scraper' %}"
+       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+      See all runs →
+    </a>
+  </div>
+</div>
+
+{# ═══ Security Status Strip ═══ #}
+<div class="mb-6 animate-in" style="--stagger: 13"
+     x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex items-center gap-2 mb-4">
+    <h2 class="text-sm font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">Security Systems</h2>
+    <div class="flex-1 h-px bg-gradient-to-r from-[var(--color-border)]/60 to-transparent"></div>
+  </div>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="glass rounded-xl p-4 hover-glow">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-500/15 flex items-center justify-center">
+          <i data-lucide="smartphone" class="w-4 h-4 text-blue-400"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Device Guard</p>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold
+            {% if security_status.devices_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
+            <span class="w-1.5 h-1.5 rounded-full {% if security_status.devices_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
+            {{ security_status.devices_enabled|yesno:"Active,Inactive" }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass rounded-xl p-4 hover-glow">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center">
+          <i data-lucide="bot" class="w-4 h-4 text-amber-400"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Bot Protection</p>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold
+            {% if security_status.bots_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
+            <span class="w-1.5 h-1.5 rounded-full {% if security_status.bots_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
+            {{ security_status.bots_enabled|yesno:"Active,Inactive" }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass rounded-xl p-4 hover-glow">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-violet-500/15 flex items-center justify-center">
+          <i data-lucide="activity" class="w-4 h-4 text-violet-400"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Risk Analysis</p>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold
+            {% if security_status.risk_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
+            <span class="w-1.5 h-1.5 rounded-full {% if security_status.risk_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
+            {{ security_status.risk_enabled|yesno:"Active,Inactive" }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass rounded-xl p-4 hover-glow">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+          <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Login Policy</p>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)]">
+            {{ security_status.login_policy }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ═══ Quick Navigation Grid ═══ #}
+<div class="animate-in" style="--stagger: 14"
+     x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex items-center gap-2 mb-4">
+    <h2 class="text-sm font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">Quick Access</h2>
+    <div class="flex-1 h-px bg-gradient-to-r from-[var(--color-border)]/60 to-transparent"></div>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 stagger-children">
+    <a href="{% url 'admin_suite:security' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-blue-500/15 group-hover:bg-blue-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="shield" class="w-5 h-5 text-blue-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Security</span>
+    </a>
+    <a href="{% url 'admin_suite:users' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-violet-500/15 group-hover:bg-violet-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="users" class="w-5 h-5 text-violet-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Users</span>
+    </a>
+    <a href="{% url 'admin_suite:blog' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/15 group-hover:bg-emerald-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="file-text" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Blog</span>
+    </a>
+    <a href="{% url 'admin_suite:firmwares' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/15 group-hover:bg-amber-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="hard-drive" class="w-5 h-5 text-amber-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Firmwares</span>
+    </a>
+    <a href="{% url 'admin_suite:storage' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/15 group-hover:bg-cyan-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="database" class="w-5 h-5 text-cyan-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Storage</span>
+    </a>
+    <a href="{% url 'admin_suite:settings' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-rose-500/15 group-hover:bg-rose-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="settings" class="w-5 h-5 text-rose-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Settings</span>
+    </a>
+    <a href="{% url 'admin_suite:pages' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-indigo-500/15 group-hover:bg-indigo-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="layout" class="w-5 h-5 text-indigo-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Pages</span>
+    </a>
+    <a href="{% url 'admin_suite:content' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-teal-500/15 group-hover:bg-teal-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="newspaper" class="w-5 h-5 text-teal-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Content</span>
+    </a>
+    <a href="{% url 'admin_suite:comments' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/15 group-hover:bg-amber-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="message-square" class="w-5 h-5 text-amber-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Comments</span>
+    </a>
+    <a href="{% url 'admin_suite:marketing' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-pink-500/15 group-hover:bg-pink-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="megaphone" class="w-5 h-5 text-pink-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Marketing</span>
+    </a>
+    <a href="{% url 'admin_suite:ads' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/15 group-hover:bg-emerald-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="badge-dollar-sign" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Ads</span>
+    </a>
+    <a href="{% url 'admin_suite:distribution' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
+      <div class="w-10 h-10 rounded-xl bg-sky-500/15 group-hover:bg-sky-500/25 flex items-center justify-center transition-colors">
+        <i data-lucide="share-2" class="w-5 h-5 text-sky-400"></i>
+      </div>
+      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Distribution</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

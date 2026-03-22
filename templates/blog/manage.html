@@ -1,0 +1,105 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Manage Posts — {{ settings.site_name }} Blog{% endblock %}
+
+{% block page_header %}
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-bold">Manage Posts</h1>
+  {% if allow_user_posts %}
+  <a href="{% url 'blog:post_create' %}" class="rounded-lg bg-[var(--color-accent)] px-5 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+    {% include "components/_icon.html" with name="plus" size="16" %}
+    New Post
+  </a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Drafts -->
+<section class="mb-10">
+  <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+    {% include "components/_icon.html" with name="file-edit" size="18" %}
+    Drafts
+    {% if drafts %}
+    {% include "components/_badge.html" with text=drafts|length variant="warning" %}
+    {% endif %}
+  </h2>
+
+  {% if drafts %}
+  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-[var(--color-bg-secondary)]">
+        <tr>
+          <th class="px-4 py-3 text-left font-medium">Title</th>
+          <th class="px-4 py-3 text-left font-medium">Category</th>
+          <th class="px-4 py-3 text-left font-medium">Last Modified</th>
+          <th class="px-4 py-3 text-right font-medium">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--color-border)]">
+        {% for post in drafts %}
+        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+          <td class="px-4 py-3">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="font-medium text-[var(--color-accent)] hover:underline">
+              {{ post.title }}
+            </a>
+          </td>
+          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.category|default:"—" }}</td>
+          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.updated_at|timesince }} ago</td>
+          <td class="px-4 py-3 text-right">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-[var(--color-accent)] hover:underline text-xs">Edit</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  {% include "components/_empty_state.html" with icon="file-edit" title="No drafts" description="You don't have any draft posts." %}
+  {% endif %}
+</section>
+
+<!-- Scheduled -->
+<section>
+  <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+    {% include "components/_icon.html" with name="clock" size="18" %}
+    Scheduled
+    {% if scheduled %}
+    {% include "components/_badge.html" with text=scheduled|length variant="info" %}
+    {% endif %}
+  </h2>
+
+  {% if scheduled %}
+  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-[var(--color-bg-secondary)]">
+        <tr>
+          <th class="px-4 py-3 text-left font-medium">Title</th>
+          <th class="px-4 py-3 text-left font-medium">Category</th>
+          <th class="px-4 py-3 text-left font-medium">Scheduled For</th>
+          <th class="px-4 py-3 text-right font-medium">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--color-border)]">
+        {% for post in scheduled %}
+        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+          <td class="px-4 py-3">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="font-medium text-[var(--color-accent)] hover:underline">
+              {{ post.title }}
+            </a>
+          </td>
+          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.category|default:"—" }}</td>
+          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.publish_date|date:"M d, Y H:i" }}</td>
+          <td class="px-4 py-3 text-right">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-[var(--color-accent)] hover:underline text-xs">Edit</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  {% include "components/_empty_state.html" with icon="clock" title="No scheduled posts" description="You don't have any posts scheduled for publication." %}
+  {% endif %}
+</section>
+{% endblock %}

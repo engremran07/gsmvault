@@ -1,0 +1,24 @@
+{# components/_admin_bulk_actions.html — Bulk action toolbar #}
+{# Usage: {% include "components/_admin_bulk_actions.html" with actions=bulk_actions csrf_token=csrf_token %} #}
+{# actions is a list of dicts: [{"value": "delete", "label": "Delete Selected", "icon": "trash-2", "danger": True}, ...] #}
+<div class="glass rounded-xl p-3 mb-4" x-data="{ action: '' }" x-show="document.querySelectorAll('input[name=selected]:checked').length > 0" x-cloak>
+  <form method="post" class="flex items-center gap-3"
+    @submit.prevent="if(action === 'delete') { $store.confirm.show('Delete selected items?', 'This cannot be undone.', () => $el.submit()) } else { $el.submit() }">
+    {% csrf_token %}
+    <span class="text-xs text-[var(--color-text-muted)] shrink-0">
+      With selected:
+    </span>
+    <select name="bulk_action" x-model="action"
+      class="px-3 py-1.5 rounded-lg bg-[var(--color-bg-primary)]/60 border border-[var(--color-border)]/60 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)]/60 focus:outline-none">
+      <option value="">Choose action...</option>
+      {% for act in actions %}
+      <option value="{{ act.value }}">{{ act.label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" :disabled="!action"
+      class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      :class="action === 'delete' ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20'">
+      Apply
+    </button>
+  </form>
+</div>

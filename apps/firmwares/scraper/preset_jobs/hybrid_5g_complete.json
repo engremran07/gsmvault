@@ -1,0 +1,16 @@
+{
+  "_comment": "Full brand walk + search-targeted 5G pass for maximum coverage",
+  "_strategy": "hybrid",
+  "job_id": "hybrid_5g_complete",
+  "description": "Full brand walk + search-targeted 5G pass for maximum coverage",
+  "version": "6.0",
+  "strategy": "hybrid",
+  "filters": {
+    "year_min": 2019,
+    "availabilities": [
+      1,
+      2
+    ],
+    "has_5g": true
+  }
+}

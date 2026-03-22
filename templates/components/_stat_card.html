@@ -1,0 +1,13 @@
+{# components/_stat_card.html — Reusable public stat/info card #}
+{# Usage: {% include "components/_stat_card.html" with icon="download" color="cyan" value="1,234" label="Downloads" %} #}
+<div class="glass rounded-xl p-5">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-{{ color|default:'blue' }}-500/15 flex items-center justify-center shrink-0">
+      <i data-lucide="{{ icon|default:'info' }}" class="w-5 h-5 text-{{ color|default:'blue' }}-400"></i>
+    </div>
+    <div>
+      <div class="text-xl font-bold text-[var(--color-text-primary)]">{{ value|default:"0" }}</div>
+      <p class="text-xs text-[var(--color-text-muted)]">{{ label|default:"—" }}</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+{# templates/layouts/minimal.html — Error pages, maintenance #}
+{% extends "base/_base.html" %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[calc(100vh-8rem)] px-4">
+  <div class="text-center max-w-lg">
+    {% block error_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{
+  "_comment": "Android phones with Snapdragon 8-series chips (2020+)",
+  "_strategy": "search_targeted",
+  "job_id": "android_flagship_snapdragon",
+  "description": "Android phones with Snapdragon 8-series chips (2020+)",
+  "version": "6.0",
+  "strategy": "search_targeted",
+  "filters": {
+    "year_min": 2020,
+    "availabilities": [
+      1
+    ],
+    "free_text": "Snapdragon 8",
+    "os_ids": [
+      2
+    ]
+  }
+}

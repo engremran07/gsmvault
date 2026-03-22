@@ -1,0 +1,39 @@
+{% extends "layouts/default.html" %}
+
+{% block title %}Create Category — {{ settings.site_name }} Blog{% endblock %}
+
+{% block page_header %}
+<h1 class="text-2xl font-bold">Create Category</h1>
+{% include "components/_breadcrumb.html" with label="Blog" %}
+{% endblock %}
+
+{% block page_content %}
+<div class="max-w-lg">
+  <form method="post" class="space-y-5">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    {% include "components/_alert.html" with type="error" message=form.non_field_errors.0 %}
+    {% endif %}
+
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 space-y-4">
+      {% for field in form %}
+      <div>
+        <label for="{{ field.id_for_label }}" class="block text-sm font-medium mb-1">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="text-xs text-[var(--color-error)] mt-1">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="flex gap-3">
+      <button type="submit" class="rounded-lg bg-[var(--color-accent)] px-6 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+        Create Category
+      </button>
+      <a href="{% url 'blog:post_list' %}" class="rounded-lg border border-[var(--color-border)] px-6 py-2.5 hover:bg-[var(--color-bg-secondary)] transition">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

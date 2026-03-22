@@ -1,0 +1,17 @@
+{
+  "_comment": "Budget smartphones under $250, available now",
+  "_strategy": "search_targeted",
+  "job_id": "budget_global",
+  "description": "Budget smartphones under $250, available now",
+  "version": "6.0",
+  "strategy": "search_targeted",
+  "filters": {
+    "availabilities": [
+      1
+    ],
+    "price_max_usd": 250,
+    "os_ids": [
+      2
+    ]
+  }
+}

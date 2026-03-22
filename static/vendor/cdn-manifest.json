@@ -1,0 +1,37 @@
+{
+  "tailwindcss": {
+    "version": "4.1.8",
+    "cdns": [
+      "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4",
+      "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/4.1.8/tailwindcss.min.js",
+      "https://unpkg.com/@tailwindcss/browser@4"
+    ],
+    "local": "/static/vendor/tailwindcss/tailwind.min.js"
+  },
+  "alpinejs": {
+    "version": "3.14.9",
+    "cdns": [
+      "https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.9/cdn.min.js",
+      "https://unpkg.com/alpinejs@3/dist/cdn.min.js"
+    ],
+    "local": "/static/vendor/alpinejs/alpine.min.js"
+  },
+  "htmx": {
+    "version": "2.0.4",
+    "cdns": [
+      "https://cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js",
+      "https://unpkg.com/htmx.org@2/dist/htmx.min.js"
+    ],
+    "local": "/static/vendor/htmx/htmx.min.js"
+  },
+  "lucide": {
+    "version": "0.468.0",
+    "cdns": [
+      "https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js",
+      "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"
+    ],
+    "local": "/static/vendor/lucide/lucide.min.js"
+  }
+}

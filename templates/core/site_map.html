@@ -1,0 +1,34 @@
+{% extends "layouts/default.html" %}
+
+{% block title %}Site Map — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<h1 class="text-2xl font-bold">Site Map</h1>
+{% endblock %}
+
+{% block page_content %}
+{% if sections %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  {% for section in sections %}
+  <div>
+    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2">
+      {% include "components/_icon.html" with name="folder" size="18" %}
+      {{ section.title }}
+    </h2>
+    <ul class="space-y-2">
+      {% for link in section.links %}
+      <li>
+        <a href="{{ link.url }}" class="text-sm text-[var(--color-accent)] hover:underline flex items-center gap-1.5">
+          {% include "components/_icon.html" with name="chevron-right" size="12" %}
+          {{ link.title }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="map" title="Site map unavailable" description="The site map is currently being generated." %}
+{% endif %}
+{% endblock %}

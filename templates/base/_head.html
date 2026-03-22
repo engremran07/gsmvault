@@ -1,0 +1,97 @@
+{# templates/base/_head.html — Meta tags, CDN links, theme CSS #}
+{% load static %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="view-transition" content="same-origin">
+<meta name="htmx-config" content='{"inlineScriptNonce":"{{ request.csp_nonce }}"}'>
+<meta name="description" content="{% block meta_description %}{{ settings.site_name }} — Enterprise Firmware Distribution platform{% endblock %}">
+{% block meta_robots %}{% endblock %}
+<title>{% block title %}{{ settings.site_name }}{% endblock %}</title>
+
+{# Canonical URL — pages override via block #}
+{% block canonical %}{% endblock %}
+
+{# Favicon — from SiteSettings or static fallback #}
+<link rel="icon" href="{{ settings.favicon }}" type="image/x-icon">
+<link rel="apple-touch-icon" href="{{ settings.favicon }}">
+
+{# Open Graph meta tags #}
+<meta property="og:site_name" content="{{ settings.site_name }}">
+<meta property="og:title" content="{% block og_title %}{{ settings.site_name }}{% endblock %}">
+<meta property="og:description" content="{% block og_description %}{{ settings.site_description }}{% endblock %}">
+{% block og_image %}<meta property="og:image" content="{{ settings.og_image }}">{% endblock %}
+{% block og_url %}{% if settings.site_url %}<meta property="og:url" content="{{ settings.site_url }}">{% endif %}{% endblock %}
+{% block og_type %}<meta property="og:type" content="website">{% endblock %}
+
+{# Twitter Card meta tags #}
+<meta name="twitter:card" content="summary_large_image">
+{% if settings.twitter_handle %}<meta name="twitter:site" content="@{{ settings.twitter_handle }}">{% endif %}
+<meta name="twitter:title" content="{% block twitter_title %}{{ settings.site_name }}{% endblock %}">
+<meta name="twitter:description" content="{% block twitter_description %}{{ settings.site_description }}{% endblock %}">
+{% block twitter_image %}<meta name="twitter:image" content="{{ settings.og_image }}">{% endblock %}
+
+{# Verification meta tags from SiteSettings #}
+{% for tag in meta_tags %}
+<meta name="{{ tag.name }}" content="{{ tag.content }}">
+{% endfor %}
+
+{# JSON-LD Structured Data — WebSite schema on every page, pages inject additional via block #}
+<script type="application/ld+json" nonce="{{ request.csp_nonce }}">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "{{ settings.site_name }}",
+  "url": "{{ settings.site_url|default:request.scheme }}{% if not settings.site_url %}://{{ request.get_host }}{% endif %}"{% if settings.site_description %},
+  "description": "{{ settings.site_description }}"{% endif %}
+}
+</script>
+{% block structured_data %}{% endblock %}
+
+{# CDN preconnect — reduce DNS+TLS latency for script loading #}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+{# Font preloading — self-hosted WOFF2 variable fonts (eliminates Google Fonts dep) #}
+<link rel="preload" href="{% static 'fonts/inter/inter-variable.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'fonts/jetbrains-mono/jetbrains-mono-variable.woff2' %}" as="font" type="font/woff2" crossorigin>
+
+{# Theme CSS custom properties #}
+<link rel="stylesheet" href="{% static 'css/dist/main.css' %}">
+
+{# Alpine.js x-cloak — hide elements until Alpine initializes #}
+<style nonce="{{ request.csp_nonce }}">[x-cloak]{display:none!important}.no-js-hidden{display:none}</style>
+
+{# Tailwind CSS — CDN for dev, compiled for prod #}
+{% if debug %}
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"
+        nonce="{{ request.csp_nonce }}"
+        crossorigin="anonymous"></script>
+{% endif %}
+
+{# Prevent FOUC: apply stored theme immediately #}
+<script nonce="{{ request.csp_nonce }}">
+  (function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+</script>
+
+{# Google Analytics (GA4) #}
+{% if settings.google_analytics_id %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.google_analytics_id }}" nonce="{{ request.csp_nonce }}"></script>
+<script nonce="{{ request.csp_nonce }}">
+  window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());gtag('config','{{ settings.google_analytics_id }}');
+</script>
+{% endif %}
+
+{# Google Tag Manager #}
+{% if settings.google_tag_manager_id %}
+<script nonce="{{ request.csp_nonce }}">
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+  var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+  j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','{{ settings.google_tag_manager_id }}');
+</script>
+{% endif %}

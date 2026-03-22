@@ -1,0 +1,28 @@
+{# admin_suite/_page_header.html — Title + subtitle + flash message (breadcrumb in topbar) #}
+<div class="mb-6">
+  {# Title row with optional action slot #}
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">{{ page_title|default:"Admin" }}</h1>
+      {% if subtitle %}<p class="text-sm text-[var(--color-text-muted)] mt-1">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% block page_actions %}{% endblock %}
+  </div>
+
+  {# Flash message #}
+  {% if message %}
+  <div class="mt-4 flex items-center gap-3 px-4 py-3 rounded-xl border text-sm
+    {% if 'error' in message|lower or 'fail' in message|lower %}bg-red-500/10 border-red-500/20 text-red-400
+    {% elif 'success' in message|lower or 'saved' in message|lower or 'created' in message|lower or 'deleted' in message|lower %}bg-emerald-500/10 border-emerald-500/20 text-emerald-400
+    {% else %}bg-[var(--color-accent)]/10 border-[var(--color-accent)]/20 text-[var(--color-accent)]{% endif %}"
+    x-data="{ show: true }" x-show="show" x-cloak
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+    <i data-lucide="{% if 'error' in message|lower or 'fail' in message|lower %}alert-circle{% elif 'success' in message|lower or 'saved' in message|lower or 'created' in message|lower or 'deleted' in message|lower %}check-circle-2{% else %}info{% endif %}" class="w-4 h-4 shrink-0"></i>
+    <span class="flex-1">{{ message }}</span>
+    <button @click="show = false" class="ml-auto p-0.5 rounded hover:bg-white/10 transition-colors">
+      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+    </button>
+  </div>
+  {% endif %}
+</div>

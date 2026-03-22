@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /django-admin/
+Disallow: /api/
+Disallow: /account/
+Disallow: /accounts/
+Disallow: /users/dashboard/
+Disallow: /users/devices/
+Disallow: /consent/
+Disallow: /notifications/
+Disallow: /site_settings/
+
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml

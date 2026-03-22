@@ -1,0 +1,71 @@
+{% extends "layouts/admin.html" %}
+{% block title %}i18n — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Internationalization</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:i18n_translations' %}" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="languages" class="w-3.5 h-3.5 inline mr-1"></i>Translation Strings</a>
+</div>
+{% endblock %}
+{% block page_content %}
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 stagger-children">
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:0" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3"><i data-lucide="globe" class="w-4 h-4 text-blue-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.total_languages|default:'0' }})" x-text="display.toLocaleString()">{{ stats.total_languages|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Languages</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:1" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.active_languages|default:'0' }})" x-text="display.toLocaleString()">{{ stats.active_languages|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Active</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:2" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center mb-3"><i data-lucide="key" class="w-4 h-4 text-violet-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.total_keys|default:'0' }})" x-text="display.toLocaleString()">{{ stats.total_keys|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Keys</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:3" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center mb-3"><i data-lucide="type" class="w-4 h-4 text-cyan-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.total_translations|default:'0' }})" x-text="display.toLocaleString()">{{ stats.total_translations|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Translations</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:4" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3"><i data-lucide="alert-circle" class="w-4 h-4 text-amber-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.missing_translations|default:'0' }})" x-text="display.toLocaleString()">{{ stats.missing_translations|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Missing</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:5" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3"><i data-lucide="percent" class="w-4 h-4 text-emerald-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.translation_coverage|floatformat:1|default:"0" }}%</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Coverage</p>
+  </div>
+</div>
+
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<div x-data="{ tab: 'languages' }" class="animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
+    <button @click="tab='languages'" :class="tab==='languages' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Languages</button>
+    <button @click="tab='missing'" :class="tab==='missing' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Missing</button>
+  </div>
+  <div x-show="tab==='languages'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Code</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">RTL</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for lang in languages %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-mono text-xs font-bold text-[var(--color-accent)]">{{ lang.code }}</td><td class="py-3 px-4 text-[var(--color-text-primary)]">{{ lang.name }}</td><td class="py-3 px-4 text-center">{% if lang.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td><td class="py-3 px-4 text-center">{% if lang.is_rtl %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">RTL</span>{% else %}<span class="text-xs text-[var(--color-text-muted)]">LTR</span>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No languages</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div x-show="tab==='missing'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Key</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Language</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Detected</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for m in recent_missing %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ m.key }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ m.language }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ m.created_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="3" class="py-8 text-center text-emerald-400"><i data-lucide="check-circle" class="w-5 h-5 inline mr-2"></i>All translations up to date</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

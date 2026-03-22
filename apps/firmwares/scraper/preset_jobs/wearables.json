@@ -1,0 +1,13 @@
+{
+  "_comment": "All smartwatches and wearable devices",
+  "_strategy": "search_targeted",
+  "job_id": "wearables",
+  "description": "All smartwatches and wearable devices",
+  "version": "6.0",
+  "strategy": "search_targeted",
+  "filters": {
+    "form_factors": [
+      6
+    ]
+  }
+}

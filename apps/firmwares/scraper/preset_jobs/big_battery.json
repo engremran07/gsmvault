@@ -1,0 +1,18 @@
+{
+  "_comment": "All phones with 5000mAh+ battery, available now",
+  "_strategy": "search_targeted",
+  "job_id": "big_battery",
+  "description": "All phones with 5000mAh+ battery, available now",
+  "version": "6.0",
+  "strategy": "search_targeted",
+  "filters": {
+    "availabilities": [
+      1
+    ],
+    "os_ids": [
+      2
+    ],
+    "battery_min_mah": 5000,
+    "sort": 5
+  }
+}

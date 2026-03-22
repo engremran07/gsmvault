@@ -1,0 +1,25 @@
+{# templates/components/_breadcrumb.html — Breadcrumb navigation #}
+{# Usage: label="Blog" for a simple leaf, or items=list_of_dicts for multi-level #}
+{% if label or items %}
+<nav aria-label="Breadcrumb" class="mb-4">
+  <ol class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+    <li><a href="{% url 'home' %}" class="hover:text-[var(--color-accent)]"><i data-lucide="home" class="w-4 h-4"></i></a></li>
+    {% if label %}
+    <li class="flex items-center gap-2">
+      <i data-lucide="chevron-right" class="w-3 h-3"></i>
+      <span class="text-[var(--color-text-primary)]">{{ label }}</span>
+    </li>
+    {% endif %}
+    {% for item in items %}
+    <li class="flex items-center gap-2">
+      <i data-lucide="chevron-right" class="w-3 h-3"></i>
+      {% if item.url %}
+      <a href="{{ item.url }}" class="hover:text-[var(--color-accent)]">{{ item.label }}</a>
+      {% else %}
+      <span class="text-[var(--color-text-primary)]">{{ item.label }}</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</nav>
+{% endif %}

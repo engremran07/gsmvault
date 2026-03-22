@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+import fnmatch
+import hashlib
+from collections.abc import Callable
+
+from django.core.cache import cache
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+
+from apps.core.app_service import AppService
+from apps.core.models import AppRegistry
+from apps.core.utils.ip import get_client_ip
+from apps.security.models import CrawlerEvent, CrawlerRule
+
+
+class CrawlerGuardMiddleware:
+    """
+    Lightweight anti-scraping middleware.
+    Moved from apps.crawler_guard to apps.security.
+    """
+
+    def __init__(self, get_response: Callable) -> None:
+        self.get_response = get_response
+
+    def __call__(self, request):
+        try:
+            reg = AppRegistry.get_solo()
+            if not getattr(reg, "crawler_guard_enabled", True):
+                return self.get_response(request)
+        except Exception:  # noqa: S110 - fail-open: registry unavailable must not block
+            pass
+
+        rule = self._match_rule(request.path_info)
+        ip = get_client_ip(request) or ""
+        device_id = self._resolve_device_identifier(request)
+        headers_hash = self._hash_headers(request)
+        user_agent = request.META.get("HTTP_USER_AGENT", "")
+
+        response: HttpResponse | None = None
+        action_taken = "allow"
+
+        is_known_bot = any(
+            b in (user_agent or "").lower()
+            for b in ["googlebot", "bingbot", "duckduckbot", "slurp"]
+        )
+
+        if rule:
+            action_taken = rule.action
+            over_limit = self._over_limit(rule, ip, device_id, headers_hash)
+            if rule.action == "block" and not is_known_bot:
+                response = HttpResponseForbidden("Request blocked.")
+            elif rule.action == "throttle":
+                if over_limit and not is_known_bot:
+                    response = JsonResponse(
+                        {"detail": "Too many requests."}, status=429
+                    )
+                else:
+                    action_taken = "allow"
+            elif rule.action == "challenge" and not is_known_bot:
+                response = JsonResponse(
+                    {"detail": "Challenge required", "challenge": "turnstile"},
+                    status=429,
+                )
+                response["X-Crawler-Challenge"] = "required"
+            else:
+                action_taken = "allow"
+
+        self._log_event(
+            ip=ip,
+            device_identifier=device_id,
+            path=request.path_info,
+            rule=rule,
+            action_taken=action_taken,
+            user_agent=user_agent,
+            headers_hash=headers_hash,
+        )
+
+        if response:
+            return response
+        return self.get_response(request)
+
+    def _match_rule(self, path: str) -> CrawlerRule | None:
+        try:
+            rules = CrawlerRule.objects.filter(is_enabled=True).order_by("-priority")
+            for rule in rules:
+                if fnmatch.fnmatch(path, rule.path_pattern):
+                    return rule
+        except Exception:
+            return None
+        return None
+
+    def _resolve_device_identifier(self, request) -> str | None:
+        try:
+            devices_api = AppService.get("devices")
+            if devices_api and hasattr(devices_api, "resolve_identity"):
+                ident = devices_api.resolve_identity(request)
+                return ident.get("os_fingerprint") or ident.get("server_fallback_fp")
+        except Exception:
+            return None
+        return None
+
+    def _hash_headers(self, request) -> str:
+        headers = []
+        for k, v in request.META.items():
+            if k.startswith("HTTP_"):
+                if k in {"HTTP_AUTHORIZATION", "HTTP_COOKIE"}:
+                    continue
+                headers.append(f"{k}:{v}")
+        data = "|".join(sorted(headers)).encode("utf-8", errors="ignore")
+        return hashlib.sha256(data).hexdigest()
+
+    def _log_event(
+        self,
+        *,
+        ip: str,
+        device_identifier: str | None,
+        path: str,
+        rule: CrawlerRule | None,
+        action_taken: str,
+        user_agent: str,
+        headers_hash: str,
+    ) -> None:
+        try:
+            CrawlerEvent.objects.create(
+                ip=ip,
+                device_identifier=device_identifier,
+                path=path,
+                rule_triggered=rule,
+                action_taken=action_taken,
+                user_agent=user_agent,
+                headers_hash=headers_hash,
+                metadata={
+                    "rule_id": getattr(rule, "id", None),
+                    "priority": getattr(rule, "priority", None),
+                    "stop_processing": getattr(rule, "stop_processing", None),
+                },
+            )
+        except Exception:  # noqa: S110 - logging failure must not block requests
+            pass
+
+    def _over_limit(
+        self,
+        rule: CrawlerRule,
+        ip: str,
+        device_identifier: str | None,
+        headers_hash: str,
+    ) -> bool:
+        if not rule.requests_per_minute:
+            return False
+        keys = [f"cg:{rule.id}:ip:{ip}"]  # type: ignore[attr-defined]
+        if device_identifier:
+            keys.append(f"cg:{rule.id}:dev:{device_identifier}")  # type: ignore[attr-defined]
+        if headers_hash:
+            keys.append(f"cg:{rule.id}:hdr:{headers_hash}")  # type: ignore[attr-defined]
+        for key in keys:
+            try:
+                current = cache.incr(key)
+                if current == 1:
+                    cache.expire(key, 60)  # type: ignore[attr-defined]
+            except Exception:  # noqa: S112 - cache failure must not block requests
+                try:
+                    val = cache.get(key, 0) + 1
+                    cache.set(key, val, 60)
+                    current = val
+                except Exception:  # noqa: S110 - secondary cache failure is non-fatal
+                    pass
+            if current > rule.requests_per_minute:
+                return True
+        return False

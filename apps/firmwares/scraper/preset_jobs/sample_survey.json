@@ -1,0 +1,10 @@
+{
+  "_comment": "Representative sample: oldest+mid+newest 5 devices per brand",
+  "_strategy": "brand_walk",
+  "job_id": "sample_survey",
+  "description": "Representative sample: oldest+mid+newest 5 devices per brand",
+  "version": "6.0",
+  "strategy": "brand_walk",
+  "sample_size": 5,
+  "sort_by_popularity": true
+}

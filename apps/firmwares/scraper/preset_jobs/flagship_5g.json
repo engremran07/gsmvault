@@ -1,0 +1,19 @@
+{
+  "_comment": "All flagship 5G smartphones released 2020 onwards",
+  "_strategy": "search_targeted",
+  "job_id": "flagship_5g",
+  "description": "All flagship 5G smartphones released 2020 onwards",
+  "version": "6.0",
+  "strategy": "search_targeted",
+  "filters": {
+    "year_min": 2020,
+    "availabilities": [
+      1
+    ],
+    "has_5g": true,
+    "os_ids": [
+      2,
+      3
+    ]
+  }
+}

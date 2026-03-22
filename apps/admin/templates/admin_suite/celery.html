@@ -1,0 +1,168 @@
+{# admin_suite/celery.html — Celery Task Monitoring #}
+{% extends "layouts/admin.html" %}
+
+{% block title %}Celery — Admin Panel{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Celery</h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Task queue monitoring &amp; worker status</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{# ═══ KPI Cards ═══ #}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 stagger-children">
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 0"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3">
+      <i data-lucide="server" class="w-5 h-5 text-emerald-400"></i>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.worker_count }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Workers Online</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3">
+      <i data-lucide="activity" class="w-5 h-5 text-blue-400"></i>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.active_count }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Active Tasks</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center mb-3">
+      <i data-lucide="list-checks" class="w-5 h-5 text-purple-400"></i>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.registered_count }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Registered Tasks</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center mb-3">
+      <i data-lucide="link" class="w-5 h-5 text-cyan-400"></i>
+    </div>
+    <div class="text-sm font-mono font-bold text-[var(--color-text-primary)] truncate">{{ stats.broker }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Broker</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+  {# ═══ Workers ═══ #}
+  <div class="glass rounded-xl overflow-hidden animate-in"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-4 border-b border-[var(--color-border)]">
+      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+        <i data-lucide="server" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
+        Workers
+      </h2>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]">
+      {% for w in workers %}
+      <div class="px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-sm font-medium text-[var(--color-text-primary)]">{{ w.name }}</span>
+        </div>
+        <span class="text-xs text-[var(--color-text-muted)]">{{ w.active }} active</span>
+      </div>
+      {% empty %}
+      <div class="px-5 py-8 text-center text-[var(--color-text-muted)]">
+        <i data-lucide="server-off" class="w-6 h-6 mx-auto mb-2 opacity-30"></i>
+        <p class="text-sm">No workers detected</p>
+        <p class="text-xs mt-1">Start workers or check Redis connection</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ═══ Beat Schedule ═══ #}
+  <div class="glass rounded-xl overflow-hidden animate-in"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-4 border-b border-[var(--color-border)]">
+      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+        <i data-lucide="clock" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
+        Beat Schedule
+      </h2>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]">
+      {% for s in scheduled_tasks %}
+      <div class="px-5 py-3">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm font-medium text-[var(--color-text-primary)]">{{ s.name }}</span>
+          <span class="text-xs text-[var(--color-text-muted)] font-mono">{{ s.schedule }}</span>
+        </div>
+        <p class="text-xs text-[var(--color-text-muted)] font-mono truncate">{{ s.task }}</p>
+      </div>
+      {% empty %}
+      <div class="px-5 py-8 text-center text-[var(--color-text-muted)]">
+        <i data-lucide="clock" class="w-6 h-6 mx-auto mb-2 opacity-30"></i>
+        <p class="text-sm">No scheduled tasks configured</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{# ═══ Active Tasks ═══ #}
+{% if active_tasks %}
+<div class="glass rounded-xl overflow-hidden mb-6 animate-in"
+     x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="px-5 py-4 border-b border-[var(--color-border)]">
+    <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <i data-lucide="activity" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
+      Active Tasks
+    </h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+          <th class="px-5 py-3 text-left font-medium">Task</th>
+          <th class="px-5 py-3 text-left font-medium">ID</th>
+          <th class="px-5 py-3 text-left font-medium">Worker</th>
+          <th class="px-5 py-3 text-left font-medium">Started</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--color-border)]">
+        {% for t in active_tasks %}
+        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
+          <td class="px-5 py-3 font-medium text-[var(--color-text-primary)]">{{ t.name }}</td>
+          <td class="px-5 py-3 text-[var(--color-text-muted)] font-mono text-xs truncate max-w-[200px]">{{ t.id }}</td>
+          <td class="px-5 py-3 text-[var(--color-text-secondary)]">{{ t.worker }}</td>
+          <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ t.started }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{# ═══ Registered Tasks ═══ #}
+<div class="glass rounded-xl overflow-hidden animate-in"
+     x-data="{ show: false }" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between cursor-pointer"
+       @click="show = !show">
+    <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <i data-lucide="list-checks" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
+      Registered Tasks
+      <span class="text-xs font-normal text-[var(--color-text-muted)] ml-1">({{ registered_tasks|length }})</span>
+    </h2>
+    <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform"
+       :class="show ? 'rotate-180' : ''"></i>
+  </div>
+  <div x-show="show" x-collapse x-cloak class="divide-y divide-[var(--color-border)]">
+    {% for task in registered_tasks %}
+    <div class="px-5 py-2 text-sm font-mono text-[var(--color-text-secondary)]">{{ task }}</div>
+    {% empty %}
+    <div class="px-5 py-6 text-center text-[var(--color-text-muted)] text-sm">
+      No registered tasks found — workers may be offline
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

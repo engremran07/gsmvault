@@ -1,0 +1,75 @@
+{# templates/base/_nav.html — Top navigation bar #}{% load static %}<nav class="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] sticky top-0 z-50"
+     x-data="{ mobileOpen: false }">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      {# Logo #}
+      <a href="{% url 'home' %}" class="flex items-center gap-2 text-[var(--color-accent)] font-bold text-xl">
+        <img src="{{ settings.logo }}" alt="{{ settings.site_name }}" class="w-6 h-6 object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <i data-lucide="cpu" class="w-6 h-6" style="display:none"></i>
+        {{ settings.site_name }}
+      </a>
+
+      {# Desktop nav links #}
+      <div class="hidden md:flex items-center gap-6">
+        <a href="{% url 'home' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Home</a>
+        <a href="{% url 'firmwares:library_hub' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Devices</a>
+        <a href="{% url 'blog:post_list' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Blog</a>
+        <a href="{% url 'bounty:bounty_list' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Bounty</a>
+        <a href="{% url 'forum:index' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">Forum</a>
+
+        {# Theme switcher #}
+        {% include "components/_theme_switcher.html" %}
+
+        {# Auth buttons #}
+        {% if user.is_authenticated %}
+        {% if user.is_staff %}
+        <a href="{% url 'admin_suite:admin_suite' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors" title="Admin Panel">
+          <i data-lucide="shield" class="w-5 h-5"></i>
+        </a>
+        {% endif %}
+        <a href="{% url 'users:dashboard' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors" title="Dashboard">
+          <i data-lucide="user" class="w-5 h-5"></i>
+        </a>
+        <a href="{% url 'users:account_logout' %}" class="text-[var(--color-text-secondary)] hover:text-red-400 transition-colors" title="Sign Out">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </a>
+        {% else %}
+        <a href="{% url 'users:account_login' %}" class="btn-signin">
+          Sign In
+        </a>
+        {% endif %}
+      </div>
+
+      {# Mobile menu button #}
+      <button @click="mobileOpen = !mobileOpen" class="md:hidden text-[var(--color-text-secondary)]">
+        <i x-show="!mobileOpen" data-lucide="menu" class="w-6 h-6"></i>
+        <i x-show="mobileOpen" x-cloak data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+  </div>
+
+  {# Mobile menu #}
+  <div x-show="mobileOpen" x-cloak x-transition class="md:hidden border-t border-[var(--color-border)]">
+    <div class="px-4 py-3 space-y-2">
+      <a href="{% url 'home' %}" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Home</a>
+      <a href="{% url 'firmwares:library_hub' %}" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Devices</a>
+      <a href="{% url 'blog:post_list' %}" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Blog</a>
+      <a href="{% url 'bounty:bounty_list' %}" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Bounty</a>
+      <a href="{% url 'forum:index' %}" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Forum</a>
+      <div class="py-2">{% include "components/_theme_switcher.html" %}</div>
+      {% if user.is_authenticated %}
+      {% if user.is_staff %}
+      <a href="{% url 'admin_suite:admin_suite' %}" class="block py-2 text-[var(--color-accent)] font-medium">
+        <i data-lucide="shield" class="w-4 h-4 inline"></i> Admin Panel
+      </a>
+      {% endif %}
+      <a href="{% url 'users:dashboard' %}" class="block py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Dashboard</a>
+      <a href="{% url 'users:account_logout' %}" class="block py-2 text-red-400 hover:text-red-300">
+        <i data-lucide="log-out" class="w-4 h-4 inline"></i> Sign Out
+      </a>
+      {% else %}
+      <a href="{% url 'users:account_login' %}" class="btn-signin inline-block mt-1">Sign In</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>

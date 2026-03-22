@@ -1,0 +1,13 @@
+{
+  "_comment": "All foldable smartphones ever listed on GSMArena",
+  "_strategy": "search_targeted",
+  "job_id": "foldables",
+  "description": "All foldable smartphones ever listed on GSMArena",
+  "version": "6.0",
+  "strategy": "search_targeted",
+  "filters": {
+    "form_factors": [
+      8
+    ]
+  }
+}

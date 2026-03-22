@@ -1,0 +1,445 @@
+{# admin_suite/users.html — User Management with registration chart + provider breakdown #}
+{% extends "layouts/admin.html" %}
+{% load static %}
+
+{% block title %}Users — Admin Panel{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Users</h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Staff and user activity overview</p>
+  </div>
+  <div class="flex items-center gap-2 flex-wrap">
+    <a href="{% url 'admin_suite:staff_users' %}" class="btn btn-secondary btn-press text-xs">
+      <i data-lucide="shield-check" class="w-4 h-4"></i> Staff
+    </a>
+    <a href="{% url 'admin_suite:user_sessions' %}" class="btn btn-secondary btn-press text-xs">
+      <i data-lucide="monitor" class="w-4 h-4"></i> Sessions
+    </a>
+    <a href="?export=csv" class="btn btn-secondary btn-press text-xs">
+      <i data-lucide="download" class="w-4 h-4"></i> CSV
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+{% if message %}
+<div class="glass rounded-xl p-4 mb-6 border-l-4 border-[var(--color-accent)]">
+  <p class="text-sm text-[var(--color-text-secondary)]">{{ message }}</p>
+</div>
+{% endif %}
+
+{# ═══ Create User Form ═══ #}
+<div class="mb-6 animate-in" style="--stagger: -1"
+     x-data="{ showCreateForm: false, selectedProfile: '' }"
+     x-intersect.once="$el.classList.add('animate-in-visible')">
+  <button @click="showCreateForm = !showCreateForm"
+          class="btn btn-primary btn-press text-xs">
+    <i data-lucide="user-plus" class="w-4 h-4"></i>
+    <span x-text="showCreateForm ? 'Cancel' : 'Create User'"></span>
+  </button>
+  <div x-show="showCreateForm" x-cloak x-transition class="glass rounded-xl p-6 mt-3">
+    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
+      <i data-lucide="user-plus" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>New User
+    </h3>
+    <form method="post" class="space-y-5">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create_user">
+      <input type="hidden" name="staff_profile" :value="selectedProfile">
+
+      {# ── Email & Password row ── #}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs text-[var(--color-text-muted)] mb-1">Email</label>
+          <input type="email" name="email" required placeholder="user@example.com"
+                 class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition">
+        </div>
+        <div>
+          <label class="block text-xs text-[var(--color-text-muted)] mb-1">Password (min 10 characters)</label>
+          <input type="password" name="password" required minlength="10"
+                 class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition">
+        </div>
+      </div>
+
+      {# ── Staff Profile Selector ── #}
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+          <i data-lucide="shield" class="w-3.5 h-3.5 inline mr-1"></i>Staff Profile
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+          {% for profile in staff_profiles %}
+          <label @click="selectedProfile = '{{ profile.value }}'"
+                 :class="selectedProfile === '{{ profile.value }}'
+                   ? 'border-[var(--color-accent)] ring-2 ring-[var(--color-accent)]/30 bg-[var(--color-accent)]/5'
+                   : 'border-[var(--color-border)] hover:border-[var(--color-text-muted)]'"
+                 class="relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200 block">
+            {# Checkmark indicator #}
+            <div x-show="selectedProfile === '{{ profile.value }}'" x-cloak
+                 class="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--color-accent)] flex items-center justify-center">
+              <i data-lucide="check" class="w-3 h-3 text-white"></i>
+            </div>
+            {# Profile header #}
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center
+                {% if profile.color == 'gray' %}bg-gray-500/15{% elif profile.color == 'red' %}bg-red-500/15{% elif profile.color == 'blue' %}bg-blue-500/15{% elif profile.color == 'green' %}bg-green-500/15{% elif profile.color == 'amber' %}bg-amber-500/15{% endif %}">
+                <i data-lucide="{{ profile.icon }}" class="w-4 h-4
+                  {% if profile.color == 'gray' %}text-gray-400{% elif profile.color == 'red' %}text-red-400{% elif profile.color == 'blue' %}text-blue-400{% elif profile.color == 'green' %}text-green-400{% elif profile.color == 'amber' %}text-amber-400{% endif %}"></i>
+              </div>
+              <span class="text-xs font-semibold text-[var(--color-text-primary)]">{{ profile.label }}</span>
+            </div>
+            {# Description #}
+            <p class="text-[10px] text-[var(--color-text-muted)] mb-2 leading-relaxed">{{ profile.description }}</p>
+            {# Permissions list #}
+            {% if profile.permissions %}
+            <ul class="space-y-1">
+              {% for perm in profile.permissions %}
+              <li class="flex items-start gap-1.5 text-[10px] text-[var(--color-text-secondary)] leading-tight">
+                <i data-lucide="check-circle" class="w-3 h-3 mt-0.5 shrink-0
+                  {% if profile.color == 'red' %}text-red-400{% elif profile.color == 'blue' %}text-blue-400{% elif profile.color == 'green' %}text-green-400{% elif profile.color == 'amber' %}text-amber-400{% else %}text-gray-400{% endif %}"></i>
+                {{ perm }}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-[10px] text-[var(--color-text-muted)] italic">No admin permissions</p>
+            {% endif %}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# ── Submit #}
+      <div class="flex items-center gap-3 pt-2">
+        <button type="submit" class="btn btn-primary btn-press text-xs px-5 py-2">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i> Create User
+        </button>
+        <span x-show="selectedProfile" x-cloak class="text-[10px] text-[var(--color-text-muted)]">
+          Profile: <strong class="text-[var(--color-text-secondary)]" x-text="selectedProfile || 'Regular User'"></strong>
+          <template x-if="selectedProfile">
+            <span class="text-amber-400 ml-1">(requires superuser)</span>
+          </template>
+        </span>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ═══ KPI Cards ═══ #}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger-children">
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 0"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center">
+        <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ stats.total_users }})" x-text="display.toLocaleString()">{{ stats.total_users }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Total Users</p>
+  </div>
+
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
+        <i data-lucide="shield-check" class="w-5 h-5 text-violet-400"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ stats.staff_users }})" x-text="display.toLocaleString()">{{ stats.staff_users }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Staff Members</p>
+  </div>
+
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ stats.active_users }})" x-text="display.toLocaleString()">{{ stats.active_users }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Active Users</p>
+  </div>
+
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-pink-500/15 flex items-center justify-center">
+        <i data-lucide="link" class="w-5 h-5 text-pink-400"></i>
+      </div>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ stats.social_users }})" x-text="display.toLocaleString()">{{ stats.social_users }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Social Auth</p>
+  </div>
+</div>
+
+{# ═══ Charts Row ═══ #}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  {# Registration Trend (2/3) #}
+  <div class="lg:col-span-2 glass rounded-xl p-6 animate-in" style="--stagger: 4"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Registration Trend</h3>
+        <p class="text-xs text-[var(--color-text-muted)]">New sign-ups — last 7 days</p>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+        <i data-lucide="trending-up" class="w-4 h-4 text-blue-400"></i>
+      </div>
+    </div>
+    <div class="h-56" x-data="adminChart({
+      type: 'line',
+      labels: {{ chart_reg_labels|safe }},
+      datasets: [{ label: 'New Users', data: {{ chart_reg_data|safe }} }]
+    })" x-init="init($refs.canvas)">
+      <canvas x-ref="canvas"></canvas>
+    </div>
+  </div>
+
+  {# Provider Breakdown Doughnut (1/3) #}
+  <div class="glass rounded-xl p-6 animate-in" style="--stagger: 5"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Auth Providers</h3>
+        <p class="text-xs text-[var(--color-text-muted)]">Local vs Social</p>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+        <i data-lucide="pie-chart" class="w-4 h-4 text-violet-400"></i>
+      </div>
+    </div>
+    <div class="h-56" x-data="adminChart({
+      type: 'doughnut',
+      labels: ['Local', 'Social'],
+      datasets: [{ data: [{{ stats.local_users }}, {{ stats.social_users }}] }],
+      options: { plugins: { legend: { display: true, position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'circle' } } } }
+    })" x-init="init($refs.canvas)">
+      <canvas x-ref="canvas"></canvas>
+    </div>
+  </div>
+</div>
+
+{# ═══ Search + Filter Bar ═══ #}
+<div class="glass rounded-xl p-4 mb-6 animate-in" style="--stagger: 6"
+     x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+  <form method="get" class="flex flex-col sm:flex-row gap-3">
+    <div class="flex-1 relative">
+      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by email or ID…"
+             class="w-full pl-10 pr-4 py-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition">
+    </div>
+    <select name="provider"
+            class="rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] px-3 py-2">
+      <option value="all" {% if provider_filter == 'all' %}selected{% endif %}>All Providers</option>
+      <option value="local" {% if provider_filter == 'local' %}selected{% endif %}>Local Only</option>
+      <option value="social" {% if provider_filter == 'social' %}selected{% endif %}>Social Auth</option>
+    </select>
+    <button type="submit" class="btn btn-primary btn-press text-xs">
+      <i data-lucide="filter" class="w-4 h-4"></i> Filter
+    </button>
+  </form>
+</div>
+
+{# ═══ Bulk Actions + Users Table ═══ #}
+<div x-data="{
+    selectedIds: [],
+    expanded: null,
+    bulkAction: '',
+    allIds: [{% for u in users_page %}'{{ u.id }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+    toggleUser(id) {
+        const idx = this.selectedIds.indexOf(id);
+        if (idx > -1) this.selectedIds.splice(idx, 1);
+        else this.selectedIds.push(id);
+    },
+    toggleAll(checked) {
+        this.selectedIds = checked ? [...this.allIds] : [];
+    },
+    isSelected(id) { return this.selectedIds.includes(id); },
+    toggleExpand(id) {
+        this.expanded = this.expanded === id ? null : id;
+    }
+}" class="animate-in" style="--stagger: 7"
+   x-intersect.once="$el.classList.add('animate-in-visible')">
+
+  {# Bulk Actions Bar #}
+  <div x-show="selectedIds.length > 0" x-cloak x-transition
+       class="glass rounded-xl p-3 mb-4">
+    <form method="post" class="flex items-center gap-3"
+          @submit.prevent="if(bulkAction === 'delete') { $store.confirm.show('Soft-delete selected users?', 'Selected users will be deactivated.', () => $el.submit()) } else { $el.submit() }">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="bulk_action">
+      <template x-for="id in selectedIds" :key="id">
+        <input type="hidden" name="selected" :value="id">
+      </template>
+      <span class="text-xs text-[var(--color-text-muted)] shrink-0">
+        <span x-text="selectedIds.length" class="font-semibold text-[var(--color-accent)]"></span> selected:
+      </span>
+      <select name="bulk_action" x-model="bulkAction"
+              class="px-3 py-1.5 rounded-lg bg-[var(--color-bg-primary)]/60 border border-[var(--color-border)]/60 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)]/60 focus:outline-none">
+        <option value="">Choose action…</option>
+        <option value="activate">Activate</option>
+        <option value="deactivate">Deactivate</option>
+        <option value="toggle_staff">Toggle Staff</option>
+        <option value="delete">Soft Delete</option>
+      </select>
+      <button type="submit" :disabled="!bulkAction"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              :class="bulkAction === 'delete' ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20'">
+        Apply
+      </button>
+    </form>
+  </div>
+
+  {# Users Table #}
+  <div class="glass rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--color-border)]/40">
+            <th class="py-3 px-4 w-10">
+              <input type="checkbox"
+                     @change="toggleAll($event.target.checked)"
+                     :checked="selectedIds.length === allIds.length && allIds.length > 0"
+                     :indeterminate="selectedIds.length > 0 && selectedIds.length < allIds.length"
+                     class="rounded border-[var(--color-border)]">
+            </th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider"><a href="?sort=email&dir={% if sort == 'email' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">User {% if sort == 'email' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider"><a href="?sort=staff&dir={% if sort == 'staff' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Role {% if sort == 'staff' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Status</th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden md:table-cell"><a href="?sort=joined&dir={% if sort == 'joined' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Joined {% if sort == 'joined' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden lg:table-cell"><a href="?sort=login&dir={% if sort == 'login' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Last Login {% if sort == 'login' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
+            <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--color-border)]/20">
+          {% for u in users_page %}
+          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors group"
+              :class="isSelected('{{ u.id }}') ? 'bg-[var(--color-accent)]/5' : ''">
+            <td class="py-3 px-4">
+              <input type="checkbox"
+                     :checked="isSelected('{{ u.id }}')"
+                     @change="toggleUser('{{ u.id }}')"
+                     class="rounded border-[var(--color-border)]">
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-[var(--color-accent)]/15 flex items-center justify-center text-xs font-bold text-[var(--color-accent)]">
+                  {{ u.email|first|upper }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-[var(--color-text-primary)] truncate max-w-[180px]">{{ u.email }}</p>
+                  {% if u.providers %}
+                  <p class="text-[10px] text-[var(--color-text-muted)]">{{ u.providers|join:", " }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              {% if u.is_staff %}
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-violet-400">
+                <i data-lucide="shield" class="w-3 h-3"></i> Staff
+              </span>
+              {% else %}
+              <span class="text-xs text-[var(--color-text-muted)]">User</span>
+              {% endif %}
+            </td>
+            <td class="py-3 px-4">
+              {% if u.is_active %}
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-400">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
+              </span>
+              {% else %}
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-red-400">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Inactive
+              </span>
+              {% endif %}
+            </td>
+            <td class="py-3 px-4 hidden md:table-cell text-xs text-[var(--color-text-muted)]">{{ u.date_joined|date:"M d, Y" }}</td>
+            <td class="py-3 px-4 hidden lg:table-cell text-xs text-[var(--color-text-muted)]">{{ u.last_login|date:"M d, H:i"|default:"Never" }}</td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <button @click="toggleExpand('{{ u.id }}')"
+                        class="inline-flex items-center gap-1 text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+                  <span x-text="expanded === '{{ u.id }}' ? 'Close' : 'Actions'"></span>
+                  <i data-lucide="chevron-down" class="w-3 h-3 transition-transform"
+                     :class="expanded === '{{ u.id }}' ? 'rotate-180' : ''"></i>
+                </button>
+                <a href="{% url 'admin_suite:user_detail' u.id %}"
+                   class="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"
+                   title="Full profile">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {# Inline expandable actions row #}
+          <tr x-show="expanded === '{{ u.id }}'" x-cloak>
+            <td colspan="7" class="px-4 py-3 bg-[var(--color-bg-tertiary)]/30 border-l-2 border-[var(--color-accent)]/40">
+              <div class="flex flex-wrap items-center gap-2">
+                <form method="post" class="inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="inline_toggle_active">
+                  <input type="hidden" name="user_id" value="{{ u.id }}">
+                  <button type="submit"
+                          class="px-3 py-1.5 rounded-lg text-xs font-medium btn-press transition-all {% if u.is_active %}bg-red-500/10 text-red-400 hover:bg-red-500/20{% else %}bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20{% endif %}">
+                    <i data-lucide="{% if u.is_active %}x-circle{% else %}check-circle{% endif %}" class="w-3 h-3 inline mr-1"></i>
+                    {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                  </button>
+                </form>
+                <form method="post" class="inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="inline_toggle_staff">
+                  <input type="hidden" name="user_id" value="{{ u.id }}">
+                  <button type="submit"
+                          class="px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 btn-press transition-all">
+                    <i data-lucide="shield" class="w-3 h-3 inline mr-1"></i>
+                    {% if u.is_staff %}Remove Staff{% else %}Grant Staff{% endif %}
+                  </button>
+                </form>
+                <a href="{% url 'admin_suite:user_detail' u.id %}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 btn-press transition-all inline-flex items-center gap-1">
+                  <i data-lucide="eye" class="w-3 h-3"></i> Full Profile
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="py-12 text-center">
+              <i data-lucide="users" class="w-10 h-10 text-[var(--color-text-muted)] mx-auto mb-3"></i>
+              <p class="text-sm text-[var(--color-text-muted)]">No users found</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# Pagination #}
+    {% if page_obj and page_obj.has_other_pages %}
+    <div class="flex items-center justify-between p-4 border-t border-[var(--color-border)]/40">
+      <span class="text-xs text-[var(--color-text-muted)]">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      <div class="flex gap-2">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}"
+           class="btn btn-secondary btn-press text-xs px-3 py-1">
+          <i data-lucide="chevron-left" class="w-3 h-3"></i> Prev
+        </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}"
+           class="btn btn-secondary btn-press text-xs px-3 py-1">
+          Next <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

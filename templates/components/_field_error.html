@@ -1,0 +1,15 @@
+{# templates/components/_field_error.html — Field-level validation error #}
+{% comment %}
+  Usage: {% include "components/_field_error.html" with field=form.email %}
+  Shows errors below a specific form field.
+{% endcomment %}
+{% if field.errors %}
+<div class="mt-1 space-y-1" role="alert">
+  {% for error in field.errors %}
+  <p class="text-xs text-[var(--color-error)] flex items-center gap-1">
+    <i data-lucide="alert-circle" class="w-3 h-3 shrink-0"></i>
+    {{ error }}
+  </p>
+  {% endfor %}
+</div>
+{% endif %}

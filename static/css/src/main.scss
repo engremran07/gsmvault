@@ -1,0 +1,29 @@
+/* static/css/src/main.scss — SCSS entry point
+   Architecture: @layer theme, base, components — Tailwind v4 compatible
+   Layer order: theme < base < components < [Tailwind utilities]
+   Each partial wraps its content in the appropriate @layer. */
+
+/* Layer order declaration — must come before any @layer content */
+@layer theme, base, components;
+
+/* Font faces — outside layers (@font-face are resource declarations) */
+@import 'typography';
+
+/* @layer theme — CSS custom properties + theme tokens */
+@import 'variables';
+@import 'themes/dark';
+@import 'themes/light';
+@import 'themes/contrast';
+
+/* @layer base — Reset + base element styles */
+@import 'reset';
+@import 'base';
+
+/* @layer components — All UI component classes */
+@import 'components';
+@import 'utilities';
+@import 'animations';
+@import 'admin';
+
+/* Unlayered — critical overrides */
+[x-cloak] { display: none !important; }

@@ -1,0 +1,49 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Device Events — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<h1 class="text-2xl font-bold">Device Events</h1>
+{% endblock %}
+
+{% block page_content %}
+{% if events %}
+<div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-[var(--color-bg-secondary)]">
+      <tr>
+        <th class="px-4 py-3 text-left font-medium">Event</th>
+        <th class="px-4 py-3 text-left font-medium">Device</th>
+        <th class="px-4 py-3 text-left font-medium">IP Address</th>
+        <th class="px-4 py-3 text-left font-medium">Time</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-[var(--color-border)]">
+      {% for event in events %}
+      <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2">
+            {% if event.event_type == "login" %}
+            {% include "components/_icon.html" with name="log-in" size="14" %}
+            {% elif event.event_type == "logout" %}
+            {% include "components/_icon.html" with name="log-out" size="14" %}
+            {% elif event.event_type == "blocked" %}
+            {% include "components/_icon.html" with name="shield-off" size="14" %}
+            {% else %}
+            {% include "components/_icon.html" with name="activity" size="14" %}
+            {% endif %}
+            <span>{{ event.event_type|title }}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ event.device_name|default:"Unknown" }}</td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)] font-mono text-xs">{{ event.ip_address|default:"—" }}</td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ event.created_at|timesince }} ago</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="activity" title="No events" description="No device events have been recorded yet." %}
+{% endif %}
+{% endblock %}

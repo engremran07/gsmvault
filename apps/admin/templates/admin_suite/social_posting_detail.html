@@ -1,0 +1,44 @@
+{% extends "layouts/admin.html" %}
+{% block title %}{{ account.name|default:"Account" }} — Social Posting — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">{{ account.name|default:account.username|default:"Account" }}</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:social_posting' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Accounts</a>
+</div>
+{% endblock %}
+{% block page_content %}
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+<div class="grid md:grid-cols-3 gap-6">
+  <div class="md:col-span-2 space-y-6">
+    <div class="glass rounded-xl p-6 animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Account Settings</h3>
+      <form method="post" class="space-y-4">{% csrf_token %}
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Destination</label><select name="destination" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">{% for val, label in destination_choices %}<option value="{{ val }}" {% if account.destination == val %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+          <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Content Type</label><select name="content_type" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">{% for val, label in content_type_choices %}<option value="{{ val }}" {% if account.content_type == val %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        </div>
+        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Default Template</label><textarea name="default_template" rows="4" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono">{{ default_template|default:'' }}</textarea></div>
+        <div class="flex justify-end gap-3"><button type="submit" name="action" value="update_account" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="space-y-4">
+    <div class="glass rounded-xl p-6 animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Info</h3>
+      <div class="space-y-3">
+        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Platform</p><p class="text-sm font-medium text-[var(--color-text-primary)]">{{ account.platform|default:"-" }}</p></div>
+        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Status</p>{% if account.is_active %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Active</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">Inactive</span>{% endif %}</div>
+        {% if auth_info %}<div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Auth</p><p class="text-xs font-mono text-[var(--color-text-secondary)]">{{ auth_info }}</p></div>{% endif %}
+      </div>
+    </div>
+    <div class="glass rounded-xl p-6 animate-in" style="--stagger:2" x-intersect.once="$el.classList.add('animate-in-visible')">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Actions</h3>
+      <div class="space-y-2">
+        <form method="post">{% csrf_token %}<button type="submit" name="action" value="test_post" class="w-full px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all text-left"><i data-lucide="send" class="w-3.5 h-3.5 inline mr-2"></i>Send Test Post</button></form>
+        <form method="post" onsubmit="return confirm('Delete this account?')">{% csrf_token %}<button type="submit" name="action" value="delete_account" class="w-full px-4 py-2 rounded-lg glass text-xs font-semibold text-red-400 hover:text-red-300 btn-press transition-all text-left"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline mr-2"></i>Delete Account</button></form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "layouts/admin.html" %}
+{% block title %}Ads — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Ads</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <div class="flex gap-2">
+    <a href="{% url 'admin_suite:ads_campaigns' %}" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="megaphone" class="w-3.5 h-3.5 inline mr-1"></i>Campaigns</a>
+    <a href="{% url 'admin_suite:ads_analytics' %}" class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] text-xs font-semibold btn-press hover:text-[var(--color-text-primary)] transition-all"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5 inline mr-1"></i>Analytics</a>
+  </div>
+</div>
+{% endblock %}
+{% block page_content %}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stagger-children">
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:0" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3"><i data-lucide="layout" class="w-4 h-4 text-blue-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.placements|default:'0' }})" x-text="display.toLocaleString()">{{ stats.placements|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Placements</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:1" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center mb-3"><i data-lucide="image" class="w-4 h-4 text-violet-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.creatives|default:'0' }})" x-text="display.toLocaleString()">{{ stats.creatives|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Creatives</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:2" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3"><i data-lucide="eye" class="w-4 h-4 text-emerald-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.impressions_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.impressions_24h|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Impressions 24h</p>
+  </div>
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:3" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3"><i data-lucide="mouse-pointer" class="w-4 h-4 text-amber-400"></i></div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.clicks_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.clicks_24h|default:"0" }}</div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Clicks 24h</p>
+  </div>
+</div>
+
+{% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
+
+{% include "components/_admin_search.html" with placeholder="Search ads..." q=q sort=sort dir=dir %}
+
+<div x-data="{ tab: 'placements' }" class="animate-in" style="--stagger:4" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
+    <button @click="tab='placements'" :class="tab==='placements' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Placements</button>
+    <button @click="tab='creatives'" :class="tab==='creatives' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Creatives</button>
+  </div>
+  <div x-show="tab==='placements'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=name&dir={% if sort == 'name' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Name {% if sort == 'name' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=slug&dir={% if sort == 'slug' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Slug {% if sort == 'slug' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Context</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for p in placements %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ p.name }}</td><td class="py-3 px-4 text-xs font-mono text-[var(--color-text-muted)]">{{ p.slug }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ p.page_context }}</td><td class="py-3 px-4 text-center">{% if p.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No placements</td></tr>{% endfor %}
+        </tbody>
+      </table>
+      {% if placements_page and placements_page.has_other_pages %}
+      <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
+        <span class="text-xs text-[var(--color-text-muted)]">{{ placements_page.paginator.count }} total &middot; Page {{ placements_page.number }} of {{ placements_page.paginator.num_pages }}</span>
+        <div class="flex items-center gap-1">
+          {% if placements_page.has_previous %}<a href="?page={{ placements_page.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+          {% if placements_page.has_next %}<a href="?page={{ placements_page.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div x-show="tab==='creatives'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Type</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Size</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for c in creatives %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ c.name }}</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ c.creative_type }}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ c.width }}×{{ c.height }}</td><td class="py-3 px-4 text-center">{% if c.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No creatives</td></tr>{% endfor %}
+        </tbody>
+      </table>
+      {% if creatives_page and creatives_page.has_other_pages %}
+      <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
+        <span class="text-xs text-[var(--color-text-muted)]">{{ creatives_page.paginator.count }} total &middot; Page {{ creatives_page.number }} of {{ creatives_page.paginator.num_pages }}</span>
+        <div class="flex items-center gap-1">
+          {% if creatives_page.has_previous %}<a href="?page={{ creatives_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+          {% if creatives_page.has_next %}<a href="?page={{ creatives_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

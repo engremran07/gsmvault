@@ -1,0 +1,19 @@
+{# templates/components/_form_field.html — Form field wrapper with validation #}
+<div class="mb-4">
+  {% if label %}
+  <label for="{{ field_id|default:name }}" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">{{ label }}</label>
+  {% endif %}
+  <input type="{{ type|default:'text' }}"
+         name="{{ name }}"
+         id="{{ field_id|default:name }}"
+         value="{{ value|default:'' }}"
+         placeholder="{{ placeholder|default:'' }}"
+         class="w-full px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition"
+         {% if required %}required{% endif %}>
+  {% if error %}
+  <p class="mt-1 text-sm text-[var(--color-error)]">{{ error }}</p>
+  {% endif %}
+  {% if help_text %}
+  <p class="mt-1 text-xs text-[var(--color-text-secondary)]">{{ help_text }}</p>
+  {% endif %}
+</div>

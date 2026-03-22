@@ -1,0 +1,32 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}Email Verification Required — {{ settings.site_name }}{% endblock %}
+
+{% block auth_header %}
+<div class="text-center">
+  <i data-lucide="mail-warning" class="w-16 h-16 text-[var(--color-warning)] mx-auto mb-4"></i>
+  <h1 class="text-2xl font-bold">Verification Required</h1>
+</div>
+{% endblock %}
+
+{% block auth_content %}
+<div class="text-center space-y-4">
+  <p class="text-[var(--color-text-secondary)]">
+    Please verify your email address to continue using {{ settings.site_name }}.
+    {% if user.email %}
+    We sent a verification email to <strong>{{ user.email }}</strong>.
+    {% endif %}
+  </p>
+  <div class="flex flex-col gap-3 mt-6">
+    <form method="post" action="{% url 'users:resend_verification' %}">
+      {% csrf_token %}
+      <button type="submit" class="w-full rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+        Resend Verification Email
+      </button>
+    </form>
+    <a href="{% url 'users:account_login' %}" class="text-sm text-[var(--color-accent)] hover:underline">
+      Back to Sign In
+    </a>
+  </div>
+</div>
+{% endblock %}

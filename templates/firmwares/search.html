@@ -1,0 +1,39 @@
+{# templates/firmwares/search.html — Standalone firmware search page #}
+{% extends "layouts/default.html" %}
+{% load static device_tags %}
+
+{% block title %}Search Firmware{% if query %} — {{ query }}{% endif %} — {{ settings.site_name }}{% endblock %}
+{% block meta_description %}Search firmware across all brands. Find your device by name, codename, model code, or chipset.{% endblock %}
+
+{% block page_content %}
+<section class="space-y-8">
+  {% include "components/_breadcrumb.html" with items=breadcrumb label="Search" %}
+
+  <div class="text-center space-y-3">
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)]">Search Firmware</h1>
+  </div>
+
+  {# Search bar #}
+  <div class="max-w-2xl mx-auto">
+    <form method="get" class="relative">
+      <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+      <input type="text"
+             name="q"
+             value="{{ query }}"
+             placeholder="Search any brand, model, codename, or chipset..."
+             autofocus
+             class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-input)] text-[var(--color-text-primary)] text-base placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
+    </form>
+  </div>
+
+  {# Results #}
+  {% if results %}
+  <div class="space-y-2">
+    <p class="text-sm text-[var(--color-text-muted)]">{{ results|length }} result{{ results|length|pluralize }} for "<strong>{{ query }}</strong>"</p>
+    {% include "firmwares/fragments/search_results.html" %}
+  </div>
+  {% elif query %}
+  {% include "components/_empty_state.html" with icon="search-x" message="No devices found" action_url="/firmwares/" action_text="Browse All Brands" %}
+  {% endif %}
+</section>
+{% endblock %}

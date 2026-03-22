@@ -1,0 +1,110 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Analytics Dashboard — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
+  <a href="{% url 'analytics:realtime_dashboard' %}" class="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+    {% include "components/_icon.html" with name="activity" size="14" %}
+    Realtime
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<!-- Today's Metrics -->
+<section class="mb-8">
+  <h2 class="text-lg font-semibold mb-4">Today</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {% include "components/_card.html" with title="Page Views" value=today_metrics.page_views|default:"0" icon="eye" %}
+    {% include "components/_card.html" with title="Downloads" value=today_metrics.downloads|default:"0" icon="download" %}
+    {% include "components/_card.html" with title="Searches" value=today_metrics.searches|default:"0" icon="search" %}
+    {% include "components/_card.html" with title="New Users" value=today_metrics.new_users|default:"0" icon="user-plus" %}
+  </div>
+</section>
+
+<!-- Totals -->
+<section class="mb-8">
+  <h2 class="text-lg font-semibold mb-4">Totals</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <p class="text-sm text-[var(--color-text-muted)]">Total Page Views</p>
+      <p class="text-2xl font-bold mt-1">{{ total_page_views|default:"0" }}</p>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <p class="text-sm text-[var(--color-text-muted)]">Total Downloads</p>
+      <p class="text-2xl font-bold mt-1">{{ total_downloads|default:"0" }}</p>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <p class="text-sm text-[var(--color-text-muted)]">Total Searches</p>
+      <p class="text-2xl font-bold mt-1">{{ total_searches|default:"0" }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Last 30 Days -->
+<section class="mb-8">
+  <h2 class="text-lg font-semibold mb-4">Last 30 Days</h2>
+  {% if last_30_days %}
+  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-[var(--color-bg-secondary)]">
+        <tr>
+          <th class="px-4 py-3 text-left font-medium">Date</th>
+          <th class="px-4 py-3 text-right font-medium">Page Views</th>
+          <th class="px-4 py-3 text-right font-medium">Downloads</th>
+          <th class="px-4 py-3 text-right font-medium">Searches</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--color-border)]">
+        {% for day in last_30_days %}
+        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+          <td class="px-4 py-3">{{ day.date|date:"M d" }}</td>
+          <td class="px-4 py-3 text-right">{{ day.page_views|default:"0" }}</td>
+          <td class="px-4 py-3 text-right">{{ day.downloads|default:"0" }}</td>
+          <td class="px-4 py-3 text-right">{{ day.searches|default:"0" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  {% include "components/_empty_state.html" with icon="bar-chart-2" title="No data yet" description="Analytics data will appear once visitors start using the site." %}
+  {% endif %}
+</section>
+
+<!-- Report Links -->
+<section>
+  <h2 class="text-lg font-semibold mb-4">Reports</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <a href="{% url 'analytics:traffic_report' %}" class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)] transition group">
+      <div class="flex items-center gap-3">
+        {% include "components/_icon.html" with name="trending-up" size="20" %}
+        <div>
+          <p class="font-medium group-hover:text-[var(--color-accent)] transition">Traffic Report</p>
+          <p class="text-xs text-[var(--color-text-muted)]">Page views, sessions, referrers</p>
+        </div>
+      </div>
+    </a>
+    <a href="{% url 'analytics:engagement_report' %}" class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)] transition group">
+      <div class="flex items-center gap-3">
+        {% include "components/_icon.html" with name="heart" size="20" %}
+        <div>
+          <p class="font-medium group-hover:text-[var(--color-accent)] transition">Engagement Report</p>
+          <p class="text-xs text-[var(--color-text-muted)]">Comments, shares, time on page</p>
+        </div>
+      </div>
+    </a>
+    <a href="{% url 'analytics:content_report' %}" class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)] transition group">
+      <div class="flex items-center gap-3">
+        {% include "components/_icon.html" with name="file-text" size="20" %}
+        <div>
+          <p class="font-medium group-hover:text-[var(--color-accent)] transition">Content Report</p>
+          <p class="text-xs text-[var(--color-text-muted)]">Top posts, categories, authors</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{# templates/forum/fragments/poll_results.html — Poll results bars #}
+<div class="space-y-2">
+  {% for choice in poll.choices.all %}
+  {% widthratio choice.vote_count poll.vote_count 100 as pct %}
+  <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] relative overflow-hidden">
+    <div class="absolute inset-y-0 left-0 bg-[var(--color-accent)]/10 rounded-lg" style="width: {{ pct|default:'0' }}%;"></div>
+    <div class="relative flex items-center justify-between">
+      <span class="text-[var(--color-text-primary)] text-sm">{{ choice.description }}</span>
+      <span class="text-xs text-[var(--color-text-secondary)]">{{ choice.vote_count }} ({{ pct|default:'0' }}%)</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<p class="text-xs text-[var(--color-text-secondary)] mt-2">
+  {{ poll.vote_count }} total vote{{ poll.vote_count|pluralize }}
+  {% if not poll.is_open %} · Voting closed{% endif %}
+  {% if poll.is_secret %} · Secret ballot{% endif %}
+</p>

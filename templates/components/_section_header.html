@@ -1,0 +1,13 @@
+{# components/_section_header.html — Reusable section header with optional action link #}
+{# Usage: {% include "components/_section_header.html" with title="Latest Firmware" subtitle="Recently added files" action_url="/browse/" action_label="View All" %} #}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-4">
+  <div>
+    <h2 class="text-xl font-bold text-[var(--color-text-primary)]">{{ title }}</h2>
+    {% if subtitle %}<p class="mt-0.5 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>{% endif %}
+  </div>
+  {% if action_url %}
+  <a href="{{ action_url }}" class="text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+    {{ action_label|default:"View All" }} &rarr;
+  </a>
+  {% endif %}
+</div>

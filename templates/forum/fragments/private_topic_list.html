@@ -1,0 +1,19 @@
+{# templates/forum/fragments/private_topic_list.html — Private topic listing fragment #}
+{% if topics %}
+<div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] divide-y divide-[var(--color-border)]">
+  {% for topic in topics %}
+  <a href="{% url 'forum:topic_detail' pk=topic.pk slug=topic.slug %}"
+     class="flex items-center gap-4 px-5 py-4 hover:bg-[var(--color-bg-tertiary)] transition-colors">
+    <i data-lucide="lock" class="w-5 h-5 text-[var(--color-text-secondary)]"></i>
+    <div class="flex-1 min-w-0">
+      <div class="font-medium text-[var(--color-text-primary)] truncate">{{ topic.title }}</div>
+      <div class="text-xs text-[var(--color-text-secondary)] mt-0.5">
+        with {{ topic.user.username }} · {{ topic.reply_count }} messages · {{ topic.last_active|timesince }} ago
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="lock" title="No private messages" description="Start a conversation with someone!" %}
+{% endif %}

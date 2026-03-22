@@ -1,0 +1,8 @@
+{
+  "_comment": "Full GSMArena catalogue — all brands, all models, all time",
+  "_strategy": "brand_walk",
+  "job_id": "full_catalogue",
+  "description": "Full GSMArena catalogue — all brands, all models, all time",
+  "version": "6.0",
+  "strategy": "brand_walk"
+}

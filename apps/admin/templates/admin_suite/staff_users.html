@@ -1,0 +1,18 @@
+{% extends "layouts/admin.html" %}
+{% block title %}Staff Users — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Staff Users</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:users' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Users</a>
+</div>
+{% endblock %}
+{% block page_content %}
+<div class="glass rounded-xl overflow-hidden animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <table class="w-full text-sm">
+    <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Email</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Role</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Joined</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Last Login</th></tr></thead>
+    <tbody class="divide-y divide-[var(--color-border)]/10">
+      {% for u in staff_users %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4"><a href="{% url 'admin_suite:user_detail' u.pk %}" class="font-medium text-[var(--color-accent)] hover:underline">{{ u.email }}</a></td><td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ u.first_name }} {{ u.last_name }}</td><td class="py-3 px-4 text-center">{% if u.is_superuser %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">Superuser</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">Staff</span>{% endif %}</td><td class="py-3 px-4 text-center">{% if u.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ u.date_joined|date:"M d, Y" }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{% if u.last_login %}{{ u.last_login|timesince }} ago{% else %}Never{% endif %}</td></tr>{% empty %}<tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">No staff users</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

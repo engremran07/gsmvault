@@ -1,0 +1,89 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Realtime Dashboard — {{ settings.site_name }}{% endblock %}
+
+{% block page_header %}
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-bold flex items-center gap-2">
+    <span class="relative flex h-3 w-3">
+      <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+      <span class="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+    </span>
+    Realtime
+  </h1>
+  <a href="{% url 'analytics:dashboard' %}" class="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+    Back to Dashboard
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div x-data="{ autoRefresh: true }" x-init="setInterval(() => { if(autoRefresh) htmx.trigger(document.body, 'refresh-metrics') }, 15000)">
+  <div class="flex items-center justify-end mb-4">
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" x-model="autoRefresh" class="rounded border-[var(--color-border)]">
+      Auto-refresh (15s)
+    </label>
+  </div>
+
+  {% if metrics %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <div class="flex items-center gap-2 text-[var(--color-text-muted)]">
+        {% include "components/_icon.html" with name="users" size="16" %}
+        <span class="text-sm">Active Users</span>
+      </div>
+      <p class="text-3xl font-bold mt-2">{{ metrics.active_users|default:"0" }}</p>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <div class="flex items-center gap-2 text-[var(--color-text-muted)]">
+        {% include "components/_icon.html" with name="eye" size="16" %}
+        <span class="text-sm">Page Views (1min)</span>
+      </div>
+      <p class="text-3xl font-bold mt-2">{{ metrics.page_views_per_minute|default:"0" }}</p>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <div class="flex items-center gap-2 text-[var(--color-text-muted)]">
+        {% include "components/_icon.html" with name="download" size="16" %}
+        <span class="text-sm">Downloads (1min)</span>
+      </div>
+      <p class="text-3xl font-bold mt-2">{{ metrics.downloads_per_minute|default:"0" }}</p>
+    </div>
+    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <div class="flex items-center gap-2 text-[var(--color-text-muted)]">
+        {% include "components/_icon.html" with name="search" size="16" %}
+        <span class="text-sm">Searches (1min)</span>
+      </div>
+      <p class="text-3xl font-bold mt-2">{{ metrics.searches_per_minute|default:"0" }}</p>
+    </div>
+  </div>
+
+  {% if metrics.top_pages %}
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold mb-3">Top Pages Right Now</h2>
+    <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-[var(--color-bg-secondary)]">
+          <tr>
+            <th class="px-4 py-3 text-left font-medium">Page</th>
+            <th class="px-4 py-3 text-right font-medium">Active Users</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--color-border)]">
+          {% for page in metrics.top_pages %}
+          <tr>
+            <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ page.path }}</td>
+            <td class="px-4 py-3 text-right font-medium">{{ page.users }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  {% else %}
+  {% include "components/_empty_state.html" with icon="activity" title="No realtime data" description="Realtime metrics will appear when visitors are active on the site." %}
+  {% endif %}
+</div>
+{% endblock %}

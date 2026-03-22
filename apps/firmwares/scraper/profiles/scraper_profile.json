@@ -1,0 +1,65 @@
+{
+  "_comment": "GSMArena Ultimate Scraper Profile v5",
+  "_version": "5.0",
+  "_docs": {
+    "mode": "full | profile | exclude",
+    "include_sections": "only used when mode=profile",
+    "exclude_sections": "only used when mode=exclude",
+    "field_aliases": "rename raw field keys to preferred output names",
+    "output_formats": "enable/disable each output writer independently",
+    "ai_canonicalize": "use Claude API to unify field names across page eras (requires ANTHROPIC_API_KEY)",
+    "ai_enrich": "use Claude API to infer chipset process node, arch, fab, year (requires ANTHROPIC_API_KEY)"
+  },
+
+  "mode": "full",
+
+  "include_sections": [
+    "Network", "Launch", "Body", "Display", "Platform",
+    "Memory", "Main Camera", "Selfie camera", "Sound",
+    "Comms", "Features", "Battery", "Misc", "Tests"
+  ],
+
+  "exclude_sections": [],
+
+  "include_fields": [],
+
+  "exclude_fields": [
+    "tests_performance",
+    "tests_loudspeaker_test"
+  ],
+
+  "field_aliases": {
+    "platform_os":          "os_version",
+    "platform_chipset":     "chipset",
+    "platform_cpu":         "cpu",
+    "platform_gpu":         "gpu",
+    "misc_models":          "variant_codes_raw",
+    "network_technology":   "network_gen",
+    "body_dimensions":      "dimensions",
+    "body_weight":          "weight_g",
+    "display_type":         "screen_type",
+    "display_size":         "screen_size_inches",
+    "display_resolution":   "screen_resolution",
+    "memory_internal":      "storage_ram",
+    "battery_capacity":     "battery_mah",
+    "misc_price":           "price_eur"
+  },
+
+  "always_include_meta": true,
+  "normalize_values": true,
+  "extract_model_codes": true,
+
+  "ai_canonicalize": false,
+  "ai_enrich": false,
+
+  "output_formats": {
+    "csv":     true,
+    "json":    true,
+    "jsonl":   true,
+    "sqlite":  true,
+    "excel":   false,
+    "parquet": false
+  },
+
+  "schema_export": true
+}
