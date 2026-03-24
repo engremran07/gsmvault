@@ -13,7 +13,7 @@ from .models import (
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin[Category]):
     list_display = ("name", "parent", "slug")
     search_fields = ("name", "slug")
     list_filter = ("parent",)
@@ -21,7 +21,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(Post)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(admin.ModelAdmin[Post]):
     list_display = (
         "title",
         "author",
@@ -60,7 +60,7 @@ class BlogSettingsAdmin(SingletonModelAdmin):
 
 
 @admin.register(AutoTopic)
-class AutoTopicAdmin(admin.ModelAdmin):
+class AutoTopicAdmin(admin.ModelAdmin[AutoTopic]):
     list_display = (
         "topic",
         "status",
@@ -76,7 +76,7 @@ class AutoTopicAdmin(admin.ModelAdmin):
 
 
 @admin.register(PostTranslation)
-class PostTranslationAdmin(admin.ModelAdmin):
+class PostTranslationAdmin(admin.ModelAdmin[PostTranslation]):
     list_display = ("post", "language", "title")
     list_filter = ("language",)
     search_fields = ("title", "summary", "post__title")
@@ -84,7 +84,7 @@ class PostTranslationAdmin(admin.ModelAdmin):
 
 
 @admin.register(CategoryTranslation)
-class CategoryTranslationAdmin(admin.ModelAdmin):
+class CategoryTranslationAdmin(admin.ModelAdmin[CategoryTranslation]):
     list_display = ("category", "language", "name")
     list_filter = ("language",)
     search_fields = ("name", "category__name")
@@ -92,7 +92,7 @@ class CategoryTranslationAdmin(admin.ModelAdmin):
 
 
 @admin.register(TagTranslation)
-class TagTranslationAdmin(admin.ModelAdmin):
+class TagTranslationAdmin(admin.ModelAdmin[TagTranslation]):
     list_display = ("tag", "language", "name")
     list_filter = ("language",)
     search_fields = ("name", "tag__name")

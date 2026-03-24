@@ -6,21 +6,39 @@ from django.http import HttpRequest
 
 from .models import (
     ForumAttachment,
+    ForumBestAnswer,
     ForumBookmark,
     ForumCategory,
+    ForumCategorySubscription,
+    ForumChangelog,
+    ForumFAQEntry,
     ForumFlag,
+    ForumIPBan,
     ForumLike,
     ForumMention,
+    ForumOnlineUser,
     ForumPoll,
     ForumPollChoice,
     ForumPollVote,
     ForumPrivateTopic,
     ForumPrivateTopicUser,
+    ForumReaction,
     ForumReply,
     ForumReplyHistory,
+    ForumReplyReaction,
     ForumTopic,
     ForumTopicFavorite,
+    ForumTopicMergeLog,
+    ForumTopicMoveLog,
+    ForumTopicPrefix,
+    ForumTopicRating,
     ForumTopicSubscription,
+    ForumTopicTag,
+    ForumTrustLevel,
+    ForumUsefulPost,
+    ForumUserProfile,
+    ForumWarning,
+    ForumWikiHeaderHistory,
 )
 
 
@@ -180,3 +198,177 @@ class ForumPollChoiceAdmin(admin.ModelAdmin[ForumPollChoice]):
 class ForumPollVoteAdmin(admin.ModelAdmin[ForumPollVote]):
     list_display = ["user", "poll", "choice", "created_at"]
     raw_id_fields = ["user", "poll", "choice"]
+
+
+# ---------------------------------------------------------------------------
+# Enrichment models
+# ---------------------------------------------------------------------------
+
+
+@admin.register(ForumTrustLevel)
+class ForumTrustLevelAdmin(admin.ModelAdmin[ForumTrustLevel]):
+    list_display = [
+        "title",
+        "level",
+        "min_topics_created",
+        "min_replies_posted",
+        "min_days_visited",
+        "can_flag",
+        "can_create_polls",
+    ]
+    list_editable = ["min_topics_created", "min_replies_posted", "min_days_visited"]
+    ordering = ["level"]
+
+
+@admin.register(ForumUserProfile)
+class ForumUserProfileAdmin(admin.ModelAdmin[ForumUserProfile]):
+    list_display = [
+        "user",
+        "trust_level",
+        "reputation",
+        "topic_count",
+        "reply_count",
+        "is_banned",
+        "warning_level",
+    ]
+    list_filter = ["trust_level", "is_banned"]
+    search_fields = ["user__username", "custom_title"]
+    raw_id_fields = ["user"]
+    readonly_fields = ["reputation", "topic_count", "reply_count", "likes_received"]
+
+
+@admin.register(ForumReaction)
+class ForumReactionAdmin(admin.ModelAdmin[ForumReaction]):
+    list_display = ["name", "emoji", "icon", "score", "sort_order", "is_active"]
+    list_editable = ["sort_order", "is_active", "score"]
+    ordering = ["sort_order"]
+
+
+@admin.register(ForumReplyReaction)
+class ForumReplyReactionAdmin(admin.ModelAdmin[ForumReplyReaction]):
+    list_display = ["user", "reply", "reaction", "created_at"]
+    raw_id_fields = ["user", "reply", "reaction"]
+
+
+@admin.register(ForumTopicPrefix)
+class ForumTopicPrefixAdmin(admin.ModelAdmin[ForumTopicPrefix]):
+    list_display = ["name", "slug", "color", "is_active"]
+    list_editable = ["is_active"]
+    prepopulated_fields = {"slug": ("name",)}
+    filter_horizontal = ["categories"]
+
+
+@admin.register(ForumTopicTag)
+class ForumTopicTagAdmin(admin.ModelAdmin[ForumTopicTag]):
+    list_display = ["name", "slug", "topic"]
+    search_fields = ["name"]
+    raw_id_fields = ["topic"]
+
+
+@admin.register(ForumBestAnswer)
+class ForumBestAnswerAdmin(admin.ModelAdmin[ForumBestAnswer]):
+    list_display = ["topic", "reply", "marked_by", "created_at"]
+    raw_id_fields = ["topic", "reply", "marked_by"]
+
+
+@admin.register(ForumTopicRating)
+class ForumTopicRatingAdmin(admin.ModelAdmin[ForumTopicRating]):
+    list_display = ["topic", "user", "score", "created_at"]
+    raw_id_fields = ["topic", "user"]
+
+
+@admin.register(ForumWarning)
+class ForumWarningAdmin(admin.ModelAdmin[ForumWarning]):
+    list_display = [
+        "user",
+        "severity",
+        "points",
+        "issued_by",
+        "is_acknowledged",
+        "created_at",
+        "expires_at",
+    ]
+    list_filter = ["severity", "is_acknowledged"]
+    search_fields = ["user__username", "reason"]
+    raw_id_fields = ["user", "issued_by"]
+    date_hierarchy = "created_at"
+
+
+@admin.register(ForumIPBan)
+class ForumIPBanAdmin(admin.ModelAdmin[ForumIPBan]):
+    list_display = ["ip_address", "banned_by", "is_active", "created_at", "expires_at"]
+    list_filter = ["is_active"]
+    search_fields = ["ip_address", "reason"]
+    raw_id_fields = ["banned_by"]
+
+
+@admin.register(ForumCategorySubscription)
+class ForumCategorySubscriptionAdmin(admin.ModelAdmin[ForumCategorySubscription]):
+    list_display = [
+        "user",
+        "category",
+        "notify_new_topics",
+        "notify_new_replies",
+        "created_at",
+    ]
+    list_filter = ["notify_new_topics", "notify_new_replies"]
+    raw_id_fields = ["user", "category"]
+
+
+@admin.register(ForumOnlineUser)
+class ForumOnlineUserAdmin(admin.ModelAdmin[ForumOnlineUser]):
+    list_display = ["user", "last_seen", "location"]
+    raw_id_fields = ["user"]
+
+
+@admin.register(ForumTopicMoveLog)
+class ForumTopicMoveLogAdmin(admin.ModelAdmin[ForumTopicMoveLog]):
+    list_display = ["topic", "from_category", "to_category", "moved_by", "created_at"]
+    raw_id_fields = ["topic", "from_category", "to_category", "moved_by"]
+    date_hierarchy = "created_at"
+
+
+@admin.register(ForumTopicMergeLog)
+class ForumTopicMergeLogAdmin(admin.ModelAdmin[ForumTopicMergeLog]):
+    list_display = [
+        "source_topic_title",
+        "target_topic",
+        "merged_by",
+        "replies_moved",
+        "created_at",
+    ]
+    raw_id_fields = ["target_topic", "merged_by"]
+    date_hierarchy = "created_at"
+
+
+# ---------------------------------------------------------------------------
+# 4PDA-style model admins
+# ---------------------------------------------------------------------------
+
+
+@admin.register(ForumUsefulPost)
+class ForumUsefulPostAdmin(admin.ModelAdmin[ForumUsefulPost]):
+    list_display = ["reply", "user", "created_at"]
+    raw_id_fields = ["reply", "user"]
+
+
+@admin.register(ForumFAQEntry)
+class ForumFAQEntryAdmin(admin.ModelAdmin[ForumFAQEntry]):
+    list_display = ["question", "topic", "reply", "sort_order", "created_at"]
+    raw_id_fields = ["topic", "reply"]
+    search_fields = ["question"]
+
+
+@admin.register(ForumChangelog)
+class ForumChangelogAdmin(admin.ModelAdmin[ForumChangelog]):
+    list_display = ["version", "topic", "added_by", "released_at", "created_at"]
+    raw_id_fields = ["topic", "added_by"]
+    search_fields = ["version"]
+    date_hierarchy = "created_at"
+
+
+@admin.register(ForumWikiHeaderHistory)
+class ForumWikiHeaderHistoryAdmin(admin.ModelAdmin[ForumWikiHeaderHistory]):
+    list_display = ["topic", "edited_by", "created_at"]
+    raw_id_fields = ["topic", "edited_by"]
+    date_hierarchy = "created_at"

@@ -1,15 +1,11 @@
 from __future__ import annotations
 
 import logging
-import re
 from datetime import timedelta
-from pathlib import Path
 from typing import Any
 
 from celery import shared_task
-from django.conf import settings
 from django.db.models import Count
-from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
@@ -32,7 +28,7 @@ def aggregate_events(self) -> dict:
     Runs hourly to aggregate ad impressions, clicks, and conversions.
     """
     try:
-        from apps.ads.models import AdAnalytics, AdEvent  # type: ignore[attr-defined]
+        from apps.ads.models import AdEvent
 
         logger.info("Starting ad events aggregation")
 
@@ -48,20 +44,15 @@ def aggregate_events(self) -> dict:
         aggregated_count = 0
 
         for event_data in events:
-            placement_id = event_data["placement_id"]
-            event_type = event_data["event_type"]
-            count = event_data["count"]
-
-            # Create or update analytics record
-            AdAnalytics.objects.update_or_create(
-                placement_id=placement_id,
-                event_type=event_type,
-                period_start=one_hour_ago.replace(minute=0, second=0, microsecond=0),
-                defaults={"count": count, "period_end": timezone.now()},
-            )
             aggregated_count += 1
+            logger.debug(
+                "Placement %s: %s × %d",
+                event_data["placement_id"],
+                event_data["event_type"],
+                event_data["count"],
+            )
 
-        logger.info(f"Aggregated {aggregated_count} ad event types")
+        logger.info("Aggregated %d ad event types", aggregated_count)
 
         return {
             "status": "success",
@@ -101,207 +92,32 @@ def cleanup_old_events(self):
         return {"status": "error", "error": str(e)}
 
 
-# ==================== AUTO ADS TEMPLATE SCANNING ====================
+# ==================== BLOG POST CONTENT SCANNING ====================
 
 
 @shared_task(
     bind=True,
+    max_retries=2,
+    default_retry_delay=30,
     acks_late=True,
-    soft_time_limit=300,
-    time_limit=600,
+    soft_time_limit=60,
+    time_limit=120,
 )
-def scan_templates_for_ad_placements(self) -> dict[str, Any]:
+def scan_blog_post_content(self, post_id: int) -> dict[str, Any]:
     """
-    Automatically scan templates for ad placement opportunities.
+    Scan a published blog post's body HTML for in-content ad placement.
 
-    This task:
-    1. Scans all HTML templates in the project
-    2. Identifies existing {% render_ad_slot %} tags
-    3. Suggests new placement locations based on content structure
-    4. Creates AdPlacement records for discovered slots
-    5. Optionally uses AI to recommend optimal placement
+    Triggered automatically via ``post_save`` signal when a blog post is
+    published.  Analyses paragraph count, headings, images, and determines
+    optimal insertion points for inline / in-feed ads.
     """
     try:
-        from apps.ads.models import AdPlacement, AdsSettings, AutoAdsScanResult
+        from apps.ads.services.scanner import scan_blog_post_body
 
-        settings_obj = AdsSettings.get_solo()
-        if not settings_obj.auto_ads_enabled:
-            logger.info("Auto ads scanning disabled")
-            return {"status": "skipped", "reason": "auto_ads_disabled"}
-
-        templates_dir = Path(settings.BASE_DIR) / "templates"
-        if not templates_dir.exists():
-            return {"status": "error", "reason": "templates_dir_not_found"}
-
-        # Pattern to find existing ad slots
-        ad_slot_pattern = re.compile(
-            r"(?:ads:slot|<!--\s*ad-slot:|{%\s*render_ad_slot\s+['\"])(?P<name>[\w\-\s]+)",
-            re.IGNORECASE,
-        )
-
-        # Pattern to find content sections suitable for ads
-        content_patterns = {
-            "article": re.compile(r"<article[^>]*>", re.IGNORECASE),
-            "main_content": re.compile(
-                r'class="[^"]*(?:content|main|body|prose)[^"]*"', re.IGNORECASE
-            ),
-            "sidebar": re.compile(
-                r'class="[^"]*(?:sidebar|aside|rail)[^"]*"', re.IGNORECASE
-            ),
-            "footer": re.compile(r"<footer[^>]*>", re.IGNORECASE),
-            "list": re.compile(
-                r'class="[^"]*(?:list|grid|feed|posts)[^"]*"', re.IGNORECASE
-            ),
-        }
-
-        created = 0
-        updated = 0
-        scanned = 0
-        suggestions = []
-
-        for path in templates_dir.rglob("*.html"):
-            try:
-                text = path.read_text(encoding="utf-8", errors="ignore")
-            except Exception:  # noqa: S112
-                continue
-
-            scanned += 1
-            relative_path = str(path.relative_to(templates_dir))
-
-            # Find existing ad slots
-            for match in ad_slot_pattern.finditer(text):
-                raw_name = match.group("name").strip()
-                if not raw_name:
-                    continue
-                slug = slugify(raw_name)
-                _obj, created_flag = AdPlacement.objects.get_or_create(
-                    slug=slug,
-                    defaults={
-                        "code": slug or raw_name.lower().replace(" ", "-"),
-                        "name": raw_name,
-                        "allowed_types": "banner,native,html",
-                        "context": "auto",
-                        "template_reference": f"{relative_path}",
-                    },
-                )
-                if created_flag:
-                    created += 1
-                else:
-                    updated += 1
-
-            # Analyze content structure for suggestions
-            content_analysis = {}
-            for pattern_name, pattern in content_patterns.items():
-                matches = pattern.findall(text)
-                if matches:
-                    content_analysis[pattern_name] = len(matches)
-
-            if content_analysis:
-                # Store scan result for AI analysis
-                AutoAdsScanResult.objects.create(
-                    template_path=relative_path,
-                    content_analysis=content_analysis,
-                    suggested_placements=_suggest_placements(
-                        content_analysis, relative_path
-                    ),
-                    score=_calculate_placement_score(content_analysis),
-                )
-                suggestions.append(
-                    {
-                        "template": relative_path,
-                        "content_types": list(content_analysis.keys()),
-                    }
-                )
-
-        logger.info(
-            f"Auto ads scan complete. Scanned: {scanned}, Created: {created}, Updated: {updated}"
-        )
-
-        return {
-            "status": "success",
-            "scanned": scanned,
-            "created": created,
-            "updated": updated,
-            "suggestions": suggestions[:10],  # Top 10 suggestions
-        }
-
-    except Exception as e:
-        logger.error(f"Auto ads scan failed: {e}", exc_info=True)
-        return {"status": "error", "error": str(e)}
-
-
-def _suggest_placements(
-    content_analysis: dict[str, int], template_path: str
-) -> list[dict]:
-    """Generate placement suggestions based on content analysis."""
-    suggestions = []
-
-    if "article" in content_analysis or "main_content" in content_analysis:
-        suggestions.append(
-            {
-                "type": "in_article",
-                "position": "after_paragraph_3",
-                "rationale": "In-article ads perform well after initial content engagement",
-            }
-        )
-        suggestions.append(
-            {
-                "type": "post_top",
-                "position": "before_content",
-                "rationale": "Above-the-fold placement for high visibility",
-            }
-        )
-
-    if "sidebar" in content_analysis:
-        suggestions.append(
-            {
-                "type": "sidebar_rect",
-                "position": "sidebar_top",
-                "rationale": "Sidebar ads are highly visible without disrupting content",
-            }
-        )
-
-    if "list" in content_analysis:
-        suggestions.append(
-            {
-                "type": "in_feed",
-                "position": "every_nth_item",
-                "rationale": "In-feed ads blend naturally with list content",
-            }
-        )
-
-    if "footer" in content_analysis:
-        suggestions.append(
-            {
-                "type": "footer_banner",
-                "position": "above_footer",
-                "rationale": "Catch users who read to the end",
-            }
-        )
-
-    return suggestions
-
-
-def _calculate_placement_score(content_analysis: dict[str, int]) -> float:
-    """Calculate a score indicating how suitable the template is for ads."""
-    score = 0.0
-
-    # Weight different content types
-    weights = {
-        "article": 0.3,
-        "main_content": 0.25,
-        "sidebar": 0.2,
-        "list": 0.15,
-        "footer": 0.1,
-    }
-
-    for content_type, weight in weights.items():
-        if content_type in content_analysis:
-            score += weight * min(
-                content_analysis[content_type], 3
-            )  # Cap at 3 occurrences
-
-    return min(score, 1.0) * 100  # Return as percentage
+        return scan_blog_post_body(post_id)
+    except Exception as exc:
+        logger.error("Blog post scan failed for post %s: %s", post_id, exc)
+        raise self.retry(exc=exc, countdown=30)  # noqa: B904
 
 
 # ==================== AI OPTIMIZATION TASKS ====================
@@ -673,7 +489,6 @@ def ads_hourly_tasks(self):
 def ads_daily_tasks(self):
     """Run all daily ads tasks."""
     cleanup_old_events.delay()  # type: ignore[attr-defined]
-    scan_templates_for_ad_placements.delay()  # type: ignore[attr-defined]
     ai_optimize_ad_placements.delay()  # type: ignore[attr-defined]
     sync_ad_networks.delay()  # type: ignore[attr-defined]
     sync_affiliate_products.delay()  # type: ignore[attr-defined]

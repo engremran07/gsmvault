@@ -4,7 +4,7 @@ from .models import Page
 
 
 @admin.register(Page)
-class PageAdmin(admin.ModelAdmin):
+class PageAdmin(admin.ModelAdmin[Page]):
     list_display = (
         "title",
         "slug",

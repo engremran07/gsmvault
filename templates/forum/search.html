@@ -20,15 +20,15 @@
 {% block page_content %}
 <div class="max-w-3xl">
   <form method="get" class="mb-8"
+        hx-boost="false"
         hx-get="{% url 'forum:search' %}"
         hx-target="#search-results"
-        hx-swap="innerHTML"
-        hx-trigger="submit">
+        hx-swap="innerHTML">
     <div class="flex gap-2">
       <input type="text" name="q" value="{{ query }}" placeholder="Search topics…" autofocus
              class="flex-1 px-4 py-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:border-[var(--color-accent)] focus:outline-none">
       <button type="submit"
-              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:opacity-90">
+              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition-colors">
         Search
       </button>
     </div>

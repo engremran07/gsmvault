@@ -117,7 +117,7 @@
           {% for topic in recent_topics %}
           <tr class="hover:bg-[var(--color-sidebar-hover)] transition-colors">
             <td class="py-2 pr-4">
-              <a href="{% url 'forum:topic_detail' slug=topic.slug %}" class="text-[var(--color-accent)] hover:underline" target="_blank">
+              <a href="{% url 'forum:topic_detail' pk=topic.pk slug=topic.slug %}" class="text-[var(--color-accent)] hover:underline" target="_blank">
                 {{ topic.title|truncatechars:50 }}
               </a>
               {% if topic.is_pinned %}<span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400">PIN</span>{% endif %}

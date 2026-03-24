@@ -32,6 +32,17 @@
       </div>
     </div>
     <div class="flex gap-3">
+      {# Watch category #}
+      {% if user.is_authenticated %}
+      <form hx-post="{% url 'forum:toggle_category_subscription' category_slug=category.slug %}"
+            hx-target="#watch-btn" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button type="submit" id="watch-btn"
+                class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-2">
+          {% include "forum/fragments/watch_category_button.html" %}
+        </button>
+      </form>
+      {% endif %}
       {# Search within category #}
       <form method="get" class="flex gap-2">
         <input type="text" name="q" value="{{ search_query }}" placeholder="Search topics…"
@@ -39,7 +50,7 @@
       </form>
       {% if not category.is_closed and user.is_authenticated %}
       <a href="{% url 'forum:topic_create' category_slug=category.slug %}"
-         class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:opacity-90 transition-opacity flex items-center gap-2">
+         class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition-colors flex items-center gap-2">
         <i data-lucide="plus" class="w-4 h-4"></i> New Topic
       </a>
       {% endif %}

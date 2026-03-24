@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
 from typing import TYPE_CHECKING, cast
 
 from django.contrib import messages
@@ -9,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef, Prefetch
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 if TYPE_CHECKING:
@@ -16,24 +18,51 @@ if TYPE_CHECKING:
 
 from . import services
 from .forms import (
+    ChangelogEntryForm,
+    DeviceLinkForm,
+    FAQEntryForm,
     FlagForm,
+    IPBanForm,
     PollVoteForm,
     PrivateTopicForm,
     ReplyCreateForm,
     ReplyEditForm,
     SearchForm,
+    SignatureForm,
     TopicCreateForm,
+    TopicMergeForm,
+    TopicMoveForm,
+    TopicRatingForm,
+    TopicTagForm,
+    TopicTypeForm,
+    WarningForm,
+    WikiHeaderForm,
 )
 from .models import (
+    ForumAttachment,
+    ForumBestAnswer,
     ForumCategory,
+    ForumCategorySubscription,
+    ForumChangelog,
+    ForumFAQEntry,
+    ForumIPBan,
     ForumLike,
+    ForumOnlineUser,
     ForumPoll,
     ForumPollChoice,
     ForumPrivateTopicUser,
+    ForumReaction,
     ForumReply,
+    ForumReplyReaction,
     ForumTopic,
     ForumTopicFavorite,
+    ForumTopicRating,
     ForumTopicSubscription,
+    ForumTopicTag,
+    ForumUsefulPost,
+    ForumUserProfile,
+    ForumWarning,
+    ForumWikiHeaderHistory,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,7 +103,25 @@ def forum_index(request: HttpRequest) -> HttpResponse:
     if request.headers.get("HX-Request"):
         template = "forum/fragments/category_cards.html"
 
-    return render(request, template, {"categories": categories})
+    # Landing page enrichment data
+    stats = services.get_forum_stats()
+    trending = services.get_trending_topics()
+    recent_topics = services.get_recent_topics()
+    latest_replies = services.get_latest_replies()
+    online_users = services.get_online_users()
+
+    return render(
+        request,
+        template,
+        {
+            "categories": categories,
+            "stats": stats,
+            "trending_topics": trending,
+            "recent_topics": recent_topics,
+            "latest_replies": latest_replies,
+            "online_users": online_users,
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -179,6 +226,70 @@ def topic_detail(request: HttpRequest, pk: int, slug: str = "") -> HttpResponse:
             topic=topic, user=request.user
         ).exists()
 
+    # Best answer
+    best_answer = ForumBestAnswer.objects.filter(topic=topic).first()
+
+    # Topic tags
+    topic_tags = ForumTopicTag.objects.filter(topic=topic)
+
+    # User's rating
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = ForumTopicRating.objects.filter(
+            topic=topic, user=request.user
+        ).first()
+
+    # Similar topics
+    similar_topics = services.find_similar_topics(topic, limit=5)
+
+    # Reactions (available types)
+    available_reactions = ForumReaction.objects.filter(is_active=True)
+
+    # User reactions map (reply_id -> reaction_id)
+    user_reactions: dict[int, int] = {}
+    if request.user.is_authenticated:
+        user_reactions = dict(
+            ForumReplyReaction.objects.filter(
+                reply__topic=topic, user=request.user
+            ).values_list("reply_id", "reaction_id")
+        )
+
+    # Online users count (for the sidebar)
+    online_count = ForumOnlineUser.objects.filter(
+        last_seen__gte=timezone.now() - timedelta(minutes=15)
+    ).count()
+
+    # Update online presence
+    if request.user.is_authenticated:
+        services.update_online_presence(
+            _user(request), location=f"Viewing: {topic.title}"
+        )
+
+    # 4PDA — Useful post counts
+    useful_counts: dict[int, int] = {}
+    user_useful_marks: set[int] = set()
+    if request.user.is_authenticated:
+        user_useful_marks = set(
+            ForumUsefulPost.objects.filter(
+                reply__topic=topic, user=request.user
+            ).values_list("reply_id", flat=True)
+        )
+    for reply_obj in replies:
+        useful_counts[reply_obj.pk] = ForumUsefulPost.objects.filter(
+            reply_id=reply_obj.pk
+        ).count()
+
+    # 4PDA — FAQ entries
+    faq_entries = ForumFAQEntry.objects.filter(topic=topic).select_related(
+        "reply", "reply__user"
+    )
+
+    # 4PDA — Changelog
+    changelog_entries = ForumChangelog.objects.filter(topic=topic)
+
+    # 4PDA — Wiki header history count
+    wiki_edit_count = ForumWikiHeaderHistory.objects.filter(topic=topic).count()
+
     template = "forum/topic_detail.html"
     if request.headers.get("HX-Request") and request.GET.get("fragment") == "replies":
         template = "forum/fragments/reply_list.html"
@@ -195,6 +306,23 @@ def topic_detail(request: HttpRequest, pk: int, slug: str = "") -> HttpResponse:
             "is_subscribed": is_subscribed,
             "reply_form": ReplyCreateForm(),
             "flag_form": FlagForm(),
+            "best_answer": best_answer,
+            "topic_tags": topic_tags,
+            "user_rating": user_rating,
+            "similar_topics": similar_topics,
+            "available_reactions": available_reactions,
+            "user_reactions": user_reactions,
+            "online_count": online_count,
+            "rating_form": TopicRatingForm(),
+            # 4PDA context
+            "useful_counts": useful_counts,
+            "user_useful_marks": user_useful_marks,
+            "faq_entries": faq_entries,
+            "changelog_entries": changelog_entries,
+            "wiki_edit_count": wiki_edit_count,
+            "wiki_header_form": WikiHeaderForm(initial={"content": topic.wiki_header}),
+            "changelog_form": ChangelogEntryForm(),
+            "faq_form": FAQEntryForm(),
         },
     )
 
@@ -654,3 +782,652 @@ def _get_client_ip(request: HttpRequest) -> str | None:
     if xff:
         return xff.split(",")[0].strip()
     return request.META.get("REMOTE_ADDR")
+
+
+# ---------------------------------------------------------------------------
+# Reactions (XenForo-style — set/change reaction on a reply)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def set_reaction(request: HttpRequest, reply_pk: int) -> HttpResponse:
+    reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
+    reaction_id = request.POST.get("reaction_id")
+
+    if not reaction_id:
+        services.remove_reaction(reply, _user(request))
+    else:
+        reaction = get_object_or_404(ForumReaction, pk=reaction_id, is_active=True)
+        services.set_reaction(reply, _user(request), reaction)
+
+    reply.refresh_from_db(fields=["reaction_count", "likes_count"])
+    if request.headers.get("HX-Request"):
+        reactions = ForumReplyReaction.objects.filter(reply=reply).select_related(
+            "reaction"
+        )
+        user_reaction = ForumReplyReaction.objects.filter(
+            reply=reply, user=request.user
+        ).first()
+        return render(
+            request,
+            "forum/fragments/reaction_bar.html",
+            {
+                "reply": reply,
+                "reactions": reactions,
+                "user_reaction": user_reaction,
+                "available_reactions": ForumReaction.objects.filter(is_active=True),
+            },
+        )
+    return redirect("forum:topic_detail", pk=reply.topic.pk, slug=reply.topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# Best Answer / Solution
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def mark_solution(request: HttpRequest, reply_pk: int) -> HttpResponse:
+    reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
+    topic = reply.topic
+
+    # Only topic author or staff can mark solution
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden(
+            "Only the topic author or staff can mark a solution."
+        )
+
+    services.mark_best_answer(topic, reply, _user(request))
+    messages.success(request, "Reply marked as best answer!")
+
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "forum/fragments/solution_badge.html",
+            {"reply": reply, "is_solution": True},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+@login_required
+@require_POST
+def unmark_solution(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    services.unmark_best_answer(topic)
+    messages.success(request, "Best answer removed.")
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# Topic Rating (vBulletin star rating)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def rate_topic(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk, is_removed=False)
+    form = TopicRatingForm(request.POST)
+    if form.is_valid():
+        services.rate_topic(topic, _user(request), form.cleaned_data["score"])
+
+    topic.refresh_from_db(fields=["rating_score", "rating_count"])
+    if request.headers.get("HX-Request"):
+        user_rating = ForumTopicRating.objects.filter(
+            topic=topic, user=request.user
+        ).first()
+        return render(
+            request,
+            "forum/fragments/topic_rating.html",
+            {"topic": topic, "user_rating": user_rating},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# Topic Tags
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def update_tags(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+
+    # Only topic author or staff
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    form = TopicTagForm(request.POST)
+    if form.is_valid():
+        services.set_topic_tags(topic, form.cleaned_data["tags"])
+
+    if request.headers.get("HX-Request"):
+        tags = ForumTopicTag.objects.filter(topic=topic)
+        return render(
+            request,
+            "forum/fragments/topic_tags.html",
+            {"topic": topic, "topic_tags": tags},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# Topic Move (moderation)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def topic_move(request: HttpRequest, pk: int) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    topic = get_object_or_404(ForumTopic, pk=pk)
+    form = TopicMoveForm(request.POST)
+    if form.is_valid():
+        to_cat = get_object_or_404(ForumCategory, pk=form.cleaned_data["to_category"])
+        services.move_topic(
+            topic,
+            to_category=to_cat,
+            moved_by=_user(request),
+            reason=form.cleaned_data.get("reason", ""),
+        )
+        messages.success(request, f"Topic moved to {to_cat.title}.")
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# Topic Merge (moderation)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def topic_merge(request: HttpRequest, pk: int) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    source = get_object_or_404(ForumTopic, pk=pk)
+    form = TopicMergeForm(request.POST)
+    if form.is_valid():
+        target = get_object_or_404(ForumTopic, pk=form.cleaned_data["target_topic_id"])
+        services.merge_topics(source, target, merged_by=_user(request))
+        messages.success(request, f"Topic merged into '{target.title}'.")
+        return redirect("forum:topic_detail", pk=target.pk, slug=target.slug)
+    return redirect("forum:topic_detail", pk=source.pk, slug=source.slug)
+
+
+# ---------------------------------------------------------------------------
+# Warning System (moderation)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def issue_warning(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    form = WarningForm(request.POST)
+    if form.is_valid():
+        target_user = get_object_or_404(User, pk=form.cleaned_data["user_id"])
+        services.issue_warning(
+            user=target_user,
+            issued_by=_user(request),
+            reason=form.cleaned_data["reason"],
+            severity=form.cleaned_data["severity"],
+            points=form.cleaned_data["points"],
+        )
+        messages.success(request, f"Warning issued to {target_user.username}.")  # type: ignore[attr-defined]
+
+    referer = request.META.get("HTTP_REFERER", "/forum/")
+    return redirect(referer)
+
+
+# ---------------------------------------------------------------------------
+# IP Ban (moderation)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def ip_ban(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    form = IPBanForm(request.POST)
+    if form.is_valid():
+        services.ban_ip(
+            ip_address=form.cleaned_data["ip_address"],
+            banned_by=_user(request),
+            reason=form.cleaned_data.get("reason", ""),
+        )
+        messages.success(request, f"IP {form.cleaned_data['ip_address']} banned.")
+
+    referer = request.META.get("HTTP_REFERER", "/forum/")
+    return redirect(referer)
+
+
+@login_required
+@require_POST
+def ip_unban(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    ip = request.POST.get("ip_address", "")
+    if ip:
+        services.unban_ip(ip)
+        messages.success(request, f"IP {ip} unbanned.")
+    referer = request.META.get("HTTP_REFERER", "/forum/")
+    return redirect(referer)
+
+
+# ---------------------------------------------------------------------------
+# User Ban (moderation)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def ban_user(request: HttpRequest, user_pk: int) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    target = get_object_or_404(User, pk=user_pk)
+    reason = request.POST.get("reason", "")
+    services.ban_user(target, reason=reason)
+    messages.success(request, f"User {target.username} banned from forum.")  # type: ignore[attr-defined]
+    referer = request.META.get("HTTP_REFERER", "/forum/")
+    return redirect(referer)
+
+
+@login_required
+@require_POST
+def unban_user(request: HttpRequest, user_pk: int) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    target = get_object_or_404(User, pk=user_pk)
+    services.unban_user(target)
+    messages.success(request, f"User {target.username} unbanned.")  # type: ignore[attr-defined]
+    referer = request.META.get("HTTP_REFERER", "/forum/")
+    return redirect(referer)
+
+
+# ---------------------------------------------------------------------------
+# Category Subscription (XenForo "Watch Forum")
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def toggle_category_subscription(
+    request: HttpRequest, category_slug: str
+) -> HttpResponse:
+    category = get_object_or_404(ForumCategory, slug=category_slug)
+    existing = ForumCategorySubscription.objects.filter(
+        category=category, user=request.user
+    ).first()
+    if existing:
+        existing.delete()
+        is_watching = False
+    else:
+        services.subscribe_category(category, _user(request))
+        is_watching = True
+
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "forum/fragments/watch_category_button.html",
+            {"category": category, "is_watching": is_watching},
+        )
+    return redirect("forum:category_detail", slug=category.slug)
+
+
+# ---------------------------------------------------------------------------
+# Forum Profile & Signature
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def edit_profile(request: HttpRequest) -> HttpResponse:
+    profile = services.get_or_create_forum_profile(_user(request))
+
+    if request.method == "POST":
+        form = SignatureForm(request.POST)
+        if form.is_valid():
+            profile.signature = form.cleaned_data["signature"]
+            profile.signature_html = services.render_markdown(
+                form.cleaned_data["signature"]
+            )
+            profile.custom_title = form.cleaned_data.get("custom_title", "")
+            profile.website = form.cleaned_data.get("website", "")
+            profile.location = form.cleaned_data.get("location", "")
+            profile.save(
+                update_fields=[
+                    "signature",
+                    "signature_html",
+                    "custom_title",
+                    "website",
+                    "location",
+                    "updated_at",
+                ]
+            )
+            messages.success(request, "Forum profile updated!")
+            return redirect("forum:edit_profile")
+    else:
+        form = SignatureForm(
+            initial={
+                "signature": profile.signature,
+                "custom_title": profile.custom_title,
+                "website": profile.website,
+                "location": profile.location,
+            }
+        )
+
+    return render(
+        request,
+        "forum/edit_profile.html",
+        {"form": form, "profile": profile},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Who's Online
+# ---------------------------------------------------------------------------
+
+
+def whos_online(request: HttpRequest) -> HttpResponse:
+    online_users = services.get_online_users()
+    template = "forum/whos_online.html"
+    if request.headers.get("HX-Request"):
+        template = "forum/fragments/online_users.html"
+    return render(request, template, {"online_users": online_users})
+
+
+# ---------------------------------------------------------------------------
+# Leaderboard (reputation)
+# ---------------------------------------------------------------------------
+
+
+def leaderboard(request: HttpRequest) -> HttpResponse:
+    top_users = ForumUserProfile.objects.select_related("user").order_by("-reputation")[
+        :25
+    ]
+    return render(request, "forum/leaderboard.html", {"top_users": top_users})
+
+
+# ---------------------------------------------------------------------------
+# IP Ban List (staff only)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def ip_ban_list(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    bans = ForumIPBan.objects.filter(is_active=True).order_by("-created_at")
+    return render(
+        request,
+        "forum/ip_ban_list.html",
+        {"bans": bans, "form": IPBanForm()},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Warning List (staff only)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def warning_list(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+    warnings = ForumWarning.objects.select_related("user", "issued_by").order_by(
+        "-created_at"
+    )[:100]
+    return render(
+        request,
+        "forum/warning_list.html",
+        {"warnings": warnings, "form": WarningForm()},
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Wiki Header (шапка)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def edit_wiki_header(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk, is_removed=False)
+
+    # Only topic author or staff can edit wiki header
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden(
+            "Only the topic author or staff can edit the wiki header."
+        )
+
+    form = WikiHeaderForm(request.POST)
+    if form.is_valid():
+        services.update_wiki_header(
+            topic, user=_user(request), content=form.cleaned_data["content"]
+        )
+        messages.success(request, "Wiki header updated!")
+
+    if request.headers.get("HX-Request"):
+        topic.refresh_from_db()
+        return render(
+            request,
+            "forum/fragments/wiki_header.html",
+            {"topic": topic},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+def wiki_header_history(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+    history = ForumWikiHeaderHistory.objects.filter(topic=topic).select_related(
+        "edited_by"
+    )
+    return render(
+        request,
+        "forum/fragments/wiki_header_history.html",
+        {"topic": topic, "history": history},
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Useful Post toggle
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def toggle_useful(request: HttpRequest, reply_pk: int) -> HttpResponse:
+    reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
+    is_useful = services.toggle_useful_post(reply, _user(request))
+    useful_count = services.get_useful_count(reply)
+
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "forum/fragments/useful_button.html",
+            {"reply": reply, "is_useful": is_useful, "useful_count": useful_count},
+        )
+    return redirect("forum:topic_detail", pk=reply.topic.pk, slug=reply.topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — FAQ entries
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def add_faq(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    form = FAQEntryForm(request.POST)
+    if form.is_valid():
+        reply = get_object_or_404(ForumReply, pk=form.cleaned_data["reply_id"])
+        services.add_faq_entry(
+            topic,
+            reply,
+            question=form.cleaned_data["question"],
+            sort_order=form.cleaned_data.get("sort_order") or 0,
+        )
+        messages.success(request, "FAQ entry added!")
+
+    if request.headers.get("HX-Request"):
+        entries = services.get_faq_entries(topic)
+        return render(
+            request,
+            "forum/fragments/faq_entries.html",
+            {"topic": topic, "faq_entries": entries},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+@login_required
+@require_POST
+def remove_faq(request: HttpRequest, faq_pk: int) -> HttpResponse:
+    faq = get_object_or_404(ForumFAQEntry, pk=faq_pk)
+    topic = faq.topic
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    services.remove_faq_entry(faq_pk)
+    messages.success(request, "FAQ entry removed.")
+
+    if request.headers.get("HX-Request"):
+        entries = services.get_faq_entries(topic)
+        return render(
+            request,
+            "forum/fragments/faq_entries.html",
+            {"topic": topic, "faq_entries": entries},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Changelog
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def add_changelog(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    form = ChangelogEntryForm(request.POST)
+    if form.is_valid():
+        services.add_changelog_entry(
+            topic,
+            user=_user(request),
+            version=form.cleaned_data["version"],
+            changes=form.cleaned_data["changes"],
+            released_at=form.cleaned_data.get("released_at"),
+        )
+        messages.success(request, "Changelog entry added!")
+
+    if request.headers.get("HX-Request"):
+        entries = services.get_changelog(topic)
+        return render(
+            request,
+            "forum/fragments/changelog.html",
+            {"topic": topic, "changelog_entries": entries},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+@login_required
+@require_POST
+def remove_changelog(request: HttpRequest, entry_pk: int) -> HttpResponse:
+    entry = get_object_or_404(ForumChangelog, pk=entry_pk)
+    topic = entry.topic
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    services.remove_changelog_entry(entry_pk)
+    messages.success(request, "Changelog entry removed.")
+
+    if request.headers.get("HX-Request"):
+        entries = services.get_changelog(topic)
+        return render(
+            request,
+            "forum/fragments/changelog.html",
+            {"topic": topic, "changelog_entries": entries},
+        )
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Topic type change
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def change_topic_type(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    form = TopicTypeForm(request.POST)
+    if form.is_valid():
+        topic.topic_type = form.cleaned_data["topic_type"]
+        topic.save(update_fields=["topic_type", "updated_at"])
+        messages.success(request, "Topic type updated!")
+
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Device linking
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def link_device(request: HttpRequest, topic_pk: int) -> HttpResponse:
+    topic = get_object_or_404(ForumTopic, pk=topic_pk)
+
+    if topic.user != request.user and not request.user.is_staff:  # type: ignore[union-attr]
+        return HttpResponseForbidden()
+
+    form = DeviceLinkForm(request.POST)
+    if form.is_valid():
+        device_id = form.cleaned_data.get("device_id")
+        if device_id:
+            from apps.firmwares.models import Model as DeviceModel
+
+            device = DeviceModel.objects.filter(pk=device_id).first()
+            topic.linked_device = device
+        else:
+            topic.linked_device = None
+        topic.save(update_fields=["linked_device", "updated_at"])
+        messages.success(request, "Device link updated!")
+
+    return redirect("forum:topic_detail", pk=topic.pk, slug=topic.slug)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Attachment download counter
+# ---------------------------------------------------------------------------
+
+
+def download_attachment(request: HttpRequest, attachment_pk: int) -> HttpResponse:
+    attachment = get_object_or_404(ForumAttachment, pk=attachment_pk)
+    services.increment_download_count(attachment)
+    return redirect(attachment.file.url)

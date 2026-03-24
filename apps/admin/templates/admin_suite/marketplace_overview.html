@@ -1,0 +1,55 @@
+{% extends "layouts/admin.html" %}
+{% load humanize %}
+{% block title %}Marketplace — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Marketplace</h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+{# KPI Cards #}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 stagger-children">
+  {% include "components/_admin_kpi_card.html" with icon="store" color="blue" value=stats.total_sellers label="Active Sellers" stagger=0 %}
+  {% include "components/_admin_kpi_card.html" with icon="badge-check" color="emerald" value=stats.verified_sellers label="Verified" stagger=1 %}
+  {% include "components/_admin_kpi_card.html" with icon="clock" color="amber" value=stats.pending_verifications label="Pending Verify" stagger=2 %}
+  {% include "components/_admin_kpi_card.html" with icon="package" color="violet" value=stats.total_listings label="Active Listings" stagger=3 %}
+</div>
+
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 stagger-children">
+  {% include "components/_admin_kpi_card.html" with icon="star" color="amber" value=stats.featured_listings label="Featured" stagger=4 %}
+  {% include "components/_admin_kpi_card.html" with icon="shopping-bag" color="cyan" value=stats.total_sales label="Total Sales" stagger=5 %}
+  {% include "components/_admin_kpi_card.html" with icon="plus-circle" color="green" value=stats.new_listings_30d label="New (30d)" stagger=6 %}
+  {% include "components/_admin_kpi_card.html" with icon="dollar-sign" color="emerald" value=stats.total_revenue label="Revenue Index" stagger=7 %}
+</div>
+
+{# Quick Nav #}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <a href="{% url 'admin_suite:marketplace_sellers' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10"><i data-lucide="store" class="w-5 h-5 text-blue-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Sellers</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">Manage seller profiles, verification status, and payout methods.</p>
+  </a>
+  <a href="{% url 'admin_suite:marketplace_listings' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10"><i data-lucide="package" class="w-5 h-5 text-emerald-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Listings</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">View all marketplace listings, featured items, and pricing.</p>
+  </a>
+  <a href="{% url 'admin_suite:marketplace_verifications' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500/10"><i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Verifications</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">Review and approve/reject seller verification requests.</p>
+  </a>
+</div>
+
+{% endblock %}

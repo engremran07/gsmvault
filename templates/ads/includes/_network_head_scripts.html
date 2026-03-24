@@ -1,0 +1,6 @@
+{% comment %}Inject enabled ad-network head scripts (AdSense, Media.net, Ezoic, etc).{% endcomment %}
+{% if ads_show and ads_enabled_networks %}
+{% for network in ads_enabled_networks %}{% if network.header_script %}
+{{ network.header_script }}
+{% endif %}{% endfor %}
+{% endif %}

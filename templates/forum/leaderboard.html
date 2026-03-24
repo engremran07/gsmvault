@@ -1,0 +1,79 @@
+{# templates/forum/leaderboard.html — Forum reputation leaderboard #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Leaderboard — Forum{% endblock %}
+{% block meta_description %}Top forum contributors ranked by reputation.{% endblock %}
+
+{% block page_header %}
+<div class="mb-8">
+  <nav class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-4">
+    <a href="{% url 'forum:index' %}" class="hover:text-[var(--color-accent)]">Forum</a>
+    <i data-lucide="chevron-right" class="w-3 h-3"></i>
+    <span class="text-[var(--color-text-primary)]">Leaderboard</span>
+  </nav>
+  <h1 class="text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+    <i data-lucide="trophy" class="w-7 h-7 text-yellow-400"></i>
+    Forum Leaderboard
+  </h1>
+  <p class="text-[var(--color-text-secondary)] mt-1">Top contributors by reputation</p>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-[var(--color-border)] bg-[var(--color-bg-tertiary)]">
+        <th class="px-4 py-3 text-left text-[var(--color-text-secondary)] font-medium w-12">#</th>
+        <th class="px-4 py-3 text-left text-[var(--color-text-secondary)] font-medium">User</th>
+        <th class="px-4 py-3 text-right text-[var(--color-text-secondary)] font-medium">Reputation</th>
+        <th class="px-4 py-3 text-right text-[var(--color-text-secondary)] font-medium hidden sm:table-cell">Topics</th>
+        <th class="px-4 py-3 text-right text-[var(--color-text-secondary)] font-medium hidden sm:table-cell">Replies</th>
+        <th class="px-4 py-3 text-right text-[var(--color-text-secondary)] font-medium hidden md:table-cell">Best Answers</th>
+        <th class="px-4 py-3 text-center text-[var(--color-text-secondary)] font-medium">Trust</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for profile in top_users %}
+      <tr class="border-b border-[var(--color-border)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
+        <td class="px-4 py-3 text-[var(--color-text-secondary)] font-bold">
+          {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}{{ forloop.counter }}{% endif %}
+        </td>
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
+              <span class="text-[var(--color-accent)] font-bold text-xs">{{ profile.user.username|first|upper }}</span>
+            </div>
+            <div>
+              <a href="{% url 'forum:user_topics' pk=profile.user.pk %}"
+                 class="font-medium text-[var(--color-accent)] hover:underline">{{ profile.user.username }}</a>
+              {% if profile.custom_title %}
+              <p class="text-xs text-[var(--color-text-secondary)]">{{ profile.custom_title }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-right font-semibold text-[var(--color-text-primary)]">{{ profile.reputation }}</td>
+        <td class="px-4 py-3 text-right text-[var(--color-text-secondary)] hidden sm:table-cell">{{ profile.topic_count }}</td>
+        <td class="px-4 py-3 text-right text-[var(--color-text-secondary)] hidden sm:table-cell">{{ profile.reply_count }}</td>
+        <td class="px-4 py-3 text-right text-[var(--color-text-secondary)] hidden md:table-cell">{{ profile.best_answer_count }}</td>
+        <td class="px-4 py-3 text-center">
+          <span class="text-xs px-2 py-0.5 rounded-full
+            {% if profile.trust_level >= 4 %}bg-purple-500/20 text-purple-400
+            {% elif profile.trust_level >= 3 %}bg-blue-500/20 text-blue-400
+            {% elif profile.trust_level >= 2 %}bg-green-500/20 text-green-400
+            {% else %}bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]{% endif %}">
+            TL{{ profile.trust_level }}
+          </span>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="px-4 py-8 text-center text-[var(--color-text-secondary)]">No forum profiles yet.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

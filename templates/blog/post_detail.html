@@ -1,5 +1,6 @@
 {% extends "layouts/default.html" %}
 {% load static %}
+{% load ad_tags %}
 
 {% block title %}{{ post.title }} — {{ settings.site_name }} Blog{% endblock %}
 {% block meta_description %}{{ post.summary|default:post.title|truncatewords:30 }}{% endblock %}
@@ -98,6 +99,9 @@
     </div>
     {% endif %}
 
+    {# ── Ad: In-Article Top ── #}
+    {% render_ad_slot "in-article-top" css_class="my-6" %}
+
     {# Body Content #}
     <div class="prose prose-invert max-w-none
                 text-[var(--color-text-primary)]
@@ -115,6 +119,9 @@
                 [&_table]:w-full [&_th]:text-left [&_th]:p-2 [&_td]:p-2 [&_tr]:border-b [&_tr]:border-[var(--color-border)]">
       {{ post.body|safe }}
     </div>
+
+    {# ── Ad: Content Bottom ── #}
+    {% render_ad_slot "content-bottom" css_class="my-6" %}
 
     {# ── Live Firmware Table (auto-generated posts) ── #}
     {% if firmware_table_data %}
@@ -157,7 +164,7 @@
               <td class="px-3 py-2 font-mono text-xs">{{ fw.build_number|default:"—" }}</td>
               <td class="px-3 py-2">
                 <a href="{% url 'firmwares:firmware_detail' firmware_type=fw.firmware_type firmware_id=fw.id %}"
-                   class="inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-semibold bg-[var(--color-accent)] text-[var(--color-accent-text)] hover:opacity-90 transition">
+                   class="inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs font-semibold bg-[var(--color-accent)] text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition-colors">
                   <i data-lucide="download" class="w-3 h-3"></i> View
                 </a>
               </td>
@@ -206,6 +213,9 @@
 
   {# Sidebar #}
   <aside class="lg:col-span-1 space-y-6">
+    {# ── Ad: Sidebar Top ── #}
+    {% render_ad_slot "sidebar-top" css_class="mb-2" %}
+
     {# Tag Cloud #}
     {% if tag_cloud %}
     <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">

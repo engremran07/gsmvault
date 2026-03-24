@@ -1,0 +1,27 @@
+{# templates/forum/fragments/topic_rating.html — Star rating widget for topics #}
+<div class="flex items-center gap-2" x-data="{ hover: 0 }">
+  {% if user.is_authenticated %}
+  <form method="post" action="{% url 'forum:rate_topic' topic_pk=topic.pk %}" class="flex gap-0.5">
+    {% csrf_token %}
+    {% for i in "12345" %}
+    <button type="submit" name="score" value="{{ i }}"
+            @mouseenter="hover = {{ i }}" @mouseleave="hover = 0"
+            class="focus:outline-none transition-colors"
+            title="Rate {{ i }}/5">
+      <i data-lucide="star"
+         :class="(hover >= {{ i }} || {{ user_rating.score|default:0 }} >= {{ i }}) ? 'w-5 h-5 text-yellow-400 fill-yellow-400' : 'w-5 h-5 text-[var(--color-text-secondary)]'"></i>
+    </button>
+    {% endfor %}
+  </form>
+  {% else %}
+  <div class="flex gap-0.5">
+    {% for i in "12345" %}
+    <i data-lucide="star"
+       class="w-4 h-4 {% if topic.rating_score >= forloop.counter %}text-yellow-400 fill-yellow-400{% else %}text-[var(--color-text-secondary)]{% endif %}"></i>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <span class="text-xs text-[var(--color-text-secondary)]">
+    {{ topic.rating_score|floatformat:1 }} ({{ topic.rating_count }} rating{{ topic.rating_count|pluralize }})
+  </span>
+</div>

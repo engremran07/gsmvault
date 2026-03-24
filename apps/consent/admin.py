@@ -95,7 +95,7 @@ class PolicyVersionFilter(admin.SimpleListFilter):
 #  CONSENT POLICY ADMIN
 # =====================================================================
 @admin.register(ConsentPolicy)
-class ConsentPolicyAdmin(admin.ModelAdmin):
+class ConsentPolicyAdmin(admin.ModelAdmin[ConsentPolicy]):
     """
     Manage versioned consent policies with atomic activation logic.
     """
@@ -202,7 +202,7 @@ class ConsentPolicyAdmin(admin.ModelAdmin):
 #  CONSENT RECORD ADMIN
 # =====================================================================
 @admin.register(ConsentRecord)
-class ConsentRecordAdmin(admin.ModelAdmin):
+class ConsentRecordAdmin(admin.ModelAdmin[ConsentRecord]):
     """
     Admin interface for user consent records.
     """
@@ -319,7 +319,7 @@ class ConsentRecordAdmin(admin.ModelAdmin):
 #  CONSENT LOG ADMIN — READ-ONLY AUDIT TRAIL
 # =====================================================================
 @admin.register(ConsentLog)
-class ConsentLogAdmin(admin.ModelAdmin):
+class ConsentLogAdmin(admin.ModelAdmin[ConsentLog]):
     """
     Immutable forensic log entries.
     """

@@ -1,0 +1,41 @@
+{# templates/forum/fragments/faq_entries.html — 4PDA FAQ entries sidebar #}
+{% load static %}
+
+<div id="faq-entries" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5">
+  <h3 class="text-base font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+    <i data-lucide="help-circle" class="w-5 h-5 text-amber-400"></i>
+    FAQ
+  </h3>
+
+  <div class="space-y-3">
+    {% for entry in faq_entries %}
+    <div class="flex items-start gap-3">
+      <span class="text-amber-400 font-bold text-sm mt-0.5">Q:</span>
+      <div class="flex-1">
+        <a href="#reply-{{ entry.reply.pk }}"
+           class="text-[var(--color-accent)] hover:underline text-sm font-medium">
+          {{ entry.question }}
+        </a>
+        <p class="text-xs text-[var(--color-text-secondary)]">
+          by {{ entry.reply.user }} — {{ entry.reply.created_at|timesince }} ago
+        </p>
+      </div>
+      {% if user.is_authenticated and user == topic.user or user.is_staff %}
+      <form method="post"
+            action="{% url 'forum:remove_faq' faq_pk=entry.pk %}"
+            hx-post="{% url 'forum:remove_faq' faq_pk=entry.pk %}"
+            hx-target="#faq-entries"
+            hx-swap="outerHTML"
+            hx-boost="false">
+        {% csrf_token %}
+        <button type="submit" class="text-red-400 hover:text-red-300 text-xs" title="Remove FAQ">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </form>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-[var(--color-text-secondary)] text-sm italic">No FAQ entries yet.</p>
+    {% endfor %}
+  </div>
+</div>

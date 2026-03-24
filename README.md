@@ -1,5 +1,11 @@
 # GSM Firmware Distribution Platform
 
+![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-316192?logo=postgresql&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/License-Proprietary-red)
+
 Enterprise-grade Django 5.2 full-stack platform for firmware distribution. Django-served frontend with progressive enhancement — zero separate SPA, zero extra hosting cost. Built for scale with automated OEM scraping, AI analytics, subscription tiers, and a complete commerce ecosystem.
 
 ---
@@ -53,11 +59,18 @@ Enterprise-grade Django 5.2 full-stack platform for firmware distribution. Djang
 
 ### Commerce Ecosystem
 
-- **Affiliate marketing** — Multi-network system (Amazon, AliExpress, CJ, ShareASale, Banggood)
-- **Product matching** — Auto-match firmware device models to affiliate products
+- **Autonomous ads management** — 18-model system with rotation engine, targeting engine, AI optimizer, and analytics tracker
+- **Ad networks** — Multi-network waterfall (AdSense, Ad Manager, Media.net, Ezoic, Mediavine, PropellerAds, Taboola, Amazon, and 10+ more)
+- **Rewarded ads** — User-watched video ads for download credits, premium access, or ad-free periods with cooldown and daily limits
+- **Auto-ads scanning** — AI-powered template scanning discovers optimal ad placement locations
+- **Placement assignments** — Weighted creative rotation per placement with lock controls
+- **Campaign management** — Budget, daily/total caps, targeting rules (geo, device, user segment), time-based scheduling
+- **Affiliate marketing** — Multi-network system (Amazon, AliExpress, CJ, ShareASale, Banggood, Rakuten, eBay, Awin, Impact)
+- **Product matching** — Auto-match firmware device models to affiliate products via keywords and AI relevance scoring
+- **Affiliate tracking** — Click tracking, source attribution, commission reporting, fraud detection
 - **Shop** — Product listings, orders, checkout
-- **Wallet & credits** — In-app credits, referral rewards, transaction history
-- **P2P marketplace** — User-to-user firmware/resource trading
+- **Wallet & credits** — In-app credits, referral rewards, transaction history (`select_for_update()` on all balance changes)
+- **P2P marketplace** — User-to-user firmware/resource trading with seller verification
 - **Bounty system** — Crowd-sourced firmware sourcing with rewards
 - **Gamification** — Points, badges, leaderboards for community engagement
 - **Referral programme** — Referral codes, reward tracking
@@ -69,10 +82,35 @@ Enterprise-grade Django 5.2 full-stack platform for firmware distribution. Djang
 - **Comments** — User comments with moderation and consent gating
 - **Notifications** — In-app, push, email (templates + queue), webhooks
 - **Distribution** — Blog/social content syndication (Twitter, LinkedIn, WebSub)
-- **SEO** — Full-featured SEO engine: metadata management, XML sitemaps with XSLT human-readable
-  stylesheet, robots.txt, Open Graph, JSON-LD structured data, 301/302 redirect management,
-  internal linking engine, AI-powered meta generation, SEO automation settings, sitemap index
-  with per-section sitemaps (pages, blog, SEO entries, static URLs)
+- **SEO engine** — Full-featured SEO management:
+  - **Metadata** — Per-page title, description, canonical URL, Open Graph tags, robots directives
+  - **XML sitemaps** — Auto-generated sitemap index with per-section sitemaps (pages, blog, SEO entries, static URLs), XSLT human-readable stylesheet, HTTP status monitoring
+  - **JSON-LD schemas** — Structured data entries (Article, Product, FAQ, Organization, etc.)
+  - **Redirects** — 301/302 redirect management with hit tracking
+  - **Internal linking** — `LinkableEntity` + `LinkSuggestion` engine for cross-content linking
+  - **AI automation** — Auto-generate meta titles/descriptions, auto-tag content, auto-create schemas
+  - **Admin settings** — 7 automation toggles (auto_meta, auto_tags, auto_schema, suggest_only, tag_sitemap, comment_nofollow, comment_bump_lastmod)
+  - **robots.txt** — Dynamic generation with crawl directives
+  - **SERP preview** — Title/description length analysis with character count validation
+
+### Community Forum
+
+- **Categories & subcategories** — Hierarchical forum structure with custom icons, colours, sort order, privacy
+- **Topics** — Create, edit, close, pin (local + global), move, merge, soft-delete
+- **Replies** — Markdown with @mentions, edit history, reactions (Like, Love, Insightful, Funny, Agree, Disagree)
+- **Polls** — Single/multiple choice, secret ballot, configurable close date
+- **Trust levels** — Discourse-style auto-promotion (New → Basic → Member → Regular → Leader)
+- **User profiles** — Reputation, signatures, custom titles, activity stats
+- **4PDA features** — Wiki headers (шапка), topic types, device linking, changelogs, FAQ entries, useful post marks, attachment download counts
+- **Inline search** — HTMX-powered live search on forum landing page with type-ahead results
+- **Private messages** — Topic-based private messaging between users
+- **Moderation** — Warnings, IP bans, content flags, topic move/merge audit logs
+- **Bookmarks & subscriptions** — Topic favourites, reply bookmarks, email/in-app subscription notifications
+- **Best answers** — Mark solved topics with accepted answers
+- **Topic tags & prefixes** — vBulletin-style thread prefixes + tag system
+- **Leaderboard** — Reputation-based user rankings
+- **Online users** — Real-time presence tracking
+- **Landing page** — Stats bar, trending topics, recent activity, latest replies, online users sidebar
 
 ### Security
 
@@ -98,7 +136,7 @@ Enterprise-grade Django 5.2 full-stack platform for firmware distribution. Djang
 
 ```text
 app/                  # Project config (settings, urls, wsgi, asgi, celery)
-apps/                 # 30 Django apps — all consolidated, zero dissolved stubs
+apps/                 # 31 Django apps — all consolidated, zero dissolved stubs
   # --- Infrastructure ---
   core/               # Enterprise infrastructure: caching, AI facade, sanitization,
                       #   throttling, event bus, signals, service abstractions, utils
@@ -126,6 +164,10 @@ apps/                 # 30 Django apps — all consolidated, zero dissolved stub
                       #   internal linking (LinkableEntity, LinkSuggestion), SEO automation settings
                       #   (SEOSettings, SeoAutomationSettings), AI-powered meta generation,
                       #   robots.txt, Open Graph, JSON-LD. Own admin panel section.
+  # --- Community ---
+  forum/              # Full community forum: categories, topics, replies, polls, reactions,
+                      #   trust levels, wiki headers, 4PDA features, inline search, leaderboard,
+                      #   private messages, moderation, online users
   # --- Commerce ---
   shop/               # Product listings, orders
   wallet/             # User wallet, credits, transactions
@@ -184,6 +226,9 @@ pip install djangorestframework-stubs django-stubs types-requests
 # Create superuser
 & .\.venv\Scripts\python.exe manage.py createsuperuser --settings=app.settings_dev
 
+# Seed forum with test data
+& .\.venv\Scripts\python.exe manage.py seed_forum --settings=app.settings_dev
+
 # Start development server
 & .\.venv\Scripts\python.exe manage.py runserver --settings=app.settings_dev
 ```
@@ -197,6 +242,7 @@ pip install -r requirements.txt
 pip install djangorestframework-stubs django-stubs types-requests
 python manage.py migrate --settings=app.settings_dev
 python manage.py createsuperuser --settings=app.settings_dev
+python manage.py seed_forum --settings=app.settings_dev
 python manage.py runserver --settings=app.settings_dev
 ```
 
@@ -268,6 +314,7 @@ All endpoints under `/api/v1/` with DRF serializers, JWT authentication, and cur
 | Ads | `/api/v1/ads/` | Campaigns, affiliate tracking |
 | Users | `/api/v1/users/` | Management, profiles, auth |
 | Consent | `/api/v1/consent/` | Privacy consent status |
+| Forum | `/forum/` | Categories, topics, replies, search |
 | Analytics | `/api/v1/analytics/` | Traffic, download metrics |
 
 Error format: `{"error": "message", "code": "ERROR_CODE"}`

@@ -26,7 +26,7 @@ from .models import (
 
 
 @admin.register(Brand)
-class BrandAdmin(admin.ModelAdmin):
+class BrandAdmin(admin.ModelAdmin[Brand]):
     list_display = ("name", "slug", "model_count", "autofill_status", "created_at")
     list_filter = ("created_at",)
     search_fields = ("name", "slug")
@@ -121,7 +121,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 
 @admin.register(Model)
-class DeviceModelAdmin(admin.ModelAdmin):
+class DeviceModelAdmin(admin.ModelAdmin[Model]):
     list_display = ("name", "brand", "slug", "variant_count", "created_at")
     list_filter = ("brand", "created_at")
     search_fields = ("name", "slug", "brand__name")
@@ -146,7 +146,7 @@ class DeviceModelAdmin(admin.ModelAdmin):
 
 
 @admin.register(Variant)
-class VariantAdmin(admin.ModelAdmin):
+class VariantAdmin(admin.ModelAdmin[Variant]):
     list_display = ("name", "model", "get_brand", "slug", "region", "created_at")
     list_filter = ("model__brand", "created_at")
     search_fields = (
@@ -173,7 +173,7 @@ class VariantAdmin(admin.ModelAdmin):
 
 
 @admin.register(BrandSchema)
-class BrandSchemaAdmin(admin.ModelAdmin):
+class BrandSchemaAdmin(admin.ModelAdmin[BrandSchema]):
     list_display = ("brand", "approved_by", "approved_at", "created_at")
     list_filter = ("created_at", "approved_at")
     search_fields = ("brand__name",)
@@ -181,7 +181,7 @@ class BrandSchemaAdmin(admin.ModelAdmin):
 
 
 @admin.register(SchemaUpdateProposal)
-class SchemaUpdateProposalAdmin(admin.ModelAdmin):
+class SchemaUpdateProposalAdmin(admin.ModelAdmin[SchemaUpdateProposal]):
     list_display = ("brand", "status_badge", "proposed_by", "reviewed_by", "created_at")
     list_filter = ("status", "created_at")
     search_fields = ("brand__name", "proposed_by__email")
@@ -200,7 +200,7 @@ class SchemaUpdateProposalAdmin(admin.ModelAdmin):
 
 
 @admin.register(BrandCreationRequest)
-class BrandCreationRequestAdmin(admin.ModelAdmin):
+class BrandCreationRequestAdmin(admin.ModelAdmin[BrandCreationRequest]):
     list_display = ("name", "status_badge", "requested_by", "reviewed_by", "created_at")
     list_filter = ("status", "created_at")
     search_fields = ("name", "requested_by__email")
@@ -242,7 +242,7 @@ class BrandCreationRequestAdmin(admin.ModelAdmin):
 
 
 @admin.register(ModelCreationRequest)
-class ModelCreationRequestAdmin(admin.ModelAdmin):
+class ModelCreationRequestAdmin(admin.ModelAdmin[ModelCreationRequest]):
     list_display = ("name", "brand", "status_badge", "requested_by", "created_at")
     list_filter = ("status", "brand", "created_at")
     search_fields = ("name", "brand__name", "requested_by__email")
@@ -262,7 +262,7 @@ class ModelCreationRequestAdmin(admin.ModelAdmin):
 
 
 @admin.register(VariantCreationRequest)
-class VariantCreationRequestAdmin(admin.ModelAdmin):
+class VariantCreationRequestAdmin(admin.ModelAdmin[VariantCreationRequest]):
     list_display = ("name", "model", "status_badge", "requested_by", "created_at")
     list_filter = ("status", "model__brand", "created_at")
     search_fields = ("name", "model__name", "model__brand__name", "requested_by__email")
@@ -282,7 +282,7 @@ class VariantCreationRequestAdmin(admin.ModelAdmin):
 
 
 @admin.register(PendingFirmware)
-class PendingFirmwareAdmin(admin.ModelAdmin):
+class PendingFirmwareAdmin(admin.ModelAdmin[PendingFirmware]):
     list_display = (
         "original_file_name",
         "uploader",

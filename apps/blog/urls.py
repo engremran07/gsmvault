@@ -43,6 +43,8 @@ urlpatterns = [
         views.model_posts,
         name="model_posts",
     ),
+    # Search
+    path("search/", views.blog_search, name="blog_search"),
     # Post detail — MUST be last (catch-all slug)
     path("<slug:slug>/", views.post_detail, name="post_detail"),
 ]

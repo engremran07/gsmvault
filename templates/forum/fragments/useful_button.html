@@ -1,0 +1,16 @@
+{# templates/forum/fragments/useful_button.html — 4PDA-style "Useful" mark button #}
+
+<form method="post"
+      action="{% url 'forum:toggle_useful' reply_pk=reply.pk %}"
+      hx-post="{% url 'forum:toggle_useful' reply_pk=reply.pk %}"
+      hx-swap="outerHTML"
+      hx-boost="false"
+      class="inline-flex">
+  {% csrf_token %}
+  <button type="submit"
+          class="flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm transition-colors
+                 {% if is_useful %}bg-green-500/20 text-green-400 border border-green-500/30{% else %}bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:text-green-400 border border-[var(--color-border)]{% endif %}">
+    <i data-lucide="{% if is_useful %}check-circle{% else %}thumbs-up{% endif %}" class="w-3.5 h-3.5"></i>
+    Useful{% if useful_count %} ({{ useful_count }}){% endif %}
+  </button>
+</form>

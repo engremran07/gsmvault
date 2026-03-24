@@ -127,3 +127,13 @@ def connect_signals():
                 logger.warning(
                     f"Failed to queue auto-translation for post {instance.pk}: {e}"
                 )
+
+        # Scan published post body for in-content ad placement (ASYNC)
+        if instance.status == PostStatus.PUBLISHED:
+            try:
+                from apps.ads.tasks import scan_blog_post_content
+
+                scan_blog_post_content.delay(instance.pk)  # type: ignore[attr-defined]
+                logger.info(f"Queued ad content scan for post {instance.pk}")
+            except Exception as e:
+                logger.debug("Failed to queue ad scan for post %s: %s", instance.pk, e)

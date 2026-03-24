@@ -1,0 +1,32 @@
+{# templates/forum/fragments/wiki_header.html — 4PDA wiki-style header (шапка) display #}
+{% load static %}
+
+<div id="wiki-header" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-6 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+      <i data-lucide="book-open" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      Wiki Header
+    </h3>
+    <div class="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
+      {% if topic.wiki_header_updated_at %}
+      <span>Updated {{ topic.wiki_header_updated_at|timesince }} ago</span>
+      {% endif %}
+      {% if user.is_authenticated and user == topic.user or user.is_staff %}
+      <button onclick="document.getElementById('wiki-edit-modal').classList.remove('hidden')"
+              class="px-3 py-1 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm hover:bg-[var(--color-accent-hover)] transition-colors flex items-center gap-1">
+        <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Edit
+      </button>
+      {% endif %}
+      <a href="{% url 'forum:wiki_header_history' topic_pk=topic.pk %}"
+         class="text-[var(--color-accent)] hover:underline text-xs">History</a>
+    </div>
+  </div>
+
+  {% if topic.wiki_header_html %}
+  <div class="prose prose-invert max-w-none text-[var(--color-text-primary)]">
+    {{ topic.wiki_header_html|safe }}
+  </div>
+  {% else %}
+  <p class="text-[var(--color-text-secondary)] italic">No wiki header yet. The topic author or staff can add one.</p>
+  {% endif %}
+</div>

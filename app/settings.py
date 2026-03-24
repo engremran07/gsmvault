@@ -335,6 +335,7 @@ TEMPLATES = [
                 "apps.users.context_processors.auth_status",
                 "apps.pages.context_processors.navigation_pages",
                 "apps.admin.context_processors.admin_sidebar_badges",
+                "apps.ads.context_processors.ads_context",
             ],
             "libraries": {},
         },

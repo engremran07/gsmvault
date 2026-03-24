@@ -225,7 +225,7 @@
   {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
   {# â”€â”€ Distribution â”€â”€ #}
   {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  <div x-data="{ open: {% if nav_active == 'distribution' or nav_active == 'social_posting' %}true{% else %}false{% endif %} }">
+  <div x-data="{ open: {% if nav_active == 'distribution' or nav_active == 'social_posting' or nav_active == 'distribution_settings' %}true{% else %}false{% endif %} }">
     <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="share-2" class="w-4 h-4 shrink-0"></i>
@@ -240,9 +240,11 @@
         <i data-lucide="network" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
       <a href="{% url 'admin_suite:social_posting' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'social_posting' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
         <i data-lucide="send" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Social Posting</span></a>
+      <a href="{% url 'admin_suite:distribution_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'distribution_settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="sliders" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Settings</span></a>
     </div>
     <a href="{% url 'admin_suite:distribution' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'distribution' or nav_active == 'social_posting' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'distribution' or nav_active == 'social_posting' or nav_active == 'distribution_settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
       <i data-lucide="share-2" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
@@ -306,15 +308,47 @@
   {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
   {# â”€â”€ Economy & Credits â”€â”€ #}
   {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  <a href="{% url 'admin_suite:credit_pricing' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}"
-     x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
-    <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
-    <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Credits</span>
-  </a>
-  <a href="{% url 'admin_suite:credit_pricing' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
-    <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
-  </a>
+  <div x-data="{ open: {% if nav_active == 'credit_pricing' or nav_active == 'shop' or nav_active == 'shop_packages' or nav_active == 'shop_orders' or nav_active == 'shop_subscriptions' or nav_active == 'shop_user_packages' or nav_active == 'marketplace' or nav_active == 'marketplace_sellers' or nav_active == 'marketplace_listings' or nav_active == 'marketplace_verifications' %}true{% else %}false{% endif %} }">
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+      x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
+      <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
+      <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Economy</span>
+      <i data-lucide="chevron-down" class="w-3 h-3 shrink-0 transition-transform duration-200" :class="open && 'rotate-180'"></i>
+    </button>
+    <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
+      x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+      x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:credit_pricing' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="circle-dollar-sign" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Credits</span></a>
+      {# Shop sub-section #}
+      <span class="block px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]/60">Shop</span>
+      <a href="{% url 'admin_suite:shop' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="store" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
+      <a href="{% url 'admin_suite:shop_packages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_packages' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="package" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Packages</span></a>
+      <a href="{% url 'admin_suite:shop_orders' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_orders' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="receipt" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Orders</span></a>
+      <a href="{% url 'admin_suite:shop_subscriptions' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_subscriptions' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="repeat" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Subscriptions</span></a>
+      <a href="{% url 'admin_suite:shop_user_packages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_user_packages' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">User Packages</span></a>
+      {# Marketplace sub-section #}
+      <span class="block px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]/60">Marketplace</span>
+      <a href="{% url 'admin_suite:marketplace' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="shopping-bag" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
+      <a href="{% url 'admin_suite:marketplace_sellers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_sellers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="user-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Sellers</span></a>
+      <a href="{% url 'admin_suite:marketplace_listings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_listings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="list" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Listings</span></a>
+      <a href="{% url 'admin_suite:marketplace_verifications' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_verifications' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Verifications</span></a>
+    </div>
+    <a href="{% url 'admin_suite:shop' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' or nav_active == 'shop' or nav_active == 'shop_packages' or nav_active == 'marketplace' or nav_active == 'marketplace_sellers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+      <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
+    </a>
+  </div>
 
   {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
   {# â”€â”€ Audit Log â”€â”€ #}

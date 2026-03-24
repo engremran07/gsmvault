@@ -158,7 +158,7 @@ class SiteSettingsAdmin(ExportMixin, SingletonModelAdmin):
 
 
 @admin.register(VerificationMetaTag)
-class VerificationMetaTagAdmin(admin.ModelAdmin):
+class VerificationMetaTagAdmin(admin.ModelAdmin[VerificationMetaTag]):
     list_display = ("provider", "name_attr", "content_attr", "created_at")
     search_fields = ("provider", "name_attr", "content_attr")
     ordering = ("-created_at",)
@@ -167,7 +167,7 @@ class VerificationMetaTagAdmin(admin.ModelAdmin):
 
 
 @admin.register(VerificationFile)
-class VerificationFileAdmin(admin.ModelAdmin):
+class VerificationFileAdmin(admin.ModelAdmin[VerificationFile]):
     list_display = ("provider", "file", "uploaded_at")
     search_fields = ("provider", "file")
     ordering = ("-uploaded_at",)

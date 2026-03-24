@@ -1,82 +1,56 @@
 ---
 name: static-cdn-registry
-description: "CDN library registry and fallback chain. Use when: adding CDN libraries, checking CDN versions, configuring fallbacks, verifying external script integrity, updating library versions, adding new vendor dependencies."
+description: "Vendor library registry. Use when: adding vendor JS libraries, checking library versions, updating library versions, adding new vendor dependencies."
 ---
 
-# Static / CDN Registry Skill
+# Static / Vendor Library Registry Skill
+
+## Strategy: Local-First
+
+All frontend JS libraries are served from **local vendor files** in `static/vendor/`. No CDN loading in templates. This eliminates CDN latency, prevents cache-busting issues, and removes external dependencies for page rendering.
 
 ## MANDATORY Rules
 
-1. **Always pin versions** — never use `@latest` in production CDN URLs
-2. **Always provide 3-tier fallback** — jsDelivr → cdnjs → unpkg → local vendor
-3. **Always add `nonce="{{ request.csp_nonce }}"` and `crossorigin="anonymous"`** to all external scripts
+1. **Always pin versions** — record exact version in `cdn-manifest.json`
+2. **All vendor files in `static/vendor/<lib>/`** — never inline or load from CDN
+3. **Always add `nonce="{{ request.csp_nonce }}"`** to all `<script>` tags
 4. **Always use `defer`** on Alpine.js and its plugins
-5. **Never add new CDN dependencies without updating this registry**
+5. **Never add new vendor dependencies without updating this registry and `cdn-manifest.json`**
 
 ---
 
-## CDN Library Inventory
+## Vendor Library Inventory
 
 ### Frontend Framework Libraries (6)
 
-| # | Library | Version | CDN URL (jsDelivr Primary) | File | Purpose |
-|---|---------|---------|---------------------------|------|---------|
-| 1 | **Tailwind CSS** | v4 (browser) | `cdn.jsdelivr.net/npm/@tailwindcss/browser@4` | `_head.html:50` | Utility-first CSS framework (dev-only CDN, compiled in prod) |
-| 2 | **HTMX** | v2 | `cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js` | `_scripts.html:5` | HTML-over-the-wire partial page updates |
-| 3 | **Alpine.js** | v3 | `cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js` | `_scripts.html:46` | Lightweight client-side reactivity (must be LAST deferred script) |
-| 4 | **Alpine.js Intersect** | v3 | `cdn.jsdelivr.net/npm/@alpinejs/intersect@3/dist/cdn.min.js` | `_scripts.html:41` | Scroll-triggered entrance animations (loaded BEFORE Alpine core) |
-| 5 | **Chart.js** | v4 | `cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js` | `_scripts.html:28` | Analytics and dashboard charts |
-| 6 | **Lucide Icons** | v0.468.0 | `cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js` | `_scripts.html:10` | SVG icon library (pin to minor — breaking changes between minors) |
+| # | Library | Version | Local Path | Template | Purpose |
+|---|---------|---------|------------|----------|---------|
+| 1 | **Tailwind CSS** | v4.1.8 | `vendor/tailwindcss/tailwind.min.js` | `_head.html` | Utility-first CSS framework (dev-only, compiled in prod) |
+| 2 | **HTMX** | v2.0.4 | `vendor/htmx/htmx.min.js` | `_scripts.html` | HTML-over-the-wire partial page updates |
+| 3 | **Alpine.js** | v3.14.9 | `vendor/alpinejs/alpine.min.js` | `_scripts.html` | Lightweight client-side reactivity (must be LAST deferred script) |
+| 4 | **Alpine.js Intersect** | v3.14.9 | `vendor/alpinejs/intersect.min.js` | `_scripts.html` | Scroll-triggered entrance animations (loaded BEFORE Alpine core) |
+| 5 | **Chart.js** | v4.4.7 | `vendor/chartjs/chart.umd.min.js` | `layouts/admin.html` | Analytics and dashboard charts (admin only) |
+| 6 | **Lucide Icons** | v0.460.0 | `vendor/lucide/lucide.min.js` | `_scripts.html` | SVG icon library (pin to minor — breaking changes between minors) |
 
-### Google Services (4)
+### Google Services (conditional, still external)
 
 | # | Service | URL | File | Purpose | Conditional |
 |---|---------|-----|------|---------|-------------|
-| 7 | **Google Fonts** | `fonts.googleapis.com/css2?family=Inter:wght@300..900&family=JetBrains+Mono:wght@400..700&display=swap` | `_head.html:40` | Typography — Inter (body) + JetBrains Mono (code) | Always |
-| 8 | **Google Analytics (GA4)** | `www.googletagmanager.com/gtag/js?id={ID}` | `_head.html:62` | Page analytics tracking | `{% if settings.google_analytics_id %}` |
-| 9 | **Google Tag Manager** | `www.googletagmanager.com/gtm.js?id={ID}` | `_head.html:74` | Tag management container | `{% if settings.google_tag_manager_id %}` |
-| 10 | **Google Indexing API** | Server-side only (googleapis.com) | `apps/distribution/` | Search engine URL submission | Backend only |
+| 7 | **Google Analytics (GA4)** | `www.googletagmanager.com/gtag/js?id={ID}` | `_head.html` | Page analytics tracking | `{% if settings.google_analytics_id %}` |
+| 8 | **Google Tag Manager** | `www.googletagmanager.com/gtm.js?id={ID}` | `_head.html` | Tag management container | `{% if settings.google_tag_manager_id %}` |
+
+> Google Analytics/GTM are the only external scripts — they cannot be self-hosted. They are conditionally loaded and only present when the admin configures tracking IDs.
 
 ---
 
-## Fallback Chain
+## Fonts
 
-Defined in `templates/base/_cdn_fallback.html`. Runs after primary CDN scripts load and checks if globals are defined.
+Self-hosted WOFF2 variable fonts in `static/fonts/`. No Google Fonts CDN dependency.
 
-### HTMX Fallback (3-tier + local)
-
-| Tier | URL | Version |
-|------|-----|---------|
-| Primary | `cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js` | @2 (semver range) |
-| Fallback 1 | `cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js` | 2.0.4 (pinned) |
-| Fallback 2 | `unpkg.com/htmx.org@2/dist/htmx.min.js` | @2 (semver range) |
-| Local | `{% static "vendor/htmx/htmx.min.js" %}` | Bundled copy |
-
-### Alpine.js Fallback (3-tier + local)
-
-| Tier | URL | Version |
-|------|-----|---------|
-| Primary | `cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js` | @3 |
-| Fallback 1 | `cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.9/cdn.min.js` | 3.14.9 (pinned) |
-| Fallback 2 | `unpkg.com/alpinejs@3/dist/cdn.min.js` | @3 |
-| Local | `{% static "vendor/alpinejs/alpine.min.js" %}` | Bundled copy |
-
-### Lucide Icons Fallback (2-tier + local)
-
-| Tier | URL | Version |
-|------|-----|---------|
-| Primary | `cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js` | 0.468.0 (pinned) |
-| Fallback 1 | `unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js` | 0.468.0 (pinned) |
-| Local | `{% static "vendor/lucide/lucide.min.js" %}` | Bundled copy |
-
-### NO Fallback Configured
-
-| Library | Primary CDN | Risk |
-|---------|------------|------|
-| **Chart.js v4** | jsDelivr only | Admin charts break if jsDelivr is down |
-| **Alpine.js Intersect** | jsDelivr only | Entrance animations stop working |
-| **Tailwind CSS (browser)** | jsDelivr only | Dev-only, acceptable — compiled CSS used in prod |
-| **Google Fonts** | Google only | Falls back to system fonts via CSS font-stack |
+| Font | File | Purpose |
+|------|------|---------|
+| Inter Variable | `fonts/inter/inter-variable.woff2` | Body text |
+| JetBrains Mono Variable | `fonts/jetbrains-mono/jetbrains-mono-variable.woff2` | Code blocks |
 
 ---
 
@@ -85,36 +59,47 @@ Defined in `templates/base/_cdn_fallback.html`. Runs after primary CDN scripts l
 Critical — Alpine.js must be loaded LAST so all stores are registered before auto-init:
 
 ```
-1. HTMX               (immediate, no defer)
-2. Lucide Icons        (immediate, no defer)
-3. Lucide init         (inline, DOMContentLoaded)
-4. CDN fallback        (inline, runs immediately)
-5. Chart.js            (defer)
+1. HTMX               (defer)
+2. Lucide Icons        (defer)
+3. Lucide init         (inline, DOMContentLoaded + htmx:afterSettle)
+4. Vendor check        (inline, console.warn on failure)
+5. Chart.js            (defer, admin only)
 6. theme-switcher.js   (defer — Alpine store)
 7. notifications.js    (defer — Alpine store)
-8. admin-charts.js     (defer — Alpine store)
+8. admin-charts.js     (defer — Alpine store, admin only)
 9. Alpine Intersect    (defer — plugin, before Alpine)
 10. Alpine.js          (defer — MUST BE LAST)
 ```
 
 ---
 
-## Adding a New CDN Library
+## Adding a New Vendor Library
 
-1. Add primary `<script>` or `<link>` to `_scripts.html` or `_head.html`
-2. Always include `nonce="{{ request.csp_nonce }}"` and `crossorigin="anonymous"`
-3. Add fallback entries to `_cdn_fallback.html` with test function
-4. Bundle a local copy in `static/vendor/<lib>/`
+1. Download the minified JS/CSS file
+2. Place in `static/vendor/<lib>/<file>.min.js`
+3. Add `<script src="{% static 'vendor/<lib>/<file>.min.js' %}" nonce="{{ request.csp_nonce }}" defer></script>` to the appropriate template
+4. Update `static/vendor/cdn-manifest.json` with library name, version, and local path
 5. Update this SKILL.md with the new entry
-6. Pin to a specific major version (`@4`, `@3`) — never use `@latest`
+6. Run quality gate
+
+### Download Command
+
+```powershell
+& .\.venv\Scripts\python.exe -c "
+import urllib.request, os
+url = 'https://cdn.jsdelivr.net/npm/<package>@<version>/dist/<file>.min.js'
+path = 'static/vendor/<lib>/<file>.min.js'
+os.makedirs(os.path.dirname(path), exist_ok=True)
+urllib.request.urlretrieve(url, path)
+print(f'Downloaded {os.path.getsize(path):,} bytes')
+"
+```
 
 ---
 
-## Known Issues / Risks
+## Upgrading a Library
 
-| Issue | Severity | Location |
-|-------|----------|----------|
-| ~~Lucide pinned to `@latest`~~ — **RESOLVED**: pinned to `0.468.0` | ~~HIGH~~ | `_scripts.html:10`, `_cdn_fallback.html:42` |
-| Chart.js has zero fallback — single point of failure | **MEDIUM** | `_scripts.html:28` |
-| Alpine Intersect has zero fallback | **LOW** | `_scripts.html:41` |
-| HTMX version mismatch: `@2` in primary vs `2.0.4` in cdnjs fallback | **LOW** | `_cdn_fallback.html:22` |
+1. Download the new version to `static/vendor/<lib>/`
+2. Update the version in `cdn-manifest.json`
+3. Update this SKILL.md
+4. Test thoroughly — especially Lucide (breaking changes between minor versions)

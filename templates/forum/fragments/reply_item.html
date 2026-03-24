@@ -25,6 +25,10 @@
         {% if reply.action != 0 %}
         <span class="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">{{ reply.get_action_display }}</span>
         {% endif %}
+        {# Solution badge #}
+        {% if best_answer and best_answer.reply_id == reply.pk %}
+        {% include "forum/fragments/solution_badge.html" with is_solution=True %}
+        {% endif %}
       </div>
 
       {# Content #}
@@ -84,7 +88,27 @@
           </button>
         </form>
         {% endif %}
+
+        {# Mark as solution (topic owner or staff) #}
+        {% if user.is_authenticated and reply.action == 0 %}
+        {% if topic.user == user or user.is_staff %}
+        {% if not best_answer or best_answer.reply_id != reply.pk %}
+        <form method="post" action="{% url 'forum:mark_solution' reply_pk=reply.pk %}">{% csrf_token %}
+          <button class="flex items-center gap-1 text-[var(--color-text-secondary)] hover:text-green-400">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Solution
+          </button>
+        </form>
+        {% endif %}
+        {% endif %}
+        {% endif %}
       </div>
+
+      {# Reactions bar #}
+      {% if reply.action == 0 %}
+      <div class="mt-2" id="reactions-{{ reply.pk }}">
+        {% include "forum/fragments/reaction_bar.html" with reply=reply available_reactions=available_reactions user_reaction=None %}
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>

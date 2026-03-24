@@ -18,11 +18,18 @@ from apps.admin.views_shared import (
 from apps.core.models import AppRegistry
 from apps.distribution.api import get_settings as dist_get_settings
 from apps.distribution.forms import SocialAccountForm
-from apps.distribution.models import ShareJob, ShareLog, SharePlan, SocialAccount
+from apps.distribution.models import (
+    ContentVariant,
+    ShareJob,
+    ShareLog,
+    SharePlan,
+    SocialAccount,
+)
 from apps.distribution.tasks import enqueue_pending_for_account
 
 __all__ = [
     "admin_suite_distribution",
+    "admin_suite_distribution_settings",
     "admin_suite_social_posting",
     "admin_suite_social_posting_detail",
     "admin_suite_social_posting_oauth_callback",
@@ -81,6 +88,15 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
                 jid = request.POST.get("job_id")
                 ShareJob.objects.filter(pk=jid).update(status="cancelled")
                 message = "Job cancelled."
+            elif action == "generate_video":
+                post_id = request.POST.get("post_id")
+                if post_id:
+                    from apps.distribution.tasks import generate_video_scripts
+
+                    generate_video_scripts.delay(int(post_id))
+                    message = "Video script generation queued."
+                else:
+                    message = "Post ID required for video generation."
         except Exception as exc:
             logger.warning("Admin suite distribution action failed: %s", exc)
             message = "Action failed."
@@ -115,10 +131,19 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
         plans = plan_qs[:50]
         jobs = jobs_qs[:50]
         logs = logs_qs[:50]
+
+        video_scripts = (
+            ContentVariant.objects.filter(variant_type="video_script")
+            .select_related("post")
+            .order_by("-generated_at")[:50]
+        )
+        stats["video_scripts"] = ContentVariant.objects.filter(
+            variant_type="video_script"
+        ).count()
     except Exception as exc:
         logger.debug("Admin suite distribution snapshot failed: %s", exc)
         dist_settings = {}
-        accounts = plans = jobs = logs = []
+        accounts = plans = jobs = logs = video_scripts = []
         message = "Unable to load distribution data."
 
     return _render_admin(
@@ -130,7 +155,8 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
             "plans": plans,
             "jobs": jobs,
             "logs": logs,
-            "query": query,
+            "video_scripts": video_scripts,
+            "q": query,
             "message": message,
             "dist_settings": dist_settings,
             "account_form": account_form,
@@ -480,6 +506,15 @@ def admin_suite_social_posting_detail(
                 else:
                     message = "This platform does not require OAuth."
 
+            elif action == "delete_account":
+                if not getattr(request.user, "is_superuser", False):
+                    message = "Superuser required to delete accounts."
+                else:
+                    from django.shortcuts import redirect
+
+                    account.delete()
+                    return redirect("admin_suite:social_posting")
+
         except Exception as exc:
             logger.warning("Social posting detail action failed: %s", exc)
             message = f"Action failed: {exc}"
@@ -560,3 +595,94 @@ def admin_suite_social_posting_oauth_callback(
         logger.error(f"OAuth token exchange failed for {platform}: {exc}")
 
     return redirect("admin_suite:social_posting")
+
+
+# ==============================================================================
+# Distribution Settings
+# ==============================================================================
+
+
+@csrf_protect
+@staff_member_required
+def admin_suite_distribution_settings(request: HttpRequest) -> HttpResponse:
+    """
+    Global distribution settings configuration (django-solo singleton).
+    """
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.distribution.models import DistributionSettings
+
+    dist_settings = DistributionSettings.get_solo()
+    message = ""
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "save_settings":
+            try:
+                # General
+                dist_settings.distribution_enabled = (
+                    request.POST.get("distribution_enabled") == "on"
+                )
+                dist_settings.auto_fanout_on_publish = (
+                    request.POST.get("auto_fanout_on_publish") == "on"
+                )
+                channels_raw = request.POST.get("default_channels", "").strip()
+                dist_settings.default_channels = (
+                    [c.strip() for c in channels_raw.split(",") if c.strip()]
+                    if channels_raw
+                    else []
+                )
+
+                # Platform limits
+                for int_field in [
+                    "max_platforms_per_content",
+                    "distribution_frequency_hours",
+                    "max_seo_title_length",
+                    "max_seo_description_length",
+                    "max_seo_tags",
+                    "max_auto_tags",
+                    "auto_tag_frequency_days",
+                    "max_retries",
+                    "retry_backoff_seconds",
+                ]:
+                    val = request.POST.get(int_field)
+                    if val is not None:
+                        try:
+                            setattr(dist_settings, int_field, int(val))
+                        except (ValueError, TypeError):
+                            pass
+
+                # Advanced
+                dist_settings.allow_indexing_jobs = (
+                    request.POST.get("allow_indexing_jobs") == "on"
+                )
+                dist_settings.require_admin_approval = (
+                    request.POST.get("require_admin_approval") == "on"
+                )
+                dist_settings.enable_firmware_auto_distribution = (
+                    request.POST.get("enable_firmware_auto_distribution") == "on"
+                )
+
+                dist_settings.save()
+                message = "Settings saved successfully."
+            except Exception as exc:
+                logger.warning("Distribution settings save failed: %s", exc)
+                message = f"Save failed: {exc}"
+
+    return _render_admin(
+        request,
+        "admin_suite/distribution_settings.html",
+        {
+            "dist_settings": dist_settings,
+            "message": message,
+        },
+        nav_active="distribution_settings",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Distribution", "admin_suite:distribution"),
+            ("Settings", None),
+        ),
+        subtitle="Global distribution configuration and limits",
+    )

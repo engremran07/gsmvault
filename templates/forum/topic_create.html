@@ -97,7 +97,7 @@
     {# Submit #}
     <div class="flex gap-3">
       <button type="submit"
-              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:opacity-90 transition-opacity">
+              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition-colors">
         Create Topic
       </button>
       <a href="{% url 'forum:category_detail' slug=category.slug %}"

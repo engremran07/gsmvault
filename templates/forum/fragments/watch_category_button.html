@@ -1,0 +1,10 @@
+{# templates/forum/fragments/watch_category_button.html — Category subscription toggle #}
+{% if is_watching %}
+<span class="flex items-center gap-1 text-[var(--color-accent)]">
+  <i data-lucide="eye" class="w-4 h-4"></i> Watching
+</span>
+{% else %}
+<span class="flex items-center gap-1 text-[var(--color-text-secondary)]">
+  <i data-lucide="eye-off" class="w-4 h-4"></i> Watch
+</span>
+{% endif %}

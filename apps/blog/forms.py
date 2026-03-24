@@ -5,6 +5,13 @@ from django import forms
 from .models import Category, Post
 
 
+class SearchForm(forms.Form):
+    q = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"placeholder": "Search blog…"}),
+    )
+
+
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category

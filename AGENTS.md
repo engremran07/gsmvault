@@ -8,11 +8,11 @@ Platform pillars: automated OEM firmware scraping, AI behaviour analytics, verif
 
 ## Architecture
 
-30 Django apps in `apps/` — all consolidated, zero dissolved stubs remaining.
+31 Django apps in `apps/` — all consolidated, zero dissolved stubs remaining.
 
 ```text
 app/                  # Project config (settings, urls, wsgi, asgi, celery)
-apps/                 # All Django apps (30 — post-consolidation)
+apps/                 # All Django apps (31 — post-consolidation)
   # --- Infrastructure ---
   core/               # Enterprise infrastructure layer: exception handling, caching (DistributedCacheManager),
                       # AI facade (CoreAiService), sanitization (nh3-based XSS prevention), throttling
@@ -62,6 +62,12 @@ apps/                 # All Django apps (30 — post-consolidation)
                       # LinkableEntity + LinkSuggestion (internal linking engine), SEOSettings +
                       # SeoAutomationSettings (AI meta generation, auto-tags, auto-schema).
                       # robots.txt, Open Graph, sitemap index. Own admin panel section.
+  # --- Community ---
+  forum/              # Full-featured community forum: categories, topics, replies, polls,
+                      #   reactions, trust levels, user profiles, wiki headers, changelogs,
+                      #   FAQ entries, private messages, search, leaderboard, online users,
+                      #   4PDA-style features, inline HTMX search, device linking,
+                      #   moderation (warnings, IP bans, move/merge), bookmarks, subscriptions
   # --- Commerce ---
   shop/               # Product listings, orders
   wallet/             # User wallet, credits, transactions
@@ -217,13 +223,31 @@ Tiers: Free (ad-gated) → Registered → Subscriber → Premium. Limits: per-GB
 
 ---
 
-## Affiliate Marketing (`apps.ads`)
+## Ads Management System (`apps.ads`)
 
-Full affiliate marketing system co-located with ad management. All models exist — extend with new networks as needed.
+Full autonomous ads management system co-located with affiliate marketing. 18+ models covering ad serving, campaigns, rewarded ads, auto-ads scanning, and a multi-network affiliate pipeline.
+
+### Core Ad Models
 
 | Model | Purpose |
 | --- | --- |
-| `AffiliateProvider` | Network config (Amazon, AliExpress, Banggood, CJ, ShareASale…), API keys, cookie duration |
+| `AdsSettings` | Singleton config: `ads_enabled`, `ad_networks_enabled`, `affiliate_enabled`, `aggressiveness` |
+| `AdNetwork` | 18 network types (adsense, ad_manager, media_net, ezoic, mediavine, propeller, etc.) with priority/status |
+| `AdUnit` | Unit config per network (unit_id, format: banner/interstitial/native/video/rewarded/sticky) |
+| `AdPlacement` | Named placement slots in templates (header, sidebar, in-content, footer, etc.) |
+| `Campaign` | Budget, daily/total caps, targeting rules, `start_at`/`end_at` scheduling, status |
+| `AdCreative` | Creative assets (title, body, image, CTA URL, click/impression counts) |
+| `PlacementAssignment` | Weighted creative ↔ placement binding with lock/priority controls |
+| `AdEvent` | Analytics events (impression, click, viewable, conversion) with timestamp + user FK |
+| `RewardedAdConfig` | Reward rules (credits, premium_hours, ad_free_hours, cooldown, daily_limit) |
+| `RewardedAdView` | User reward tracking per view (credits_earned, completed flag) |
+| `AutoAdsScanResult` | AI template scan results: discovered placement locations, confidence scores |
+
+### Affiliate Models
+
+| Model | Purpose |
+| --- | --- |
+| `AffiliateProvider` | Network config (Amazon, AliExpress, Banggood, CJ, ShareASale, Rakuten, eBay, Awin, Impact), API keys, cookie duration |
 | `AffiliateProductCategory` | Product taxonomy |
 | `AffiliateProduct` | Product listings with commission rates and deep links |
 | `AffiliateSource` | Traffic source tracking |
@@ -231,7 +255,27 @@ Full affiliate marketing system co-located with ad management. All models exist 
 | `AffiliateClick` | Every click recorded for commission attribution |
 | `AffiliateProductMatch` | Auto-matching firmware device models to relevant affiliate products |
 
-API: `apps/ads/api.py` — affiliate endpoints under `/api/v1/ads/`.
+### Service Layer (`apps/ads/services/`)
+
+| Service | Purpose |
+| --- | --- |
+| `rotation.py` | Weighted creative rotation per placement with priority and lock controls |
+| `targeting.py` | Campaign targeting (geo, device, user segment, time-of-day) |
+| `analytics.py` | Event tracking and aggregation |
+| `affiliate.py` | Affiliate link resolution and click attribution |
+| `ai_optimizer.py` | AI-powered placement optimization and creative scoring |
+| `schemas.py` | DRF serializers for ad and affiliate endpoints |
+
+### Celery Tasks
+
+| Task | Schedule | Purpose |
+| --- | --- | --- |
+| `aggregate_events` | Periodically | Aggregate AdEvent data for dashboard reporting |
+| `cleanup_old_events` | Daily | Remove stale ad events beyond retention window |
+| `scan_templates_for_ad_placements` | On demand | AI scan of Django templates for optimal ad slot discovery |
+| `ai_optimize_ad_placements` | Weekly | AI analysis of placement performance with optimization suggestions |
+
+API: `apps/ads/api.py` — ad serving, click tracking, and affiliate endpoints under `/api/v1/ads/`.
 Revenue tracking: events emitted to `apps.analytics` for attribution and commission reporting.
 
 ---
@@ -244,10 +288,80 @@ Outperforms Easy Firmware Store Ultimate (Jaudi Softs) through:
 - Verified tester programme (`TrustedTester`, `VerificationReport`) for firmware quality assurance
 - AI behaviour analytics (`BehaviorInsight`) for anti-abuse and trust scoring
 - Full affiliate marketing alongside ad campaigns — dual ad-revenue model
+- **Full-featured community forum** (4PDA/vBulletin/Discourse-inspired) with polls, reactions, wiki headers, device linking, trust levels, private messages, moderation, inline search
 - Gamification (points, badges, leaderboards) for community engagement
 - Bounty system for crowd-sourced firmware sourcing
 - P2P marketplace for firmware/device resource trading
 - Subscription wallet with credits, referral rewards, and ad-unlock gates
+
+---
+
+## Community Forum (`apps.forum`)
+
+Full-featured community forum inspired by 4PDA, vBulletin, and Discourse. Self-contained Django app with services layer, HTMX fragments, and Alpine.js interactivity.
+
+### Models (30+)
+
+| Model | Purpose |
+| --- | --- |
+| `ForumCategory` | Hierarchical categories (parent/child) with icons, colours, privacy, sort order |
+| `ForumTopic` | Discussion threads with prefix, type, wiki header, device linking |
+| `ForumReply` | Thread replies with Markdown, @mentions, edit history |
+| `ForumPoll` / `ForumPollChoice` / `ForumPollVote` | Topic polls (single/multiple, secret ballot) |
+| `ForumReaction` / `ForumReplyReaction` | Configurable reactions (Like, Love, Insightful, Funny, Agree, Disagree) |
+| `ForumTrustLevel` | Discourse-style auto-promotion criteria |
+| `ForumUserProfile` | Per-user forum stats, reputation, signatures, custom titles |
+| `ForumTopicPrefix` / `ForumTopicTag` | vBulletin-style prefixes + topic tags |
+| `ForumBestAnswer` | Accepted solutions for help topics |
+| `ForumTopicRating` | Star ratings on topics |
+| `ForumBookmark` / `ForumTopicFavorite` | Saved topics and reply bookmarks |
+| `ForumTopicSubscription` / `ForumCategorySubscription` | Email/in-app notifications |
+| `ForumPrivateTopic` / `ForumPrivateTopicUser` | Private messaging system |
+| `ForumFlag` | Content flagging for moderation |
+| `ForumWarning` / `ForumIPBan` | Moderation tools |
+| `ForumOnlineUser` | Real-time presence tracking |
+| `ForumTopicMoveLog` / `ForumTopicMergeLog` | Moderation audit trail |
+| `ForumAttachment` | File attachments with download counter |
+| `ForumReplyHistory` / `ForumMention` | Edit tracking and @mention resolution |
+| `ForumUsefulPost` | 4PDA "useful" post marks |
+| `ForumFAQEntry` | 4PDA per-topic FAQ sidebar |
+| `ForumChangelog` | 4PDA per-topic changelog timeline |
+| `ForumWikiHeaderHistory` | 4PDA wiki header (шапка) edit history |
+
+### 4PDA-Specific Features
+
+- **Topic types**: Discussion, Firmware, FAQ, Guide, News, Review, Bug Report
+- **Wiki headers (шапка)**: Collaboratively editable header post with Markdown, edit history
+- **Device linking**: FK to `firmwares.Model` for device-specific topics
+- **Changelog**: Per-topic version timeline with rich text and release dates
+- **FAQ entries**: Per-topic FAQ sidebar linking to specific replies
+- **Useful post marks**: Community-driven answer highlighting with reputation rewards
+- **Attachment download counts**: Per-file download tracking
+
+### Service Layer (`services.py`)
+
+All business logic in `apps/forum/services.py`. Views call services — never put logic in views.
+
+Key functions: `create_topic()`, `create_reply()`, `toggle_like()`, `toggle_favorite()`, `create_poll()`, `cast_vote()`, `update_wiki_header()`, `toggle_useful_post()`, `add_faq_entry()`, `add_changelog_entry()`, `search_topics()`, `get_online_users()`, `get_forum_stats()`, `get_trending_topics()`, `get_recent_topics()`, `get_latest_replies()`, `evaluate_trust_level()`, `move_topic()`, `merge_topics()`.
+
+### URL Patterns
+
+All under `forum:` namespace. Category: `c/<slug>/`, Topic: `t/<pk>/<slug>/`, Search: `search/`, Private: `messages/`, Leaderboard: `leaderboard/`, Online: `whos-online/`.
+
+### Templates
+
+- `forum_index.html` — Enriched landing page (stats bar, inline search, trending, categories, sidebar)
+- `category_detail.html` — Topic listing with search
+- `topic_detail.html` — Full topic view with wiki header, polls, replies, reactions
+- `fragments/` — 15+ HTMX fragments for partial updates (search results, category cards, reply items, poll widget, reactions, wiki header, useful button, FAQ, changelog, etc.)
+
+### Management Command
+
+```powershell
+& .\.venv\Scripts\python.exe manage.py seed_forum --settings=app.settings_dev
+```
+
+Seeds 8 test users, 12 categories, 10 topics, 23 replies, polls, tags, wiki headers, changelogs, FAQ entries, and online users for visual smoke testing.
 
 ---
 
@@ -608,3 +722,4 @@ These are real issues encountered during development. Every agent MUST be aware 
 14. **[DB] Dissolved app models keep `db_table`** — e.g. `db_table = "crawler_guard_crawlerrule"` ensures existing data is preserved without data migration.
 15. **[DB] Always `select_for_update()` on wallet transactions** — prevents race conditions on credit balance changes.
 16. **[Frontend] Consent form views NEVER return JSON** — `accept_all`, `reject_all`, `accept` always return `HttpResponseRedirect` to `HTTP_REFERER`. Cookie is set on the redirect response. `fetch()` callers follow the redirect automatically and their `.then()` handler fires regardless. This eliminates the entire class of "raw JSON on blank screen" bugs. See `apps/consent/views.py` `_consent_done()` for the canonical pattern. For JSON consent API, use `consent/api/status/` and `consent/api/update/` (separate DRF endpoints).
+17. **[Docs] Every new feature/app MUST be documented** in `README.md`, `AGENTS.md`, and `.github/copilot-instructions.md` before the task is considered complete.

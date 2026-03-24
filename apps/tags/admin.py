@@ -5,7 +5,7 @@ from .models_keyword import KeywordProvider, KeywordSuggestion
 
 
 @admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(admin.ModelAdmin[Tag]):
     list_display = (
         "name",
         "slug",
@@ -54,7 +54,7 @@ class TagAdmin(admin.ModelAdmin):
 
 
 @admin.register(KeywordProvider)
-class KeywordProviderAdmin(admin.ModelAdmin):
+class KeywordProviderAdmin(admin.ModelAdmin[KeywordProvider]):
     list_display = ("name", "source", "is_enabled", "last_run_at", "last_status")
     list_filter = ("is_enabled", "source")
     search_fields = ("name", "source")
@@ -62,7 +62,7 @@ class KeywordProviderAdmin(admin.ModelAdmin):
 
 
 @admin.register(KeywordSuggestion)
-class KeywordSuggestionAdmin(admin.ModelAdmin):
+class KeywordSuggestionAdmin(admin.ModelAdmin[KeywordSuggestion]):
     list_display = ("keyword", "provider", "score", "locale", "category", "created_at")
     search_fields = ("keyword", "normalized", "provider__name")
     list_filter = ("provider", "locale", "category")

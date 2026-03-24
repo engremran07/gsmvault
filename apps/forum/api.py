@@ -17,9 +17,15 @@ from .models import (
     ForumCategory,
     ForumPoll,
     ForumPollChoice,
+    ForumReaction,
     ForumReply,
     ForumTopic,
+    ForumTopicPrefix,
     ForumTopicSubscription,
+    ForumTopicTag,
+    ForumTrustLevel,
+    ForumUserProfile,
+    ForumWarning,
 )
 
 # ---------------------------------------------------------------------------
@@ -324,3 +330,160 @@ class ReplyViewSet(viewsets.ModelViewSet[ForumReply]):
         is_liked = services.toggle_like(reply, cast("AbstractBaseUser", request.user))
         reply.refresh_from_db(fields=["likes_count"])
         return Response({"is_liked": is_liked, "likes_count": reply.likes_count})
+
+    @action(
+        detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+    )
+    def react(self, request: Request, pk: int | None = None) -> Response:
+        """Set a reaction on a reply. Send reaction_id to set, omit to remove."""
+        reply = self.get_object()
+        reaction_id = request.data.get("reaction_id")
+        if not reaction_id:
+            services.remove_reaction(reply, cast("AbstractBaseUser", request.user))
+            return Response({"reaction": None})
+        reaction = ForumReaction.objects.filter(pk=reaction_id, is_active=True).first()
+        if not reaction:
+            return Response(
+                {"error": "Reaction not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        rr = services.set_reaction(
+            reply, cast("AbstractBaseUser", request.user), reaction
+        )
+        return Response(
+            {"reaction_id": rr.reaction_id, "reaction_name": rr.reaction.name}  # type: ignore[attr-defined]
+        )
+
+    @action(
+        detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated]
+    )
+    def mark_solution(self, request: Request, pk: int | None = None) -> Response:
+        """Mark this reply as the best answer for its topic."""
+        reply = self.get_object()
+        best = services.mark_best_answer(
+            reply.topic, reply, cast("AbstractBaseUser", request.user)
+        )
+        return Response({"topic_id": best.topic_id, "reply_id": best.reply_id})  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Trust Level & User Profile ViewSets
+# ---------------------------------------------------------------------------
+
+
+class TrustLevelSerializer(serializers.ModelSerializer[ForumTrustLevel]):
+    class Meta:
+        model = ForumTrustLevel
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class ForumUserProfileSerializer(serializers.ModelSerializer[ForumUserProfile]):
+    username = serializers.CharField(source="user.username", read_only=True)
+    display_title = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = ForumUserProfile
+        fields = [
+            "id",
+            "user",
+            "username",
+            "trust_level",
+            "display_title",
+            "custom_title",
+            "signature",
+            "website",
+            "location",
+            "topic_count",
+            "reply_count",
+            "likes_received",
+            "likes_given",
+            "solutions_count",
+            "reputation",
+            "is_banned",
+            "warning_level",
+            "last_active_at",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "username",
+            "trust_level",
+            "display_title",
+            "topic_count",
+            "reply_count",
+            "likes_received",
+            "likes_given",
+            "solutions_count",
+            "reputation",
+            "is_banned",
+            "warning_level",
+            "last_active_at",
+            "created_at",
+        ]
+
+
+class ReactionSerializer(serializers.ModelSerializer[ForumReaction]):
+    class Meta:
+        model = ForumReaction
+        fields = ["id", "name", "emoji", "icon", "score", "is_positive"]
+        read_only_fields = fields
+
+
+class TopicPrefixSerializer(serializers.ModelSerializer[ForumTopicPrefix]):
+    class Meta:
+        model = ForumTopicPrefix
+        fields = ["id", "name", "slug", "color"]
+        read_only_fields = fields
+
+
+class TopicTagSerializer(serializers.ModelSerializer[ForumTopicTag]):
+    class Meta:
+        model = ForumTopicTag
+        fields = ["id", "name", "slug"]
+        read_only_fields = fields
+
+
+class WarningSerializer(serializers.ModelSerializer[ForumWarning]):
+    class Meta:
+        model = ForumWarning
+        fields = [
+            "id",
+            "severity",
+            "reason",
+            "points",
+            "expires_at",
+            "is_acknowledged",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+
+class ForumUserProfileViewSet(viewsets.ReadOnlyModelViewSet[ForumUserProfile]):
+    serializer_class = ForumUserProfileSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):  # type: ignore[override]
+        return ForumUserProfile.objects.select_related("user").order_by("-reputation")
+
+    @action(
+        detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated]
+    )
+    def me(self, request: Request) -> Response:
+        profile = services.get_or_create_forum_profile(
+            cast("AbstractBaseUser", request.user)
+        )
+        return Response(ForumUserProfileSerializer(profile).data)
+
+    @action(detail=False, methods=["get"])
+    def leaderboard(self, request: Request) -> Response:
+        top = ForumUserProfile.objects.select_related("user").order_by("-reputation")[
+            :20
+        ]
+        return Response(ForumUserProfileSerializer(top, many=True).data)
+
+
+class ReactionViewSet(viewsets.ReadOnlyModelViewSet[ForumReaction]):
+    serializer_class = ReactionSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = ForumReaction.objects.filter(is_active=True)

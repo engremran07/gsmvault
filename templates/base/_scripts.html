@@ -1,30 +1,37 @@
 {# JS includes: Alpine, HTMX, Lucide, custom — all deferred for non-blocking render #}
 {% load static %}
 
-{# HTMX — deferred, executes before DOMContentLoaded so hx-boost works #}
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@2/dist/htmx.min.js"
-        nonce="{{ request.csp_nonce }}"
-        crossorigin="anonymous" defer></script>
+{# HTMX v2.0.4 — local vendor copy #}
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"
+        nonce="{{ request.csp_nonce }}" defer></script>
 
-{# Lucide Icons — deferred, initialized on DOMContentLoaded below #}
-<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"
-        nonce="{{ request.csp_nonce }}"
-        crossorigin="anonymous" defer></script>
+{# Lucide Icons v0.460.0 — local vendor copy #}
+<script src="{% static 'vendor/lucide/lucide.min.js' %}"
+        nonce="{{ request.csp_nonce }}" defer></script>
 
 {# Initialize Lucide icons + HTMX config after DOM ready #}
 <script nonce="{{ request.csp_nonce }}">
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-    if (typeof htmx !== 'undefined') {
-      htmx.config.inlineScriptNonce = '{{ request.csp_nonce }}';
-      htmx.config.defaultSettleDelay = 0;
-      htmx.config.defaultSwapDelay = 0;
-      htmx.config.scrollIntoViewOnBoost = false;
+  (function() {
+    function initIcons() {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
-  });
-  document.addEventListener('htmx:afterSwap', function() {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  });
+    function initAlpine(el) {
+      if (typeof Alpine !== 'undefined' && Alpine.initTree) {
+        Alpine.initTree(el || document.body);
+      }
+    }
+    /* First load: DOMContentLoaded fires after deferred scripts */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() { initIcons(); });
+    } else {
+      initIcons();
+    }
+    /* Re-init icons + Alpine components after every HTMX partial swap */
+    document.addEventListener('htmx:afterSettle', function(evt) {
+      initIcons();
+      initAlpine(evt.detail.elt);
+    });
+  })();
 </script>
 
 {# Multi-CDN fallback — checks after DOMContentLoaded when deferred scripts have run #}
@@ -35,13 +42,13 @@
         nonce="{{ request.csp_nonce }}" defer></script>
 <script src="{% static 'js/src/notifications.js' %}"
         nonce="{{ request.csp_nonce }}" defer></script>
+<script src="{% static 'js/src/ads.js' %}"
+        nonce="{{ request.csp_nonce }}" defer></script>
 
-{# Alpine.js Intersect plugin — entrance animations on scroll (before Alpine core) #}
-<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3/dist/cdn.min.js"
-        nonce="{{ request.csp_nonce }}"
-        crossorigin="anonymous"></script>
+{# Alpine.js Intersect v3.14.9 — entrance animations on scroll (before Alpine core) #}
+<script defer src="{% static 'vendor/alpinejs/intersect.min.js' %}"
+        nonce="{{ request.csp_nonce }}"></script>
 
-{# Alpine.js — MUST be last deferred script so all stores are registered when it auto-initializes #}
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"
-        nonce="{{ request.csp_nonce }}"
-        crossorigin="anonymous"></script>
+{# Alpine.js v3.14.9 — MUST be last deferred script so all stores are registered when it auto-initializes #}
+<script defer src="{% static 'vendor/alpinejs/alpine.min.js' %}"
+        nonce="{{ request.csp_nonce }}"></script>

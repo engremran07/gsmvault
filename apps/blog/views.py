@@ -20,6 +20,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from apps.blog.models import CategoryTranslation, PostTranslation, TagTranslation
 from apps.blog.services import ai_editor, workflow
+from apps.blog.services.post_service import search_posts
 from apps.core import ai_client
 from apps.core.app_service import AppService
 from apps.core.utils import feature_flags
@@ -30,7 +31,7 @@ from apps.tags import services as tag_services
 from apps.tags.models import Tag
 from apps.users.models import CustomUser
 
-from .forms import CategoryForm, PostForm
+from .forms import CategoryForm, PostForm, SearchForm
 from .models import Category, Post, PostDraft, PostRevision, PostStatus
 
 logger = logging.getLogger(__name__)
@@ -406,7 +407,26 @@ def post_list(request: HttpRequest) -> HttpResponse:
             ("title", "Title A-Z"),
         ],
     }
+    if request.headers.get("HX-Request"):
+        return render(request, "blog/partials/post_list_items.html", context)
     return render(request, "blog/post_list.html", context)
+
+
+@require_GET
+def blog_search(request: HttpRequest) -> HttpResponse:
+    """Blog search — returns full page or HTMX fragment for inline results."""
+    form = SearchForm(request.GET or None)
+    results: list = []
+    query = ""
+    if form.is_valid():
+        query = form.cleaned_data["q"]
+        results = list(search_posts(query))
+
+    template = "blog/search.html"
+    if request.headers.get("HX-Request"):
+        template = "blog/fragments/search_results.html"
+
+    return render(request, template, {"form": form, "results": results, "query": query})
 
 
 @require_GET

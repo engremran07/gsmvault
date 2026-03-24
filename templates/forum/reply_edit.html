@@ -26,7 +26,7 @@
               >{{ form.content.value }}</textarea>
     <div class="flex gap-3">
       <button type="submit"
-              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:opacity-90">
+              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition-colors">
         Save Edit
       </button>
       <a href="{% url 'forum:topic_detail' pk=reply.topic.pk slug=reply.topic.slug %}"

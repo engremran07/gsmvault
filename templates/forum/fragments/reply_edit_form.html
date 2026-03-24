@@ -9,7 +9,7 @@
               >{{ form.content.value }}</textarea>
     <div class="flex items-center gap-2 mt-3">
       <button type="submit"
-              class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:opacity-90 text-sm">
+              class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition-colors text-sm">
         Save Edit
       </button>
       <a hx-get="{% url 'forum:topic_detail' pk=reply.topic.pk slug=reply.topic.slug %}?fragment=replies"

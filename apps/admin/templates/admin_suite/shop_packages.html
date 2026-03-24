@@ -1,0 +1,310 @@
+{% extends "layouts/admin.html" %}
+{% load humanize %}
+{% block title %}Package Tiers — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Package Tiers</h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+  </div>
+  <button onclick="document.getElementById('new-tier-form').classList.toggle('hidden')"
+     class="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all flex items-center gap-2 self-start">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    New Package Tier
+  </button>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+{% if message %}
+{% include "components/_alert.html" with type=msg_type message=message %}
+{% endif %}
+
+{# ─── New Tier Form (hidden by default) ─── #}
+<div id="new-tier-form" class="hidden mb-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] overflow-hidden">
+  <div class="px-6 py-4 border-b border-[var(--color-border)]/50">
+    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+      <i data-lucide="plus-circle" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      Create New Package Tier
+    </h2>
+  </div>
+  <form method="post" class="p-6">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_tier">
+
+    {# Basic Info #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Basic Info</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Name</label>
+        <input type="text" name="name" required class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Slug</label>
+        <input type="text" name="slug" required class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Tier Level</label>
+        <select name="tier_level" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+          {% for value, label in tier_levels %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Badge Color</label>
+        <input type="text" name="badge_color" value="blue" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Badge Icon</label>
+        <input type="text" name="badge_icon" value="package" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Sort Order</label>
+        <input type="number" name="sort_order" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+      </div>
+    </div>
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Description</label>
+      <textarea name="description" rows="2" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"></textarea>
+    </div>
+
+    {# Pricing #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Pricing</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly ($)</label>
+        <input type="number" step="0.01" name="price_monthly" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Quarterly ($)</label>
+        <input type="number" step="0.01" name="price_quarterly" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Yearly ($)</label>
+        <input type="number" step="0.01" name="price_yearly" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Lifetime ($)</label>
+        <input type="number" step="0.01" name="price_lifetime" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Credits</label>
+        <input type="number" step="0.01" name="credit_price" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Trial Days</label>
+        <input type="number" name="trial_days" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+    </div>
+
+    {# Download Quotas #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Download Quotas</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Daily Downloads</label>
+        <input type="number" name="daily_download_limit" value="5" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly Downloads</label>
+        <input type="number" name="monthly_download_limit" value="50" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Max File Size (MB)</label>
+        <input type="number" name="max_file_size_mb" value="500" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Daily BW (MB)</label>
+        <input type="number" name="daily_bandwidth_mb" value="2048" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly BW (MB)</label>
+        <input type="number" name="monthly_bandwidth_mb" value="20480" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
+      </div>
+    </div>
+
+    {# Speed & Concurrency #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Speed &amp; Concurrency</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Speed Cap (KB/s)</label>
+        <input type="number" name="max_download_speed_kbps" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <p class="text-[10px] text-[var(--color-text-muted)] mt-1">0 = no limit</p>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Concurrent Downloads</label>
+        <input type="number" name="max_concurrent_downloads" value="1" min="1" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Cooldown (seconds)</label>
+        <input type="number" name="cooldown_seconds" value="60" min="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+      </div>
+    </div>
+
+    {# Feature Flags #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Feature Flags</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="ad_free" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Ad-Free Downloads</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="priority_queue" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Priority Queue</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="resume_support" checked class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Resume Support</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="api_access" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">API Access</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="early_access" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Early Access</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="direct_links" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Direct Links</span>
+      </label>
+    </div>
+
+    {# Firmware Type Access #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Firmware Type Access</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="access_official" checked class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Official</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="access_engineering" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Engineering</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="access_readback" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Readback</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="access_modified" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Modified</span>
+      </label>
+    </div>
+
+    {# Admin Flags #}
+    <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Admin Flags</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="is_active" checked class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Active</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="is_default" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Default for new users</span>
+      </label>
+      <label class="flex items-center gap-3 rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 cursor-pointer hover:border-[var(--color-accent)]/30 transition">
+        <input type="checkbox" name="is_featured" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <span class="text-sm text-[var(--color-text-primary)]">Featured on pricing page</span>
+      </label>
+    </div>
+
+    <div class="flex justify-end pt-4 border-t border-[var(--color-border)]/50">
+      <button type="submit" class="rounded-lg bg-[var(--color-accent)] px-6 py-2.5 text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all flex items-center gap-2">
+        <i data-lucide="save" class="w-4 h-4"></i> Create Package Tier
+      </button>
+    </div>
+  </form>
+</div>
+
+{# ─── Existing Tiers ─── #}
+<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] overflow-hidden">
+  <div class="px-6 py-4 border-b border-[var(--color-border)]/50">
+    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+      <i data-lucide="layers" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      All Package Tiers
+    </h2>
+  </div>
+
+  {% if tiers %}
+  <div class="divide-y divide-[var(--color-border)]/30">
+    {% for tier in tiers %}
+    <div class="px-6 py-4 flex flex-col lg:flex-row lg:items-center gap-4 {% if not tier.is_active %}opacity-50{% endif %}">
+      {# Badge & Name #}
+      <div class="flex items-center gap-3 lg:w-1/4 min-w-0">
+        <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-{{ tier.badge_color }}-500/10 shrink-0">
+          <i data-lucide="{{ tier.badge_icon }}" class="w-5 h-5 text-{{ tier.badge_color }}-400"></i>
+        </span>
+        <div class="min-w-0">
+          <h3 class="font-semibold text-[var(--color-text-primary)] truncate">{{ tier.name }}</h3>
+          <p class="text-xs text-[var(--color-text-muted)]">{{ tier.get_tier_level_display }} &middot; {{ tier.slug }}</p>
+        </div>
+      </div>
+
+      {# Quotas Summary #}
+      <div class="flex flex-wrap gap-3 lg:flex-1 text-xs">
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30">
+          <i data-lucide="download" class="w-3 h-3 text-blue-400"></i>
+          {% if tier.daily_download_limit == -1 %}∞{% else %}{{ tier.daily_download_limit }}{% endif %}/day
+        </span>
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30">
+          <i data-lucide="calendar" class="w-3 h-3 text-emerald-400"></i>
+          {% if tier.monthly_download_limit == -1 %}∞{% else %}{{ tier.monthly_download_limit }}{% endif %}/mo
+        </span>
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30">
+          <i data-lucide="gauge" class="w-3 h-3 text-amber-400"></i>
+          {% if tier.max_download_speed_kbps == 0 %}No limit{% else %}{{ tier.max_download_speed_kbps }} KB/s{% endif %}
+        </span>
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30">
+          <i data-lucide="layers" class="w-3 h-3 text-violet-400"></i>
+          {{ tier.max_concurrent_downloads }} concurrent
+        </span>
+        {% if tier.ad_free %}
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400">
+          <i data-lucide="shield-check" class="w-3 h-3"></i> Ad-Free
+        </span>
+        {% endif %}
+        {% if tier.is_featured %}
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-amber-500/10 text-amber-400">
+          <i data-lucide="star" class="w-3 h-3"></i> Featured
+        </span>
+        {% endif %}
+        {% if tier.is_default %}
+        <span class="flex items-center gap-1 px-2 py-1 rounded-md bg-blue-500/10 text-blue-400">
+          <i data-lucide="check-circle" class="w-3 h-3"></i> Default
+        </span>
+        {% endif %}
+      </div>
+
+      {# Price #}
+      <div class="lg:w-28 text-right">
+        <span class="text-lg font-bold text-[var(--color-text-primary)] tabular-nums">${{ tier.price_monthly }}</span>
+        <span class="text-xs text-[var(--color-text-muted)]">/mo</span>
+      </div>
+
+      {# Actions #}
+      <div class="flex items-center gap-2 lg:w-auto">
+        <form method="post" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="toggle_tier">
+          <input type="hidden" name="tier_id" value="{{ tier.pk }}">
+          <button type="submit" class="p-2 rounded-lg hover:bg-[var(--color-bg-primary)] transition text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]" title="{% if tier.is_active %}Deactivate{% else %}Activate{% endif %}">
+            <i data-lucide="{% if tier.is_active %}pause{% else %}play{% endif %}" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  {% include "components/_empty_state.html" with icon="package" title="No Package Tiers" description="Create your first package tier to define download quotas and limits." %}
+  {% endif %}
+</div>
+
+{% endblock %}

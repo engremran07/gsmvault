@@ -237,3 +237,126 @@ def fanout_post_publish(post: Post, *, created_by=None) -> SharePlan | None:
         channels=plan.channels,
     )
     return plan
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Video Script Generation
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Platforms that benefit from video content
+VIDEO_CHANNELS: set[str] = {
+    Channel.TIKTOK,
+    Channel.INSTAGRAM,
+    Channel.FACEBOOK,
+    Channel.TWITTER,
+    Channel.LINKEDIN,
+}
+
+
+def generate_video_script(post: Post, *, channel: str | None = None) -> dict[str, Any]:
+    """
+    Generate an AI video script for a blog post.
+
+    Returns a dict with keys: title, hook, scenes (list of scene dicts),
+    cta (call-to-action), duration_seconds, hashtags.
+    Each scene has: narration, visual_description, duration_seconds.
+    """
+    target_channel = channel or "generic"
+    platform_hints: dict[str, str] = {
+        Channel.TIKTOK: "Keep it under 60 seconds. Fast-paced, trend-aware, vertical format.",
+        Channel.INSTAGRAM: "Reels format, 30-90 seconds. Visual-first with text overlays.",
+        Channel.FACEBOOK: "1-3 minutes. Story-driven, emotional hook, landscape or square.",
+        Channel.TWITTER: "Under 140 seconds. Punchy, informative, horizontal.",
+        Channel.LINKEDIN: "Professional tone, 1-2 minutes. Insight-driven, value-first.",
+    }
+    platform_hint = platform_hints.get(
+        target_channel, "General social media video, 60-90 seconds."
+    )
+
+    try:
+        import json
+
+        from apps.ai.services import test_completion
+
+        prompt = f"""
+Create a video script for a social media post about this blog article.
+Platform: {target_channel} — {platform_hint}
+
+Return ONLY a valid JSON object with these keys:
+- title: Catchy video title
+- hook: Opening 5-second hook text to grab attention
+- scenes: Array of 3-5 scene objects, each with:
+  - narration: What the narrator says
+  - visual_description: What appears on screen
+  - duration_seconds: Scene length in seconds
+- cta: Call-to-action text for the end
+- duration_seconds: Total video duration
+- hashtags: Array of 5 relevant hashtags (no # prefix)
+
+Blog Title: {post.title}
+Blog Summary: {post.summary or ""}
+Blog Body (excerpt): {post.body[:1500] if post.body else ""}
+"""
+        resp = test_completion(prompt)
+        text = resp.get("text", "")
+        if text.startswith("```"):
+            text = text.split("```")[1].replace("json", "").strip()
+
+        script = json.loads(text)
+        # Validate minimal structure
+        if not isinstance(script.get("scenes"), list):
+            script["scenes"] = []
+        return script
+
+    except Exception as e:
+        logger.warning("Video script generation failed: %s", e)
+        return {
+            "title": post.title,
+            "hook": f"Did you know about {post.title}?",
+            "scenes": [
+                {
+                    "narration": post.summary or post.title,
+                    "visual_description": "Title card with blog post image",
+                    "duration_seconds": 10,
+                },
+                {
+                    "narration": "Check out the full article for more details!",
+                    "visual_description": "Blog URL and QR code on screen",
+                    "duration_seconds": 5,
+                },
+            ],
+            "cta": "Link in bio!",
+            "duration_seconds": 15,
+            "hashtags": [],
+        }
+
+
+def create_video_variants_for_post(
+    post: Post, *, channels: Iterable[str] | None = None, created_by: Any = None
+) -> list[ContentVariant]:
+    """
+    Generate video script variants for a post across video-friendly channels.
+    Returns the created/updated ContentVariant objects.
+    """
+    target_channels = set(channels or VIDEO_CHANNELS) & VIDEO_CHANNELS
+    if not target_channels:
+        return []
+
+    results: list[ContentVariant] = []
+    for ch in target_channels:
+        script = generate_video_script(post, channel=ch)
+        variant, _created = ContentVariant.objects.update_or_create(
+            post=post,
+            channel=ch,
+            variant_type="video_script",
+            defaults={
+                "payload": script,
+                "generated_by": created_by,
+            },
+        )
+        results.append(variant)
+        logger.info(
+            "distribution.video_script.generated",
+            extra={"post": post.pk, "channel": ch},
+        )
+    return results

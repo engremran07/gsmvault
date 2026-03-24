@@ -1,0 +1,57 @@
+{# Blog post list fragment — HTMX partial for pagination #}
+{% load ad_tags %}
+{% for post in page_obj %}
+<article class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-accent)] transition group">
+  <div class="flex">
+    {# Content #}
+    <div class="flex-1 min-w-0 p-5">
+      <div class="flex items-center gap-2 mb-1">
+        {% if post.featured %}
+        {% include "components/_badge.html" with text="Featured" variant="warning" %}
+        {% endif %}
+        {% if post.category %}
+        <span class="text-xs text-[var(--color-accent)]">{{ post.category.name }}</span>
+        {% endif %}
+      </div>
+      <h2 class="text-lg font-semibold">
+        <a href="{% url 'blog:post_detail' slug=post.slug %}" class="hover:text-[var(--color-accent)]">{{ post.title }}</a>
+      </h2>
+      <p class="text-sm text-[var(--color-text-secondary)] mt-1">{{ post.summary|truncatewords:30 }}</p>
+      <div class="flex items-center gap-3 text-xs text-[var(--color-text-muted)] mt-2">
+        <span>{{ post.author }}</span>
+        <span>&middot;</span>
+        <span>{{ post.published_at|date:"M d, Y" }}</span>
+        {% if post.tags.all %}
+        <span>&middot;</span>
+        {% for tag in post.tags.all|slice:":3" %}
+        <span class="text-[var(--color-accent)]">#{{ tag.name }}</span>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+    {# Image / Placeholder #}
+    <div class="hidden sm:block w-44 flex-shrink-0">
+      {% if post.hero_image %}
+      <img src="{{ post.hero_image }}" alt="{{ post.title }}"
+           class="w-full h-full object-cover rounded-r-lg" loading="lazy">
+      {% else %}
+      <div class="w-full h-full rounded-r-lg bg-[var(--color-bg-tertiary)] flex items-center justify-center">
+        <i data-lucide="{% if post.firmware_brand %}smartphone{% elif post.category %}newspaper{% else %}file-text{% endif %}"
+           class="w-10 h-10 text-[var(--color-text-muted)] opacity-40 group-hover:text-[var(--color-accent)] group-hover:opacity-60 transition"></i>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</article>
+{# In-feed ad card after every 3 posts — styled like a blog post card #}
+{% if forloop.counter|divisibleby:3 and not forloop.last %}
+{% render_ad_slot "in-feed" css_class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5" %}
+{% endif %}
+{% empty %}
+{% include "components/_empty_state.html" with message="No blog posts yet." icon="file-text" %}
+{% endfor %}
+
+{# Pagination — included inside #content-list so HTMX swap keeps it #}
+{% if page_obj.has_other_pages %}
+{% include "components/_pagination.html" with page_obj=page_obj hx_target="#content-list" %}
+{% endif %}

@@ -1,0 +1,167 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Ads Dashboard{% endblock %}
+
+{% block page_header %}
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-bold">Ads Dashboard</h1>
+  <div class="flex items-center gap-2">
+    {% if ads_enabled %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Ads Active</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">Ads Disabled</span>{% endif %}
+    {% if affiliate_enabled %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/10 text-cyan-400">Affiliate</span>{% endif %}
+    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ ad_aggressiveness_level|title }}</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{# ── KPI Overview ─────────────────────────────────────────────── #}
+<section class="mb-8">
+  <h2 class="text-lg font-semibold mb-4">Performance</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    {% include "components/_card.html" with title="Impressions" value=impressions|default:"0" icon="eye" %}
+    {% include "components/_card.html" with title="Clicks" value=clicks|default:"0" icon="mouse-pointer" %}
+    {% include "components/_card.html" with title="CTR" value=ctr|default:"0" icon="percent" %}
+  </div>
+</section>
+
+{# ── Global Toggles ──────────────────────────────────────────── #}
+<section class="mb-8">
+  <div class="p-4 rounded-xl border border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
+    <form method="post" action="{% url 'ads:toggle_settings' %}" class="flex flex-wrap items-center gap-4">
+      {% csrf_token %}
+      <label class="flex items-center gap-2 cursor-pointer text-sm">
+        <input type="checkbox" name="ads_enabled" value="1" {% if ads_enabled %}checked{% endif %} class="rounded border-[var(--color-border)] text-[var(--color-accent)]">
+        <span>Ads Enabled</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer text-sm">
+        <input type="checkbox" name="ad_networks_enabled" value="1" {% if ad_networks_enabled %}checked{% endif %} class="rounded border-[var(--color-border)] text-[var(--color-accent)]">
+        <span>Ad Networks</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer text-sm">
+        <input type="checkbox" name="affiliate_enabled" value="1" {% if affiliate_enabled %}checked{% endif %} class="rounded border-[var(--color-border)] text-[var(--color-accent)]">
+        <span>Affiliates</span>
+      </label>
+      <select name="ad_aggressiveness_level" class="text-xs rounded bg-[var(--color-bg-tertiary)] border-[var(--color-border)] text-[var(--color-text-primary)] px-2 py-1">
+        <option value="minimal" {% if ad_aggressiveness_level == "minimal" %}selected{% endif %}>Minimal</option>
+        <option value="balanced" {% if ad_aggressiveness_level == "balanced" %}selected{% endif %}>Balanced</option>
+        <option value="aggressive" {% if ad_aggressiveness_level == "aggressive" %}selected{% endif %}>Aggressive</option>
+      </select>
+      <button type="submit" class="px-4 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold">Save</button>
+    </form>
+  </div>
+</section>
+
+{# ── Tabs ─────────────────────────────────────────────────────── #}
+<div x-data="{ tab: 'placements' }">
+  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit flex-wrap">
+    <button @click="tab='placements'" :class="tab==='placements' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Placements</button>
+    <button @click="tab='campaigns'" :class="tab==='campaigns' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Campaigns</button>
+    <button @click="tab='creatives'" :class="tab==='creatives' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Creatives</button>
+  </div>
+
+  {# ── Placements Tab ─────────────────────────────────────────── #}
+  <div x-show="tab==='placements'" x-cloak>
+    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]/20">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Placement</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Enabled</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Locked</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Impressions</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Clicks</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">CTR</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        </tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for p in placements %}
+          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <td class="py-2 px-4">
+              <span class="font-medium text-[var(--color-text-primary)]">{{ p.name }}</span>
+              <span class="text-[10px] text-[var(--color-text-muted)] ml-1">{{ p.slug }}</span>
+            </td>
+            <td class="py-2 px-4 text-center">{% if p.is_enabled %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
+            <td class="py-2 px-4 text-center">{% if p.locked %}<span class="text-[10px] text-amber-400">Locked</span>{% else %}<span class="text-[10px] text-[var(--color-text-muted)]">—</span>{% endif %}</td>
+            {% with pstats=placement_stats|default_if_none:"" %}
+            <td class="py-2 px-4 text-right font-mono text-xs">{{ pstats.impressions|default:"0" }}</td>
+            <td class="py-2 px-4 text-right font-mono text-xs">{{ pstats.clicks|default:"0" }}</td>
+            <td class="py-2 px-4 text-right font-mono text-xs">{{ pstats.ctr|default:"0" }}%</td>
+            {% endwith %}
+            <td class="py-2 px-4 text-right">
+              <form method="post" action="{% url 'ads:toggle_settings' %}" class="inline">{% csrf_token %}<input type="hidden" name="placement" value="{{ p.pk }}">
+                {% if p.is_enabled %}<button name="action" value="disable_placement" class="text-xs text-amber-400 hover:underline">Disable</button>
+                {% else %}<button name="action" value="enable_placement" class="text-xs text-emerald-400 hover:underline">Enable</button>{% endif %}
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="py-8 text-center text-[var(--color-text-muted)]">{% include "components/_empty_state.html" with icon="layout" message="No placements configured" %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {# ── Campaigns Tab ──────────────────────────────────────────── #}
+  <div x-show="tab==='campaigns'" x-cloak>
+    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]/20">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Campaign</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Type</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Budget</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        </tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for c in campaigns %}
+          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <td class="py-2 px-4 font-medium text-[var(--color-text-primary)]">{{ c.name }}</td>
+            <td class="py-2 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ c.type }}</span></td>
+            <td class="py-2 px-4 text-center">{% if c.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
+            <td class="py-2 px-4 text-right font-mono text-xs">${{ c.budget|default:"-" }}</td>
+            <td class="py-2 px-4 text-right">
+              <form method="post" action="{% url 'ads:toggle_settings' %}" class="inline">{% csrf_token %}<input type="hidden" name="campaign" value="{{ c.pk }}">
+                {% if c.is_active %}<button name="action" value="disable_campaign" class="text-xs text-amber-400 hover:underline">Pause</button>
+                {% else %}<button name="action" value="enable_campaign" class="text-xs text-emerald-400 hover:underline">Enable</button>{% endif %}
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]">{% include "components/_empty_state.html" with icon="megaphone" message="No campaigns" %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {# ── Creatives Tab ──────────────────────────────────────────── #}
+  <div x-show="tab==='creatives'" x-cloak>
+    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]/20">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Creative</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Campaign</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Enabled</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Impressions</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Clicks</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">CTR</th>
+        </tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for c in creatives %}
+          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <td class="py-2 px-4 font-medium text-[var(--color-text-primary)]">{{ c.name }}</td>
+            <td class="py-2 px-4 text-xs text-[var(--color-text-muted)]">{{ c.campaign.name|default:"—" }}</td>
+            <td class="py-2 px-4 text-center">{% if c.is_enabled %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
+            <td class="py-2 px-4 text-right font-mono text-xs">0</td>
+            <td class="py-2 px-4 text-right font-mono text-xs">0</td>
+            <td class="py-2 px-4 text-right font-mono text-xs">0%</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">{% include "components/_empty_state.html" with icon="image" message="No creatives" %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "layouts/admin.html" %}
+{% load humanize %}
+{% block title %}Sellers — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Sellers</h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+{% include "components/_admin_search.html" with placeholder="Search sellers by name, email, or username..." value=search %}
+
+<div class="flex gap-2 mb-6 flex-wrap">
+  <a href="?q={{ search }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if not verified_filter %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">All</a>
+  <a href="?q={{ search }}&verified=verified" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if verified_filter == 'verified' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">Verified</a>
+  <a href="?q={{ search }}&verified=unverified" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if verified_filter == 'unverified' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">Unverified</a>
+</div>
+
+<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] overflow-hidden">
+  {% if sellers %}
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-[var(--color-border)]/50 text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+          <th class="px-6 py-3 text-left">Seller</th>
+          <th class="px-6 py-3 text-left">Email</th>
+          <th class="px-6 py-3 text-center">Verified</th>
+          <th class="px-6 py-3 text-right">Rating</th>
+          <th class="px-6 py-3 text-right">Sales</th>
+          <th class="px-6 py-3 text-left">Payout</th>
+          <th class="px-6 py-3 text-left">Joined</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--color-border)]/20">
+        {% for seller in sellers %}
+        <tr class="hover:bg-[var(--color-bg-primary)]/50 transition">
+          <td class="px-6 py-3 text-[var(--color-text-primary)] font-medium">{{ seller.display_name|default:seller.user.username }}</td>
+          <td class="px-6 py-3 text-[var(--color-text-secondary)]">{{ seller.user.email }}</td>
+          <td class="px-6 py-3 text-center">
+            {% if seller.verified %}
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400">
+              <i data-lucide="check" class="w-3 h-3"></i> Yes
+            </span>
+            {% else %}
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/15 text-slate-400">No</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-3 text-right tabular-nums text-[var(--color-text-primary)]">{{ seller.rating|floatformat:1 }}</td>
+          <td class="px-6 py-3 text-right tabular-nums text-[var(--color-text-primary)]">{{ seller.total_sales|intcomma }}</td>
+          <td class="px-6 py-3 text-[var(--color-text-muted)]">{{ seller.get_payout_method_display }}</td>
+          <td class="px-6 py-3 text-[var(--color-text-muted)]">{{ seller.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "components/_pagination.html" with page_obj=sellers %}
+  {% else %}
+  {% include "components/_empty_state.html" with icon="store" title="No Sellers" description="No sellers match your search criteria." %}
+  {% endif %}
+</div>
+
+{% endblock %}

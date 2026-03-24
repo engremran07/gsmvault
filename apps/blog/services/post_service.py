@@ -164,16 +164,13 @@ class PostService:
 
         # Auto-share if distribution app available
         try:
-            from apps.app_registry.services import (  # type: ignore[import-not-found]
-                AppRegistryService,
+            from apps.distribution.services import (
+                create_plan_for_post,
+                should_fanout,
             )
 
-            if AppRegistryService().is_app_enabled("distribution"):
-                from apps.distribution.services import (  # type: ignore[attr-defined]
-                    DistributionService,  # type: ignore[attr-defined]
-                )
-
-                DistributionService().auto_share_post(post)
+            if should_fanout(post):
+                create_plan_for_post(post)
         except ImportError:
             pass
 
@@ -354,4 +351,27 @@ class PostService:
         return post
 
 
-__all__ = ["PostService"]
+def search_posts(query: str, limit: int = 20):
+    """Search published posts using PostgreSQL full-text search."""
+    from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+
+    from apps.blog.models import Post, PostStatus
+
+    now = timezone.now()
+    vector = (
+        SearchVector("title", weight="A")
+        + SearchVector("summary", weight="B")
+        + SearchVector("body", weight="C")
+    )
+    search_query = SearchQuery(query, search_type="plain")
+    return (
+        Post.objects.filter(status=PostStatus.PUBLISHED, publish_at__lte=now)
+        .annotate(rank=SearchRank(vector, search_query))
+        .filter(rank__gte=0.05)
+        .select_related("author", "category")
+        .prefetch_related("tags")
+        .order_by("-rank", "-published_at")[:limit]
+    )
+
+
+__all__ = ["PostService", "search_posts"]

@@ -7,7 +7,7 @@ from apps.devices.models import AppPolicy, Device, DeviceConfig, DeviceEvent
 
 
 @admin.register(Device)
-class DeviceAdmin(admin.ModelAdmin):
+class DeviceAdmin(admin.ModelAdmin[Device]):
     list_display = (
         "user",
         "display_name",
@@ -115,7 +115,7 @@ class DeviceConfigAdmin(SingletonModelAdmin):
 
 
 @admin.register(AppPolicy)
-class AppPolicyAdmin(admin.ModelAdmin):
+class AppPolicyAdmin(admin.ModelAdmin[AppPolicy]):
     list_display = (
         "name",
         "device_locking_mode",
@@ -145,7 +145,7 @@ class AppPolicyAdmin(admin.ModelAdmin):
 
 
 @admin.register(DeviceEvent)
-class DeviceEventAdmin(admin.ModelAdmin):
+class DeviceEventAdmin(admin.ModelAdmin[DeviceEvent]):
     list_display = (
         "created_at",
         "event_type",

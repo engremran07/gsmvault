@@ -120,3 +120,35 @@ def enqueue_pending_for_account(account: SocialAccount) -> int:
         deliver_job.delay(job.pk)
         count += 1
     return count
+
+
+@shared_task(
+    name="distribution.generate_video_scripts",
+    bind=True,
+    acks_late=True,
+    soft_time_limit=300,
+    time_limit=360,
+)
+def generate_video_scripts(
+    self, post_id: int, channels: list[str] | None = None
+) -> int:
+    """Generate AI video scripts for a blog post across video-friendly channels."""
+    from apps.blog.models import Post
+
+    from .services import create_video_variants_for_post
+
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        logger.warning("generate_video_scripts: Post %s not found", post_id)
+        return 0
+
+    variants = create_video_variants_for_post(
+        post,
+        channels=channels,
+    )
+    logger.info(
+        "distribution.video_scripts.completed",
+        extra={"post": post_id, "count": len(variants)},
+    )
+    return len(variants)

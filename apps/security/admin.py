@@ -10,12 +10,12 @@ from .models import (
 
 
 @admin.register(SecurityConfig)
-class SecurityConfigAdmin(admin.ModelAdmin):
+class SecurityConfigAdmin(admin.ModelAdmin[SecurityConfig]):
     pass
 
 
 @admin.register(SecurityEvent)
-class SecurityEventAdmin(admin.ModelAdmin):
+class SecurityEventAdmin(admin.ModelAdmin[SecurityEvent]):
     list_display = ["event_type", "severity", "user", "ip", "created_at"]
     list_filter = ["event_type", "severity"]
     search_fields = ["ip", "user__email"]
@@ -23,16 +23,16 @@ class SecurityEventAdmin(admin.ModelAdmin):
 
 
 @admin.register(RateLimitRule)
-class RateLimitRuleAdmin(admin.ModelAdmin):
+class RateLimitRuleAdmin(admin.ModelAdmin[RateLimitRule]):
     list_display = ["path_pattern", "limit", "window_seconds", "action", "is_active"]
 
 
 @admin.register(BlockedIP)
-class BlockedIPAdmin(admin.ModelAdmin):
+class BlockedIPAdmin(admin.ModelAdmin[BlockedIP]):
     list_display = ["ip", "reason", "blocked_until", "is_active", "created_at"]
 
 
 @admin.register(CSPViolationReport)
-class CSPViolationReportAdmin(admin.ModelAdmin):
+class CSPViolationReportAdmin(admin.ModelAdmin[CSPViolationReport]):
     list_display = ["violated_directive", "document_uri", "created_at"]
     readonly_fields = ["created_at"]

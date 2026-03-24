@@ -7,32 +7,13 @@
 </div>
 {% endblock %}
 {% block page_content %}
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8 stagger-children">
-  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:0" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3"><i data-lucide="users" class="w-4 h-4 text-blue-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.accounts|default:'0' }})" x-text="display.toLocaleString()">{{ stats.accounts|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Accounts</p>
-  </div>
-  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:1" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center mb-3"><i data-lucide="calendar" class="w-4 h-4 text-violet-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.plans|default:'0' }})" x-text="display.toLocaleString()">{{ stats.plans|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Plans</p>
-  </div>
-  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:2" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3"><i data-lucide="clock" class="w-4 h-4 text-amber-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.jobs_pending|default:'0' }})" x-text="display.toLocaleString()">{{ stats.jobs_pending|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Jobs Pending</p>
-  </div>
-  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:3" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center mb-3"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.jobs_failed|default:'0' }})" x-text="display.toLocaleString()">{{ stats.jobs_failed|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Jobs Failed</p>
-  </div>
-  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:4" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3"><i data-lucide="scroll-text" class="w-4 h-4 text-emerald-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.logs_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.logs_24h|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Logs 24h</p>
-  </div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 stagger-children">
+  {% include "components/_admin_kpi_card.html" with icon="users" color="blue" value=stats.accounts label="Accounts" stagger=0 %}
+  {% include "components/_admin_kpi_card.html" with icon="calendar" color="violet" value=stats.plans label="Plans" stagger=1 %}
+  {% include "components/_admin_kpi_card.html" with icon="clock" color="amber" value=stats.jobs_pending label="Jobs Pending" stagger=2 %}
+  {% include "components/_admin_kpi_card.html" with icon="alert-triangle" color="red" value=stats.jobs_failed label="Jobs Failed" stagger=3 %}
+  {% include "components/_admin_kpi_card.html" with icon="scroll-text" color="emerald" value=stats.logs_24h label="Logs 24h" stagger=4 %}
+  {% include "components/_admin_kpi_card.html" with icon="video" color="pink" value=stats.video_scripts label="Video Scripts" stagger=5 %}
 </div>
 
 {% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
@@ -45,55 +26,137 @@
     <button @click="tab='plans'" :class="tab==='plans' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Plans</button>
     <button @click="tab='jobs'" :class="tab==='jobs' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Jobs</button>
     <button @click="tab='logs'" :class="tab==='logs' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Logs</button>
+    <button @click="tab='video'" :class="tab==='video' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Video Scripts</button>
   </div>
   <div x-show="tab==='accounts'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Platform</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for a in accounts %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ a.platform }}</span></td><td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ a.name }}</td><td class="py-3 px-4 text-center">{% if a.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ a.created_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No accounts</td></tr>{% endfor %}</tbody>
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Account</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th><th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">{% for a in accounts %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ a.get_channel_display }}</span></td>
+          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ a.account_name|default:"—" }}</td>
+          <td class="py-3 px-4 text-center">{% if a.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ a.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-right">
+            <form method="post" class="inline">{% csrf_token %}
+              <input type="hidden" name="account_id" value="{{ a.pk }}">
+              {% if a.is_active %}
+              <button type="submit" name="action" value="disable_account" class="text-xs text-amber-400 hover:underline">Disable</button>
+              {% else %}
+              <button type="submit" name="action" value="enable_account" class="text-xs text-emerald-400 hover:underline">Enable</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No accounts configured</p></td></tr>{% endfor %}</tbody>
       </table>
+      </div>
     </div>
   </div>
   <div x-show="tab==='plans'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Schedule</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for p in plans %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ p.name }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.schedule }}</td><td class="py-3 px-4 text-center">{% if p.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td></tr>{% empty %}<tr><td colspan="3" class="py-8 text-center text-[var(--color-text-muted)]">No plans</td></tr>{% endfor %}</tbody>
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channels</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Scheduled</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">{% for p in plans %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[200px]">{{ p.post.title|default:p.post_id|truncatechars:40 }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.channels|join:", "|truncatechars:30 }}</td>
+          <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if p.status == 'sent' %}bg-emerald-500/10 text-emerald-400{% elif p.status == 'failed' %}bg-red-500/10 text-red-400{% elif p.status == 'pending' %}bg-amber-500/10 text-amber-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ p.get_status_display }}</span></td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.schedule_at|default:"Immediate" }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.created_at|timesince }} ago</td>
+        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="calendar" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No distribution plans</p></td></tr>{% endfor %}</tbody>
       </table>
+      </div>
     </div>
   </div>
   <div x-show="tab==='jobs'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Plan</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Started</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Error</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for j in jobs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ j.plan_name|default:j.plan_id }}</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if j.status == 'completed' %}bg-emerald-500/10 text-emerald-400{% elif j.status == 'failed' %}bg-red-500/10 text-red-400{% elif j.status == 'pending' %}bg-amber-500/10 text-amber-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ j.status }}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ j.started_at|timesince }} ago</td><td class="py-3 px-4 text-xs text-red-400 truncate max-w-[200px]">{{ j.error_message|default:"-" }}</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No jobs</td></tr>{% endfor %}</tbody>
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Attempts</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Error</th><th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">{% for j in jobs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ j.get_channel_display }}</span></td>
+          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[160px]">{{ j.post.title|default:j.post_id|truncatechars:30 }}</td>
+          <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if j.status == 'sent' %}bg-emerald-500/10 text-emerald-400{% elif j.status == 'failed' %}bg-red-500/10 text-red-400{% elif j.status == 'pending' %}bg-amber-500/10 text-amber-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ j.get_status_display }}</span></td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ j.attempt_count }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ j.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-red-400 truncate max-w-[200px]">{{ j.last_error|default:"—" }}</td>
+          <td class="py-3 px-4 text-right">
+            {% if j.status == 'failed' %}
+            <form method="post" class="inline">{% csrf_token %}
+              <input type="hidden" name="job_id" value="{{ j.pk }}">
+              <button type="submit" name="action" value="retry_job" class="text-xs text-[var(--color-accent)] hover:underline mr-2">Retry</button>
+              <button type="submit" name="action" value="cancel_job" class="text-xs text-red-400 hover:underline">Cancel</button>
+            </form>
+            {% elif j.status == 'pending' %}
+            <form method="post" class="inline">{% csrf_token %}
+              <input type="hidden" name="job_id" value="{{ j.pk }}">
+              <button type="submit" name="action" value="cancel_job" class="text-xs text-red-400 hover:underline">Cancel</button>
+            </form>
+            {% else %}—{% endif %}
+          </td>
+        </tr>{% empty %}<tr><td colspan="7" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="send" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No distribution jobs</p></td></tr>{% endfor %}</tbody>
       </table>
-      {% if jobs_page and jobs_page.has_other_pages %}
-      <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-        <span class="text-xs text-[var(--color-text-muted)]">{{ jobs_page.paginator.count }} total &middot; Page {{ jobs_page.number }} of {{ jobs_page.paginator.num_pages }}</span>
-        <div class="flex items-center gap-1">
-          {% if jobs_page.has_previous %}<a href="?page={{ jobs_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-          {% if jobs_page.has_next %}<a href="?page={{ jobs_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
-        </div>
       </div>
-      {% endif %}
     </div>
   </div>
   <div x-show="tab==='logs'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Platform</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Action</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Time</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for l in logs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ l.platform }}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-primary)]">{{ l.action }}</td><td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if l.success %}bg-emerald-500/10 text-emerald-400{% else %}bg-red-500/10 text-red-400{% endif %}">{% if l.success %}ok{% else %}fail{% endif %}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ l.created_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No logs</td></tr>{% endfor %}</tbody>
+        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Job</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Level</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Message</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Response</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Time</th></tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">{% for l in logs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">#{{ l.job_id }}</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if l.level == 'error' %}bg-red-500/10 text-red-400{% elif l.level == 'warning' %}bg-amber-500/10 text-amber-400{% else %}bg-emerald-500/10 text-emerald-400{% endif %}">{{ l.level }}</span></td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-primary)] truncate max-w-[300px]">{{ l.message|truncatechars:80 }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ l.response_code|default:"—" }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ l.created_at|timesince }} ago</td>
+        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No logs in last 24h</p></td></tr>{% endfor %}</tbody>
       </table>
-      {% if logs_page and logs_page.has_other_pages %}
-      <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-        <span class="text-xs text-[var(--color-text-muted)]">{{ logs_page.paginator.count }} total &middot; Page {{ logs_page.number }} of {{ logs_page.paginator.num_pages }}</span>
-        <div class="flex items-center gap-1">
-          {% if logs_page.has_previous %}<a href="?page={{ logs_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-          {% if logs_page.has_next %}<a href="?page={{ logs_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
-        </div>
       </div>
-      {% endif %}
+    </div>
+  </div>
+  <div x-show="tab==='video'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-[var(--color-border)]/20 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+          <i data-lucide="video" class="w-4 h-4 text-[var(--color-accent)]"></i> Video Scripts
+        </h3>
+        <form method="post" class="flex items-center gap-2">{% csrf_token %}
+          <input type="number" name="post_id" placeholder="Post ID" class="w-24 px-2 py-1 rounded text-xs bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] border border-[var(--color-border)]/30">
+          <button type="submit" name="action" value="generate_video" class="px-3 py-1 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press">Generate</button>
+        </form>
+      </div>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Title</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Scenes</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Duration</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Generated</th>
+        </tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for v in video_scripts %}
+          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[160px]">{{ v.post.title|truncatechars:30 }}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/10 text-pink-400">{{ v.get_channel_display }}</span></td>
+            <td class="py-3 px-4 text-xs text-[var(--color-text-primary)]">{{ v.payload.title|default:"—"|truncatechars:40 }}</td>
+            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ v.payload.scenes|length|default:"0" }}</td>
+            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ v.payload.duration_seconds|default:"—" }}s</td>
+            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ v.generated_at|timesince }} ago</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">
+            <i data-lucide="video" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+            <p>No video scripts generated yet</p>
+            <p class="text-[10px] mt-1">Enter a Post ID and click Generate to create AI video scripts</p>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
     </div>
   </div>
 </div>

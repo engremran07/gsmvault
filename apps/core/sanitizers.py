@@ -228,7 +228,7 @@ ALLOWED_CONTENT_TAGS = [
 
 ALLOWED_CONTENT_ATTRS = {
     "*": ["class", "id", "title", "lang", "dir"],
-    "a": ["href", "target", "rel", "title", "download"],
+    "a": ["href", "target", "title", "download"],
     "img": ["src", "alt", "width", "height", "loading", "srcset", "sizes"],
     "iframe": [
         "src",
@@ -303,10 +303,13 @@ def sanitize_html_content(content: str | None) -> str:
             attrs[tag] = set(attr_list)
 
     # nh3 uses url_schemes instead of protocols
+    # Note: nh3 manages `rel` on <a> tags internally via link_rel — never
+    # include "rel" in tag_attributes or ammonia will panic.
     return nh3.clean(
         content,
         tags=tags,
         attributes=attrs,
+        link_rel="nofollow noopener",
         url_schemes=set(ALLOWED_PROTOCOLS),
         strip_comments=True,
     )

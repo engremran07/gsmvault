@@ -1,6 +1,7 @@
 {# templates/base/_messages.html — Toast notification system #}{# Handles: Django messages framework + Alpine.js $store.notify toasts #}{# ── Toast Container (Alpine-driven, always present) ── #}<div id="toast-container"
      class="fixed right-4 z-[60] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
      style="top: calc(var(--nav-height, 4rem) + 1rem);"
+     x-cloak
      x-data
      x-init="if (!Alpine.store('notify')) { Alpine.store('notify', { items: [], icon() { return 'info'; } }) }">
 

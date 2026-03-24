@@ -15,6 +15,7 @@ import logging
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpRequest, HttpResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
 from .views_shared import (
@@ -1027,6 +1028,502 @@ def admin_suite_credit_pricing(request: HttpRequest) -> HttpResponse:
     )
 
 
+# =============================================================================
+# SHOP — OVERVIEW / PACKAGE TIERS / ORDERS / SUBSCRIPTIONS / USER PACKAGES
+# =============================================================================
+
+
+@staff_member_required
+def admin_suite_shop(request: HttpRequest) -> HttpResponse:
+    """Shop overview dashboard with KPIs."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.shop.services import get_shop_stats
+
+    stats = get_shop_stats()
+
+    return _render_admin(
+        request,
+        "admin_suite/shop_overview.html",
+        {"stats": stats},
+        nav_active="shop",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Shop", None),
+        ),
+        subtitle="Shop & Packages Dashboard",
+    )
+
+
+@csrf_protect
+@staff_member_required
+def admin_suite_shop_packages(request: HttpRequest) -> HttpResponse:
+    """Package tier management — list, create, edit, toggle."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from decimal import Decimal, InvalidOperation
+
+    from apps.shop.models import PackageTier
+
+    message = ""
+    msg_type = ""
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "toggle_tier":
+            tier_id = request.POST.get("tier_id")
+            try:
+                tier = PackageTier.objects.get(pk=tier_id)
+                tier.is_active = not tier.is_active
+                tier.save(update_fields=["is_active"])
+                state = "activated" if tier.is_active else "deactivated"
+                message = f"Package '{tier.name}' {state}."
+                msg_type = "success"
+            except PackageTier.DoesNotExist:
+                message = "Package tier not found."
+                msg_type = "error"
+
+        elif action == "save_tier":
+            tier_id = request.POST.get("tier_id")
+            try:
+                if tier_id:
+                    tier = PackageTier.objects.get(pk=tier_id)
+                else:
+                    tier = PackageTier()
+
+                # String fields
+                tier.name = (request.POST.get("name") or "").strip()
+                tier.slug = (request.POST.get("slug") or "").strip()
+                tier.tier_level = request.POST.get("tier_level", "free")
+                tier.description = (request.POST.get("description") or "").strip()
+                tier.badge_color = (request.POST.get("badge_color") or "blue").strip()
+                tier.badge_icon = (request.POST.get("badge_icon") or "package").strip()
+
+                # Decimal fields
+                decimal_fields = [
+                    "price_monthly",
+                    "price_quarterly",
+                    "price_yearly",
+                    "price_lifetime",
+                    "credit_price",
+                ]
+                for fname in decimal_fields:
+                    raw = (request.POST.get(fname) or "0").strip()
+                    try:
+                        setattr(tier, fname, Decimal(raw))
+                    except (InvalidOperation, ValueError):
+                        message = f"Invalid decimal for {fname}: {raw}"
+                        msg_type = "error"
+                        break
+
+                # Integer fields
+                if not message:
+                    int_fields = [
+                        "trial_days",
+                        "daily_download_limit",
+                        "monthly_download_limit",
+                        "max_file_size_mb",
+                        "daily_bandwidth_mb",
+                        "monthly_bandwidth_mb",
+                        "max_download_speed_kbps",
+                        "max_concurrent_downloads",
+                        "cooldown_seconds",
+                        "sort_order",
+                    ]
+                    for fname in int_fields:
+                        raw = (request.POST.get(fname) or "0").strip()
+                        try:
+                            setattr(tier, fname, int(raw))
+                        except ValueError:
+                            message = f"Invalid integer for {fname}: {raw}"
+                            msg_type = "error"
+                            break
+
+                # Boolean fields
+                if not message:
+                    bool_fields = [
+                        "ad_free",
+                        "priority_queue",
+                        "resume_support",
+                        "api_access",
+                        "early_access",
+                        "direct_links",
+                        "access_official",
+                        "access_engineering",
+                        "access_readback",
+                        "access_modified",
+                        "is_active",
+                        "is_default",
+                        "is_featured",
+                    ]
+                    for fname in bool_fields:
+                        setattr(tier, fname, request.POST.get(fname) == "on")
+
+                if not message:
+                    tier.save()
+                    verb = "updated" if tier_id else "created"
+                    message = f"Package '{tier.name}' {verb} successfully."
+                    msg_type = "success"
+            except PackageTier.DoesNotExist:
+                message = "Package tier not found."
+                msg_type = "error"
+            except Exception as exc:
+                message = f"Error saving tier: {exc}"
+                msg_type = "error"
+
+    tiers = PackageTier.objects.all().order_by("sort_order", "price_monthly")
+
+    return _render_admin(
+        request,
+        "admin_suite/shop_packages.html",
+        {
+            "tiers": tiers,
+            "tier_levels": PackageTier.TierLevel.choices,
+            "message": message,
+            "msg_type": msg_type,
+        },
+        nav_active="shop_packages",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Shop", "admin_suite:shop"),
+            ("Packages", None),
+        ),
+        subtitle="Package Tier Management",
+    )
+
+
+@staff_member_required
+def admin_suite_shop_orders(request: HttpRequest) -> HttpResponse:
+    """Order management list for admin."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.shop.models import Order
+    from apps.shop.services import get_order_list
+
+    search = _admin_search(request)
+    status_filter = request.GET.get("status", "")
+    qs = get_order_list(search=search, status_filter=status_filter)
+    qs, sort_field, sort_dir = _admin_sort(
+        request,
+        qs,
+        {
+            "date": "created_at",
+            "total": "total",
+            "status": "status",
+            "user": "user__email",
+        },
+        default_sort="-created_at",
+    )
+    page = _admin_paginate(request, qs, per_page=25)
+
+    return _render_admin(
+        request,
+        "admin_suite/shop_orders.html",
+        {
+            "orders": page,
+            "search": search,
+            "status_filter": status_filter,
+            "status_choices": Order.Status.choices,
+            "sort_field": sort_field,
+            "sort_dir": sort_dir,
+        },
+        nav_active="shop_orders",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Shop", "admin_suite:shop"),
+            ("Orders", None),
+        ),
+        subtitle="Order Management",
+    )
+
+
+@staff_member_required
+def admin_suite_shop_subscriptions(request: HttpRequest) -> HttpResponse:
+    """Subscription list for admin."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.shop.models import Subscription
+    from apps.shop.services import get_subscription_list
+
+    search = _admin_search(request)
+    status_filter = request.GET.get("status", "")
+    qs = get_subscription_list(search=search, status_filter=status_filter)
+    qs, sort_field, sort_dir = _admin_sort(
+        request,
+        qs,
+        {
+            "date": "started_at",
+            "status": "status",
+            "user": "user__email",
+            "plan": "plan__name",
+        },
+        default_sort="-started_at",
+    )
+    page = _admin_paginate(request, qs, per_page=25)
+
+    return _render_admin(
+        request,
+        "admin_suite/shop_subscriptions.html",
+        {
+            "subscriptions": page,
+            "search": search,
+            "status_filter": status_filter,
+            "status_choices": Subscription.Status.choices,
+            "sort_field": sort_field,
+            "sort_dir": sort_dir,
+        },
+        nav_active="shop_subscriptions",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Shop", "admin_suite:shop"),
+            ("Subscriptions", None),
+        ),
+        subtitle="Subscription Management",
+    )
+
+
+@staff_member_required
+def admin_suite_shop_user_packages(request: HttpRequest) -> HttpResponse:
+    """User package assignment list for admin."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.shop.models import UserPackage
+    from apps.shop.services import get_user_package_list
+
+    search = _admin_search(request)
+    status_filter = request.GET.get("status", "")
+    qs = get_user_package_list(search=search, status_filter=status_filter)
+    qs, sort_field, sort_dir = _admin_sort(
+        request,
+        qs,
+        {
+            "date": "started_at",
+            "status": "status",
+            "user": "user__email",
+            "package": "package__name",
+        },
+        default_sort="-started_at",
+    )
+    page = _admin_paginate(request, qs, per_page=25)
+
+    return _render_admin(
+        request,
+        "admin_suite/shop_user_packages.html",
+        {
+            "user_packages": page,
+            "search": search,
+            "status_filter": status_filter,
+            "status_choices": UserPackage.Status.choices,
+            "sort_field": sort_field,
+            "sort_dir": sort_dir,
+        },
+        nav_active="shop_user_packages",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Shop", "admin_suite:shop"),
+            ("User Packages", None),
+        ),
+        subtitle="User Package Assignments",
+    )
+
+
+# =============================================================================
+# MARKETPLACE — OVERVIEW / SELLERS / LISTINGS / VERIFICATIONS
+# =============================================================================
+
+
+@staff_member_required
+def admin_suite_marketplace(request: HttpRequest) -> HttpResponse:
+    """Marketplace overview dashboard."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.marketplace.services import get_marketplace_stats
+
+    stats = get_marketplace_stats()
+
+    return _render_admin(
+        request,
+        "admin_suite/marketplace_overview.html",
+        {"stats": stats},
+        nav_active="marketplace",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Marketplace", None),
+        ),
+        subtitle="Marketplace Dashboard",
+    )
+
+
+@staff_member_required
+def admin_suite_marketplace_sellers(request: HttpRequest) -> HttpResponse:
+    """Seller management list."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.marketplace.services import get_seller_list
+
+    search = _admin_search(request)
+    verified_filter = request.GET.get("verified", "")
+    qs = get_seller_list(search=search, verified_filter=verified_filter)
+    qs, sort_field, sort_dir = _admin_sort(
+        request,
+        qs,
+        {
+            "name": "display_name",
+            "sales": "total_sales",
+            "rating": "rating",
+            "date": "created_at",
+        },
+        default_sort="-total_sales",
+    )
+    page = _admin_paginate(request, qs, per_page=25)
+
+    return _render_admin(
+        request,
+        "admin_suite/marketplace_sellers.html",
+        {
+            "sellers": page,
+            "search": search,
+            "verified_filter": verified_filter,
+            "sort_field": sort_field,
+            "sort_dir": sort_dir,
+        },
+        nav_active="marketplace_sellers",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Marketplace", "admin_suite:marketplace"),
+            ("Sellers", None),
+        ),
+        subtitle="Seller Management",
+    )
+
+
+@staff_member_required
+def admin_suite_marketplace_listings(request: HttpRequest) -> HttpResponse:
+    """Listing management view."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.marketplace.services import get_listing_list
+
+    search = _admin_search(request)
+    status_filter = request.GET.get("status", "")
+    qs = get_listing_list(search=search, status_filter=status_filter)
+    qs, sort_field, sort_dir = _admin_sort(
+        request,
+        qs,
+        {
+            "title": "title",
+            "price": "price",
+            "sales": "sale_count",
+            "views": "view_count",
+            "date": "created_at",
+        },
+        default_sort="-created_at",
+    )
+    page = _admin_paginate(request, qs, per_page=25)
+
+    return _render_admin(
+        request,
+        "admin_suite/marketplace_listings.html",
+        {
+            "listings": page,
+            "search": search,
+            "status_filter": status_filter,
+            "sort_field": sort_field,
+            "sort_dir": sort_dir,
+        },
+        nav_active="marketplace_listings",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Marketplace", "admin_suite:marketplace"),
+            ("Listings", None),
+        ),
+        subtitle="Listing Management",
+    )
+
+
+@csrf_protect
+@staff_member_required
+def admin_suite_marketplace_verifications(request: HttpRequest) -> HttpResponse:
+    """Seller verification requests — approve/reject."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.marketplace.models import SellerVerification
+    from apps.marketplace.services import get_verification_list
+
+    message = ""
+    msg_type = ""
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        ver_id = request.POST.get("verification_id")
+
+        if action in ("approve", "reject") and ver_id:
+            try:
+                ver = SellerVerification.objects.select_related("seller").get(pk=ver_id)
+                if action == "approve":
+                    ver.status = "approved"
+                    ver.reviewed_at = timezone.now()
+                    ver.reviewer = request.user
+                    ver.save(update_fields=["status", "reviewed_at", "reviewer"])
+                    ver.seller.verified = True
+                    ver.seller.save(update_fields=["verified"])
+                    message = f"Seller '{ver.seller}' approved."
+                    msg_type = "success"
+                else:
+                    ver.status = "rejected"
+                    ver.reviewed_at = timezone.now()
+                    ver.reviewer = request.user
+                    notes = (request.POST.get("notes") or "").strip()
+                    if notes:
+                        ver.notes = notes
+                    ver.save(
+                        update_fields=[
+                            "status",
+                            "reviewed_at",
+                            "reviewer",
+                            "notes",
+                        ]
+                    )
+                    message = f"Verification for '{ver.seller}' rejected."
+                    msg_type = "warning"
+            except SellerVerification.DoesNotExist:
+                message = "Verification request not found."
+                msg_type = "error"
+
+    status_filter = request.GET.get("status", "")
+    qs = get_verification_list(status_filter=status_filter)
+    page = _admin_paginate(request, qs, per_page=25)
+
+    return _render_admin(
+        request,
+        "admin_suite/marketplace_verifications.html",
+        {
+            "verifications": page,
+            "status_filter": status_filter,
+            "status_choices": SellerVerification.Status.choices,
+            "message": message,
+            "msg_type": msg_type,
+        },
+        nav_active="marketplace_verifications",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Marketplace", "admin_suite:marketplace"),
+            ("Verifications", None),
+        ),
+        subtitle="Seller Verification Requests",
+    )
+
+
 __all__ = [
     # AI Extended
     "admin_suite_ai_endpoints",
@@ -1045,4 +1542,15 @@ __all__ = [
     # i18n
     "admin_suite_i18n",
     "admin_suite_i18n_translations",
+    # Shop
+    "admin_suite_shop",
+    "admin_suite_shop_packages",
+    "admin_suite_shop_orders",
+    "admin_suite_shop_subscriptions",
+    "admin_suite_shop_user_packages",
+    # Marketplace
+    "admin_suite_marketplace",
+    "admin_suite_marketplace_sellers",
+    "admin_suite_marketplace_listings",
+    "admin_suite_marketplace_verifications",
 ]

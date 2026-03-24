@@ -4,7 +4,7 @@ from .models import Listing, SellerProfile, SellerVerification
 
 
 @admin.register(SellerProfile)
-class SellerProfileAdmin(admin.ModelAdmin):
+class SellerProfileAdmin(admin.ModelAdmin[SellerProfile]):
     list_display = [
         "user",
         "display_name",
@@ -17,13 +17,13 @@ class SellerProfileAdmin(admin.ModelAdmin):
 
 
 @admin.register(SellerVerification)
-class SellerVerificationAdmin(admin.ModelAdmin):
+class SellerVerificationAdmin(admin.ModelAdmin[SellerVerification]):
     list_display = ["seller", "document_type", "status", "submitted_at"]
     list_filter = ["status", "document_type"]
 
 
 @admin.register(Listing)
-class ListingAdmin(admin.ModelAdmin):
+class ListingAdmin(admin.ModelAdmin[Listing]):
     list_display = [
         "title",
         "seller",

@@ -25,5 +25,3 @@ class CSPNonceMiddleware(MiddlewareMixin):
         # Generate cryptographically secure random nonce
         nonce = secrets.token_urlsafe(16)
         request.csp_nonce = nonce
-
-    # No process_response needed - SecurityHeadersMiddleware handles CSP headers

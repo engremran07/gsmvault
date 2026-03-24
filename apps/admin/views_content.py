@@ -56,9 +56,7 @@ class PageForm(forms.ModelForm):  # noqa: F405
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        base_class = (
-            "border border-slate-300 rounded px-2 py-1 w-full bg-white text-slate-900"
-        )
+        base_class = "rounded px-2 py-1 w-full bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
         for name, field in self.fields.items():
             if name == "include_in_sitemap":
                 continue
@@ -211,55 +209,55 @@ def admin_suite_blog(request: HttpRequest) -> HttpResponse:  # noqa: F405
                 "publish_at": forms.DateTimeInput(  # noqa: F405
                     attrs={
                         "type": "datetime-local",
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900",
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors",
                     }
                 ),
                 "summary": forms.Textarea(  # noqa: F405
                     attrs={
                         "rows": 2,
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900",
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors",
                     }
                 ),
                 "body": forms.Textarea(  # noqa: F405
                     attrs={
                         "rows": 8,
-                        "class": "w-full border rounded px-2 py-2 bg-white text-slate-900",
+                        "class": "w-full rounded px-2 py-2 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors",
                     }
                 ),
                 "title": forms.TextInput(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "slug": forms.TextInput(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "seo_title": forms.TextInput(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "seo_description": forms.Textarea(  # noqa: F405
                     attrs={
                         "rows": 2,
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900",
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors",
                     }
                 ),
                 "canonical_url": forms.URLInput(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "status": forms.Select(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "category": forms.Select(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "featured": forms.CheckboxInput(  # noqa: F405
@@ -407,17 +405,17 @@ def admin_suite_blog_categories(request: HttpRequest) -> HttpResponse:  # noqa: 
             widgets = {
                 "name": forms.TextInput(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "slug": forms.TextInput(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
                 "parent": forms.Select(  # noqa: F405
                     attrs={
-                        "class": "w-full border rounded px-2 py-1 bg-white text-slate-900"
+                        "class": "w-full rounded px-2 py-1 bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"
                     }
                 ),
             }
@@ -682,139 +680,20 @@ def admin_suite_ai(request: HttpRequest) -> HttpResponse:  # noqa: F405
 
 @staff_member_required  # noqa: F405
 def admin_suite_distribution(request: HttpRequest) -> HttpResponse:  # noqa: F405
-    """Distribution overview."""
-    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
-        raise _ADMIN_DISABLED  # noqa: F405
+    """Distribution overview — delegates to views_distribution module."""
+    from apps.admin.views_distribution import admin_suite_distribution as _dist_view
 
-    stats = {
-        "accounts": 0,
-        "plans": 0,
-        "jobs_pending": 0,
-        "jobs_failed": 0,
-        "logs_24h": 0,
-    }
-    accounts: list[dict[str, Any]] = []  # noqa: F405
-    plans: list[dict[str, Any]] = []  # noqa: F405
-    message = ""
+    return _dist_view(request)
 
-    if request.method == "POST":
-        action = request.POST.get("action")
-        try:
-            from apps.distribution.models import ShareJob, SharePlan, SocialAccount
 
-            if action == "disable_account":
-                aid = request.POST.get("account_id")
-                SocialAccount.objects.filter(pk=aid).update(is_active=False)
-                message = "Account disabled."
-            elif action == "enable_account":
-                aid = request.POST.get("account_id")
-                SocialAccount.objects.filter(pk=aid).update(is_active=True)
-                message = "Account enabled."
-            elif action == "save_account":
-                aid = request.POST.get("account_id")
-                fields = {
-                    "channel": (request.POST.get("channel") or "")[:50],
-                    "account_name": (request.POST.get("account_name") or "")[:255],
-                    "is_active": bool(request.POST.get("is_active")),
-                }
-                if aid:
-                    SocialAccount.objects.filter(pk=aid).update(**fields)
-                else:
-                    SocialAccount.objects.create(**fields)
-                message = "Account saved."
-            elif action == "save_plan":
-                pid = request.POST.get("plan_id")
-                fields = {
-                    "name": (request.POST.get("name") or "")[:255],
-                    "description": (request.POST.get("description") or "")[:500],
-                    "is_active": bool(request.POST.get("is_active")),
-                }
-                if pid:
-                    SharePlan.objects.filter(pk=pid).update(**fields)
-                else:
-                    SharePlan.objects.create(**fields)
-                message = "Plan saved."
-            elif action == "retry_job":
-                jid = request.POST.get("job_id")
-                ShareJob.objects.filter(pk=jid).update(status="pending", last_error="")
-                message = "Job retried."
-            elif action == "delete_job":
-                jid = request.POST.get("job_id")
-                ShareJob.objects.filter(pk=jid).delete()
-                message = "Job deleted."
-        except Exception as exc:
-            logger.warning("Admin suite distribution toggle failed: %s", exc)  # noqa: F405
-            message = "Action failed."
-
+def _get_ad_network_types() -> list[tuple[str, str]]:
+    """Return AdNetwork.NETWORK_TYPES choices for the template."""
     try:
-        from django.utils import timezone
+        from apps.ads.models import AdNetwork
 
-        from apps.distribution.models import (
-            ShareJob,
-            ShareLog,
-            SharePlan,
-            SocialAccount,
-        )
-
-        stats["accounts"] = SocialAccount.objects.count()
-        stats["plans"] = SharePlan.objects.count()
-        stats["jobs_pending"] = ShareJob.objects.filter(status="pending").count()
-        stats["jobs_failed"] = ShareJob.objects.filter(status="failed").count()
-
-        since = timezone.now() - timedelta(hours=24)
-        stats["logs_24h"] = ShareLog.objects.filter(created_at__gte=since).count()
-
-        q = _admin_search(request)
-        account_qs = SocialAccount.objects.order_by("channel", "account_name")
-        plan_qs = SharePlan.objects.order_by("-created_at")
-        jobs_qs = ShareJob.objects.order_by("-created_at")
-        logs_qs = ShareLog.objects.order_by("-created_at")
-        if q:
-            from django.db.models import Q
-
-            account_qs = account_qs.filter(
-                Q(channel__icontains=q) | Q(account_name__icontains=q)
-            )
-            plan_qs = plan_qs.filter(Q(name__icontains=q) | Q(description__icontains=q))
-            jobs_qs = jobs_qs.filter(Q(channel__icontains=q) | Q(status__icontains=q))
-            logs_qs = logs_qs.filter(Q(level__icontains=q) | Q(message__icontains=q))
-
-        accounts = list(
-            account_qs[:20].values(
-                "id", "channel", "account_name", "is_active", "token_expires_at"
-            )
-        )
-        plans = list(
-            plan_qs[:20].values("id", "name", "description", "is_active", "created_at")
-        )
-        jobs_page = _admin_paginate(request, jobs_qs, per_page=10)
-        logs_page = _admin_paginate(request, logs_qs, per_page=10)
-    except Exception as exc:
-        logger.debug("Admin suite distribution snapshot failed: %s", exc)  # noqa: F405
-        q = ""
-        jobs_page = None
-        logs_page = None
-
-    return _render_admin(
-        request,
-        "admin_suite/distribution.html",
-        {
-            "stats": stats,
-            "accounts": accounts,
-            "plans": plans,
-            "jobs": jobs_page,
-            "jobs_page": jobs_page,
-            "logs": logs_page,
-            "logs_page": logs_page,
-            "message": message,
-            "q": q,
-        },
-        nav_active="distribution",
-        breadcrumb=_make_breadcrumb(
-            ("Admin Home", "admin_suite:admin_suite"), ("Distribution", None)
-        ),
-        subtitle="Accounts, plans, jobs, and logs",
-    )
+        return list(AdNetwork.NETWORK_TYPES)
+    except Exception:
+        return []
 
 
 @staff_member_required  # noqa: F405
@@ -833,7 +712,7 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
     if request.method == "POST":
         action = request.POST.get("action")
         try:
-            from apps.ads.models import AdCreative, AdPlacement
+            from apps.ads.models import AdCreative, AdNetwork, AdPlacement
 
             if action == "disable_placement":
                 pid = request.POST.get("placement_id")
@@ -872,6 +751,33 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
                 else:
                     AdCreative.objects.create(**fields)
                 message = "Creative saved."
+            elif action == "save_network":
+                nid = request.POST.get("network_id")
+                fields = {
+                    "name": (request.POST.get("name") or "")[:100],
+                    "network_type": (request.POST.get("network_type") or "")[:30],
+                    "publisher_id": (request.POST.get("publisher_id") or "")[:100],
+                    "priority": int(request.POST.get("priority") or 10),
+                    "is_enabled": bool(request.POST.get("is_enabled")),
+                }
+                if nid:
+                    AdNetwork.objects.filter(pk=nid).update(**fields)
+                else:
+                    AdNetwork.objects.create(**fields)
+                message = "Network saved."
+            elif action == "enable_network":
+                nid = request.POST.get("network_id")
+                AdNetwork.objects.filter(pk=nid).update(is_enabled=True)
+            elif action == "disable_network":
+                nid = request.POST.get("network_id")
+                AdNetwork.objects.filter(pk=nid).update(is_enabled=False)
+            elif action == "trigger_scan":
+                from apps.ads.services.scanner import scan_templates_for_placements
+
+                scan_data = scan_templates_for_placements()
+                scanned = scan_data.get("scanned", 0)
+                created = scan_data.get("created", 0)
+                message = f"Scan complete: {scanned} public templates scanned, {created} new placements discovered."
         except Exception as exc:
             logger.warning("Admin suite ads toggle/save failed: %s", exc)  # noqa: F405
             message = "Action failed."
@@ -879,10 +785,11 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
     try:
         from django.utils import timezone
 
-        from apps.ads.models import AdCreative, AdEvent, AdPlacement
+        from apps.ads.models import AdCreative, AdEvent, AdNetwork, AdPlacement
 
         stats["placements"] = AdPlacement.objects.count()
         stats["creatives"] = AdCreative.objects.count()
+        stats["networks"] = AdNetwork.objects.filter(is_enabled=True).count()
         since = timezone.now() - timedelta(hours=24)
         stats["impressions_24h"] = AdEvent.objects.filter(
             event_type="impression", created_at__gte=since
@@ -894,6 +801,7 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
         q = _admin_search(request)
         placement_qs = AdPlacement.objects.all()
         creative_qs = AdCreative.objects.all()
+        network_qs = AdNetwork.objects.all()
         if q:
             from django.db.models import Q
 
@@ -904,6 +812,9 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
             )
             creative_qs = creative_qs.filter(
                 Q(name__icontains=q) | Q(creative_type__icontains=q)
+            )
+            network_qs = network_qs.filter(
+                Q(name__icontains=q) | Q(network_type__icontains=q)
             )
 
         placement_qs, sort_field, sort_dir = _admin_sort(
@@ -916,6 +827,9 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
         creatives_page = _admin_paginate(
             request, creative_qs.order_by("-updated_at"), per_page=20
         )
+        networks_page = _admin_paginate(
+            request, network_qs.order_by("-priority", "name"), per_page=20
+        )
     except Exception as exc:
         logger.debug("Admin suite ads snapshot failed: %s", exc)  # noqa: F405
         q = ""
@@ -923,6 +837,16 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
         sort_dir = "asc"
         placements_page = None
         creatives_page = None
+        networks_page = None
+
+    # Load recent auto-scan results
+    scan_results = []
+    try:
+        from apps.ads.models import AutoAdsScanResult
+
+        scan_results = list(AutoAdsScanResult.objects.order_by("-created_at")[:25])
+    except Exception:  # noqa: S110
+        pass
 
     return _render_admin(
         request,
@@ -933,6 +857,10 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
             "placements_page": placements_page,
             "creatives": creatives_page,
             "creatives_page": creatives_page,
+            "networks": networks_page,
+            "networks_page": networks_page,
+            "network_types": _get_ad_network_types(),
+            "scan_results": scan_results,
             "message": message,
             "q": q,
             "sort": sort_field,
@@ -1051,7 +979,14 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
     if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
         raise _ADMIN_DISABLED  # noqa: F405
 
-    stats = {"redirects": 0, "sitemap_urls": 0}
+    stats = {
+        "redirects": 0,
+        "sitemap_urls": 0,
+        "metadata": 0,
+        "entities": 0,
+        "schemas": 0,
+        "link_issues": 0,
+    }
     seo_settings: dict[str, Any] = {}  # noqa: F405
     message = ""
 
@@ -1107,11 +1042,21 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
             message = "Action failed."
 
     try:
-        from apps.seo.models import Redirect, SitemapEntry
+        from apps.seo.models import (
+            LinkableEntity,
+            Metadata,
+            Redirect,
+            SchemaEntry,
+            SitemapEntry,
+        )
         from apps.seo.models_settings import SeoAutomationSettings
 
         stats["redirects"] = Redirect.objects.count()
         stats["sitemap_urls"] = SitemapEntry.objects.count()
+        stats["metadata"] = Metadata.objects.count()
+        stats["entities"] = LinkableEntity.objects.count()
+        stats["schemas"] = SchemaEntry.objects.count()
+        stats["link_issues"] = SitemapEntry.objects.filter(last_status__gte=400).count()
 
         q = _admin_search(request)
 

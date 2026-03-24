@@ -64,7 +64,11 @@ class SellerVerification(models.Model):
         max_length=10, choices=Status.choices, default=Status.PENDING, db_index=True
     )
     reviewer = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="reviewed_verifications",
     )
     notes = models.TextField(blank=True, default="")
     submitted_at = models.DateTimeField(auto_now_add=True)

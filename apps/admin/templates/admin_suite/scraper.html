@@ -514,7 +514,7 @@
       {% endif %}
       {% for num in pending_devices_page.paginator.page_range %}
         {% if pending_devices_page.number == num %}
-        <span class="px-2.5 py-1.5 rounded-lg bg-[var(--color-accent)] text-white text-xs font-medium">{{ num }}</span>
+        <span class="px-2.5 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-medium">{{ num }}</span>
         {% elif num > pending_devices_page.number|add:"-3" and num < pending_devices_page.number|add:"4" %}
         <a href="?page={{ num }}{% if device_brand_filter %}&device_brand={{ device_brand_filter }}{% endif %}"
            class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">{{ num }}</a>

@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
-class PageView(models.Model):  # noqa: DJ008
+class PageView(models.Model):
     """Track page views for analytics"""
 
     path = models.CharField(
@@ -36,8 +36,11 @@ class PageView(models.Model):  # noqa: DJ008
         ]
         ordering = ["-created_at"]
 
+    def __str__(self) -> str:
+        return f"{self.path} ({self.created_at:%Y-%m-%d %H:%M})"
 
-class Event(models.Model):  # noqa: DJ008
+
+class Event(models.Model):
     """Track custom events for analytics"""
 
     EVENT_TYPES = [
@@ -85,8 +88,11 @@ class Event(models.Model):  # noqa: DJ008
         ]
         ordering = ["-created_at"]
 
+    def __str__(self) -> str:
+        return f"{self.event_type}: {self.event_name}"
 
-class DailyMetrics(models.Model):  # noqa: DJ008
+
+class DailyMetrics(models.Model):
     """Aggregated daily metrics"""
 
     date = models.DateField(unique=True, db_index=True)
@@ -123,8 +129,11 @@ class DailyMetrics(models.Model):  # noqa: DJ008
         ordering = ["-date"]
         verbose_name_plural = "Daily Metrics"
 
+    def __str__(self) -> str:
+        return f"Metrics {self.date}"
 
-class RealtimeMetrics(models.Model):  # noqa: DJ008
+
+class RealtimeMetrics(models.Model):
     """Real-time metrics snapshot (updated every minute)"""
 
     timestamp = models.DateTimeField(unique=True, db_index=True)
@@ -151,8 +160,11 @@ class RealtimeMetrics(models.Model):  # noqa: DJ008
         ordering = ["-timestamp"]
         verbose_name_plural = "Realtime Metrics"
 
+    def __str__(self) -> str:
+        return f"Realtime {self.timestamp:%Y-%m-%d %H:%M}"
 
-class UserAnalytics(models.Model):  # noqa: DJ008
+
+class UserAnalytics(models.Model):
     """Per-user analytics summary"""
 
     user = models.OneToOneField(
@@ -182,3 +194,6 @@ class UserAnalytics(models.Model):  # noqa: DJ008
     class Meta:
         db_table = "analytics_user_analytics"
         verbose_name_plural = "User Analytics"
+
+    def __str__(self) -> str:
+        return f"Analytics for {self.user}"

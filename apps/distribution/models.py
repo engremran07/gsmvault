@@ -106,6 +106,7 @@ class ContentVariant(models.Model):
         ("caption", "Caption"),
         ("tags", "Hashtags/Tags"),
         ("image_prompt", "Image prompt"),
+        ("video_script", "Video script"),
         ("thread", "Thread/long-form"),
         ("email", "Email"),
     )

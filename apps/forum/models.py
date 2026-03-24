@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
 from django.db.models import QuerySet
@@ -18,6 +20,18 @@ class TopicAction(models.IntegerChoices):
     UNCLOSED = 3, "Unclosed"
     PINNED = 4, "Pinned"
     UNPINNED = 5, "Unpinned"
+
+
+class TopicType(models.TextChoices):
+    """4PDA-style topic type classification."""
+
+    DISCUSSION = "discussion", "Discussion"
+    FIRMWARE = "firmware", "Firmware"
+    FAQ = "faq", "FAQ"
+    GUIDE = "guide", "Guide"
+    NEWS = "news", "News"
+    REVIEW = "review", "Review"
+    BUG_REPORT = "bug_report", "Bug Report"
 
 
 class NotifyFrequency(models.TextChoices):
@@ -144,15 +158,63 @@ class ForumTopic(models.Model):
         blank=True, default="", help_text="Rendered & sanitized HTML"
     )
 
+    # Thread prefix (vBulletin-style)
+    prefix = models.ForeignKey(
+        "ForumTopicPrefix",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="topics",
+    )
+
+    # 4PDA-style topic type
+    topic_type = models.CharField(
+        max_length=20,
+        choices=TopicType.choices,
+        default=TopicType.DISCUSSION,
+        help_text="4PDA-style topic classification",
+    )
+
+    # 4PDA wiki-style header post (шапка)
+    wiki_header = models.TextField(
+        blank=True, default="", help_text="Wiki-style editable header (Markdown)"
+    )
+    wiki_header_html = models.TextField(
+        blank=True, default="", help_text="Rendered wiki header HTML"
+    )
+    wiki_header_updated_at = models.DateTimeField(null=True, blank=True)
+    wiki_header_updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="forum_wiki_edits",
+    )
+
+    # 4PDA device linking
+    linked_device = models.ForeignKey(
+        "firmwares.Model",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="forum_topics",
+        help_text="4PDA-style device link for this topic",
+    )
+
     # Flags
     is_pinned = models.BooleanField(default=False)
     is_globally_pinned = models.BooleanField(default=False)
     is_closed = models.BooleanField(default=False)
     is_removed = models.BooleanField(default=False)
+    has_solution = models.BooleanField(
+        default=False, help_text="Has an accepted best answer"
+    )
 
     # Denormalised stats
     view_count = models.PositiveIntegerField(default=0)
     reply_count = models.PositiveIntegerField(default=0)
+    rating_score = models.FloatField(default=0.0, help_text="Average star rating")
+    rating_count = models.PositiveIntegerField(default=0)
     last_active = models.DateTimeField(auto_now_add=True)
     last_reply_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -231,6 +293,9 @@ class ForumReply(models.Model):
 
     # Denormalised
     likes_count = models.PositiveIntegerField(default=0)
+    reaction_count = models.PositiveIntegerField(
+        default=0, help_text="Total reactions (all types)"
+    )
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
@@ -611,6 +676,9 @@ class ForumAttachment(models.Model):
     filename = models.CharField(max_length=255)
     content_type = models.CharField(max_length=100, blank=True, default="")
     file_size = models.PositiveIntegerField(default=0, help_text="Bytes")
+    download_count = models.PositiveIntegerField(
+        default=0, help_text="4PDA-style download counter"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -673,3 +741,682 @@ class ForumFlag(models.Model):
     def __str__(self) -> str:
         target = f"topic {self.topic_id}" if self.topic_id else f"reply {self.reply_id}"  # type: ignore[attr-defined]
         return f"Flag on {target} by {self.user_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Trust Levels (Discourse-inspired auto-promotion system)
+# ---------------------------------------------------------------------------
+
+
+class TrustLevelChoices(models.IntegerChoices):
+    NEW_USER = 0, "New User"
+    BASIC = 1, "Basic"
+    MEMBER = 2, "Member"
+    REGULAR = 3, "Regular"
+    LEADER = 4, "Leader"
+
+
+class ForumTrustLevel(models.Model):
+    """Defines thresholds for automatic trust-level promotion."""
+
+    level = models.IntegerField(
+        choices=TrustLevelChoices.choices,
+        unique=True,
+    )
+    title = models.CharField(max_length=50, help_text="Display title for this level")
+    color = models.CharField(max_length=7, default="#6366f1", help_text="Badge colour")
+    min_topics_created = models.PositiveIntegerField(default=0)
+    min_replies_posted = models.PositiveIntegerField(default=0)
+    min_likes_received = models.PositiveIntegerField(default=0)
+    min_likes_given = models.PositiveIntegerField(default=0)
+    min_days_visited = models.PositiveIntegerField(default=0)
+    min_topics_read = models.PositiveIntegerField(default=0)
+    can_flag = models.BooleanField(default=False)
+    can_create_polls = models.BooleanField(default=False)
+    can_upload_attachments = models.BooleanField(default=False)
+    can_send_private_messages = models.BooleanField(default=False)
+    can_edit_own_posts = models.BooleanField(default=True)
+    max_daily_topics = models.PositiveIntegerField(default=5)
+    max_daily_replies = models.PositiveIntegerField(default=20)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["level"]
+        verbose_name = "Forum Trust Level"
+        verbose_name_plural = "Forum Trust Levels"
+        db_table = "forum_forumtrustlevel"
+
+    def __str__(self) -> str:
+        return f"Level {self.level}: {self.title}"
+
+
+# ---------------------------------------------------------------------------
+# Forum User Profile (per-user forum stats, signature, rank)
+# ---------------------------------------------------------------------------
+
+
+class ForumUserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_profile",
+    )
+    trust_level = models.IntegerField(
+        choices=TrustLevelChoices.choices,
+        default=TrustLevelChoices.NEW_USER,
+    )
+    custom_title = models.CharField(
+        max_length=100, blank=True, default="", help_text="Custom rank title"
+    )
+    signature = models.TextField(
+        blank=True, default="", help_text="Post signature (Markdown)"
+    )
+    signature_html = models.TextField(blank=True, default="")
+    website = models.URLField(blank=True, default="")
+    location = models.CharField(max_length=100, blank=True, default="")
+
+    # Denormalized stats
+    topic_count = models.PositiveIntegerField(default=0)
+    reply_count = models.PositiveIntegerField(default=0)
+    likes_received = models.PositiveIntegerField(default=0)
+    likes_given = models.PositiveIntegerField(default=0)
+    solutions_count = models.PositiveIntegerField(default=0)
+    days_visited = models.PositiveIntegerField(default=0)
+    topics_read = models.PositiveIntegerField(default=0)
+
+    # Reputation (vBulletin-style, earned from likes/solutions/activity)
+    reputation = models.IntegerField(default=0)
+
+    # Moderation
+    is_banned = models.BooleanField(default=False)
+    ban_reason = models.TextField(blank=True, default="")
+    ban_expires_at = models.DateTimeField(null=True, blank=True)
+    warning_level = models.PositiveIntegerField(default=0)
+
+    last_active_at = models.DateTimeField(null=True, blank=True)
+    last_posted_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Forum User Profile"
+        verbose_name_plural = "Forum User Profiles"
+        db_table = "forum_forumuserprofile"
+
+    def __str__(self) -> str:
+        return f"Forum profile: {self.user_id}"  # type: ignore[attr-defined]
+
+    @property
+    def display_title(self) -> str:
+        if self.custom_title:
+            return self.custom_title
+        return str(TrustLevelChoices(self.trust_level).label)
+
+    @property
+    def is_currently_banned(self) -> bool:
+        if not self.is_banned:
+            return False
+        if self.ban_expires_at and timezone.now() >= self.ban_expires_at:
+            return False
+        return True
+
+
+# ---------------------------------------------------------------------------
+# Reactions (XenForo-style — multiple reaction types beyond just "like")
+# ---------------------------------------------------------------------------
+
+
+class ForumReaction(models.Model):
+    """Defines available reaction types."""
+
+    name = models.CharField(max_length=50, unique=True)
+    emoji = models.CharField(max_length=10, help_text="Emoji character")
+    icon = models.CharField(
+        max_length=64, blank=True, default="", help_text="Lucide icon name"
+    )
+    score = models.IntegerField(
+        default=1, help_text="Reputation points awarded (+/- for negative)"
+    )
+    sort_order = models.PositiveIntegerField(default=0)
+    is_positive = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["sort_order"]
+        verbose_name = "Forum Reaction"
+        verbose_name_plural = "Forum Reactions"
+        db_table = "forum_forumreaction"
+
+    def __str__(self) -> str:
+        return f"{self.emoji} {self.name}"
+
+
+class ForumReplyReaction(models.Model):
+    """A user's reaction on a reply."""
+
+    reply = models.ForeignKey(
+        ForumReply,
+        on_delete=models.CASCADE,
+        related_name="reactions",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_reactions_given",
+    )
+    reaction = models.ForeignKey(
+        ForumReaction,
+        on_delete=models.CASCADE,
+        related_name="reply_reactions",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("reply", "user")]
+        verbose_name = "Forum Reply Reaction"
+        verbose_name_plural = "Forum Reply Reactions"
+        db_table = "forum_forumreplyreaction"
+
+    def __str__(self) -> str:
+        return f"{self.reaction} by {self.user_id} on reply {self.reply_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Topic Tags / Prefixes (Flarum tags + vBulletin thread prefixes)
+# ---------------------------------------------------------------------------
+
+
+class ForumTopicPrefix(models.Model):
+    """Thread prefix (e.g. [SOLVED], [HELP], [GUIDE], [ROM], [MOD])."""
+
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=60, unique=True)
+    color = models.CharField(max_length=7, default="#6366f1")
+    is_active = models.BooleanField(default=True)
+    # Categories that allow this prefix (blank = all)
+    categories = models.ManyToManyField(
+        ForumCategory,
+        blank=True,
+        related_name="allowed_prefixes",
+    )
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Forum Topic Prefix"
+        verbose_name_plural = "Forum Topic Prefixes"
+        db_table = "forum_forumtopicprefix"
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class ForumTopicTag(models.Model):
+    """Free-form tag on a topic for categorization and search."""
+
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="forum_tags",
+    )
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=60)
+
+    class Meta:
+        unique_together = [("topic", "slug")]
+        verbose_name = "Forum Topic Tag"
+        verbose_name_plural = "Forum Topic Tags"
+        db_table = "forum_forumtopictag"
+
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+# ---------------------------------------------------------------------------
+# Best Answer / Solution (XenForo / Stack Overflow style)
+# ---------------------------------------------------------------------------
+
+
+class ForumBestAnswer(models.Model):
+    """Marks a single reply as the accepted solution for a topic."""
+
+    topic = models.OneToOneField(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="best_answer",
+    )
+    reply = models.OneToOneField(
+        ForumReply,
+        on_delete=models.CASCADE,
+        related_name="is_best_answer",
+    )
+    marked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_solutions_marked",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Forum Best Answer"
+        verbose_name_plural = "Forum Best Answers"
+        db_table = "forum_forumbestanswer"
+
+    def __str__(self) -> str:
+        return f"Solution for topic {self.topic_id}: reply {self.reply_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Topic Rating (vBulletin star rating system)
+# ---------------------------------------------------------------------------
+
+
+class ForumTopicRating(models.Model):
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="ratings",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_topic_ratings",
+    )
+    score = models.PositiveSmallIntegerField(help_text="1 to 5 stars")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("topic", "user")]
+        verbose_name = "Forum Topic Rating"
+        verbose_name_plural = "Forum Topic Ratings"
+        db_table = "forum_forumtopicrating"
+
+    def __str__(self) -> str:
+        return f"{self.score}★ by {self.user_id} on topic {self.topic_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Warning System (vBulletin/XenForo moderation warnings)
+# ---------------------------------------------------------------------------
+
+
+class ForumWarning(models.Model):
+    class Severity(models.TextChoices):
+        MINOR = "minor", "Minor"
+        MODERATE = "moderate", "Moderate"
+        SERIOUS = "serious", "Serious"
+        FINAL = "final", "Final Warning"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_warnings",
+    )
+    issued_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_warnings_issued",
+    )
+    topic = models.ForeignKey(
+        ForumTopic,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="warnings",
+    )
+    reply = models.ForeignKey(
+        ForumReply,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="warnings",
+    )
+    severity = models.CharField(
+        max_length=10, choices=Severity.choices, default=Severity.MINOR
+    )
+    reason = models.TextField()
+    points = models.PositiveIntegerField(default=1, help_text="Warning points added")
+    expires_at = models.DateTimeField(
+        null=True, blank=True, help_text="Auto-expire date"
+    )
+    is_acknowledged = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Forum Warning"
+        verbose_name_plural = "Forum Warnings"
+        db_table = "forum_forumwarning"
+
+    def __str__(self) -> str:
+        return f"Warning ({self.severity}) to {self.user_id}"  # type: ignore[attr-defined]
+
+    @property
+    def is_active(self) -> bool:
+        if self.expires_at and timezone.now() >= self.expires_at:
+            return False
+        return True
+
+
+# ---------------------------------------------------------------------------
+# IP Ban (forum-level IP blocking)
+# ---------------------------------------------------------------------------
+
+
+class ForumIPBan(models.Model):
+    ip_address = models.GenericIPAddressField()
+    reason = models.TextField(blank=True, default="")
+    banned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_ip_bans_issued",
+    )
+    expires_at = models.DateTimeField(
+        null=True, blank=True, help_text="Permanent if null"
+    )
+    is_active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Forum IP Ban"
+        verbose_name_plural = "Forum IP Bans"
+        db_table = "forum_forumipban"
+        indexes = [
+            models.Index(fields=["ip_address", "is_active"], name="forum_ipban_ip"),
+        ]
+
+    def __str__(self) -> str:
+        return f"IP ban: {self.ip_address}"
+
+    @property
+    def is_currently_active(self) -> bool:
+        if not self.is_active:
+            return False
+        if self.expires_at and timezone.now() >= self.expires_at:
+            return False
+        return True
+
+
+# ---------------------------------------------------------------------------
+# Category Subscription (XenForo "Watch Forum")
+# ---------------------------------------------------------------------------
+
+
+class ForumCategorySubscription(models.Model):
+    category = models.ForeignKey(
+        ForumCategory,
+        on_delete=models.CASCADE,
+        related_name="category_subscriptions",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_category_subscriptions",
+    )
+    notify_new_topics = models.BooleanField(default=True)
+    notify_new_replies = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("category", "user")]
+        verbose_name = "Forum Category Subscription"
+        verbose_name_plural = "Forum Category Subscriptions"
+        db_table = "forum_forumcategorysubscription"
+
+    def __str__(self) -> str:
+        return f"{self.user_id} watches {self.category_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Who's Online (vBulletin-style online presence tracking)
+# ---------------------------------------------------------------------------
+
+
+class ForumOnlineUser(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_online",
+    )
+    last_seen = models.DateTimeField(auto_now=True)
+    location = models.CharField(
+        max_length=255, blank=True, default="", help_text="Current page description"
+    )
+
+    class Meta:
+        verbose_name = "Forum Online User"
+        verbose_name_plural = "Forum Online Users"
+        db_table = "forum_forumonlineuser"
+
+    def __str__(self) -> str:
+        return f"{self.user_id} online"  # type: ignore[attr-defined]
+
+    @property
+    def is_online(self) -> bool:
+        threshold = timezone.now() - timedelta(minutes=15)
+        return self.last_seen >= threshold
+
+
+# ---------------------------------------------------------------------------
+# Topic Move Log (moderation audit)
+# ---------------------------------------------------------------------------
+
+
+class ForumTopicMoveLog(models.Model):
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="move_history",
+    )
+    from_category = models.ForeignKey(
+        ForumCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="+",
+    )
+    to_category = models.ForeignKey(
+        ForumCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="+",
+    )
+    moved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_moves",
+    )
+    reason = models.TextField(blank=True, default="")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Forum Topic Move"
+        verbose_name_plural = "Forum Topic Moves"
+        db_table = "forum_forumtopicmovelog"
+
+    def __str__(self) -> str:
+        return f"Topic {self.topic_id} moved"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# Topic Merge Log
+# ---------------------------------------------------------------------------
+
+
+class ForumTopicMergeLog(models.Model):
+    source_topic_title = models.CharField(max_length=255)
+    target_topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="merge_history",
+    )
+    merged_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_merges",
+    )
+    replies_moved = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Forum Topic Merge"
+        verbose_name_plural = "Forum Topic Merges"
+        db_table = "forum_forumtopicmergelog"
+
+    def __str__(self) -> str:
+        return f"Merged '{self.source_topic_title}' into {self.target_topic_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# 4PDA-style "Useful" Post (multiple posts can be marked useful, unlike best answer)
+# ---------------------------------------------------------------------------
+
+
+class ForumUsefulPost(models.Model):
+    """4PDA-style useful post marking — multiple replies can be marked useful."""
+
+    reply = models.ForeignKey(
+        ForumReply,
+        on_delete=models.CASCADE,
+        related_name="useful_marks",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="forum_useful_marks",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [("reply", "user")]
+        verbose_name = "Forum Useful Post"
+        verbose_name_plural = "Forum Useful Posts"
+        db_table = "forum_forumusefulpost"
+
+    def __str__(self) -> str:
+        return f"Useful mark by {self.user_id} on reply {self.reply_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# 4PDA-style FAQ entry (topic author marks replies as FAQ entries)
+# ---------------------------------------------------------------------------
+
+
+class ForumFAQEntry(models.Model):
+    """Mark a reply as an FAQ item within a topic (4PDA discussion шапка FAQ)."""
+
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="faq_entries",
+    )
+    reply = models.ForeignKey(
+        ForumReply,
+        on_delete=models.CASCADE,
+        related_name="faq_entry",
+    )
+    question = models.CharField(max_length=255, help_text="Short FAQ question label")
+    sort_order = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sort_order"]
+        verbose_name = "Forum FAQ Entry"
+        verbose_name_plural = "Forum FAQ Entries"
+        db_table = "forum_forumfaqentry"
+
+    def __str__(self) -> str:
+        return f"FAQ: {self.question}"
+
+
+# ---------------------------------------------------------------------------
+# 4PDA-style Changelog (firmware threads track version history)
+# ---------------------------------------------------------------------------
+
+
+class ForumChangelog(models.Model):
+    """Version changelog entry for firmware discussion topics."""
+
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="changelog_entries",
+    )
+    version = models.CharField(max_length=50, help_text="Version string e.g. 1.2.3")
+    changes = models.TextField(help_text="Markdown description of changes")
+    changes_html = models.TextField(blank=True, default="")
+    released_at = models.DateField(null=True, blank=True)
+    added_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_changelog_entries",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Forum Changelog"
+        verbose_name_plural = "Forum Changelogs"
+        db_table = "forum_forumchangelog"
+
+    def __str__(self) -> str:
+        return f"v{self.version} — {self.topic_id}"  # type: ignore[attr-defined]
+
+
+# ---------------------------------------------------------------------------
+# 4PDA Wiki Header History (track edits to the wiki шапка)
+# ---------------------------------------------------------------------------
+
+
+class ForumWikiHeaderHistory(models.Model):
+    """Audit trail for wiki header edits on a topic."""
+
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="wiki_header_history",
+    )
+    content = models.TextField(help_text="Previous wiki header markdown")
+    content_html = models.TextField()
+    edited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="forum_wiki_header_edits",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Forum Wiki Header History"
+        verbose_name_plural = "Forum Wiki Header Histories"
+        db_table = "forum_forumwikiheaderhistory"
+
+    def __str__(self) -> str:
+        return f"Wiki edit on topic {self.topic_id} at {self.created_at}"  # type: ignore[attr-defined]

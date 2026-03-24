@@ -149,13 +149,13 @@ def check_links_async(self, limit: int = 100):
 
     try:
         entries = SitemapEntry.objects.filter(
-            is_active=True, last_checked__isnull=True
+            is_active=True, last_checked_at__isnull=True
         ).order_by("?")[:limit]
 
         if not entries.exists():
             # Check oldest entries if no unchecked ones
             entries = SitemapEntry.objects.filter(is_active=True).order_by(
-                "last_checked"
+                "last_checked_at"
             )[:limit]
 
         results = {"checked": 0, "ok": 0, "broken": 0}
@@ -163,8 +163,8 @@ def check_links_async(self, limit: int = 100):
         for entry in entries:
             try:
                 response = requests.head(entry.url, timeout=10, allow_redirects=True)
-                entry.http_status = response.status_code  # type: ignore[attr-defined]
-                entry.last_checked = timezone.now()  # type: ignore[attr-defined]
+                entry.last_status = response.status_code
+                entry.last_checked_at = timezone.now()
 
                 if response.status_code >= 400:
                     results["broken"] += 1
@@ -174,13 +174,13 @@ def check_links_async(self, limit: int = 100):
                 else:
                     results["ok"] += 1
 
-                entry.save(update_fields=["http_status", "last_checked"])
+                entry.save(update_fields=["last_status", "last_checked_at"])
                 results["checked"] += 1
 
             except requests.RequestException as e:
-                entry.http_status = 0  # type: ignore[attr-defined]
-                entry.last_checked = timezone.now()  # type: ignore[attr-defined]
-                entry.save(update_fields=["http_status", "last_checked"])
+                entry.last_status = 0
+                entry.last_checked_at = timezone.now()
+                entry.save(update_fields=["last_status", "last_checked_at"])
                 results["broken"] += 1
                 logger.exception(f"Link check failed for {entry.url}: {e}")
 

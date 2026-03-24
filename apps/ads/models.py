@@ -1304,16 +1304,32 @@ class AdEvent(TimestampedModel):
     ]
     event_type = models.CharField(max_length=20, choices=EVENT_TYPES)
     placement = models.ForeignKey(
-        AdPlacement, on_delete=models.SET_NULL, null=True, blank=True
+        AdPlacement,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
     )
     creative = models.ForeignKey(
-        AdCreative, on_delete=models.SET_NULL, null=True, blank=True
+        AdCreative,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
     )
     campaign = models.ForeignKey(
-        Campaign, on_delete=models.SET_NULL, null=True, blank=True
+        Campaign,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ad_events",
     )
     request_meta = models.JSONField(default=dict, blank=True)
     page_url = models.URLField(blank=True, default="")

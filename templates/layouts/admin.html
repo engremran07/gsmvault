@@ -26,10 +26,9 @@
 {% endblock %}
 
 {% block extra_js %}
-{# Chart.js v4 — admin analytics charts only (not loaded on public pages) #}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"
-        nonce="{{ request.csp_nonce }}"
-        crossorigin="anonymous" defer></script>
+{# Chart.js v4.4.7 — local vendor copy, admin analytics charts only #}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"
+        nonce="{{ request.csp_nonce }}" defer></script>
 <script src="{% static 'js/src/admin-charts.js' %}"
         nonce="{{ request.csp_nonce }}" defer></script>
 <script src="{% static 'js/src/admin.js' %}" defer nonce="{{ request.csp_nonce }}"></script>

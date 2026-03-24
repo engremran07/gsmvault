@@ -126,7 +126,11 @@ urlpatterns = [
         views_infrastructure.admin_suite_ads_analytics,
         name="ads_analytics",
     ),
-    path("distribution/", views_content.admin_suite_distribution, name="distribution"),
+    path(
+        "distribution/",
+        views_distribution.admin_suite_distribution,
+        name="distribution",
+    ),
     path(
         "distribution/social-posting/",
         views_distribution.admin_suite_social_posting,
@@ -141,6 +145,11 @@ urlpatterns = [
         "distribution/social-posting/oauth/callback/<str:platform>/",
         views_distribution.admin_suite_social_posting_oauth_callback,
         name="social_posting_oauth_callback",
+    ),
+    path(
+        "distribution/settings/",
+        views_distribution.admin_suite_distribution_settings,
+        name="distribution_settings",
     ),
     # Storage Management
     path("storage/", views_infrastructure.admin_suite_storage, name="storage"),
@@ -233,6 +242,45 @@ urlpatterns = [
     path("audit-log/", views_infrastructure.admin_suite_audit_log, name="audit_log"),
     # Celery Monitoring (P3)
     path("celery/", views_infrastructure.admin_suite_celery, name="celery"),
+    # Shop Management
+    path("shop/", views_extended.admin_suite_shop, name="shop"),
+    path(
+        "shop/packages/",
+        views_extended.admin_suite_shop_packages,
+        name="shop_packages",
+    ),
+    path(
+        "shop/orders/",
+        views_extended.admin_suite_shop_orders,
+        name="shop_orders",
+    ),
+    path(
+        "shop/subscriptions/",
+        views_extended.admin_suite_shop_subscriptions,
+        name="shop_subscriptions",
+    ),
+    path(
+        "shop/user-packages/",
+        views_extended.admin_suite_shop_user_packages,
+        name="shop_user_packages",
+    ),
+    # Marketplace Management
+    path("marketplace/", views_extended.admin_suite_marketplace, name="marketplace"),
+    path(
+        "marketplace/sellers/",
+        views_extended.admin_suite_marketplace_sellers,
+        name="marketplace_sellers",
+    ),
+    path(
+        "marketplace/listings/",
+        views_extended.admin_suite_marketplace_listings,
+        name="marketplace_listings",
+    ),
+    path(
+        "marketplace/verifications/",
+        views_extended.admin_suite_marketplace_verifications,
+        name="marketplace_verifications",
+    ),
     # Legacy URL aliases (backward compatibility)
     path("ai/", views_content.admin_suite_ai, name="admin_suite_ai"),
     path(

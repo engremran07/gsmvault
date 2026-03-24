@@ -26,7 +26,7 @@ from .models import (
 
 
 @admin.register(AdPlacement)
-class AdPlacementAdmin(admin.ModelAdmin):
+class AdPlacementAdmin(admin.ModelAdmin[AdPlacement]):
     list_display = ("name", "code", "context", "is_active", "locked", "updated_at")
     list_filter = ("is_active", "locked", "context")
     search_fields = ("name", "slug", "code", "context", "page_context")
@@ -35,7 +35,7 @@ class AdPlacementAdmin(admin.ModelAdmin):
 
 
 @admin.register(Campaign)
-class CampaignAdmin(admin.ModelAdmin):
+class CampaignAdmin(admin.ModelAdmin[Campaign]):
     list_display = (
         "name",
         "type",
@@ -52,7 +52,7 @@ class CampaignAdmin(admin.ModelAdmin):
 
 
 @admin.register(AdCreative)
-class AdCreativeAdmin(admin.ModelAdmin):
+class AdCreativeAdmin(admin.ModelAdmin[AdCreative]):
     list_display = (
         "name",
         "campaign",
@@ -68,7 +68,7 @@ class AdCreativeAdmin(admin.ModelAdmin):
 
 
 @admin.register(PlacementAssignment)
-class PlacementAssignmentAdmin(admin.ModelAdmin):
+class PlacementAssignmentAdmin(admin.ModelAdmin[PlacementAssignment]):
     list_display = ("placement", "creative", "weight", "is_active", "locked")
     list_filter = ("placement", "creative", "is_active", "locked")
     exclude = ("is_deleted", "deleted_at", "deleted_by")
@@ -76,7 +76,7 @@ class PlacementAssignmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(AffiliateSource)
-class AffiliateSourceAdmin(admin.ModelAdmin):
+class AffiliateSourceAdmin(admin.ModelAdmin[AffiliateSource]):
     list_display = ("name", "network", "base_url", "is_enabled", "locked", "updated_at")
     list_filter = ("network", "is_enabled", "locked")
     search_fields = ("name", "network", "base_url")
@@ -85,7 +85,7 @@ class AffiliateSourceAdmin(admin.ModelAdmin):
 
 
 @admin.register(AffiliateLink)
-class AffiliateLinkAdmin(admin.ModelAdmin):
+class AffiliateLinkAdmin(admin.ModelAdmin[AffiliateLink]):
     list_display = (
         "name",
         "source",
@@ -101,7 +101,7 @@ class AffiliateLinkAdmin(admin.ModelAdmin):
 
 
 @admin.register(AdEvent)
-class AdEventAdmin(admin.ModelAdmin):
+class AdEventAdmin(admin.ModelAdmin[AdEvent]):
     list_display = (
         "event_type",
         "campaign",
@@ -143,7 +143,7 @@ class AdUnitInline(admin.TabularInline):
 
 
 @admin.register(AdNetwork)
-class AdNetworkAdmin(admin.ModelAdmin):
+class AdNetworkAdmin(admin.ModelAdmin[AdNetwork]):
     list_display = (
         "name",
         "network_type",
@@ -218,7 +218,7 @@ class AdNetworkAdmin(admin.ModelAdmin):
 
 
 @admin.register(AdUnit)
-class AdUnitAdmin(admin.ModelAdmin):
+class AdUnitAdmin(admin.ModelAdmin[AdUnit]):
     list_display = (
         "name",
         "network",
@@ -239,7 +239,7 @@ class AdUnitAdmin(admin.ModelAdmin):
 
 
 @admin.register(RewardedAdConfig)
-class RewardedAdConfigAdmin(admin.ModelAdmin):
+class RewardedAdConfigAdmin(admin.ModelAdmin[RewardedAdConfig]):
     list_display = (
         "name",
         "reward_type",
@@ -283,7 +283,7 @@ class RewardedAdConfigAdmin(admin.ModelAdmin):
 
 
 @admin.register(RewardedAdView)
-class RewardedAdViewAdmin(admin.ModelAdmin):
+class RewardedAdViewAdmin(admin.ModelAdmin[RewardedAdView]):
     list_display = (
         "user",
         "config",
@@ -319,7 +319,7 @@ class RewardedAdViewAdmin(admin.ModelAdmin):
 
 
 @admin.register(AutoAdsScanResult)
-class AutoAdsScanResultAdmin(admin.ModelAdmin):
+class AutoAdsScanResultAdmin(admin.ModelAdmin[AutoAdsScanResult]):
     list_display = ("template_path", "score", "applied", "created_at")
     list_filter = ("applied",)
     search_fields = ("template_path", "ai_recommendation")
@@ -340,7 +340,7 @@ class AutoAdsScanResultAdmin(admin.ModelAdmin):
 
 
 @admin.register(AffiliateProvider)
-class AffiliateProviderAdmin(admin.ModelAdmin):
+class AffiliateProviderAdmin(admin.ModelAdmin[AffiliateProvider]):
     list_display = ("name", "provider_type", "is_enabled", "priority", "products_count")
     list_filter = ("provider_type", "is_enabled")
     search_fields = ("name", "associate_tag")
@@ -399,7 +399,7 @@ class AffiliateProviderAdmin(admin.ModelAdmin):
 
 
 @admin.register(AffiliateProductCategory)
-class AffiliateProductCategoryAdmin(admin.ModelAdmin):
+class AffiliateProductCategoryAdmin(admin.ModelAdmin[AffiliateProductCategory]):
     list_display = ("name", "slug", "parent", "is_active")
     list_filter = ("is_active", "parent")
     search_fields = ("name", "slug", "device_keywords")
@@ -433,7 +433,7 @@ class AffiliateProductMatchInline(admin.TabularInline):
 
 
 @admin.register(AffiliateProduct)
-class AffiliateProductAdmin(admin.ModelAdmin):
+class AffiliateProductAdmin(admin.ModelAdmin[AffiliateProduct]):
     list_display = (
         "name",
         "provider",
@@ -589,7 +589,7 @@ class AffiliateProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(AffiliateProductMatch)
-class AffiliateProductMatchAdmin(admin.ModelAdmin):
+class AffiliateProductMatchAdmin(admin.ModelAdmin[AffiliateProductMatch]):
     list_display = (
         "product",
         "target_display",
@@ -610,7 +610,7 @@ class AffiliateProductMatchAdmin(admin.ModelAdmin):
 
 
 @admin.register(AffiliateClick)
-class AffiliateClickAdmin(admin.ModelAdmin):
+class AffiliateClickAdmin(admin.ModelAdmin[AffiliateClick]):
     list_display = ("product", "provider", "user", "country", "created_at")
     list_filter = ("provider", "country", "created_at")
     search_fields = ("product__name", "user__email", "page_url")

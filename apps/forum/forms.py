@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django import forms
 
-from .models import ForumFlag, PollMode
+from .models import ForumFlag, PollMode, TopicType
 
 
 class TopicCreateForm(forms.Form):
@@ -114,4 +114,127 @@ class SearchForm(forms.Form):
     q = forms.CharField(
         max_length=200,
         widget=forms.TextInput(attrs={"placeholder": "Search forum…"}),
+    )
+
+
+class TopicRatingForm(forms.Form):
+    score = forms.IntegerField(min_value=1, max_value=5)
+
+
+class TopicMoveForm(forms.Form):
+    to_category = forms.IntegerField()
+    reason = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 2}))
+
+
+class TopicMergeForm(forms.Form):
+    target_topic_id = forms.IntegerField()
+
+
+class WarningForm(forms.Form):
+    user_id = forms.IntegerField(widget=forms.HiddenInput)
+    severity = forms.ChoiceField(
+        choices=[
+            ("minor", "Minor"),
+            ("moderate", "Moderate"),
+            ("serious", "Serious"),
+            ("final", "Final Warning"),
+        ]
+    )
+    reason = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}))
+    points = forms.IntegerField(initial=1, min_value=1, max_value=100)
+
+
+class IPBanForm(forms.Form):
+    ip_address = forms.GenericIPAddressField()
+    reason = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 2}))
+
+
+class SignatureForm(forms.Form):
+    signature = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={"rows": 3, "placeholder": "Your signature (Markdown)…"}
+        ),
+    )
+    custom_title = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "Custom title"}),
+    )
+    website = forms.URLField(required=False)
+    location = forms.CharField(max_length=100, required=False)
+
+
+class TopicTagForm(forms.Form):
+    tags = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": "Tags, comma separated (max 10)"}),
+    )
+
+    def clean_tags(self) -> list[str]:
+        raw = self.cleaned_data.get("tags", "")
+        if not raw:
+            return []
+        return [t.strip() for t in raw.split(",") if t.strip()][:10]
+
+
+# ---------------------------------------------------------------------------
+# 4PDA-style forms
+# ---------------------------------------------------------------------------
+
+
+class WikiHeaderForm(forms.Form):
+    """Edit the wiki-style header (шапка) on a topic."""
+
+    content = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                "rows": 10,
+                "placeholder": "Wiki header content (Markdown supported)…",
+            }
+        )
+    )
+
+
+class ChangelogEntryForm(forms.Form):
+    """Add a changelog entry to a firmware/discussion topic."""
+
+    version = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={"placeholder": "e.g. 1.2.3"}),
+    )
+    changes = forms.CharField(
+        widget=forms.Textarea(
+            attrs={"rows": 4, "placeholder": "What changed in this version…"}
+        )
+    )
+    released_at = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+
+class FAQEntryForm(forms.Form):
+    """Mark a reply as an FAQ entry."""
+
+    reply_id = forms.IntegerField(widget=forms.HiddenInput)
+    question = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={"placeholder": "FAQ question label"}),
+    )
+    sort_order = forms.IntegerField(initial=0, required=False)
+
+
+class TopicTypeForm(forms.Form):
+    """Change the 4PDA-style topic type."""
+
+    topic_type = forms.ChoiceField(choices=TopicType.choices)
+
+
+class DeviceLinkForm(forms.Form):
+    """Link a topic to a device model (4PDA-style)."""
+
+    device_id = forms.IntegerField(
+        widget=forms.HiddenInput,
+        required=False,
     )

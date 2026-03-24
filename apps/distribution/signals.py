@@ -19,7 +19,6 @@ def connect_signals():
     Checks if blog app is installed for modularity.
     """
     from . import services
-    from .tasks import enqueue_pending_for_account
 
     # Only connect blog signals if blog app is installed (modularity)
     if apps.is_installed("apps.blog"):
@@ -38,13 +37,3 @@ def connect_signals():
                     )
         except Exception as e:
             logger.debug(f"Blog integration not available: {e}")
-
-        try:
-            count = enqueue_pending_for_account(instance)  # noqa: F821  # type: ignore[name-defined]
-            if count:
-                logger.info(
-                    "distribution.jobs.enqueued",
-                    extra={"channel": instance.channel, "count": count},  # noqa: F821  # type: ignore[name-defined]
-                )
-        except Exception:
-            logger.exception("Failed to enqueue jobs for channel %s", instance.channel)  # noqa: F821  # type: ignore[name-defined]

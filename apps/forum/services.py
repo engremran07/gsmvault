@@ -12,24 +12,42 @@ from apps.core.sanitizers import sanitize_html_content
 
 from .models import (
     ForumAttachment,
+    ForumBestAnswer,
     ForumBookmark,
     ForumCategory,
+    ForumCategorySubscription,
+    ForumChangelog,
+    ForumFAQEntry,
     ForumFlag,
+    ForumIPBan,
     ForumLike,
     ForumMention,
+    ForumOnlineUser,
     ForumPoll,
     ForumPollChoice,
     ForumPollVote,
     ForumPrivateTopic,
     ForumPrivateTopicUser,
+    ForumReaction,
     ForumReply,
     ForumReplyHistory,
+    ForumReplyReaction,
     ForumTopic,
     ForumTopicFavorite,
+    ForumTopicMergeLog,
+    ForumTopicMoveLog,
+    ForumTopicRating,
     ForumTopicSubscription,
+    ForumTopicTag,
+    ForumTrustLevel,
+    ForumUsefulPost,
+    ForumUserProfile,
+    ForumWarning,
+    ForumWikiHeaderHistory,
     NotifyFrequency,
     PollMode,
     TopicAction,
+    TrustLevelChoices,
 )
 
 if TYPE_CHECKING:
@@ -550,6 +568,474 @@ def search_topics(query: str, limit: int = 20) -> QuerySet[ForumTopic]:
 
 
 # ---------------------------------------------------------------------------
+# Forum User Profile helpers
+# ---------------------------------------------------------------------------
+
+
+def get_or_create_forum_profile(user: AbstractBaseUser) -> ForumUserProfile:
+    profile, _ = ForumUserProfile.objects.get_or_create(user=user)
+    return profile
+
+
+def update_online_presence(user: AbstractBaseUser, location: str = "") -> None:
+    ForumOnlineUser.objects.update_or_create(user=user, defaults={"location": location})
+
+
+def get_online_users(minutes: int = 15) -> QuerySet[ForumOnlineUser]:
+    from datetime import timedelta
+
+    threshold = timezone.now() - timedelta(minutes=minutes)
+    return ForumOnlineUser.objects.filter(last_seen__gte=threshold).select_related(
+        "user"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Trust Level system (Discourse-style auto-promotion)
+# ---------------------------------------------------------------------------
+
+
+def evaluate_trust_level(user: AbstractBaseUser) -> int:
+    """Evaluate what trust level a user qualifies for based on their activity."""
+    profile = get_or_create_forum_profile(user)
+    levels = ForumTrustLevel.objects.order_by("-level")
+
+    for level_def in levels:
+        if (
+            profile.topic_count >= level_def.min_topics_created
+            and profile.reply_count >= level_def.min_replies_posted
+            and profile.likes_received >= level_def.min_likes_received
+            and profile.likes_given >= level_def.min_likes_given
+            and profile.days_visited >= level_def.min_days_visited
+            and profile.topics_read >= level_def.min_topics_read
+        ):
+            return level_def.level
+
+    return TrustLevelChoices.NEW_USER
+
+
+def auto_promote_user(user: AbstractBaseUser) -> bool:
+    """Check and promote user trust level if they qualify. Returns True if promoted."""
+    new_level = evaluate_trust_level(user)
+    profile = get_or_create_forum_profile(user)
+    if new_level > profile.trust_level:
+        profile.trust_level = new_level
+        profile.save(update_fields=["trust_level", "updated_at"])
+        _publish_event(
+            "forum.trust_level_changed",
+            {"user_id": user.pk, "new_level": new_level},
+        )
+        return True
+    return False
+
+
+def check_trust_permission(user: AbstractBaseUser, permission: str) -> bool:
+    """Check if user's trust level grants a specific permission."""
+    profile = get_or_create_forum_profile(user)
+    level_def = ForumTrustLevel.objects.filter(level=profile.trust_level).first()
+    if not level_def:
+        return False
+    return bool(getattr(level_def, permission, False))
+
+
+# ---------------------------------------------------------------------------
+# Reactions (XenForo-style)
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def set_reaction(
+    reply: ForumReply, user: AbstractBaseUser, reaction: ForumReaction
+) -> ForumReplyReaction:
+    """Set or change user's reaction on a reply. Only one reaction per user per reply."""
+    existing = ForumReplyReaction.objects.filter(reply=reply, user=user).first()
+    if existing:
+        old_reaction = existing.reaction
+        existing.reaction = reaction
+        existing.save(update_fields=["reaction"])
+        # Adjust reputation: remove old, add new
+        if old_reaction.pk != reaction.pk:
+            _adjust_reputation(reply.user, -old_reaction.score)  # type: ignore[arg-type]
+            _adjust_reputation(reply.user, reaction.score)  # type: ignore[arg-type]
+        return existing
+
+    new_reaction = ForumReplyReaction.objects.create(
+        reply=reply, user=user, reaction=reaction
+    )
+    ForumReply.objects.filter(pk=reply.pk).update(
+        reaction_count=F("reaction_count") + 1
+    )
+    _adjust_reputation(reply.user, reaction.score)  # type: ignore[arg-type]
+    return new_reaction
+
+
+@transaction.atomic
+def remove_reaction(reply: ForumReply, user: AbstractBaseUser) -> bool:
+    """Remove user's reaction from a reply. Returns True if removed."""
+    existing = ForumReplyReaction.objects.filter(reply=reply, user=user).first()
+    if not existing:
+        return False
+    _adjust_reputation(reply.user, -existing.reaction.score)  # type: ignore[arg-type]
+    existing.delete()
+    ForumReply.objects.filter(pk=reply.pk).update(
+        reaction_count=models.F("reaction_count") - 1
+    )
+    return True
+
+
+def _adjust_reputation(user: AbstractBaseUser, amount: int) -> None:
+    if amount == 0:
+        return
+    ForumUserProfile.objects.filter(user=user).update(
+        reputation=F("reputation") + amount
+    )
+
+
+# ---------------------------------------------------------------------------
+# Best Answer / Solution
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def mark_best_answer(
+    topic: ForumTopic,
+    reply: ForumReply,
+    marked_by: AbstractBaseUser,
+) -> ForumBestAnswer:
+    """Mark a reply as the best answer for a topic."""
+    # Remove existing if any
+    ForumBestAnswer.objects.filter(topic=topic).delete()
+    best = ForumBestAnswer.objects.create(topic=topic, reply=reply, marked_by=marked_by)
+    ForumTopic.objects.filter(pk=topic.pk).update(has_solution=True)
+    # Award reputation and stats
+    ForumUserProfile.objects.filter(user=reply.user).update(
+        solutions_count=F("solutions_count") + 1,
+        reputation=F("reputation") + 15,
+    )
+    _publish_event(
+        "forum.solution_marked",
+        {"topic_id": topic.pk, "reply_id": reply.pk, "user_id": reply.user_id},  # type: ignore[attr-defined]
+    )
+    return best
+
+
+@transaction.atomic
+def unmark_best_answer(topic: ForumTopic) -> None:
+    """Remove best answer status from a topic."""
+    best = ForumBestAnswer.objects.filter(topic=topic).select_related("reply").first()
+    if best:
+        ForumUserProfile.objects.filter(user=best.reply.user).update(
+            solutions_count=models.F("solutions_count") - 1,
+            reputation=models.F("reputation") - 15,
+        )
+        best.delete()
+    ForumTopic.objects.filter(pk=topic.pk).update(has_solution=False)
+
+
+# ---------------------------------------------------------------------------
+# Topic Rating (vBulletin star rating)
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def rate_topic(
+    topic: ForumTopic, user: AbstractBaseUser, score: int
+) -> ForumTopicRating:
+    """Rate a topic 1-5 stars. Updates or creates rating."""
+    score = max(1, min(5, score))
+    rating, created = ForumTopicRating.objects.update_or_create(
+        topic=topic,
+        user=user,
+        defaults={"score": score},
+    )
+    # Recalculate average
+    from django.db.models import Avg, Count
+
+    agg = ForumTopicRating.objects.filter(topic=topic).aggregate(
+        avg=Avg("score"), cnt=Count("id")
+    )
+    ForumTopic.objects.filter(pk=topic.pk).update(
+        rating_score=agg["avg"] or 0.0,
+        rating_count=agg["cnt"] or 0,
+    )
+    return rating
+
+
+# ---------------------------------------------------------------------------
+# Topic Tags
+# ---------------------------------------------------------------------------
+
+
+def set_topic_tags(topic: ForumTopic, tag_names: list[str]) -> list[ForumTopicTag]:
+    """Replace all tags on a topic with the given list."""
+    ForumTopicTag.objects.filter(topic=topic).delete()
+    tags = []
+    for name in tag_names[:10]:  # Limit to 10 tags
+        name = name.strip()
+        if name:
+            tag = ForumTopicTag(topic=topic, name=name)
+            tag.save()
+            tags.append(tag)
+    return tags
+
+
+# ---------------------------------------------------------------------------
+# Warning System
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def issue_warning(
+    *,
+    user: AbstractBaseUser,
+    issued_by: AbstractBaseUser,
+    reason: str,
+    severity: str = "minor",
+    points: int = 1,
+    topic: ForumTopic | None = None,
+    reply: ForumReply | None = None,
+    expires_at: object = None,
+) -> ForumWarning:
+    warning = ForumWarning.objects.create(
+        user=user,
+        issued_by=issued_by,
+        topic=topic,
+        reply=reply,
+        severity=severity,
+        reason=reason,
+        points=points,
+        expires_at=expires_at,
+    )
+    ForumUserProfile.objects.filter(user=user).update(
+        warning_level=F("warning_level") + points
+    )
+    _publish_event(
+        "forum.warning_issued",
+        {
+            "user_id": user.pk,
+            "issued_by_id": issued_by.pk,
+            "severity": severity,
+            "warning_id": warning.pk,
+        },
+    )
+    return warning
+
+
+def get_active_warnings(user: AbstractBaseUser) -> QuerySet[ForumWarning]:
+    return ForumWarning.objects.filter(
+        user=user,
+    ).filter(
+        models.Q(expires_at__isnull=True) | models.Q(expires_at__gt=timezone.now())
+    )
+
+
+# ---------------------------------------------------------------------------
+# IP Bans
+# ---------------------------------------------------------------------------
+
+
+def ban_ip(
+    *,
+    ip_address: str,
+    banned_by: AbstractBaseUser,
+    reason: str = "",
+    expires_at: object = None,
+) -> ForumIPBan:
+    ban, _ = ForumIPBan.objects.update_or_create(
+        ip_address=ip_address,
+        defaults={
+            "banned_by": banned_by,
+            "reason": reason,
+            "expires_at": expires_at,
+            "is_active": True,
+        },
+    )
+    return ban
+
+
+def unban_ip(ip_address: str) -> None:
+    ForumIPBan.objects.filter(ip_address=ip_address).update(is_active=False)
+
+
+def is_ip_banned(ip_address: str) -> bool:
+    return (
+        ForumIPBan.objects.filter(
+            ip_address=ip_address,
+            is_active=True,
+        )
+        .filter(
+            models.Q(expires_at__isnull=True) | models.Q(expires_at__gt=timezone.now())
+        )
+        .exists()
+    )
+
+
+# ---------------------------------------------------------------------------
+# User Bans
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def ban_user(
+    user: AbstractBaseUser,
+    *,
+    reason: str = "",
+    expires_at: object = None,
+) -> None:
+    profile = get_or_create_forum_profile(user)
+    profile.is_banned = True
+    profile.ban_reason = reason
+    profile.ban_expires_at = expires_at  # type: ignore[assignment]
+    profile.save(
+        update_fields=["is_banned", "ban_reason", "ban_expires_at", "updated_at"]
+    )
+
+
+def unban_user(user: AbstractBaseUser) -> None:
+    ForumUserProfile.objects.filter(user=user).update(
+        is_banned=False, ban_reason="", ban_expires_at=None
+    )
+
+
+def is_user_banned(user: AbstractBaseUser) -> bool:
+    profile = ForumUserProfile.objects.filter(user=user).first()
+    if not profile:
+        return False
+    return profile.is_currently_banned
+
+
+# ---------------------------------------------------------------------------
+# Category Subscriptions (XenForo "Watch Forum")
+# ---------------------------------------------------------------------------
+
+
+def subscribe_category(
+    category: ForumCategory,
+    user: AbstractBaseUser,
+    notify_topics: bool = True,
+    notify_replies: bool = False,
+) -> ForumCategorySubscription:
+    sub, _ = ForumCategorySubscription.objects.update_or_create(
+        category=category,
+        user=user,
+        defaults={
+            "notify_new_topics": notify_topics,
+            "notify_new_replies": notify_replies,
+        },
+    )
+    return sub
+
+
+def unsubscribe_category(category: ForumCategory, user: AbstractBaseUser) -> None:
+    ForumCategorySubscription.objects.filter(category=category, user=user).delete()
+
+
+# ---------------------------------------------------------------------------
+# Topic Move (moderation)
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def move_topic(
+    topic: ForumTopic,
+    *,
+    to_category: ForumCategory,
+    moved_by: AbstractBaseUser,
+    reason: str = "",
+) -> ForumTopicMoveLog:
+    old_category = topic.category
+    ForumTopicMoveLog.objects.create(
+        topic=topic,
+        from_category=old_category,
+        to_category=to_category,
+        moved_by=moved_by,
+        reason=reason,
+    )
+    topic.category = to_category
+    topic.save(update_fields=["category", "updated_at"])
+    # Recount both categories
+    recount_category(old_category)
+    recount_category(to_category)
+    # Add system reply
+    ForumReply.objects.create(
+        topic=topic,
+        user=moved_by,
+        content="",
+        content_html="",
+        action=TopicAction.MOVED,
+    )
+    return ForumTopicMoveLog.objects.filter(topic=topic).latest("created_at")
+
+
+# ---------------------------------------------------------------------------
+# Topic Merge (moderation)
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def merge_topics(
+    source: ForumTopic,
+    target: ForumTopic,
+    *,
+    merged_by: AbstractBaseUser,
+) -> ForumTopicMergeLog:
+    """Merge source topic into target — moves all replies, then soft-deletes source."""
+    reply_count = ForumReply.objects.filter(topic=source, is_removed=False).update(
+        topic=target
+    )
+    ForumTopicMergeLog.objects.create(
+        source_topic_title=source.title,
+        target_topic=target,
+        merged_by=merged_by,
+        replies_moved=reply_count,
+    )
+    # Soft-delete source
+    source.is_removed = True
+    source.save(update_fields=["is_removed", "updated_at"])
+    # Recount target
+    target.reply_count = ForumReply.objects.filter(
+        topic=target, is_removed=False
+    ).count()
+    target.save(update_fields=["reply_count", "updated_at"])
+    recount_category(target.category)
+    if source.category_id != target.category_id:  # type: ignore[attr-defined]
+        recount_category(source.category)
+    return ForumTopicMergeLog.objects.filter(target_topic=target).latest("created_at")
+
+
+# ---------------------------------------------------------------------------
+# Similar Topics
+# ---------------------------------------------------------------------------
+
+
+def find_similar_topics(topic: ForumTopic, limit: int = 5) -> QuerySet[ForumTopic]:
+    """Find topics with similar titles in the same or related categories."""
+    words = [w for w in topic.title.split() if len(w) > 3]
+    if not words:
+        return ForumTopic.objects.none()
+    q = models.Q()
+    for word in words[:5]:
+        q |= models.Q(title__icontains=word)
+    return (
+        ForumTopic.objects.filter(q, is_removed=False)
+        .exclude(pk=topic.pk)
+        .select_related("category", "user")
+        .order_by("-reply_count")[:limit]
+    )
+
+
+# ---------------------------------------------------------------------------
+# Increment profile stats
+# ---------------------------------------------------------------------------
+
+
+def increment_profile_stat(user: AbstractBaseUser, field: str, amount: int = 1) -> None:
+    """Increment a denormalized stat on the user's forum profile."""
+    profile, _ = ForumUserProfile.objects.get_or_create(user=user)
+    ForumUserProfile.objects.filter(pk=profile.pk).update(**{field: F(field) + amount})
+
+
+# ---------------------------------------------------------------------------
 # Increment view count
 # ---------------------------------------------------------------------------
 
@@ -599,3 +1085,171 @@ def _publish_event(event_type: str, data: dict[str, object]) -> None:
         event_bus.publish(event_type, data)
     except Exception:
         logger.debug("Failed to publish event %s", event_type, exc_info=True)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Wiki Header (шапка) operations
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def update_wiki_header(
+    topic: ForumTopic, *, user: AbstractBaseUser, content: str
+) -> None:
+    """Update the wiki-style header post. Saves history of previous version."""
+    if topic.wiki_header:
+        ForumWikiHeaderHistory.objects.create(
+            topic=topic,
+            content=topic.wiki_header,
+            content_html=topic.wiki_header_html,
+            edited_by=user,
+        )
+    topic.wiki_header = content
+    topic.wiki_header_html = render_markdown(content)
+    topic.wiki_header_updated_at = timezone.now()
+    topic.wiki_header_updated_by = user  # type: ignore[assignment]
+    topic.save(
+        update_fields=[
+            "wiki_header",
+            "wiki_header_html",
+            "wiki_header_updated_at",
+            "wiki_header_updated_by",
+            "updated_at",
+        ]
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Useful post toggle
+# ---------------------------------------------------------------------------
+
+
+@transaction.atomic
+def toggle_useful_post(reply: ForumReply, user: AbstractBaseUser) -> bool:
+    """Toggle 'useful' mark on a reply. Returns True if marked, False if unmarked."""
+    deleted, _ = ForumUsefulPost.objects.filter(reply=reply, user=user).delete()
+    if deleted:
+        return False
+    ForumUsefulPost.objects.create(reply=reply, user=user)
+    _adjust_reputation(reply.user, 2)  # type: ignore[arg-type]
+    return True
+
+
+def get_useful_count(reply: ForumReply) -> int:
+    return ForumUsefulPost.objects.filter(reply=reply).count()
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — FAQ entries
+# ---------------------------------------------------------------------------
+
+
+def add_faq_entry(
+    topic: ForumTopic,
+    reply: ForumReply,
+    question: str,
+    sort_order: int = 0,
+) -> ForumFAQEntry:
+    return ForumFAQEntry.objects.create(
+        topic=topic, reply=reply, question=question, sort_order=sort_order
+    )
+
+
+def remove_faq_entry(faq_id: int) -> None:
+    ForumFAQEntry.objects.filter(pk=faq_id).delete()
+
+
+def get_faq_entries(topic: ForumTopic) -> QuerySet[ForumFAQEntry]:
+    return ForumFAQEntry.objects.filter(topic=topic).select_related(
+        "reply", "reply__user"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Changelog entries
+# ---------------------------------------------------------------------------
+
+
+def add_changelog_entry(
+    topic: ForumTopic,
+    *,
+    user: AbstractBaseUser,
+    version: str,
+    changes: str,
+    released_at: object = None,
+) -> ForumChangelog:
+    return ForumChangelog.objects.create(
+        topic=topic,
+        version=version,
+        changes=changes,
+        changes_html=render_markdown(changes),
+        released_at=released_at,
+        added_by=user,
+    )
+
+
+def get_changelog(topic: ForumTopic) -> QuerySet[ForumChangelog]:
+    return ForumChangelog.objects.filter(topic=topic)
+
+
+def remove_changelog_entry(entry_id: int) -> None:
+    ForumChangelog.objects.filter(pk=entry_id).delete()
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Attachment download counter
+# ---------------------------------------------------------------------------
+
+
+def increment_download_count(attachment: ForumAttachment) -> None:
+    ForumAttachment.objects.filter(pk=attachment.pk).update(
+        download_count=F("download_count") + 1
+    )
+
+
+# ---------------------------------------------------------------------------
+# Forum landing-page helpers
+# ---------------------------------------------------------------------------
+
+
+def get_forum_stats() -> dict[str, int]:
+    """Aggregate stats for the forum landing-page header."""
+    from django.contrib.auth import get_user_model
+
+    _User = get_user_model()
+    return {
+        "total_topics": ForumTopic.objects.filter(is_removed=False).count(),
+        "total_replies": ForumReply.objects.filter(is_removed=False).count(),
+        "total_members": _User.objects.filter(is_active=True).count(),
+        "online_count": get_online_users().count(),
+    }
+
+
+def get_trending_topics(limit: int = 5) -> QuerySet[ForumTopic]:
+    """Topics with most activity in the last 7 days."""
+    from datetime import timedelta as _td
+
+    cutoff = timezone.now() - _td(days=7)
+    return (
+        ForumTopic.objects.filter(is_removed=False, last_active__gte=cutoff)
+        .select_related("category", "user", "last_reply_user")
+        .order_by("-reply_count", "-view_count")[:limit]
+    )
+
+
+def get_recent_topics(limit: int = 10) -> QuerySet[ForumTopic]:
+    """Most recently active topics for the activity feed."""
+    return (
+        ForumTopic.objects.filter(is_removed=False)
+        .select_related("category", "user", "last_reply_user")
+        .order_by("-last_active")[:limit]
+    )
+
+
+def get_latest_replies(limit: int = 5) -> QuerySet[ForumReply]:
+    """Latest replies across all topics."""
+    return (
+        ForumReply.objects.filter(is_removed=False)
+        .select_related("topic", "topic__category", "user")
+        .order_by("-created_at")[:limit]
+    )

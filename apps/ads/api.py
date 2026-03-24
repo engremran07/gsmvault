@@ -188,8 +188,6 @@ def track_affiliate_click_sync(
             ip_address=ip_address[:45] if ip_address else "",
             user_agent=user_agent[:500] if user_agent else "",
             page_url=page_url[:500] if page_url else "",
-            referrer_type=referrer_type[:20] if referrer_type else "",
-            referrer_id=referrer_id,
         )
 
         # Increment product click count

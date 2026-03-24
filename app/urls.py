@@ -24,6 +24,7 @@ from typing import Any
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import include, path, re_path
 from django.utils.module_loading import import_string
 from django.views.generic import RedirectView
@@ -235,6 +236,11 @@ urlpatterns = [
     re_path(
         r"^favicon\.ico$",
         RedirectView.as_view(url="/static/favicon.ico", permanent=True),
+    ),
+    # Silence Chrome DevTools .well-known noise (Chrome 133+)
+    re_path(
+        r"^\.well-known/appspecific/",
+        lambda request: HttpResponse(status=204),
     ),
 ]
 

@@ -1,0 +1,231 @@
+{# distribution/dashboard.html — Staff Distribution Dashboard #}
+{% extends "layouts/default.html" %}
+
+{% block title %}Distribution Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Distribution Dashboard</h1>
+      <p class="mt-1 text-sm text-[var(--color-text-muted)]">Content syndication overview &amp; channel readiness</p>
+    </div>
+    {% if dist_settings.distribution_enabled %}
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Enabled
+    </span>
+    {% else %}
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400">
+      <span class="w-2 h-2 rounded-full bg-red-400"></span> Disabled
+    </span>
+    {% endif %}
+  </div>
+
+  {# ═══ Readiness Status ═══ #}
+  {% if readiness %}
+  <div class="glass rounded-xl p-6 mb-8">
+    <h2 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
+      <i data-lucide="activity" class="w-4 h-4 text-[var(--color-accent)]"></i> Channel Readiness
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <p class="text-xs text-[var(--color-text-muted)] uppercase mb-2">Enabled Channels</p>
+        <div class="flex flex-wrap gap-1">
+          {% for ch in readiness.enabled_channels %}
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ ch }}</span>
+          {% empty %}
+          <span class="text-xs text-[var(--color-text-muted)]">None</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <p class="text-xs text-[var(--color-text-muted)] uppercase mb-2">Active Channels</p>
+        <div class="flex flex-wrap gap-1">
+          {% for ch in readiness.active_channels %}
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">{{ ch }}</span>
+          {% empty %}
+          <span class="text-xs text-[var(--color-text-muted)]">None</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <p class="text-xs text-[var(--color-text-muted)] uppercase mb-2">Missing Channels</p>
+        {% if readiness.has_gaps %}
+        <div class="flex flex-wrap gap-1">
+          {% for ch in readiness.missing_channels %}
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">{{ ch }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        <span class="text-xs text-emerald-400">All channels configured</span>
+        {% endif %}
+      </div>
+    </div>
+    {% if readiness.missing_credentials %}
+    <div class="mt-4 pt-4 border-t border-[var(--color-border)]/20">
+      <p class="text-xs text-amber-400 flex items-center gap-1">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+        Missing credentials: {{ readiness.missing_credentials|join:", " }}
+      </p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ═══ KPI Row ═══ #}
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+    {% include "components/_admin_kpi_card.html" with icon="users" color="blue" value=accounts|length label="Accounts" stagger=0 %}
+    {% include "components/_admin_kpi_card.html" with icon="file-text" color="violet" value=templates|length label="Templates" stagger=1 %}
+    {% include "components/_admin_kpi_card.html" with icon="calendar" color="amber" value=plans|length label="Plans" stagger=2 %}
+    {% include "components/_admin_kpi_card.html" with icon="send" color="emerald" value=jobs|length label="Recent Jobs" stagger=3 %}
+  </div>
+
+  {# ═══ Accounts ═══ #}
+  <div class="glass rounded-xl overflow-hidden mb-6">
+    <div class="px-4 py-3 border-b border-[var(--color-border)]/20">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="users" class="w-4 h-4 text-[var(--color-accent)]"></i> Social Accounts
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-[var(--color-border)]/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Account</th>
+        <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Expires</th>
+      </tr></thead>
+      <tbody class="divide-y divide-[var(--color-border)]/10">
+        {% for a in accounts %}
+        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ a.get_channel_display }}</span></td>
+          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ a.account_name|default:"—" }}</td>
+          <td class="py-3 px-4 text-center">
+            {% if a.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            {% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}
+          </td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">
+            {% if a.is_expired %}<span class="text-red-400">Expired</span>
+            {% elif a.token_expires_at %}{{ a.token_expires_at|timesince }} left
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">
+          <i data-lucide="users" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p>No social accounts configured</p>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  {# ═══ Recent Jobs ═══ #}
+  <div class="glass rounded-xl overflow-hidden mb-6">
+    <div class="px-4 py-3 border-b border-[var(--color-border)]/20">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="send" class="w-4 h-4 text-[var(--color-accent)]"></i> Recent Jobs
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-[var(--color-border)]/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th>
+        <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Error</th>
+      </tr></thead>
+      <tbody class="divide-y divide-[var(--color-border)]/10">
+        {% for j in jobs %}
+        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ j.get_channel_display }}</span></td>
+          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[200px]">{{ j.post.title|default:j.post_id|truncatechars:40 }}</td>
+          <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if j.status == 'sent' %}bg-emerald-500/10 text-emerald-400{% elif j.status == 'failed' %}bg-red-500/10 text-red-400{% elif j.status == 'pending' %}bg-amber-500/10 text-amber-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ j.get_status_display }}</span></td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ j.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-red-400 truncate max-w-[200px]">{{ j.last_error|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]">
+          <i data-lucide="send" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p>No distribution jobs yet</p>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  {# ═══ Recent Logs ═══ #}
+  <div class="glass rounded-xl overflow-hidden mb-6">
+    <div class="px-4 py-3 border-b border-[var(--color-border)]/20">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="scroll-text" class="w-4 h-4 text-[var(--color-accent)]"></i> Recent Logs
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-[var(--color-border)]/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Job</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Level</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Message</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Time</th>
+      </tr></thead>
+      <tbody class="divide-y divide-[var(--color-border)]/10">
+        {% for l in logs %}
+        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">#{{ l.job_id }}</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if l.level == 'error' %}bg-red-500/10 text-red-400{% elif l.level == 'warning' %}bg-amber-500/10 text-amber-400{% else %}bg-emerald-500/10 text-emerald-400{% endif %}">{{ l.level }}</span></td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-primary)] truncate max-w-[400px]">{{ l.message|truncatechars:100 }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ l.created_at|timesince }} ago</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">
+          <i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p>No distribution logs</p>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  {# ═══ Syndication Partners ═══ #}
+  <div class="glass rounded-xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-[var(--color-border)]/20">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="globe" class="w-4 h-4 text-[var(--color-accent)]"></i> Syndication Partners
+      </h3>
+    </div>
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-[var(--color-border)]/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Format</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Auth</th>
+        <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Enabled</th>
+      </tr></thead>
+      <tbody class="divide-y divide-[var(--color-border)]/10">
+        {% for p in partners %}
+        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ p.name }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.get_format_display }}</td>
+          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.get_auth_type_display }}</td>
+          <td class="py-3 px-4 text-center">
+            {% if p.enabled %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            {% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">
+          <i data-lucide="globe" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+          <p>No syndication partners</p>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

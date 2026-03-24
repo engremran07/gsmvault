@@ -1,11 +1,11 @@
-{# templates/components/_pagination.html — Paginator with HTMX #}
+{# templates/components/_pagination.html — Paginator (HTMX opt-in) #}
+{# Pass hx_target="#some-id" to enable HTMX partial updates, otherwise regular links. #}
+{% load core_tags %}
 {% if page_obj and page_obj.has_other_pages %}
 <nav aria-label="Pagination" class="flex flex-wrap items-center justify-center gap-2 mt-8">
   {% if page_obj.has_previous %}
-  <a href="?page={{ page_obj.previous_page_number }}"
-     hx-get="?page={{ page_obj.previous_page_number }}"
-     hx-target="#content-list"
-     hx-swap="innerHTML"
+  <a href="{% query_string page=page_obj.previous_page_number %}"
+     {% if hx_target %}hx-get="{% query_string page=page_obj.previous_page_number %}" hx-target="{{ hx_target }}" hx-swap="innerHTML"{% endif %}
      class="px-3 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
     <i data-lucide="chevron-left" class="w-4 h-4"></i>
   </a>
@@ -16,10 +16,8 @@
   </span>
 
   {% if page_obj.has_next %}
-  <a href="?page={{ page_obj.next_page_number }}"
-     hx-get="?page={{ page_obj.next_page_number }}"
-     hx-target="#content-list"
-     hx-swap="innerHTML"
+  <a href="{% query_string page=page_obj.next_page_number %}"
+     {% if hx_target %}hx-get="{% query_string page=page_obj.next_page_number %}" hx-target="{{ hx_target }}" hx-swap="innerHTML"{% endif %}
      class="px-3 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
     <i data-lucide="chevron-right" class="w-4 h-4"></i>
   </a>

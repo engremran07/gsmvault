@@ -1,0 +1,6 @@
+{% comment %}Inject enabled ad-network body scripts before </body>.{% endcomment %}
+{% if ads_show and ads_enabled_networks %}
+{% for network in ads_enabled_networks %}{% if network.body_script %}
+{{ network.body_script }}
+{% endif %}{% endfor %}
+{% endif %}

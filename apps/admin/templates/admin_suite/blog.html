@@ -10,6 +10,9 @@
     <p class="mt-1 text-sm text-[var(--color-text-muted)]">Posts management &amp; publishing</p>
   </div>
   <div class="flex items-center gap-2">
+    <a href="?new=1" class="btn btn-primary btn-press text-xs">
+      <i data-lucide="plus" class="w-4 h-4"></i> New Post
+    </a>
     <a href="{% url 'admin_suite:blog_categories' %}" class="btn btn-secondary btn-press text-xs">
       <i data-lucide="folder" class="w-4 h-4"></i> Categories
     </a>
@@ -28,43 +31,12 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
   {# KPI Cards (left 2/3) #}
   <div class="lg:col-span-2">
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 stagger-children">
-      <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 0"
-           x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-        <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3">
-          <i data-lucide="file-text" class="w-5 h-5 text-blue-400"></i>
-        </div>
-        <div class="text-2xl font-bold text-[var(--color-text-primary)]"
-             x-data="animatedCounter({{ stats.total }})" x-text="display.toLocaleString()">{{ stats.total }}</div>
-        <p class="text-xs text-[var(--color-text-muted)] mt-1">Total Posts</p>
-      </div>
-      <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
-           x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3">
-          <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
-        </div>
-        <div class="text-2xl font-bold text-[var(--color-text-primary)]"
-             x-data="animatedCounter({{ stats.published }})" x-text="display.toLocaleString()">{{ stats.published }}</div>
-        <p class="text-xs text-[var(--color-text-muted)] mt-1">Published</p>
-      </div>
-      <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
-           x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3">
-          <i data-lucide="pencil" class="w-5 h-5 text-amber-400"></i>
-        </div>
-        <div class="text-2xl font-bold text-[var(--color-text-primary)]"
-             x-data="animatedCounter({{ stats.drafts }})" x-text="display.toLocaleString()">{{ stats.drafts }}</div>
-        <p class="text-xs text-[var(--color-text-muted)] mt-1">Drafts</p>
-      </div>
-      <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
-           x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-        <div class="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center mb-3">
-          <i data-lucide="clock" class="w-5 h-5 text-violet-400"></i>
-        </div>
-        <div class="text-2xl font-bold text-[var(--color-text-primary)]"
-             x-data="animatedCounter({{ stats.scheduled }})" x-text="display.toLocaleString()">{{ stats.scheduled }}</div>
-        <p class="text-xs text-[var(--color-text-muted)] mt-1">Scheduled</p>
-      </div>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 stagger-children">
+      {% include "components/_admin_kpi_card.html" with icon="file-text" color="blue" value=stats.total label="Total Posts" stagger=0 %}
+      {% include "components/_admin_kpi_card.html" with icon="check-circle" color="emerald" value=stats.published label="Published" stagger=1 %}
+      {% include "components/_admin_kpi_card.html" with icon="pencil" color="amber" value=stats.drafts label="Drafts" stagger=2 %}
+      {% include "components/_admin_kpi_card.html" with icon="clock" color="violet" value=stats.scheduled label="Scheduled" stagger=3 %}
+      {% include "components/_admin_kpi_card.html" with icon="archive" color="zinc" value=stats.archived label="Archived" stagger=4 %}
     </div>
   </div>
 

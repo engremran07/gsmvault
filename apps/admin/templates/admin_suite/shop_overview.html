@@ -1,0 +1,67 @@
+{% extends "layouts/admin.html" %}
+{% load humanize %}
+{% block title %}Shop Dashboard — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Shop &amp; Packages</h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+  </div>
+  <a href="{% url 'admin_suite:shop_packages' %}"
+     class="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all flex items-center gap-2 self-start">
+    <i data-lucide="package" class="w-4 h-4"></i>
+    Manage Packages
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+{# KPI Cards #}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 stagger-children">
+  {% include "components/_admin_kpi_card.html" with icon="package" color="blue" value=stats.total_tiers label="Active Tiers" stagger=0 %}
+  {% include "components/_admin_kpi_card.html" with icon="users" color="emerald" value=stats.active_packages label="Active Packages" stagger=1 %}
+  {% include "components/_admin_kpi_card.html" with icon="clock" color="amber" value=stats.trialing_packages label="Trialing" stagger=2 %}
+  {% include "components/_admin_kpi_card.html" with icon="credit-card" color="violet" value=stats.pending_orders label="Pending Orders" stagger=3 %}
+</div>
+
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 stagger-children">
+  {% include "components/_admin_kpi_card.html" with icon="repeat" color="cyan" value=stats.active_subscriptions label="Active Subs" stagger=4 %}
+  {% include "components/_admin_kpi_card.html" with icon="shopping-cart" color="slate" value=stats.total_orders label="Total Orders" stagger=5 %}
+  {% include "components/_admin_kpi_card.html" with icon="dollar-sign" color="emerald" value=stats.revenue_total label="Total Revenue" stagger=6 %}
+  {% include "components/_admin_kpi_card.html" with icon="trending-up" color="green" value=stats.revenue_30d label="Revenue (30d)" stagger=7 %}
+</div>
+
+{# Quick Nav Cards #}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+  <a href="{% url 'admin_suite:shop_packages' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10"><i data-lucide="package" class="w-5 h-5 text-blue-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Package Tiers</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">Create and configure download packages with quotas, limits, and feature flags.</p>
+  </a>
+  <a href="{% url 'admin_suite:shop_orders' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500/10"><i data-lucide="shopping-cart" class="w-5 h-5 text-amber-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Orders</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">View and manage all purchase orders, refunds, and payment statuses.</p>
+  </a>
+  <a href="{% url 'admin_suite:shop_subscriptions' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10"><i data-lucide="repeat" class="w-5 h-5 text-emerald-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Subscriptions</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">Monitor active, trialing, and expired subscriptions across all plans.</p>
+  </a>
+  <a href="{% url 'admin_suite:shop_user_packages' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-violet-500/10"><i data-lucide="user-check" class="w-5 h-5 text-violet-400"></i></span>
+      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">User Packages</h3>
+    </div>
+    <p class="text-sm text-[var(--color-text-muted)]">View user package assignments with download usage and bandwidth tracking.</p>
+  </a>
+</div>
+
+{% endblock %}

@@ -4,7 +4,7 @@ from .models import APIEndpoint, APIKey, APIUsageLog
 
 
 @admin.register(APIKey)
-class APIKeyAdmin(admin.ModelAdmin):
+class APIKeyAdmin(admin.ModelAdmin[APIKey]):
     list_display = [
         "name",
         "user",
@@ -19,13 +19,13 @@ class APIKeyAdmin(admin.ModelAdmin):
 
 
 @admin.register(APIEndpoint)
-class APIEndpointAdmin(admin.ModelAdmin):
+class APIEndpointAdmin(admin.ModelAdmin[APIEndpoint]):
     list_display = ["method", "path", "rate_limit", "is_deprecated"]
     list_filter = ["method", "is_deprecated"]
 
 
 @admin.register(APIUsageLog)
-class APIUsageLogAdmin(admin.ModelAdmin):
+class APIUsageLogAdmin(admin.ModelAdmin[APIUsageLog]):
     list_display = ["endpoint", "method", "response_code", "latency_ms", "timestamp"]
     list_filter = ["response_code", "method"]
     readonly_fields = ["timestamp"]

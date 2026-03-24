@@ -12,7 +12,7 @@ from .models import (
 
 
 @admin.register(SharedDriveAccount)
-class SharedDriveAccountAdmin(admin.ModelAdmin):
+class SharedDriveAccountAdmin(admin.ModelAdmin[SharedDriveAccount]):
     list_display = [
         "name",
         "drive_id_short",
@@ -135,7 +135,7 @@ class SharedDriveAccountAdmin(admin.ModelAdmin):
 
 
 @admin.register(ServiceAccount)
-class ServiceAccountAdmin(admin.ModelAdmin):
+class ServiceAccountAdmin(admin.ModelAdmin[ServiceAccount]):
     list_display = [
         "name",
         "shared_drive",
@@ -264,7 +264,7 @@ class ServiceAccountAdmin(admin.ModelAdmin):
 
 
 @admin.register(FirmwareStorageLocation)
-class FirmwareStorageLocationAdmin(admin.ModelAdmin):
+class FirmwareStorageLocationAdmin(admin.ModelAdmin[FirmwareStorageLocation]):
     list_display = [
         "file_name",
         "storage_type",
@@ -342,7 +342,7 @@ class FirmwareStorageLocationAdmin(admin.ModelAdmin):
 
 
 @admin.register(UserDownloadSession)
-class UserDownloadSessionAdmin(admin.ModelAdmin):
+class UserDownloadSessionAdmin(admin.ModelAdmin[UserDownloadSession]):
     list_display = [
         "id_short",
         "user",
@@ -474,7 +474,7 @@ class UserDownloadSessionAdmin(admin.ModelAdmin):
 
 
 @admin.register(ServiceAccountQuotaLog)
-class ServiceAccountQuotaLogAdmin(admin.ModelAdmin):
+class ServiceAccountQuotaLogAdmin(admin.ModelAdmin[ServiceAccountQuotaLog]):
     list_display = [
         "service_account",
         "date",
@@ -495,7 +495,7 @@ class ServiceAccountQuotaLogAdmin(admin.ModelAdmin):
 
 
 @admin.register(DriveFileOrganization)
-class DriveFileOrganizationAdmin(admin.ModelAdmin):
+class DriveFileOrganizationAdmin(admin.ModelAdmin[DriveFileOrganization]):
     list_display = [
         "shared_drive",
         "path_display",

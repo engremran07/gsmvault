@@ -1,52 +1,15 @@
-{# Multi-CDN fallback — runs after DOMContentLoaded when deferred scripts have executed #}
+{# Local vendor integrity check — warns if any library failed to load #}
 {% load static %}
 <script nonce="{{ request.csp_nonce }}">
 (function() {
-  var currentNonce = document.currentScript.nonce || document.currentScript.getAttribute('nonce');
-  function loadFallback(testFn, urls, onLoad) {
-    if (testFn()) return;
-    for (var i = 0; i < urls.length; i++) {
-      var s = document.createElement('script');
-      s.src = urls[i];
-      if (currentNonce) s.nonce = currentNonce;
-      s.crossOrigin = 'anonymous';
-      if (onLoad) s.onload = onLoad;
-      document.head.appendChild(s);
-      break;
-    }
-  }
-  var iconInit = function() { if (typeof lucide !== 'undefined') lucide.createIcons(); };
-  // Check after deferred scripts have executed
   document.addEventListener('DOMContentLoaded', function() {
-    // HTMX fallback
-    loadFallback(
-      function() { return typeof htmx !== 'undefined'; },
-      [
-        'https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js',
-        'https://unpkg.com/htmx.org@2/dist/htmx.min.js',
-        '{% static "vendor/htmx/htmx.min.js" %}'
-      ]
-    );
-    // Lucide fallback
-    loadFallback(
-      function() { return typeof lucide !== 'undefined'; },
-      [
-        'https://unpkg.com/lucide@latest/dist/umd/lucide.min.js',
-        '{% static "vendor/lucide/lucide.min.js" %}'
-      ],
-      iconInit
-    );
-    // Alpine.js fallback — short delay since Alpine is last deferred script
-    setTimeout(function() {
-      loadFallback(
-        function() { return typeof Alpine !== 'undefined'; },
-        [
-          'https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.9/cdn.min.js',
-          'https://unpkg.com/alpinejs@3/dist/cdn.min.js',
-          '{% static "vendor/alpinejs/alpine.min.js" %}'
-        ]
-      );
-    }, 500);
+    if (typeof htmx === 'undefined') console.warn('[vendor] HTMX failed to load');
+    if (typeof lucide === 'undefined') console.warn('[vendor] Lucide failed to load');
+    else lucide.createIcons();
   });
+  // Alpine.js check — short delay since it's the last deferred script
+  setTimeout(function() {
+    if (typeof Alpine === 'undefined') console.warn('[vendor] Alpine.js failed to load');
+  }, 1000);
 })();
 </script>

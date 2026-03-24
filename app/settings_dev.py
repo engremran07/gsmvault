@@ -157,30 +157,18 @@ CACHES = {
 # Security headers (Content-Security-Policy extras)
 # ============================================================
 SECURITY_SCRIPT_SRC_EXTRA = (
-    "'unsafe-eval'",  # Required: Alpine.js CDN + Tailwind Browser CDN use eval()
-    "https://cdn.jsdelivr.net",
-    "https://cdnjs.cloudflare.com",
-    "https://unpkg.com",
+    "'unsafe-eval'",  # Required: Alpine.js + Tailwind Browser CDN use eval()
 )
-SECURITY_STYLE_SRC_EXTRA = (
-    "https://cdn.jsdelivr.net",
-    "https://cdnjs.cloudflare.com",
-    "https://unpkg.com",
-    "https://fonts.googleapis.com",
-)
-SECURITY_CONNECT_SRC_EXTRA = (
-    "https://cdn.jsdelivr.net",  # Source maps for CDN scripts (dev only)
-    "https://fonts.googleapis.com",
-    "https://fonts.gstatic.com",
-)
-SECURITY_FONT_SRC_EXTRA = ("https://fonts.gstatic.com",)
+SECURITY_STYLE_SRC_EXTRA: tuple[str, ...] = ()
+SECURITY_CONNECT_SRC_EXTRA: tuple[str, ...] = ()
+SECURITY_FONT_SRC_EXTRA: tuple[str, ...] = ()
 SECURITY_FRAME_SRC_EXTRA = (
     "https://www.youtube.com/",
     "https://www.youtube-nocookie.com/",
     "https://player.vimeo.com/",
 )
 
-# Relax COEP/CORP in dev — CDN resources need cross-origin access
+# All JS/CSS served from local vendor — no CDN cross-origin needed
 SECURITY_COEP_VALUE = "unsafe-none"
 SECURITY_CORP_VALUE = "cross-origin"
 

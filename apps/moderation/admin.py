@@ -4,14 +4,14 @@ from .models import Appeal, ModerationAction, ModerationItem, ModerationRule
 
 
 @admin.register(ModerationRule)
-class ModerationRuleAdmin(admin.ModelAdmin):
+class ModerationRuleAdmin(admin.ModelAdmin[ModerationRule]):
     list_display = ["name", "action", "severity", "is_active", "created_at"]
     list_filter = ["action", "is_active"]
     search_fields = ["name"]
 
 
 @admin.register(ModerationItem)
-class ModerationItemAdmin(admin.ModelAdmin):
+class ModerationItemAdmin(admin.ModelAdmin[ModerationItem]):
     list_display = [
         "pk",
         "content_type",
@@ -25,12 +25,12 @@ class ModerationItemAdmin(admin.ModelAdmin):
 
 
 @admin.register(ModerationAction)
-class ModerationActionAdmin(admin.ModelAdmin):
+class ModerationActionAdmin(admin.ModelAdmin[ModerationAction]):
     list_display = ["item", "action", "moderator", "created_at"]
     readonly_fields = ["created_at"]
 
 
 @admin.register(Appeal)
-class AppealAdmin(admin.ModelAdmin):
+class AppealAdmin(admin.ModelAdmin[Appeal]):
     list_display = ["item", "user", "status", "reviewer", "created_at"]
     list_filter = ["status"]

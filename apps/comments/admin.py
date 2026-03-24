@@ -5,7 +5,7 @@ from .models import Comment, CommentSettings
 
 
 @admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
+class CommentAdmin(admin.ModelAdmin[Comment]):
     list_display = ("post", "user", "status", "toxicity_score", "created_at")
     list_filter = ("status", "created_at")
     search_fields = ("body", "user__email", "post__title")

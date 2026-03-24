@@ -23,6 +23,9 @@ class SEOModel(TimestampedModel, SoftDeleteModel, AuditFieldsModel):
     class Meta:
         unique_together = ("content_type", "object_id")
 
+    def __str__(self) -> str:
+        return f"SEO:{self.content_type}#{self.object_id}"
+
 
 class Metadata(TimestampedModel):
     seo = models.OneToOneField(
@@ -43,6 +46,9 @@ class Metadata(TimestampedModel):
     schema_json = models.JSONField(default=dict, blank=True)
     generated_at = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self) -> str:
+        return self.meta_title or f"Metadata for {self.seo}"
+
 
 class SchemaEntry(TimestampedModel):
     seo = models.ForeignKey(SEOModel, on_delete=models.CASCADE, related_name="schemas")
@@ -50,6 +56,9 @@ class SchemaEntry(TimestampedModel):
     payload = models.JSONField(default=dict, blank=True)
     locked = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return f"{self.schema_type} schema for {self.seo}"
 
 
 class SitemapEntry(TimestampedModel):
@@ -64,6 +73,9 @@ class SitemapEntry(TimestampedModel):
     class Meta:
         ordering = ["-created_at"]
 
+    def __str__(self) -> str:
+        return self.url
+
 
 class Redirect(TimestampedModel):
     source = models.CharField(max_length=255, unique=True)
@@ -73,6 +85,9 @@ class Redirect(TimestampedModel):
 
     class Meta:
         ordering = ["source"]
+
+    def __str__(self) -> str:
+        return f"{self.source} → {self.target}"
 
 
 class LinkableEntity(TimestampedModel):
@@ -96,6 +111,9 @@ class LinkableEntity(TimestampedModel):
     class Meta:
         unique_together = ("content_type", "object_id")
         indexes = [models.Index(fields=["content_type", "object_id"])]
+
+    def __str__(self) -> str:
+        return self.title
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -122,6 +140,9 @@ class LinkSuggestion(TimestampedModel):
 
     class Meta:
         unique_together = ("source", "target")
+
+    def __str__(self) -> str:
+        return f"{self.source} → {self.target} ({self.score:.2f})"
 
 
 class SEOSettings(SingletonModel):

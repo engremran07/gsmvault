@@ -21,7 +21,7 @@ from .models import (
 
 
 @admin.register(SocialAccount)
-class SocialAccountAdmin(admin.ModelAdmin):
+class SocialAccountAdmin(admin.ModelAdmin[SocialAccount]):
     list_display = ("channel", "account_name", "is_active", "last_tested_at")
     list_filter = ("channel", "is_active")
     search_fields = ("account_name",)
@@ -57,28 +57,28 @@ class SocialAccountAdmin(admin.ModelAdmin):
 
 
 @admin.register(ShareTemplate)
-class ShareTemplateAdmin(admin.ModelAdmin):
+class ShareTemplateAdmin(admin.ModelAdmin[ShareTemplate]):
     list_display = ("channel", "name", "is_default")
     list_filter = ("channel", "is_default")
     search_fields = ("name",)
 
 
 @admin.register(ContentVariant)
-class ContentVariantAdmin(admin.ModelAdmin):
+class ContentVariantAdmin(admin.ModelAdmin[ContentVariant]):
     list_display = ("post", "channel", "variant_type", "generated_at")
     list_filter = ("channel", "variant_type")
     search_fields = ("post__title",)
 
 
 @admin.register(SharePlan)
-class SharePlanAdmin(admin.ModelAdmin):
+class SharePlanAdmin(admin.ModelAdmin[SharePlan]):
     list_display = ("post", "status", "schedule_at", "created_at")
     list_filter = ("status",)
     search_fields = ("post__title",)
 
 
 @admin.register(ShareJob)
-class ShareJobAdmin(admin.ModelAdmin):
+class ShareJobAdmin(admin.ModelAdmin[ShareJob]):
     list_display = ("post", "channel", "status", "schedule_at", "attempt_count")
     list_filter = ("channel", "status")
     search_fields = ("post__title", "external_post_id")
@@ -115,20 +115,20 @@ class ShareJobAdmin(admin.ModelAdmin):
 
 
 @admin.register(ShareLog)
-class ShareLogAdmin(admin.ModelAdmin):
+class ShareLogAdmin(admin.ModelAdmin[ShareLog]):
     list_display = ("job", "level", "created_at")
     list_filter = ("level",)
     search_fields = ("message",)
 
 
 @admin.register(WebSubSubscription)
-class WebSubSubscriptionAdmin(admin.ModelAdmin):
+class WebSubSubscriptionAdmin(admin.ModelAdmin[WebSubSubscription]):
     list_display = ("topic_url", "hub_url", "active", "last_pinged_at")
     list_filter = ("active",)
 
 
 @admin.register(SyndicationPartner)
-class SyndicationPartnerAdmin(admin.ModelAdmin):
+class SyndicationPartnerAdmin(admin.ModelAdmin[SyndicationPartner]):
     list_display = ("name", "format", "enabled")
     list_filter = ("enabled", "format")
     search_fields = ("name",)
@@ -248,7 +248,7 @@ class DistributionSettingsAdmin(SingletonModelAdmin):
 
 
 @admin.register(ContentDistribution)
-class ContentDistributionAdmin(admin.ModelAdmin):
+class ContentDistributionAdmin(admin.ModelAdmin[ContentDistribution]):
     """
     Tracks individual content distribution jobs across platforms.
     View status, retry failed distributions, and monitor platform delivery.

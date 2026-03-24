@@ -25,9 +25,12 @@ Enterprise-grade Django 5.2 firmware distribution platform. Django-served fronte
 
 ## Architecture at a Glance
 
-- 30 Django apps in `apps/` — all consolidated, zero dissolved stubs
+- 31 Django apps in `apps/` — all consolidated, zero dissolved stubs
 - `apps.core` = Enterprise infrastructure layer (NOT a shim — only `models.py` re-exports)
 - `apps.consent` = Privacy enforcement layer (models.py is shim, rest is active code)
+- `apps.forum` = Full community forum (4PDA/vBulletin/Discourse) — self-contained with services layer
+- `apps.ads` = Autonomous ads management (18+ models, rotation/targeting engines, rewarded ads, affiliate pipeline, AI optimizer)
+- `apps.seo` = Full SEO engine (metadata, sitemaps, JSON-LD, redirects, internal linking, AI automation, 7 admin toggles)
 - WAF rate limiting (`apps.security`) ≠ Download quotas (`apps.firmwares` + `apps.devices`)
 - 23 reusable components in `templates/components/` — always use them, never inline
 - 3 themes via CSS custom properties: `dark` (default), `light`, `contrast`
@@ -44,7 +47,7 @@ Enterprise-grade Django 5.2 firmware distribution platform. Django-served fronte
 - Django reverse FK managers → `# type: ignore[attr-defined]`
 - For cross-app communication: use `apps.core.events.EventBus` or Django signals
 
-## Top 10 Gotchas
+## Critical Gotchas
 
 1. `--color-accent-text` is WHITE in dark/light but BLACK in contrast — use the token, never hardcode
 2. Alpine.js `x-show` + CSS animations conflict → remove animation classes on `x-show` elements
@@ -56,8 +59,9 @@ Enterprise-grade Django 5.2 firmware distribution platform. Django-served fronte
 8. Always `select_for_update()` on wallet transactions
 9. Views CAN import from multiple apps (they are orchestrators); models/services must NOT cross boundaries
 10. `apps/admin/` is the ONLY app allowed to import models from ALL other apps
-11. Consent form views NEVER return JSON — `accept_all`, `reject_all`, `accept` always return `HttpResponseRedirect` to `HTTP_REFERER`. Cookie is set on the redirect response. `fetch()` callers follow the redirect automatically. See `apps/consent/views.py` `_consent_done()` for the canonical pattern. For JSON consent API, use `consent/api/status/` and `consent/api/update/` (separate DRF endpoints).
-12. `requirements.txt` is the single source of truth for all deps — every `pip install` must update it, every entry must be used, check `Required-by:` before removing. See `.github/skills/requirements-management/SKILL.md`.
+11. Consent form views NEVER return JSON — always `HttpResponseRedirect` to `HTTP_REFERER`. Cookie set on redirect. For JSON API, use `consent/api/status/` and `consent/api/update/` (separate DRF endpoints). See `apps/consent/views.py` `_consent_done()`.
+12. `requirements.txt` is the single source of truth — every `pip install` must update it, every entry must be used, check `Required-by:` before removing
+13. Every new feature/app MUST be documented in `README.md`, `AGENTS.md`, and this file before the task is considered complete
 
 ## Key References
 

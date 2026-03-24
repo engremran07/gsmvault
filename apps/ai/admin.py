@@ -24,28 +24,28 @@ class AISettingsAdmin(SingletonModelAdmin):
 
 
 @admin.register(ModelEndpoint)
-class ModelEndpointAdmin(admin.ModelAdmin):
+class ModelEndpointAdmin(admin.ModelAdmin[ModelEndpoint]):
     list_display = ("name", "kind", "provider", "is_active", "updated_at")
     list_filter = ("kind", "is_active")
     search_fields = ("name", "provider")
 
 
 @admin.register(KnowledgeSource)
-class KnowledgeSourceAdmin(admin.ModelAdmin):
+class KnowledgeSourceAdmin(admin.ModelAdmin[KnowledgeSource]):
     list_display = ("name", "source_type", "is_active", "last_indexed_at")
     list_filter = ("source_type", "is_active")
     search_fields = ("name", "location")
 
 
 @admin.register(Workflow)
-class WorkflowAdmin(admin.ModelAdmin):
+class WorkflowAdmin(admin.ModelAdmin[Workflow]):
     list_display = ("name", "is_active", "updated_at")
     search_fields = ("name", "description")
     list_filter = ("is_active",)
 
 
 @admin.register(PipelineRun)
-class PipelineRunAdmin(admin.ModelAdmin):
+class PipelineRunAdmin(admin.ModelAdmin[PipelineRun]):
     list_display = ("id", "workflow", "status", "started_at", "finished_at")
     list_filter = ("status", "started_at")
     search_fields = ("workflow__name",)

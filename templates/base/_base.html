@@ -2,13 +2,11 @@
 <html lang="{{ LANGUAGE_CODE|default:'en' }}" data-theme="dark">
 <head>
   {% include "base/_head.html" %}
+  {% include "ads/includes/_network_head_scripts.html" %}
   {% block extra_css %}{% endblock %}
 </head>
 <body class="m-0 p-0 bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] min-h-screen flex flex-col antialiased"
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-      hx-boost="true"
-      hx-push-url="true"
-      hx-swap="innerHTML transition:true settle:0">{% block site_nav %}{% include "base/_nav.html" %}{% endblock %}{% include "base/_messages.html" %}
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>{% block site_nav %}{% include "base/_nav.html" %}{% endblock %}{% include "base/_messages.html" %}
   <main class="flex-1">
     {% block content %}{% endblock %}
   </main>{% block site_footer %}{% include "base/_footer.html" %}{% endblock %}
@@ -22,6 +20,15 @@
   {% include "consent/includes/banner.html" %}
   {% endif %}
   {% endblock consent_banner %}
+
+  {# Anchor (sticky footer) ad — slides up from bottom #}
+  {% include "ads/includes/_anchor_ad.html" %}
+
+  {# Vignette (full-screen interstitial) ad — between page navigations #}
+  {% include "ads/includes/_vignette_ad.html" %}
+
+  {# Ad network body scripts (before </body>) #}
+  {% include "ads/includes/_network_body_scripts.html" %}
 
   {% include "base/_scripts.html" %}
   {% block extra_js %}{% endblock %}

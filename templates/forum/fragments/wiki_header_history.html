@@ -1,0 +1,25 @@
+{# templates/forum/fragments/wiki_header_history.html — Wiki header edit history #}
+{% load static %}
+
+<div class="space-y-4">
+  <h3 class="text-lg font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+    <i data-lucide="history" class="w-5 h-5 text-[var(--color-accent)]"></i>
+    Wiki Header History
+  </h3>
+
+  {% for entry in history %}
+  <div class="bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border)] p-4">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm text-[var(--color-text-secondary)]">
+        Edited by <strong class="text-[var(--color-text-primary)]">{{ entry.edited_by }}</strong>
+      </span>
+      <span class="text-xs text-[var(--color-text-secondary)]">{{ entry.created_at|timesince }} ago</span>
+    </div>
+    <div class="prose prose-invert max-w-none text-sm text-[var(--color-text-secondary)]">
+      {{ entry.content_html|safe }}
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-[var(--color-text-secondary)] text-sm">No edit history.</p>
+  {% endfor %}
+</div>
