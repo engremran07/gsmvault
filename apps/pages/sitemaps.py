@@ -88,6 +88,10 @@ class StaticViewsSitemap(Sitemap):
         candidates = [
             ("home", None),
             ("blog:post_list", None),
+            ("forum:index", None),
+            ("firmwares:library_hub", None),
+            ("firmwares:brand_list", None),
+            ("firmwares:browse", None),
         ]
         resolved: list[tuple[str, dict | None]] = []
         for name, kwargs in candidates:

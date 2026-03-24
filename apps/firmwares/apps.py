@@ -26,9 +26,14 @@ class FirmwaresConfig(AppConfig):
         try:
             from apps.pages.sitemap_registry import register_sitemap
 
-            from .sitemaps import FirmwareBrandsSitemap, FirmwareModelsSitemap
+            from .sitemaps import (
+                FirmwareBrandsSitemap,
+                FirmwareFileSitemap,
+                FirmwareModelsSitemap,
+            )
 
             register_sitemap("brands", FirmwareBrandsSitemap)
             register_sitemap("models", FirmwareModelsSitemap)
+            register_sitemap("firmware-files", FirmwareFileSitemap)
         except Exception:  # noqa: S110
             pass

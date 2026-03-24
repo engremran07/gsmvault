@@ -9,3 +9,14 @@ class ForumConfig(AppConfig):
 
     def ready(self) -> None:
         from . import signals  # noqa: F401
+
+        # Register forum sitemaps
+        try:
+            from apps.pages.sitemap_registry import register_sitemap
+
+            from .sitemaps import ForumCategorySitemap, ForumTopicSitemap
+
+            register_sitemap("forum-categories", ForumCategorySitemap)
+            register_sitemap("forum-topics", ForumTopicSitemap)
+        except Exception:  # noqa: S110
+            pass
