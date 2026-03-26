@@ -1,0 +1,188 @@
+{# templates/firmwares/flashing_tool_detail.html — Single flashing tool detail #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}{{ tool.name }} — Flashing Tools{% endblock %}
+{% block meta_description %}{{ tool.description|truncatewords:30 }}{% endblock %}
+
+{% block page_header %}
+{% include "components/_breadcrumb.html" with items=breadcrumbs %}
+
+<div class="flex flex-col md:flex-row md:items-start gap-6 mb-8 mt-4">
+  {% if tool.hero_image %}
+  <img src="{{ tool.hero_image.url }}" alt="{{ tool.name }}" class="w-20 h-20 rounded-xl object-cover">
+  {% else %}
+  <div class="w-20 h-20 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
+    <i data-lucide="wrench" class="w-10 h-10 text-[var(--color-accent)]"></i>
+  </div>
+  {% endif %}
+  <div class="flex-1">
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)]">{{ tool.name }}</h1>
+    <div class="flex flex-wrap items-center gap-2 mt-2">
+      {% include "components/_badge.html" with label=tool.get_tool_type_display variant="info" %}
+      {% include "components/_badge.html" with label=tool.get_platform_display variant="default" %}
+      <span class="text-xs px-2 py-0.5 rounded-full
+        {% if tool.risk_level == 'safe' %}bg-[var(--color-success)]/15 text-[var(--color-success)]
+        {% elif tool.risk_level == 'moderate' %}bg-[var(--color-warning)]/15 text-[var(--color-warning)]
+        {% elif tool.risk_level == 'risky' %}bg-[var(--color-error)]/15 text-[var(--color-error)]
+        {% else %}bg-[var(--color-accent)]/15 text-[var(--color-accent)]{% endif %}">
+        {{ tool.get_risk_level_display }}
+      </span>
+      {% if tool.is_free %}
+      <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-success)]/15 text-[var(--color-success)]">Free</span>
+      {% else %}
+      <span class="text-xs px-2 py-0.5 rounded-full bg-[var(--color-warning)]/15 text-[var(--color-warning)]">Paid</span>
+      {% endif %}
+      {% if tool.version %}
+      <span class="text-xs text-[var(--color-text-muted)]">v{{ tool.version }}</span>
+      {% endif %}
+    </div>
+    <p class="text-[var(--color-text-secondary)] mt-3">{{ tool.description }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  {# ── Main Content ── #}
+  <div class="lg:col-span-2 space-y-8">
+    {# Features #}
+    {% if tool.features %}
+    <div>
+      <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+        <i data-lucide="list-checks" class="w-5 h-5 text-[var(--color-accent)]"></i> Features
+      </h2>
+      <ul class="space-y-2">
+        {% for feature in tool.features %}
+        <li class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--color-success)] mt-0.5 shrink-0"></i>
+          {{ feature }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {# Requirements #}
+    {% if tool.requirements %}
+    <div>
+      <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+        <i data-lucide="monitor" class="w-5 h-5 text-[var(--color-accent)]"></i> Requirements
+      </h2>
+      <ul class="space-y-2">
+        {% for req in tool.requirements %}
+        <li class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+          <i data-lucide="circle-dot" class="w-4 h-4 text-[var(--color-text-muted)] mt-0.5 shrink-0"></i>
+          {{ req }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {# Instructions #}
+    {% if tool.instructions %}
+    <div>
+      <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+        <i data-lucide="book-open" class="w-5 h-5 text-[var(--color-accent)]"></i> Instructions
+      </h2>
+      <div class="prose prose-sm text-[var(--color-text-secondary)] max-w-none">
+        {{ tool.instructions|linebreaksbr }}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Related Guides #}
+    {% if related_guides %}
+    <div>
+      <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+        <i data-lucide="file-text" class="w-5 h-5 text-[var(--color-accent)]"></i> Related Guides
+      </h2>
+      <div class="space-y-3">
+        {% for guide in related_guides %}
+        <a href="{% url 'blog:post_detail' slug=guide.post.slug %}"
+           class="block rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 hover:border-[var(--color-accent)]/50 transition-colors">
+          <h4 class="text-sm font-medium text-[var(--color-text-primary)]">{{ guide.post.title }}</h4>
+          {% if guide.brand %}
+          <p class="text-xs text-[var(--color-text-muted)] mt-1">{{ guide.brand.name }}{% if guide.model %} — {{ guide.model.name }}{% endif %}</p>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ── Sidebar ── #}
+  <div class="space-y-6">
+    {# Download / Links Card #}
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <h3 class="font-semibold text-[var(--color-text-primary)] mb-4">Download</h3>
+      {% if tool.download_url %}
+      <a href="{{ tool.download_url }}" target="_blank" rel="noopener noreferrer"
+         class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium text-sm hover:opacity-90 transition-opacity mb-3">
+        <i data-lucide="download" class="w-4 h-4"></i> Download v{{ tool.version|default:"Latest" }}
+      </a>
+      {% endif %}
+      {% if tool.official_url %}
+      <a href="{{ tool.official_url }}" target="_blank" rel="noopener noreferrer"
+         class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] transition-colors">
+        <i data-lucide="external-link" class="w-4 h-4"></i> Official Website
+      </a>
+      {% endif %}
+    </div>
+
+    {# Stats #}
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <h3 class="font-semibold text-[var(--color-text-primary)] mb-3">Stats</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-[var(--color-text-muted)]">Views</span>
+          <span class="text-[var(--color-text-primary)] font-medium">{{ tool.views_count }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[var(--color-text-muted)]">Downloads</span>
+          <span class="text-[var(--color-text-primary)] font-medium">{{ tool.downloads_count }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[var(--color-text-muted)]">Category</span>
+          <span class="text-[var(--color-text-primary)] font-medium">{{ tool.category.name }}</span>
+        </div>
+        {% if tool.last_version_date %}
+        <div class="flex justify-between">
+          <span class="text-[var(--color-text-muted)]">Last Updated</span>
+          <span class="text-[var(--color-text-primary)] font-medium">{{ tool.last_version_date|date:"M Y" }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Supported Chipsets #}
+    {% if tool.supported_chipsets %}
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <h3 class="font-semibold text-[var(--color-text-primary)] mb-3">Supported Chipsets</h3>
+      <div class="flex flex-wrap gap-1.5">
+        {% for chipset in tool.supported_chipsets %}
+        <span class="px-2 py-0.5 text-xs rounded-full bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">{{ chipset }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Supported Brands #}
+    {% if brands %}
+    <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+      <h3 class="font-semibold text-[var(--color-text-primary)] mb-3">Supported Brands</h3>
+      <div class="flex flex-wrap gap-1.5">
+        {% for brand in brands %}
+        <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
+           class="px-2 py-0.5 text-xs rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors">
+          {{ brand.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

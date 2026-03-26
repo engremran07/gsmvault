@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -17,7 +18,7 @@ def get_shop_stats() -> dict[str, Any]:
     from apps.shop.models import Order, PackageTier, Subscription, UserPackage
 
     now = timezone.now()
-    thirty_days_ago = now - timezone.timedelta(days=30)
+    thirty_days_ago = now - timedelta(days=30)
 
     active_subs = Subscription.objects.filter(status="active").count()
     total_orders = Order.objects.count()
@@ -44,7 +45,7 @@ def get_shop_stats() -> dict[str, Any]:
     }
 
 
-def get_package_tier_list() -> list[dict[str, Any]]:
+def get_package_tier_list() -> list[Any]:
     """Return all package tiers with subscriber counts for admin view."""
     from apps.shop.models import PackageTier
 

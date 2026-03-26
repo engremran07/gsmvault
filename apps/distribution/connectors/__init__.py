@@ -93,6 +93,18 @@ def connector_for(channel: str) -> Connector:
     return mapping.get(channel) or StubConnector()
 
 
+def _resolve_posting_account(channel: str) -> bool:
+    """Check if a SocialPostingAccount with credentials exists for the channel."""
+    try:
+        from apps.users.models_social import SocialPostingAccount
+
+        return SocialPostingAccount.objects.filter(
+            platform=channel, status="active", is_enabled=True
+        ).exists()
+    except Exception:
+        return False
+
+
 def dispatch(job: ShareJob) -> ConnectorResult:
     cfg = get_settings()
     # Honor indexing toggle
@@ -105,7 +117,8 @@ def dispatch(job: ShareJob) -> ConnectorResult:
             message="Indexing jobs disabled in settings",
         )
 
-    # Require an active SocialAccount for channels that need credentials
+    # Require an active SocialAccount or SocialPostingAccount for channels that
+    # need credentials.
     account_required = {
         "twitter",
         "linkedin",
@@ -129,10 +142,12 @@ def dispatch(job: ShareJob) -> ConnectorResult:
     account = job.account
     if job.channel in account_required:
         if not account or not getattr(account, "is_active", False):
-            has_account = SocialAccount.objects.filter(
+            # Check legacy SocialAccount first, then SocialPostingAccount
+            has_legacy = SocialAccount.objects.filter(
                 channel=job.channel, is_active=True
             ).exists()
-            if not has_account:
+            has_posting = _resolve_posting_account(job.channel)
+            if not has_legacy and not has_posting:
                 return ConnectorResult(
                     ok=True,
                     status_override="skipped",
@@ -144,11 +159,13 @@ def dispatch(job: ShareJob) -> ConnectorResult:
                 message="Job has no account assigned; active provider exists but was not linked",
             )
         if not account.access_token:
-            return ConnectorResult(
-                ok=True,
-                status_override="skipped",
-                message="Provider configured but missing access_token",
-            )
+            # Fallback: check if SocialPostingAccount has credentials
+            if not _resolve_posting_account(job.channel):
+                return ConnectorResult(
+                    ok=True,
+                    status_override="skipped",
+                    message="Provider configured but missing access_token",
+                )
 
     connector = connector_for(job.channel)
     try:

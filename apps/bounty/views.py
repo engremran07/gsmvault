@@ -10,6 +10,7 @@ from django.db.models import Count, Q, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from . import services as bounty_services
 from .models import BountyRequest, BountySubmission
 
 logger = logging.getLogger(__name__)
@@ -59,7 +60,9 @@ def bounty_list(request: HttpRequest) -> HttpResponse:
 def bounty_detail(request: HttpRequest, pk: int) -> HttpResponse:
     """Bounty detail with all submissions/solutions."""
     bounty = get_object_or_404(
-        BountyRequest.objects.select_related("user", "brand", "device_model"),
+        BountyRequest.objects.select_related(
+            "user", "brand", "device_model", "forum_topic"
+        ),
         pk=pk,
     )
     submissions = (
@@ -73,11 +76,34 @@ def bounty_detail(request: HttpRequest, pk: int) -> HttpResponse:
         request.user.is_authenticated and submissions.filter(user=request.user).exists()
     )
 
+    # Forum discussion link
+    forum_discussion_url = None
+    if bounty.forum_topic_id:  # type: ignore[attr-defined]
+        try:
+            from django.urls import reverse
+
+            topic = bounty.forum_topic
+            forum_discussion_url = reverse(
+                "forum:topic_detail",
+                kwargs={"pk": topic.pk, "slug": topic.slug},  # type: ignore[union-attr]
+            )
+        except Exception:  # noqa: S110
+            pass
+
+    # Escrow info
+    escrow = None
+    try:
+        escrow = bounty.escrow  # type: ignore[attr-defined]
+    except Exception:  # noqa: S110
+        pass
+
     context = {
         "bounty": bounty,
         "submissions": submissions,
         "is_owner": is_owner,
         "has_submitted": has_submitted,
+        "forum_discussion_url": forum_discussion_url,
+        "escrow": escrow,
     }
     return render(request, "bounty/bounty_detail.html", context)
 
@@ -100,6 +126,7 @@ def bounty_create(request: HttpRequest) -> HttpResponse:
                 "bounty/bounty_create.html",
                 {
                     "request_type_choices": BountyRequest.RequestType.choices,
+                    "brands": _get_brands(),
                 },
             )
 
@@ -108,36 +135,41 @@ def bounty_create(request: HttpRequest) -> HttpResponse:
         model_id = request.POST.get("device_model") or None
 
         try:
-            reward_decimal = max(0, float(reward))
-        except (ValueError, TypeError):
-            reward_decimal = 0
+            from apps.wallet.services import InsufficientFundsError
 
-        bounty = BountyRequest.objects.create(
-            user=request.user,
-            title=title,
-            request_type=request_type,
-            description=description,
-            what_tried=what_tried,
-            fw_version_wanted=fw_version,
-            reward_amount=reward_decimal,
-            brand_id=brand_id,
-            device_model_id=model_id,
-        )
+            bounty = bounty_services.create_bounty(
+                user=request.user,  # type: ignore[arg-type]
+                title=title,
+                request_type=request_type,
+                description=description,
+                what_tried=what_tried,
+                fw_version_wanted=fw_version,
+                reward_amount=reward,
+                brand_id=brand_id,
+                device_model_id=model_id,
+            )
+        except InsufficientFundsError:
+            messages.error(
+                request,
+                "Insufficient wallet balance to escrow the reward amount. "
+                "Please top up your wallet or reduce the reward.",
+            )
+            return render(
+                request,
+                "bounty/bounty_create.html",
+                {
+                    "request_type_choices": BountyRequest.RequestType.choices,
+                    "brands": _get_brands(),
+                },
+            )
+
         messages.success(request, f"Bounty '{bounty.title}' created successfully!")
         return redirect("bounty:bounty_detail", pk=bounty.pk)
 
     # GET — show form
-    brands = []
-    try:
-        from apps.firmwares.models import Brand
-
-        brands = list(Brand.objects.order_by("name").values("id", "name"))
-    except Exception:  # noqa: S110
-        pass
-
     context = {
         "request_type_choices": BountyRequest.RequestType.choices,
-        "brands": brands,
+        "brands": _get_brands(),
     }
     return render(request, "bounty/bounty_create.html", context)
 
@@ -231,13 +263,27 @@ def bounty_resolve(request: HttpRequest, pk: int) -> HttpResponse:
         resolution_type = request.POST.get("resolution_type", "single")
         resolution_note = request.POST.get("resolution_note", "").strip()
 
-        bounty.status = BountyRequest.Status.FULFILLED
-        bounty.resolution_type = resolution_type
-        bounty.resolution_note = resolution_note
-        bounty.save(
-            update_fields=["status", "resolution_type", "resolution_note", "updated_at"]
+        bounty_services.resolve_bounty(
+            bounty,
+            resolution_type=resolution_type,
+            resolution_note=resolution_note,
         )
 
         messages.success(request, "Bounty has been marked as resolved!")
 
     return redirect("bounty:bounty_detail", pk=pk)
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _get_brands() -> list[dict[str, object]]:
+    """Return a lightweight brand list for the create form."""
+    try:
+        from apps.firmwares.models import Brand
+
+        return list(Brand.objects.order_by("name").values("id", "name"))
+    except Exception:  # noqa: S110
+        return []

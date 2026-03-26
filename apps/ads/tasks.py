@@ -4,7 +4,19 @@ import logging
 from datetime import timedelta
 from typing import Any
 
-from celery import shared_task
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
+
 from django.db.models import Count
 from django.utils import timezone
 
@@ -252,6 +264,8 @@ def ai_optimize_ad_placements(self) -> dict[str, Any]:
 @shared_task(
     bind=True,
     acks_late=True,
+    soft_time_limit=60,
+    time_limit=120,
 )
 def process_rewarded_ad_completion(
     self,
@@ -479,13 +493,13 @@ def _sync_premium_network(network) -> dict[str, Any]:
 # ==================== SCHEDULED TASK REGISTRATION ====================
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, soft_time_limit=30, time_limit=60)
 def ads_hourly_tasks(self):
     """Run all hourly ads tasks."""
     aggregate_events.delay()  # type: ignore[attr-defined]
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, soft_time_limit=30, time_limit=60)
 def ads_daily_tasks(self):
     """Run all daily ads tasks."""
     cleanup_old_events.delay()  # type: ignore[attr-defined]

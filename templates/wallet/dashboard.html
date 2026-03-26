@@ -1,0 +1,122 @@
+{# templates/wallet/dashboard.html — Wallet overview page #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Wallet — Balance & Transactions{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+      <i data-lucide="wallet" class="w-8 h-8 text-[var(--color-accent)]"></i>
+      Wallet
+    </h1>
+  </div>
+  <div class="flex gap-3">
+    <a href="{% url 'wallet_public:transactions' %}"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+      <i data-lucide="list" class="w-4 h-4"></i> All Transactions
+    </a>
+    <a href="{% url 'wallet_public:payouts' %}"
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+      <i data-lucide="banknote" class="w-4 h-4"></i> Payouts
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{% if wallet %}
+{# ── Balance Card ── #}
+<div class="rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 mb-8">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div class="text-center sm:text-left">
+      <p class="text-sm text-[var(--color-text-muted)] mb-1">Available Balance</p>
+      <p class="text-3xl font-bold text-[var(--color-success)]">{{ wallet.balance }} <span class="text-base font-normal text-[var(--color-text-muted)]">{{ wallet.currency }}</span></p>
+    </div>
+    <div class="text-center sm:text-left">
+      <p class="text-sm text-[var(--color-text-muted)] mb-1">Locked Balance</p>
+      <p class="text-3xl font-bold text-[var(--color-warning)]">{{ wallet.locked_balance }} <span class="text-base font-normal text-[var(--color-text-muted)]">{{ wallet.currency }}</span></p>
+    </div>
+    <div class="text-center sm:text-left flex items-center">
+      {% if wallet.is_frozen %}
+      <span class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-error)] bg-[var(--color-error)]/10 px-3 py-1.5 rounded-full">
+        <i data-lucide="lock" class="w-4 h-4"></i> Wallet Frozen
+      </span>
+      {% else %}
+      <span class="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1.5 rounded-full">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Active
+      </span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# ── Pending Payouts ── #}
+{% if pending_payouts %}
+<div class="rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/5 p-4 mb-6">
+  <div class="flex items-center gap-2 mb-2">
+    <i data-lucide="clock" class="w-4 h-4 text-[var(--color-warning)]"></i>
+    <span class="text-sm font-semibold text-[var(--color-warning)]">Pending Payouts</span>
+  </div>
+  {% for payout in pending_payouts %}
+  <div class="flex items-center justify-between py-1 text-sm">
+    <span class="text-[var(--color-text-secondary)]">{{ payout.amount }} {{ wallet.currency }} via {{ payout.get_method_display }}</span>
+    <span class="text-[var(--color-text-muted)]">{{ payout.created_at|date:"M d" }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── Recent Ledger ── #}
+{% include "components/_section_header.html" with title="Recent Activity" action_url="/wallet/transactions/" action_label="View All" %}
+
+{% if recent_ledger %}
+<div class="mt-4 rounded-xl border border-[var(--color-border)] overflow-hidden">
+  <div class="divide-y divide-[var(--color-border)]/50">
+    {% for entry in recent_ledger %}
+    <div class="flex items-center justify-between px-5 py-3 bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
+      <div class="flex items-center gap-3">
+        {% if entry.entry_type == 'credit' %}
+        <div class="w-8 h-8 rounded-full bg-[var(--color-success)]/10 flex items-center justify-center">
+          <i data-lucide="arrow-down-left" class="w-4 h-4 text-[var(--color-success)]"></i>
+        </div>
+        {% elif entry.entry_type == 'debit' %}
+        <div class="w-8 h-8 rounded-full bg-[var(--color-error)]/10 flex items-center justify-center">
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-[var(--color-error)]"></i>
+        </div>
+        {% else %}
+        <div class="w-8 h-8 rounded-full bg-[var(--color-text-muted)]/10 flex items-center justify-center">
+          <i data-lucide="lock" class="w-4 h-4 text-[var(--color-text-muted)]"></i>
+        </div>
+        {% endif %}
+        <div>
+          <p class="text-sm font-medium text-[var(--color-text-primary)]">{{ entry.description|truncatewords:8 }}</p>
+          <p class="text-xs text-[var(--color-text-muted)]">{{ entry.created_at|timesince }} ago</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-bold {% if entry.entry_type == 'credit' %}text-[var(--color-success)]{% elif entry.entry_type == 'debit' %}text-[var(--color-error)]{% else %}text-[var(--color-text-muted)]{% endif %}">
+          {% if entry.entry_type == 'credit' %}+{% elif entry.entry_type == 'debit' %}-{% endif %}{{ entry.amount }}
+        </p>
+        <p class="text-xs text-[var(--color-text-muted)]">Bal: {{ entry.balance_after }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="wallet" message="No transactions yet" %}
+{% endif %}
+
+{% else %}
+{# No wallet #}
+<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-8 text-center">
+  <div class="w-16 h-16 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-4">
+    <i data-lucide="wallet" class="w-8 h-8 text-[var(--color-accent)]"></i>
+  </div>
+  <h2 class="text-xl font-bold text-[var(--color-text-primary)] mb-2">No Wallet Found</h2>
+  <p class="text-[var(--color-text-secondary)]">Your wallet will be created automatically when you earn or purchase credits.</p>
+</div>
+{% endif %}
+{% endblock %}

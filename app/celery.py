@@ -83,6 +83,11 @@ app.conf.beat_schedule = {
         "task": "apps.firmwares.tasks.scheduled_multi_source_scrape",
         "schedule": timedelta(hours=1),
     },
+    # Blog catch-up: finds firmware Models missing blog posts (signal recovery)
+    "blog-catchup-missing-posts": {
+        "task": "apps.firmwares.tasks.catchup_missing_blog_posts",
+        "schedule": timedelta(hours=1),
+    },
 }
 
 app.autodiscover_tasks()

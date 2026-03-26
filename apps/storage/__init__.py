@@ -31,7 +31,7 @@ Usage:
         )
 
 For complete integration examples, see:
-    apps/storage/INTEGRATION_EXAMPLES.py
+    apps/storage/integration_examples.py
 """
 
 # Public API (lazy-loaded via __getattr__ below)

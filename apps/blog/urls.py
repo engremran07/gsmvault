@@ -45,6 +45,10 @@ urlpatterns = [
     ),
     # Search
     path("search/", views.blog_search, name="blog_search"),
+    # Ad gate — rewards-based content unlock
+    path(
+        "<slug:slug>/ad-gate/complete/", views.ad_gate_complete, name="ad_gate_complete"
+    ),
     # Post detail — MUST be last (catch-all slug)
     path("<slug:slug>/", views.post_detail, name="post_detail"),
 ]

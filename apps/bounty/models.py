@@ -95,6 +95,17 @@ class BountyRequest(models.Model):
     )
 
     expires_at = models.DateTimeField(null=True, blank=True)
+
+    # Forum integration — auto-created on bounty creation
+    forum_topic = models.ForeignKey(
+        "forum.ForumTopic",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="bounty_requests",
+        help_text="Auto-linked forum discussion for this bounty.",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -9,14 +9,26 @@ Periodic tasks to:
 import logging
 from datetime import timedelta
 
-from celery import shared_task
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
+
 from django.apps import apps
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
 
-@shared_task
+@shared_task(soft_time_limit=120, time_limit=180)
 def aggregate_daily_firmware_stats():
     """
     Daily task to aggregate FirmwareView and FirmwareDownloadAttempt into FirmwareStats
@@ -93,7 +105,7 @@ def aggregate_daily_firmware_stats():
         return {"error": str(e)}
 
 
-@shared_task
+@shared_task(soft_time_limit=120, time_limit=180)
 def cleanup_old_tracking_data(days_to_keep: int = 90):
     """
     Weekly task to clean up old tracking data (keep last 90 days)
@@ -134,7 +146,7 @@ def cleanup_old_tracking_data(days_to_keep: int = 90):
         return {"error": str(e)}
 
 
-@shared_task
+@shared_task(soft_time_limit=60, time_limit=120)
 def update_firmware_request_priorities():
     """
     Weekly task to recalculate firmware request priorities based on:
@@ -179,7 +191,7 @@ def update_firmware_request_priorities():
         return {"error": str(e)}
 
 
-@shared_task
+@shared_task(soft_time_limit=60, time_limit=120)
 def invalidate_homepage_caches():
     """
     Hourly task to refresh homepage caches (in addition to signal-based invalidation)
@@ -198,7 +210,13 @@ def invalidate_homepage_caches():
         return {"error": str(e)}
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+@shared_task(
+    bind=True,
+    max_retries=3,
+    default_retry_delay=60,
+    soft_time_limit=300,
+    time_limit=600,
+)
 def analyze_firmware_ai(self, pending_firmware_id: int):
     """
     AI-powered firmware analysis task.
@@ -229,7 +247,7 @@ def analyze_firmware_ai(self, pending_firmware_id: int):
         raise self.retry(exc=exc, countdown=60)  # noqa: B904
 
 
-@shared_task
+@shared_task(soft_time_limit=30, time_limit=60)
 def log_firmware_view(
     firmware_ct_id: int,
     firmware_id: str,
@@ -255,13 +273,10 @@ def log_firmware_view(
 
         user = None
         if user_id:
-            User = apps.get_model(
-                apps.get_app_config("users").default_auto_field.rsplit(".", 1)[0],
-                "User",
-            )
+            User = apps.get_model("users", "CustomUser")
             try:
                 user = User.objects.get(id=user_id)
-            except:  # noqa: E722, S110
+            except Exception:  # noqa: S110
                 pass
 
         FirmwareView.objects.create(
@@ -277,7 +292,7 @@ def log_firmware_view(
         # Don't fail the main request if logging fails
 
 
-@shared_task
+@shared_task(soft_time_limit=30, time_limit=60)
 def log_firmware_download_attempt(
     firmware_ct_id: int,
     firmware_id: str,
@@ -321,7 +336,13 @@ def log_firmware_download_attempt(
 # ============================================================
 
 
-@shared_task(bind=True, max_retries=3, default_retry_delay=120)
+@shared_task(
+    bind=True,
+    max_retries=3,
+    default_retry_delay=120,
+    soft_time_limit=300,
+    time_limit=600,
+)
 def generate_firmware_blog_post(self, model_id: int, force_update: bool = False):
     """
     Async task to generate a blog post for a specific device model.
@@ -371,7 +392,7 @@ def generate_firmware_blog_post(self, model_id: int, force_update: bool = False)
             return {"status": "error", "error": str(e), "max_retries_exceeded": True}
 
 
-@shared_task
+@shared_task(soft_time_limit=3600, time_limit=7200)
 def generate_all_firmware_blogs(
     force_update: bool = False, brand_name: str | None = None
 ):
@@ -455,7 +476,13 @@ def generate_all_firmware_blogs(
         return {"status": "error", "error": str(e)}
 
 
-@shared_task(bind=True, max_retries=1, default_retry_delay=60)
+@shared_task(
+    bind=True,
+    max_retries=1,
+    default_retry_delay=60,
+    soft_time_limit=600,
+    time_limit=900,
+)
 def catchup_missing_blog_posts(self):
     """
     Periodic catch-up task: finds firmware Models that have no blog post
@@ -511,7 +538,13 @@ def catchup_missing_blog_posts(self):
             return {"status": "error", "error": str(e)}
 
 
-@shared_task(bind=True, max_retries=2, default_retry_delay=300)
+@shared_task(
+    bind=True,
+    max_retries=2,
+    default_retry_delay=300,
+    soft_time_limit=1800,
+    time_limit=3600,
+)
 def scrape_gsmarena_async(
     self,
     strategy: str = "brand_walk",
@@ -555,7 +588,7 @@ def scrape_gsmarena_async(
             return {"status": "error", "error": str(e), "max_retries_exceeded": True}
 
 
-@shared_task
+@shared_task(soft_time_limit=1800, time_limit=3600)
 def scheduled_gsmarena_scrape() -> dict[str, object]:
     """
     Periodic task called by Celery Beat (e.g. every hour).
@@ -598,7 +631,13 @@ def scheduled_gsmarena_scrape() -> dict[str, object]:
         return {"status": "error", "error": str(e)}
 
 
-@shared_task(bind=True, max_retries=1, default_retry_delay=120)
+@shared_task(
+    bind=True,
+    max_retries=1,
+    default_retry_delay=120,
+    soft_time_limit=1800,
+    time_limit=3600,
+)
 def scrape_multi_source_async(
     self,
     brand_limit: int = 20,
@@ -633,7 +672,7 @@ def scrape_multi_source_async(
             return {"status": "error", "error": str(e), "max_retries_exceeded": True}
 
 
-@shared_task
+@shared_task(soft_time_limit=1800, time_limit=3600)
 def scheduled_multi_source_scrape() -> dict[str, object]:
     """
     Periodic task called by Celery Beat for multi-source device discovery.

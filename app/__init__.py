@@ -2,26 +2,16 @@
 Generic Django Project Package
 ------------------------------
 
-This file MUST remain minimal, deterministic, and completely side-effect free.
-
-Purposes:
-    • Marks this directory as a Python package.
-    • Exposes stable, lightweight project metadata (__version__, __author__, __description__).
-    • Guarantees import-safety for manage.py, ASGI, and WSGI boot processes.
-    • Prevents ANY automatic code execution, framework initialization, or heavy imports.
-    • Protects against accidental inclusion of non-Python content.
-
-Rules:
-    • DO NOT import Django or project modules here.
-    • DO NOT perform I/O, logging, settings access, or dynamic logic.
-    • DO NOT use try/except — this file must never hide initialization issues.
-    • Content must always remain pure constants + metadata only.
-
-This structure is hardened for production deployments where stability,
-repeatability, and deterministic imports are essential.
+This file marks the directory as a Python package and exposes:
+    • Stable project metadata (__version__, __author__, __description__)
+    • Celery app instance for worker autodiscovery (required by django-celery-beat)
 """
 
-__all__ = ["__author__", "__description__", "__version__"]
+# Celery bootstrap — required so Django finds the broker on startup and
+# autodiscover_tasks() runs for every INSTALLED_APP.
+from .celery import app as celery_app
+
+__all__ = ["__author__", "__description__", "__version__", "celery_app"]
 
 # ---------------------------------------------------------------------
 # PROJECT METADATA (STATIC — SAFE — NO SIDE EFFECTS)

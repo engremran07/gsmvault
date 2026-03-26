@@ -1369,3 +1369,220 @@ class FirmwareDiff(models.Model):
 
     def __str__(self) -> str:
         return f"Diff FW#{self.old_firmware_id} → FW#{self.new_firmware_id}"  # type: ignore[attr-defined]
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Flashing Tools & Guides
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class FlashingToolCategory(Timestamped):
+    """Categorize flashing tools (OEM, Crack/Patched, Local Market, Open Source)."""
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=120, unique=True)
+    description = models.TextField(blank=True, default="")
+    icon = models.CharField(max_length=50, blank=True, default="wrench")
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "firmwares_flashingtoolcategory"
+        verbose_name = "Flashing Tool Category"
+        verbose_name_plural = "Flashing Tool Categories"
+        ordering = ["sort_order", "name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class FlashingTool(Timestamped):
+    """Catalog of flashing/unlocking/rooting tools for various devices."""
+
+    class ToolType(models.TextChoices):
+        OEM = "oem", "OEM Official"
+        CRACK = "crack", "Crack / Patched"
+        LOCAL_MARKET = "local_market", "Local Market"
+        FREE = "free", "Free / Freeware"
+        OPEN_SOURCE = "open_source", "Open Source"
+
+    class Platform(models.TextChoices):
+        WINDOWS = "windows", "Windows"
+        MAC = "macos", "macOS"
+        LINUX = "linux", "Linux"
+        ANDROID = "android", "Android"
+        MULTI = "multi", "Multi-Platform"
+
+    class RiskLevel(models.TextChoices):
+        SAFE = "safe", "Safe"
+        MODERATE = "moderate", "Moderate"
+        ADVANCED = "advanced", "Advanced"
+        RISKY = "risky", "Risky"
+
+    category = models.ForeignKey(
+        FlashingToolCategory,
+        on_delete=models.CASCADE,
+        related_name="tools",
+    )
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=220, unique=True)
+    description = models.TextField(blank=True, default="")
+    tool_type = models.CharField(
+        max_length=20, choices=ToolType.choices, default=ToolType.FREE
+    )
+    platform = models.CharField(
+        max_length=20, choices=Platform.choices, default=Platform.WINDOWS
+    )
+    risk_level = models.CharField(
+        max_length=20, choices=RiskLevel.choices, default=RiskLevel.SAFE
+    )
+    supported_brands = models.ManyToManyField(
+        Brand, blank=True, related_name="flashing_tools"
+    )
+    supported_chipsets = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='List of chipset names, e.g. ["MediaTek", "Qualcomm", "Spreadtrum"]',
+    )
+    download_url = models.URLField(max_length=500, blank=True, default="")
+    official_url = models.URLField(max_length=500, blank=True, default="")
+    version = models.CharField(max_length=50, blank=True, default="")
+    last_version_date = models.DateField(null=True, blank=True)
+    is_free = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+    hero_image = models.ImageField(upload_to="flashing_tools/", blank=True, null=True)
+    instructions = models.TextField(
+        blank=True, default="", help_text="Usage instructions (Markdown supported)"
+    )
+    features = models.JSONField(
+        default=list, blank=True, help_text="Feature bullet points"
+    )
+    requirements = models.JSONField(
+        default=list, blank=True, help_text="System requirements"
+    )
+    is_active = models.BooleanField(default=True)
+    views_count = models.PositiveIntegerField(default=0)
+    downloads_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = "firmwares_flashingtool"
+        verbose_name = "Flashing Tool"
+        verbose_name_plural = "Flashing Tools"
+        ordering = ["-is_featured", "name"]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.get_tool_type_display()})"  # type: ignore[attr-defined]
+
+
+class FlashingGuideTemplate(Timestamped):
+    """
+    Templates for auto-generating blog posts about flashing guides.
+    Can be per-brand, per-chipset, or per-category (e.g. 'How to flash Samsung').
+    """
+
+    class GuideType(models.TextChoices):
+        STOCK_FLASH = "stock_flash", "Stock Firmware Flash"
+        CUSTOM_ROM = "custom_rom", "Custom ROM Installation"
+        UNLOCK_BOOTLOADER = "unlock_bootloader", "Bootloader Unlock"
+        ROOT = "root", "Root Access"
+        RECOVERY = "recovery", "Recovery Installation"
+        FRP_BYPASS = "frp_bypass", "FRP Bypass"
+        DOWNGRADE = "downgrade", "Firmware Downgrade"
+        REPAIR = "repair", "Brick Repair"
+        GENERAL = "general", "General Guide"
+
+    title_template = models.CharField(
+        max_length=300,
+        help_text="Use {brand}, {model}, {chipset}, {guide_type} placeholders",
+    )
+    body_template = models.TextField(
+        help_text="Markdown. Use {brand}, {model}, {chipset}, {tools}, {steps} placeholders"
+    )
+    summary_template = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="SEO summary template with same placeholders",
+    )
+    guide_type = models.CharField(
+        max_length=30, choices=GuideType.choices, default=GuideType.STOCK_FLASH
+    )
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="guide_templates",
+        help_text="Generate guides for this brand. Leave empty for generic.",
+    )
+    chipset_filter = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="Only generate for models with this chipset (partial match)",
+    )
+    recommended_tools = models.ManyToManyField(
+        FlashingTool,
+        blank=True,
+        related_name="guide_templates",
+    )
+    auto_generate = models.BooleanField(
+        default=False,
+        help_text="Automatically generate blog posts for matching brand/models",
+    )
+    auto_publish = models.BooleanField(
+        default=False, help_text="Auto-publish generated guides (vs. draft)"
+    )
+    is_active = models.BooleanField(default=True)
+    generated_count = models.PositiveIntegerField(
+        default=0, help_text="Number of posts generated from this template"
+    )
+
+    class Meta:
+        db_table = "firmwares_flashingguidetemplate"
+        verbose_name = "Flashing Guide Template"
+        verbose_name_plural = "Flashing Guide Templates"
+        ordering = ["guide_type", "brand__name"]
+
+    def __str__(self) -> str:
+        brand_str = self.brand.name if self.brand_id else "Generic"  # type: ignore[attr-defined]
+        return f"{self.get_guide_type_display()} — {brand_str}"  # type: ignore[attr-defined]
+
+
+class GeneratedFlashingGuide(Timestamped):
+    """Track which blog posts were auto-generated from guide templates."""
+
+    template = models.ForeignKey(
+        FlashingGuideTemplate,
+        on_delete=models.CASCADE,
+        related_name="generated_guides",
+    )
+    post = models.OneToOneField(
+        "blog.Post",
+        on_delete=models.CASCADE,
+        related_name="flashing_guide_source",
+    )
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.CASCADE,
+        related_name="generated_guides",
+    )
+    model = models.ForeignKey(
+        "firmwares.Model",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="generated_guides",
+    )
+    chipset = models.CharField(max_length=100, blank=True, default="")
+
+    class Meta:
+        db_table = "firmwares_generatedflashingguide"
+        verbose_name = "Generated Flashing Guide"
+        verbose_name_plural = "Generated Flashing Guides"
+        ordering = ["-created_at"]
+        unique_together = [("template", "brand", "model")]
+
+    def __str__(self) -> str:
+        model_str = self.model.name if self.model_id else "All"  # type: ignore[attr-defined]
+        return f"Guide: {self.brand.name} {model_str}"  # type: ignore[attr-defined]

@@ -102,6 +102,17 @@ urlpatterns = [
     path("comments/", views_content.admin_suite_comments, name="comments"),
     path("forum/", views_content.admin_suite_forum, name="forum"),
     path("seo/", views_content.admin_suite_seo, name="seo"),
+    path("seo/audit/", views_content.admin_suite_seo_audit, name="seo_audit"),
+    path(
+        "seo/audit/<str:content_type>/",
+        views_content.admin_suite_seo_audit_type,
+        name="seo_audit_type",
+    ),
+    path(
+        "seo/audit/<str:content_type>/<str:item_id>/",
+        views_content.admin_suite_seo_audit_item,
+        name="seo_audit_item",
+    ),
     path("tags/", views_content.admin_suite_tags, name="tags"),
     # Marketing & Growth
     path("marketing/", views_content.admin_suite_marketing, name="marketing"),
@@ -184,6 +195,11 @@ urlpatterns = [
         "firmwares/downloads/",
         views_infrastructure.admin_suite_firmwares_downloads,
         name="firmwares_downloads",
+    ),
+    path(
+        "firmwares/flashing-tools/",
+        views_infrastructure.admin_suite_flashing_tools,
+        name="flashing_tools",
     ),
     # System Configuration
     path("settings/", views_settings.admin_suite_settings, name="settings"),

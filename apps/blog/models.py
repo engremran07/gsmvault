@@ -125,6 +125,34 @@ class Post(models.Model):
     likes_count = models.PositiveIntegerField(default=0, help_text="Total likes")
     comments_count = models.PositiveIntegerField(default=0, help_text="Total comments")
 
+    # Forum integration — auto-created on publish
+    forum_topic = models.ForeignKey(
+        "forum.ForumTopic",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="blog_posts",
+        help_text="Auto-linked forum discussion topic.",
+    )
+
+    # Rewarded ad gate — controls whether article body is locked behind an ad
+    ad_gate_enabled = models.BooleanField(
+        default=False,
+        help_text="Manual toggle: require ad view before reading full article.",
+    )
+    ad_gate_min_views = models.PositiveIntegerField(
+        default=0,
+        help_text="Auto-enable ad gate when views_count >= this value. 0 = disabled.",
+    )
+    ad_gate_config = models.ForeignKey(
+        "ads.RewardedAdConfig",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="gated_posts",
+        help_text="Rewarded ad configuration for this post's gate.",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

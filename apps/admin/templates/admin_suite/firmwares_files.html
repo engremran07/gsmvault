@@ -61,8 +61,8 @@
     {# Row 1: Type, Brand, Model #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Firmware Type <span class="text-red-400">*</span></label>
-        <select name="firmware_type" x-model="selectedType" required
+        <label for="id_firmware_type" class="block text-xs text-[var(--color-text-muted)] mb-1">Firmware Type <span class="text-red-400">*</span></label>
+        <select name="firmware_type" id="id_firmware_type" x-model="selectedType" required
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
           {% for key, label in firmware_types %}
           <option value="{{ key }}">{{ label }}</option>
@@ -70,8 +70,8 @@
         </select>
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Brand <span class="text-red-400">*</span></label>
-        <select name="brand_id" x-model="selectedBrand" required
+        <label for="id_file_brand_id" class="block text-xs text-[var(--color-text-muted)] mb-1">Brand <span class="text-red-400">*</span></label>
+        <select name="brand_id" id="id_file_brand_id" x-model="selectedBrand" required
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
           <option value="">Select brand…</option>
           {% for b in brands %}
@@ -80,8 +80,8 @@
         </select>
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Model <span class="text-red-400">*</span></label>
-        <select name="model_id" required
+        <label for="id_model_id" class="block text-xs text-[var(--color-text-muted)] mb-1">Model <span class="text-red-400">*</span></label>
+        <select name="model_id" id="id_model_id" required
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
           <option value="">Select model…</option>
           <template x-for="m in filteredModels" :key="m.id">
@@ -90,8 +90,8 @@
         </select>
       </div>
       <div x-show="showSubtype" x-cloak>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Subtype</label>
-        <input type="text" name="subtype" maxlength="128" placeholder="e.g. TWRP, Root, Custom"
+        <label for="id_subtype" class="block text-xs text-[var(--color-text-muted)] mb-1">Subtype</label>
+        <input type="text" name="subtype" id="id_subtype" autocomplete="off" maxlength="128" placeholder="e.g. TWRP, Root, Custom"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
     </div>
@@ -99,19 +99,19 @@
     {# Row 2: File info #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Filename <span class="text-red-400">*</span></label>
-        <input type="text" name="original_file_name" required maxlength="255" placeholder="e.g. SM-S911B_OXM_14_firmware.zip"
+        <label for="id_original_file_name" class="block text-xs text-[var(--color-text-muted)] mb-1">Filename <span class="text-red-400">*</span></label>
+        <input type="text" name="original_file_name" id="id_original_file_name" autocomplete="off" required maxlength="255" placeholder="e.g. SM-S911B_OXM_14_firmware.zip"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Download Link or File Path <span class="text-red-400">*</span></label>
-        <input type="text" name="stored_file_path" required maxlength="500" placeholder="e.g. https://mega.nz/file/abc123 or firmwares/official/samsung/file.zip"
+        <label for="id_stored_file_path" class="block text-xs text-[var(--color-text-muted)] mb-1">Download Link or File Path <span class="text-red-400">*</span></label>
+        <input type="text" name="stored_file_path" id="id_stored_file_path" autocomplete="off" required maxlength="500" placeholder="e.g. https://mega.nz/file/abc123 or firmwares/official/samsung/file.zip"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
         <p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Paste an external download link (Google Drive, Mega, MediaFire, etc.) or a local storage path</p>
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">File Size <span class="text-[10px] text-[var(--color-text-muted)]">(bytes)</span></label>
-        <input type="number" name="file_size" min="0" placeholder="e.g. 3221225472"
+        <label for="id_file_size" class="block text-xs text-[var(--color-text-muted)] mb-1">File Size <span class="text-[10px] text-[var(--color-text-muted)]">(bytes)</span></label>
+        <input type="number" name="file_size" id="id_file_size" autocomplete="off" min="0" placeholder="e.g. 3221225472"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
     </div>
@@ -119,23 +119,23 @@
     {# Row 3: Version details #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Android Version</label>
-        <input type="text" name="android_version" maxlength="32" placeholder="e.g. 14.0"
+        <label for="id_android_version" class="block text-xs text-[var(--color-text-muted)] mb-1">Android Version</label>
+        <input type="text" name="android_version" id="id_android_version" autocomplete="off" maxlength="32" placeholder="e.g. 14.0"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Build Number</label>
-        <input type="text" name="build_number" maxlength="128" placeholder="e.g. UP1A.231005.007"
+        <label for="id_build_number" class="block text-xs text-[var(--color-text-muted)] mb-1">Build Number</label>
+        <input type="text" name="build_number" id="id_build_number" autocomplete="off" maxlength="128" placeholder="e.g. UP1A.231005.007"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Security Patch</label>
-        <input type="date" name="security_patch"
+        <label for="id_security_patch" class="block text-xs text-[var(--color-text-muted)] mb-1">Security Patch</label>
+        <input type="date" name="security_patch" id="id_security_patch"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Build Date</label>
-        <input type="date" name="build_date"
+        <label for="id_build_date" class="block text-xs text-[var(--color-text-muted)] mb-1">Build Date</label>
+        <input type="date" name="build_date" id="id_build_date"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
     </div>
@@ -143,13 +143,13 @@
     {# Row 4: Extra fields #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">Chipset</label>
-        <input type="text" name="chipset" maxlength="128" placeholder="e.g. Snapdragon 8 Gen 3"
+        <label for="id_fw_chipset" class="block text-xs text-[var(--color-text-muted)] mb-1">Chipset</label>
+        <input type="text" name="chipset" id="id_fw_chipset" autocomplete="off" maxlength="128" placeholder="e.g. Snapdragon 8 Gen 3"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-xs text-[var(--color-text-muted)] mb-1">File Hash <span class="text-[10px] text-[var(--color-text-muted)]">(SHA256)</span></label>
-        <input type="text" name="file_hash" maxlength="256" placeholder="Optional SHA256 hash"
+        <label for="id_file_hash" class="block text-xs text-[var(--color-text-muted)] mb-1">File Hash <span class="text-[10px] text-[var(--color-text-muted)]">(SHA256)</span></label>
+        <input type="text" name="file_hash" id="id_file_hash" autocomplete="off" maxlength="256" placeholder="Optional SHA256 hash"
           class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
       </div>
       <div class="flex items-end">
@@ -179,9 +179,9 @@
   x-data x-intersect.once="$el.classList.add('animate-in-visible')">
   <i data-lucide="search" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
   <form method="get" class="flex-1 flex items-center gap-3">
-    <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search firmware files…"
+    <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search firmware files…" aria-label="Search firmware files"
       class="flex-1 bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none">
-    <select name="type"
+    <select name="type" aria-label="Filter by firmware type"
       class="px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
       <option value="" {% if not type_filter %}selected{% endif %}>All Types</option>
       {% for key, label in firmware_types %}

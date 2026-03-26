@@ -258,6 +258,29 @@ class Command(BaseCommand):
             )
             cats[slug] = cat
 
+        # Wire brand_link for device categories (graceful — skip if brands missing)
+        try:
+            from apps.firmwares.models import Brand
+
+            brand_map = {
+                "samsung": "samsung",
+                "xiaomi": "xiaomi",
+                "huawei": "huawei",
+            }
+            for cat_slug, brand_slug in brand_map.items():
+                brand = Brand.objects.filter(slug=brand_slug).first()
+                if brand and cat_slug in cats:
+                    ForumCategory.objects.filter(pk=cats[cat_slug].pk).update(
+                        brand_link=brand
+                    )
+                    self.stdout.write(
+                        f"  Linked category '{cat_slug}' → brand '{brand_slug}'"
+                    )
+        except Exception:  # noqa: BLE001
+            self.stdout.write(
+                self.style.WARNING("  Skipping brand_link (firmwares app unavailable)")
+            )
+
         # --- Forum User Profiles ---
         profile_data = [
             (admin_user, 4, "Site Admin", 2500, 120, 350),

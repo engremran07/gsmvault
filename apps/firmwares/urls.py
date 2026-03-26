@@ -41,6 +41,7 @@ from .views import (
     SchemaUpdateProposalViewSet,
     VariantCreationRequestViewSet,
 )
+from .views_flashing import flashing_tool_detail, flashing_tools
 
 app_name = "firmwares"
 
@@ -81,6 +82,9 @@ urlpatterns = [
     path("search/", universal_search, name="universal_search"),
     path("browse/", firmware_browse, name="browse"),
     path("brands/", brand_list, name="brand_list"),
+    # Flashing tools catalog
+    path("tools/", flashing_tools, name="flashing_tools"),
+    path("tools/<slug:slug>/", flashing_tool_detail, name="flashing_tool_detail"),
     # Admin/upload endpoints
     path("upload/", FirmwareUploadView.as_view(), name="firmware-upload"),
     path("moderate/<uuid:pk>/", ModerationView.as_view(), name="firmware-moderate"),

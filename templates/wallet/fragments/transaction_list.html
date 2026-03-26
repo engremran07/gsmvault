@@ -1,0 +1,38 @@
+{# templates/wallet/fragments/transaction_list.html — HTMX fragment for ledger #}
+{% load static %}
+
+{% if ledger_entries %}
+<div class="overflow-x-auto rounded-xl border border-[var(--color-border)]">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)] text-left text-xs uppercase tracking-wider">
+        <th class="px-4 py-3">Type</th>
+        <th class="px-4 py-3">Description</th>
+        <th class="px-4 py-3">Amount</th>
+        <th class="px-4 py-3">Balance After</th>
+        <th class="px-4 py-3">Date</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-[var(--color-border)]/50">
+      {% for entry in ledger_entries %}
+      <tr class="bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
+        <td class="px-4 py-3">
+          <span class="inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-0.5
+            {% if entry.entry_type == 'credit' %}bg-[var(--color-success)]/10 text-[var(--color-success)]{% elif entry.entry_type == 'debit' %}bg-[var(--color-error)]/10 text-[var(--color-error)]{% else %}bg-[var(--color-text-muted)]/10 text-[var(--color-text-muted)]{% endif %} capitalize">
+            {{ entry.get_entry_type_display }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-[var(--color-text-primary)]">{{ entry.description|truncatewords:12 }}</td>
+        <td class="px-4 py-3 font-bold {% if entry.entry_type == 'credit' %}text-[var(--color-success)]{% elif entry.entry_type == 'debit' %}text-[var(--color-error)]{% else %}text-[var(--color-text-muted)]{% endif %}">
+          {% if entry.entry_type == 'credit' %}+{% elif entry.entry_type == 'debit' %}-{% endif %}{{ entry.amount }}
+        </td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ entry.balance_after }}</td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ entry.created_at|date:"M d, Y H:i" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="list" message="No transactions yet" action_url="/wallet/" action_text="Back to Wallet" %}
+{% endif %}

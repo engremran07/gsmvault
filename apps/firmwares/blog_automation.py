@@ -55,8 +55,9 @@ class FirmwareBlogService:
     def ensure_brand_category(cls, brand):
         """Create or get blog category for brand.
 
-        Slug: ``<brand-slug>-firmware`` (e.g. samsung-firmware).
-        Migrates legacy ``brand-<slug>`` entries to new format.
+        Name is the brand name only — no extra text like "Firmware".
+        Slug: ``<brand-slug>`` (e.g. ``samsung``, ``xiaomi``, ``acer``).
+        Migrates legacy ``brand-<slug>`` and ``<slug>-firmware`` entries.
         """
         if not apps.is_installed("apps.blog"):
             return None
@@ -64,29 +65,38 @@ class FirmwareBlogService:
         try:
             Category = apps.get_model("blog", "Category")
 
-            new_slug = f"{brand.slug}-firmware"
+            clean_slug = brand.slug
 
-            # Try new slug first
-            category = Category.objects.filter(slug=new_slug).first()
+            # Try clean slug first (new canonical format)
+            category = Category.objects.filter(slug=clean_slug).first()
             if category:
+                # Fix name if it still has "Firmware" suffix
+                if category.name != brand.name:
+                    category.name = brand.name
+                    category.save(update_fields=["name"])
                 return category
 
-            # Check for legacy slug (brand-<slug>)
-            legacy = Category.objects.filter(slug=f"brand-{brand.slug}").first()
-            if legacy:
-                legacy.slug = new_slug
-                legacy.save(update_fields=["slug"])
-                logger.info(
-                    f"Migrated brand category slug: brand-{brand.slug} → {new_slug}"
-                )
-                return legacy
+            # Check for legacy slug variants and migrate
+            for legacy_slug in [f"{brand.slug}-firmware", f"brand-{brand.slug}"]:
+                legacy = Category.objects.filter(slug=legacy_slug).first()
+                if legacy:
+                    legacy.slug = clean_slug
+                    legacy.name = brand.name
+                    legacy.save(update_fields=["slug", "name"])
+                    logger.info(
+                        "Migrated brand category: %s → %s (%s)",
+                        legacy_slug,
+                        clean_slug,
+                        brand.name,
+                    )
+                    return legacy
 
-            # Create new
+            # Create new — brand name only, no "Firmware" suffix
             category = Category.objects.create(
-                slug=new_slug,
-                name=f"{brand.name} Firmware",
+                slug=clean_slug,
+                name=brand.name,
             )
-            logger.info(f"Created blog category for brand: {brand.name}")
+            logger.info("Created blog category for brand: %s", brand.name)
             return category
         except Exception as e:
             logger.exception(f"Error creating brand category: {e}")
@@ -96,10 +106,11 @@ class FirmwareBlogService:
     def ensure_model_category(cls, model):
         """Create or get blog category for model (child of brand category).
 
-        Smart slug — ``<brand>-<model>`` (e.g. samsung-galaxy-a05s,
-        xiaomi-redmi-note-13-pro, google-pixel-8).  Handles all naming
-        conventions: Samsung model codes, Xiaomi sub-brands, Google code names.
-        Migrates legacy ``model-<slug>`` entries to new format.
+        Name is the model name only — no brand prefix, no redundant text.
+        If the model has a marketing name different from its code name,
+        the display is ``Model Name (Marketing Name)``.
+        Slug: ``<brand>-<model>`` for uniqueness.
+        Migrates legacy ``model-<slug>`` entries.
         """
         if not apps.is_installed("apps.blog"):
             return None
@@ -110,42 +121,61 @@ class FirmwareBlogService:
             # Ensure parent brand category exists first
             parent_category = cls.ensure_brand_category(model.brand)
 
-            # Smart slug: brand-model (e.g. samsung-galaxy-a05s)
+            # Slug keeps brand prefix for global uniqueness
             new_slug = slugify(f"{model.brand.slug}-{model.slug}")
 
-            # Build descriptive name including marketing name if different
-            name = f"{model.brand.name} {model.name}"
+            # Name is model-only — brand is already the parent category
+            # Only add marketing name if it contributes new info beyond brand+name
+            name = model.name
             if model.marketing_name and model.marketing_name != model.name:
-                name = f"{model.brand.name} {model.name} ({model.marketing_name})"
+                # Strip brand prefix from marketing name to check if it's actually different
+                mkt_clean = model.marketing_name
+                brand_prefix = f"{model.brand.name} "
+                if mkt_clean.startswith(brand_prefix):
+                    mkt_clean = mkt_clean[len(brand_prefix) :]
+                if mkt_clean != model.name:
+                    name = f"{model.name} ({mkt_clean})"
 
             # Try new slug first
             category = Category.objects.filter(slug=new_slug).first()
             if category:
-                # Update parent if needed
+                changed = False
+                # Fix name if it still has brand prefix
+                if category.name != name:
+                    category.name = name
+                    changed = True
                 if category.parent != parent_category:
                     category.parent = parent_category
-                    category.save(update_fields=["parent"])
+                    changed = True
+                if changed:
+                    category.save(update_fields=["name", "parent"])
                 return category
 
             # Check for legacy slug (model-<slug>)
             legacy = Category.objects.filter(slug=f"model-{model.slug}").first()
             if legacy:
-                # Migrate: update slug, name, and parent
                 legacy.slug = new_slug
                 legacy.name = name
                 if parent_category:
                     legacy.parent = parent_category
                 legacy.save(update_fields=["slug", "name", "parent"])
-                logger.info(f"Migrated model category: model-{model.slug} → {new_slug}")
+                logger.info(
+                    "Migrated model category: model-%s → %s (%s)",
+                    model.slug,
+                    new_slug,
+                    name,
+                )
                 return legacy
 
-            # Create new
+            # Create new — model name only, brand is the parent
             category = Category.objects.create(
                 slug=new_slug,
                 name=name,
                 parent=parent_category,
             )
-            logger.info(f"Created blog category for model: {name} (slug: {new_slug})")
+            logger.info(
+                "Created blog category for model: %s (slug: %s)", name, new_slug
+            )
             return category
         except Exception as e:
             logger.exception(f"Error creating model category: {e}")
@@ -569,6 +599,17 @@ class FirmwareBlogService:
         except Exception as e:
             logger.debug(f"Skipped GSMArena specs in blog post: {e}")
 
+        # --- Recommended Flashing Tools ---
+        chipsets = cls._extract_chipsets(firmware_data)
+        tools_html = cls._generate_flashing_tools_section(model, chipsets)
+        if tools_html:
+            html.append(tools_html)
+
+        # --- Flashing Guide ---
+        guide_html = cls._generate_flashing_guide_section(model, chipsets)
+        if guide_html:
+            html.append(guide_html)
+
         # --- Safety notes ---
         html.append(
             '<div style="margin-top:24px;background:rgba(245,158,11,0.08);'
@@ -608,6 +649,295 @@ class FirmwareBlogService:
             summary += f"Types: {types}."
 
         return summary
+
+    @classmethod
+    def _extract_chipsets(cls, firmware_data: dict) -> list[str]:
+        """Extract unique chipset names from firmware variant data."""
+        chipsets: set[str] = set()
+        for variant_data in firmware_data.get("variants", []):
+            variant = variant_data.get("variant")
+            if variant and getattr(variant, "chipset", ""):
+                chipsets.add(variant.chipset)
+            for fw in variant_data.get("firmwares", []):
+                chipset = fw.get("chipset", "")
+                if chipset and chipset not in ("N/A", "Unknown", ""):
+                    chipsets.add(chipset)
+        return sorted(chipsets)
+
+    @classmethod
+    def _generate_flashing_tools_section(cls, model, chipsets: list[str]) -> str:
+        """Generate HTML section listing recommended flashing tools for a brand/chipset.
+
+        Groups tools into: OEM Official → Free/Open Source → Crack/Local Market.
+        Each tool shows name, platform, risk level, and link to detail page.
+        """
+        try:
+            FlashingTool = apps.get_model("firmwares", "FlashingTool")
+        except Exception:
+            return ""
+
+        brand = model.brand
+
+        # Query tools matching this brand OR chipset
+        from django.db.models import Q
+
+        tool_q = Q(is_active=True)
+        brand_q = Q(supported_brands=brand)
+        chipset_q = Q()
+        for chip in chipsets:
+            chipset_q |= Q(supported_chipsets__contains=chip)
+
+        # Brand-specific tools + chipset-specific tools
+        tools_qs = FlashingTool.objects.filter(tool_q).filter(brand_q | chipset_q)
+        tools = list(tools_qs.distinct().select_related("category")[:20])
+
+        if not tools:
+            # Fallback: get generic popular tools
+            tools = list(
+                FlashingTool.objects.filter(
+                    is_active=True, is_featured=True
+                ).select_related("category")[:8]
+            )
+        if not tools:
+            return ""
+
+        # Group by tool_type for display order
+        type_order = ["oem", "free", "open_source", "local_market", "crack"]
+        type_labels = {
+            "oem": (
+                "🏭 OEM Official Tools",
+                "Official manufacturer tools — safest option",
+            ),
+            "free": ("🆓 Free Tools", "Freeware tools — no cost, community-supported"),
+            "open_source": (
+                "🔓 Open Source Tools",
+                "Open source — auditable and trustworthy",
+            ),
+            "local_market": (
+                "🏪 Local Market Tools",
+                "Regional service tools — use with caution",
+            ),
+            "crack": (
+                "⚠️ Crack / Patched Tools",
+                "Modified tools — advanced users only, use at your own risk",
+            ),
+        }
+        grouped: dict[str, list] = {}
+        for tool in tools:
+            tt = tool.tool_type
+            grouped.setdefault(tt, []).append(tool)
+
+        html_parts: list[str] = []
+        brand_name = brand.name
+        chipset_str = ", ".join(chipsets) if chipsets else "various chipsets"
+
+        html_parts.append(
+            f'<h3 style="margin-top:24px">🔧 Recommended Flashing Tools for {brand_name}</h3>'
+        )
+        html_parts.append(
+            f"<p>These tools are compatible with <strong>{brand_name}</strong> devices"
+        )
+        if chipsets:
+            html_parts.append(f" ({chipset_str} chipset)")
+        html_parts.append(
+            ". Choose the right tool based on your experience level and needs.</p>"
+        )
+
+        for tt in type_order:
+            if tt not in grouped:
+                continue
+            label, desc = type_labels.get(tt, (tt.title(), ""))
+            html_parts.append(f'<h4 style="margin-top:16px">{label}</h4>')
+            html_parts.append(f'<p style="font-size:13px;color:#999">{desc}</p>')
+            html_parts.append(
+                '<table style="width:100%;border-collapse:collapse;text-align:left">'
+                "<thead><tr>"
+                '<th style="padding:6px 12px;border-bottom:2px solid #444">Tool</th>'
+                '<th style="padding:6px 12px;border-bottom:2px solid #444">Platform</th>'
+                '<th style="padding:6px 12px;border-bottom:2px solid #444">Risk</th>'
+                '<th style="padding:6px 12px;border-bottom:2px solid #444">Price</th>'
+                '<th style="padding:6px 12px;border-bottom:2px solid #444">Action</th>'
+                "</tr></thead><tbody>"
+            )
+            for tool in grouped[tt]:
+                risk_color = {
+                    "safe": "#10b981",
+                    "moderate": "#f59e0b",
+                    "advanced": "#f97316",
+                    "risky": "#ef4444",
+                }.get(tool.risk_level, "#64748b")
+                platform_icon = {
+                    "windows": "🪟",
+                    "macos": "🍎",
+                    "linux": "🐧",
+                    "android": "🤖",
+                    "multi": "🌐",
+                }.get(tool.platform, "💻")
+                price_text = "Free" if tool.is_free else "Paid"
+                price_color = "#10b981" if tool.is_free else "#f59e0b"
+
+                # Link to tool detail page
+                tool_url = f"/firmwares/tools/{tool.slug}/"
+
+                html_parts.append(
+                    f'<tr style="border-bottom:1px solid #333">'
+                    f'<td style="padding:6px 12px"><strong>{tool.name}</strong>'
+                )
+                if tool.version:
+                    html_parts.append(
+                        f' <span style="font-size:11px;color:#666">v{tool.version}</span>'
+                    )
+                html_parts.append("</td>")
+                html_parts.append(
+                    f'<td style="padding:6px 12px">{platform_icon} {tool.get_platform_display()}</td>'
+                )
+                html_parts.append(
+                    f'<td style="padding:6px 12px">'
+                    f'<span style="color:{risk_color};font-weight:600">'
+                    f"{tool.get_risk_level_display()}</span></td>"
+                )
+                html_parts.append(
+                    f'<td style="padding:6px 12px">'
+                    f'<span style="color:{price_color}">{price_text}</span></td>'
+                )
+                html_parts.append(
+                    f'<td style="padding:6px 12px">'
+                    f'<a href="{tool_url}" style="color:#06b6d4;text-decoration:none;'
+                    f'font-weight:600;font-size:13px">View Details →</a></td>'
+                )
+                html_parts.append("</tr>")
+            html_parts.append("</tbody></table>")
+
+        return "".join(html_parts)
+
+    @classmethod
+    def _generate_flashing_guide_section(cls, model, chipsets: list[str]) -> str:
+        """Generate a quick-start flashing guide section based on chipset/brand.
+
+        Detects the primary chipset and provides chipset-specific instructions
+        plus links to full guide pages.
+        """
+        brand_name = model.brand.name
+        model_name = model.name
+        device = f"{brand_name} {model_name}"
+
+        # Detect primary chipset family for tailored instructions
+        chipset_lower = " ".join(chipsets).lower() if chipsets else ""
+        guide_steps: list[str] = []
+        tool_name = ""
+        boot_mode = ""
+
+        if "mediatek" in chipset_lower or "mtk" in chipset_lower:
+            tool_name = "SP Flash Tool"
+            boot_mode = "BROM/Preloader mode"
+            guide_steps = [
+                f"Download the correct stock firmware for your {device}",
+                "Install MediaTek USB VCOM drivers on your PC",
+                f"Open <strong>{tool_name}</strong> and load the scatter file from the firmware package",
+                "Select <strong>Download Only</strong> (preserves data) or <strong>Firmware Upgrade</strong> (full wipe)",
+                f"Power off your device and connect via USB to boot into {boot_mode}",
+                "Click <strong>Download</strong> and wait for the green checkmark ✓",
+                "Disconnect and reboot — first boot may take 5-10 minutes",
+            ]
+        elif "qualcomm" in chipset_lower or "snapdragon" in chipset_lower:
+            tool_name = "QFIL (Qualcomm Flash Image Loader)"
+            boot_mode = "EDL mode (Qualcomm 9008)"
+            guide_steps = [
+                f"Download the correct stock firmware for your {device}",
+                "Install Qualcomm HS-USB QDLoader 9008 drivers",
+                f"Open <strong>{tool_name}</strong> and select Flat Build",
+                "Browse to <code>rawprogram0.xml</code> and <code>patch0.xml</code>",
+                f"Boot your device into {boot_mode} (hold Vol Up + Vol Down while connecting USB)",
+                "Click <strong>Download</strong> and wait for completion",
+                "Device will reboot automatically when done",
+            ]
+        elif "spreadtrum" in chipset_lower or "unisoc" in chipset_lower:
+            tool_name = "SPD Research Tool"
+            boot_mode = "Download mode"
+            guide_steps = [
+                f"Download the correct .pac firmware for your {device}",
+                "Install Spreadtrum/Unisoc USB drivers",
+                f"Open <strong>{tool_name}</strong> and load the .pac file",
+                f"Power off device, hold Vol Down and connect USB ({boot_mode})",
+                "Click <strong>Start Downloading</strong>",
+                "Wait for the progress bar to complete (do not disconnect)",
+                "Device reboots automatically when flashing is done",
+            ]
+        elif "samsung" in brand_name.lower():
+            tool_name = "Odin"
+            boot_mode = "Download mode"
+            guide_steps = [
+                f"Download the correct firmware for your {device} (AP, BL, CP, CSC files)",
+                f"Open <strong>{tool_name}</strong> on your PC",
+                "Load firmware files: AP → AP slot, BL → BL slot, CP → CP slot, CSC → CSC slot",
+                f"Boot into {boot_mode}: Power Off → hold Vol Down + Home + Power (or Vol Down + Bixby + Power)",
+                "Connect device via USB — Odin should show <strong>Added!!</strong>",
+                'Click <strong>Start</strong> and wait for the <strong style="color:#10b981">PASS!</strong> message',
+                "Device reboots automatically — first boot may take several minutes",
+            ]
+        elif "xiaomi" in brand_name.lower():
+            tool_name = "MiFlash Tool"
+            boot_mode = "Fastboot mode"
+            guide_steps = [
+                f"Download the Fastboot ROM for your {device}",
+                f"Install <strong>{tool_name}</strong> and Xiaomi USB drivers",
+                f"Boot into {boot_mode}: Power Off → hold Vol Down + Power",
+                "Connect device via USB",
+                "Select firmware folder in MiFlash and click <strong>Refresh</strong>",
+                "Choose flash option: <strong>clean all</strong> or <strong>save user data</strong>",
+                "Click <strong>Flash</strong> and wait for completion",
+            ]
+        else:
+            # Generic Android flashing guide
+            tool_name = "manufacturer's flash tool"
+            boot_mode = "Download/Fastboot mode"
+            guide_steps = [
+                f"Download the correct stock firmware for your {device}",
+                "Install USB drivers for your device brand",
+                f"Open the {tool_name} on your PC",
+                "Load the firmware file(s) into the tool",
+                f"Power off device and boot into {boot_mode}",
+                "Connect device via USB and start the flashing process",
+                "Wait for completion and reboot — first boot may take several minutes",
+            ]
+
+        html_parts: list[str] = []
+        html_parts.append(
+            f'<h3 style="margin-top:24px">📖 How to Flash Firmware on {device}</h3>'
+        )
+        if tool_name and tool_name != "manufacturer's flash tool":
+            html_parts.append(f"<p>The recommended tool for flashing {brand_name} ")
+            if chipsets:
+                html_parts.append(f"({', '.join(chipsets)}) ")
+            html_parts.append(
+                f"devices is <strong>{tool_name}</strong>. "
+                f"Follow these steps to flash firmware on your {device}:</p>"
+            )
+        else:
+            html_parts.append(
+                f"<p>Follow these general steps to flash firmware on your {device}:</p>"
+            )
+
+        html_parts.append('<ol style="padding-left:20px;line-height:1.8">')
+        for step in guide_steps:
+            html_parts.append(f"<li>{step}</li>")
+        html_parts.append("</ol>")
+
+        # Prerequisites box
+        html_parts.append(
+            '<div style="margin-top:12px;background:rgba(59,130,246,0.08);'
+            "border-left:4px solid rgba(59,130,246,0.6);padding:12px 16px;"
+            'border-radius:4px">'
+            "<strong>📋 Prerequisites:</strong>"
+            "<ul style='margin:8px 0 0;padding-left:20px'>"
+            "<li>Battery charged to at least 50%</li>"
+            "<li>Original USB cable (avoid cheap/third-party cables)</li>"
+            "<li>USB drivers installed for your device</li>"
+            "<li>Full data backup (flashing may erase all data)</li>"
+            "</ul></div>"
+        )
+
+        return "".join(html_parts)
 
     @classmethod
     def _update_post_tags(cls, post, model, firmware_data):

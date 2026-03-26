@@ -178,6 +178,42 @@ urlpatterns = [
     ),
     # Bounty public pages
     path("bounty/", include(("apps.bounty.urls", "bounty"), namespace="bounty")),
+    # ── Public pages for commerce/community apps ──
+    path(
+        "marketplace/",
+        include(
+            ("apps.marketplace.urls_public", "marketplace_public"),
+            namespace="marketplace_public",
+        ),
+    ),
+    path(
+        "shop/",
+        include(
+            ("apps.shop.urls_public", "shop_public"),
+            namespace="shop_public",
+        ),
+    ),
+    path(
+        "wallet/",
+        include(
+            ("apps.wallet.urls_public", "wallet_public"),
+            namespace="wallet_public",
+        ),
+    ),
+    path(
+        "rewards/",
+        include(
+            ("apps.gamification.urls_public", "gamification_public"),
+            namespace="gamification_public",
+        ),
+    ),
+    path(
+        "referrals/",
+        include(
+            ("apps.referral.urls_public", "referral_public"),
+            namespace="referral_public",
+        ),
+    ),
     path(
         "api/v1/referral/",
         include(("apps.referral.urls", "referral"), namespace="referral"),

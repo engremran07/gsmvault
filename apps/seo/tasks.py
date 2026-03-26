@@ -6,7 +6,19 @@ from __future__ import annotations
 
 import logging
 
-from celery import shared_task
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
+
 from django.core.cache import cache
 from django.utils import timezone
 
@@ -135,7 +147,13 @@ def build_sitemap_async(self, sitemap_type: str = "all", notify: bool = False):
         raise self.retry(exc=exc)  # noqa: B904
 
 
-@shared_task(bind=True, max_retries=2, default_retry_delay=120)
+@shared_task(
+    bind=True,
+    max_retries=2,
+    default_retry_delay=120,
+    soft_time_limit=600,
+    time_limit=900,
+)
 def check_links_async(self, limit: int = 100):
     """
     Check sitemap URLs for broken links and update status.
@@ -194,7 +212,7 @@ def check_links_async(self, limit: int = 100):
         raise self.retry(exc=exc)  # noqa: B904
 
 
-@shared_task(bind=True, max_retries=2)
+@shared_task(bind=True, max_retries=2, soft_time_limit=30, time_limit=60)
 def inspect_url_async(self, url: str) -> dict:
     """
     Inspect a single URL for SEO metrics and HTTP status.
@@ -250,7 +268,9 @@ def inspect_url_async(self, url: str) -> dict:
         }
 
 
-@shared_task(bind=True, max_retries=2, default_retry_delay=300)
+@shared_task(
+    bind=True, max_retries=2, default_retry_delay=300, soft_time_limit=30, time_limit=60
+)
 def notify_search_engines(self):
     """
     Notify Google and Bing of sitemap updates via ping.
@@ -291,7 +311,7 @@ def notify_search_engines(self):
         raise self.retry(exc=exc)  # noqa: B904
 
 
-@shared_task
+@shared_task(soft_time_limit=600, time_limit=900)
 def regenerate_seo_for_content_type(content_type_id: int, batch_size: int = 50):
     """
     Regenerate SEO metadata for all objects of a given content type.

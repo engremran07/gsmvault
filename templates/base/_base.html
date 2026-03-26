@@ -31,6 +31,17 @@
   {% include "ads/includes/_network_body_scripts.html" %}
 
   {% include "base/_scripts.html" %}
+
+  {% block pre_alpine %}{% endblock %}
+
+  {# Alpine.js Intersect v3.14.9 — entrance animations on scroll (before Alpine core) #}
+  <script defer src="{% static 'vendor/alpinejs/intersect.min.js' %}"
+          nonce="{{ request.csp_nonce }}"></script>
+
+  {# Alpine.js v3.14.9 — MUST come after all alpine:init listener scripts above #}
+  <script defer src="{% static 'vendor/alpinejs/alpine.min.js' %}"
+          nonce="{{ request.csp_nonce }}"></script>
+
   {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -13,9 +13,9 @@
 {% block og_description %}{{ post.summary|default:post.title|truncatewords:30 }}{% endblock %}
 {% block og_type %}<meta property="og:type" content="article">{% endblock %}
 {% block og_url %}{% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}{% endblock %}
-{% if post.featured_image %}
-{% block og_image %}<meta property="og:image" content="{{ post.featured_image.url }}">{% endblock %}
-{% block twitter_image %}<meta name="twitter:image" content="{{ post.featured_image.url }}">{% endblock %}
+{% if post.hero_image %}
+{% block og_image %}<meta property="og:image" content="{{ post.hero_image }}">{% endblock %}
+{% block twitter_image %}<meta name="twitter:image" content="{{ post.hero_image }}">{% endblock %}
 {% endif %}
 {% block twitter_title %}{{ post.title }}{% endblock %}
 {% block twitter_description %}{{ post.summary|default:post.title|truncatewords:30 }}{% endblock %}
@@ -27,7 +27,7 @@
   "@type": "Article",
   "headline": "{{ post.title|escapejs }}",
   "description": "{{ post.summary|default:post.title|truncatewords:30|escapejs }}",
-  {% if post.featured_image %}"image": "{{ post.featured_image.url }}",{% endif %}
+  {% if post.hero_image %}"image": "{{ post.hero_image }}",{% endif %}
   "author": {
     "@type": "Person",
     "name": "{{ post.author|escapejs }}"
@@ -89,8 +89,8 @@
       {% endif %}
     </header>
 
-    {% if post.featured_image %}
-    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full rounded-lg object-cover max-h-96" loading="lazy">
+    {% if post.hero_image %}
+    <img src="{{ post.hero_image }}" alt="{{ post.title }}" class="w-full rounded-lg object-cover max-h-96" loading="lazy">
     {% endif %}
 
     {% if post.summary %}
@@ -103,6 +103,45 @@
     {% render_ad_slot "in-article-top" css_class="my-6" %}
 
     {# Body Content #}
+    {% if ad_gate_required %}
+    <div class="prose prose-invert max-w-none text-[var(--color-text-primary)]">
+      {{ post.body|truncatewords_html:50|safe }}
+    </div>
+    <div class="relative mt-6">
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--color-bg-primary)] pointer-events-none" style="height: 120px; bottom: 0; top: auto;"></div>
+      <div class="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 text-center mt-4"
+           x-data="{ watching: false, countdown: {{ ad_gate_config.min_watch_seconds|default:30 }}, done: false }"
+           x-cloak>
+        <i data-lucide="lock" class="w-8 h-8 mx-auto mb-3 text-[var(--color-accent)]"></i>
+        <h3 class="text-lg font-bold mb-2">Unlock Full Article</h3>
+        <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+          Watch a short ad to unlock the complete article.
+        </p>
+        <template x-if="!watching && !done">
+          <button @click="watching = true; let t = setInterval(() => { countdown--; if (countdown <= 0) { clearInterval(t); done = true; watching = false; } }, 1000)"
+                  class="px-6 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition">
+            <i data-lucide="play" class="w-4 h-4 inline mr-1"></i> Watch Ad
+          </button>
+        </template>
+        <template x-if="watching">
+          <div>
+            <div class="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2 mb-3">
+              <div class="bg-[var(--color-accent)] h-2 rounded-full transition-all" :style="'width:' + (100 - (countdown / {{ ad_gate_config.min_watch_seconds|default:30 }}) * 100) + '%'"></div>
+            </div>
+            <p class="text-sm text-[var(--color-text-muted)]">Please wait <span x-text="countdown"></span>s…</p>
+          </div>
+        </template>
+        <template x-if="done">
+          <form method="post" action="{% url 'blog:ad_gate_complete' post.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-500 transition">
+              <i data-lucide="unlock" class="w-4 h-4 inline mr-1"></i> Unlock Article
+            </button>
+          </form>
+        </template>
+      </div>
+    </div>
+    {% else %}
     <div class="prose prose-invert max-w-none
                 text-[var(--color-text-primary)]
                 [&_a]:text-[var(--color-accent)] [&_a]:underline
@@ -119,6 +158,7 @@
                 [&_table]:w-full [&_th]:text-left [&_th]:p-2 [&_td]:p-2 [&_tr]:border-b [&_tr]:border-[var(--color-border)]">
       {{ post.body|safe }}
     </div>
+    {% endif %}
 
     {# ── Ad: Content Bottom ── #}
     {% render_ad_slot "content-bottom" css_class="my-6" %}
@@ -189,6 +229,74 @@
     {% if related_widget_html %}
     <div class="border-t border-[var(--color-border)] pt-6 mt-8">
       {{ related_widget_html|safe }}
+    </div>
+    {% endif %}
+
+    {# Forum Discussion Link #}
+    {% if forum_discussion_url %}
+    <div class="border-t border-[var(--color-border)] pt-6 mt-8">
+      <div class="rounded-lg border border-[var(--color-accent)]/20 bg-[var(--color-bg-secondary)] p-5 flex items-center gap-4">
+        <i data-lucide="message-circle" class="w-8 h-8 text-[var(--color-accent)] shrink-0"></i>
+        <div class="flex-1">
+          <h3 class="font-semibold text-sm">Join the Discussion</h3>
+          <p class="text-xs text-[var(--color-text-secondary)]">Continue this conversation in our community forum.</p>
+        </div>
+        <a href="{{ forum_discussion_url }}" class="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold hover:bg-[var(--color-accent-hover)] transition shrink-0">
+          <i data-lucide="external-link" class="w-4 h-4"></i> Forum
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    {# ── Flashing Tools Widget (firmware-linked posts) ── #}
+    {% if flashing_tools %}
+    <div class="border-t border-[var(--color-border)] pt-6 mt-8">
+      <h2 class="text-xl font-bold mb-2">
+        <i data-lucide="wrench" class="w-5 h-5 inline mr-2 text-[var(--color-accent)]"></i>
+        Recommended Flashing Tools{% if post.firmware_brand %} for {{ post.firmware_brand.name }}{% endif %}
+      </h2>
+      <p class="text-sm text-[var(--color-text-muted)] mb-4">
+        Compatible tools for flashing firmware on this device. Choose based on your experience level.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {% for tool in flashing_tools %}
+        <a href="{% url 'firmwares:flashing_tool_detail' slug=tool.slug %}"
+           class="group rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 hover:border-[var(--color-accent)]/50 transition-colors">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center
+                        {% if tool.tool_type == 'oem' %}bg-emerald-500/10 text-emerald-400
+                        {% elif tool.tool_type == 'free' %}bg-blue-500/10 text-blue-400
+                        {% elif tool.tool_type == 'open_source' %}bg-purple-500/10 text-purple-400
+                        {% else %}bg-amber-500/10 text-amber-400{% endif %}">
+              <i data-lucide="{% if tool.tool_type == 'oem' %}shield-check{% elif tool.tool_type == 'open_source' %}github{% else %}wrench{% endif %}" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-sm group-hover:text-[var(--color-accent)] transition-colors truncate">
+                {{ tool.name }}
+                {% if tool.version %}<span class="text-xs text-[var(--color-text-muted)] font-normal">v{{ tool.version }}</span>{% endif %}
+              </h4>
+              <div class="flex flex-wrap gap-2 mt-1">
+                <span class="text-xs px-1.5 py-0.5 rounded
+                  {% if tool.risk_level == 'safe' %}bg-emerald-500/10 text-emerald-400
+                  {% elif tool.risk_level == 'moderate' %}bg-amber-500/10 text-amber-400
+                  {% elif tool.risk_level == 'advanced' %}bg-orange-500/10 text-orange-400
+                  {% else %}bg-red-500/10 text-red-400{% endif %}">
+                  {{ tool.get_risk_level_display }}
+                </span>
+                <span class="text-xs text-[var(--color-text-muted)]">{{ tool.get_platform_display }}</span>
+                {% if tool.is_free %}<span class="text-xs text-emerald-400">Free</span>{% else %}<span class="text-xs text-amber-400">Paid</span>{% endif %}
+              </div>
+              {% if tool.description %}<p class="text-xs text-[var(--color-text-muted)] mt-1 line-clamp-2">{{ tool.description|truncatewords:20 }}</p>{% endif %}
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      <div class="mt-3 text-right">
+        <a href="{% url 'firmwares:flashing_tools' %}" class="text-sm text-[var(--color-accent)] hover:underline">
+          <i data-lucide="arrow-right" class="w-4 h-4 inline"></i> Browse all flashing tools
+        </a>
+      </div>
     </div>
     {% endif %}
 

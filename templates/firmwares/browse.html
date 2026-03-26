@@ -35,8 +35,8 @@
   {# Expanded Filters #}
   <div x-show="showFilters" x-cloak x-transition class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
     <div>
-      <label class="block text-sm font-medium mb-1">Brand</label>
-      <select onchange="location.href='?brand='+this.value+'{% if selected_type %}&type={{ selected_type }}{% endif %}'"
+      <label for="id_filter_brand" class="block text-sm font-medium mb-1">Brand</label>
+      <select id="id_filter_brand" onchange="location.href='?brand='+this.value+'{% if selected_type %}&type={{ selected_type }}{% endif %}'"
               class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm">
         <option value="">All Brands</option>
         {% for brand in brands %}
@@ -45,8 +45,8 @@
       </select>
     </div>
     <div>
-      <label class="block text-sm font-medium mb-1">Chipset</label>
-      <select onchange="location.href='?chipset='+this.value+'{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}'"
+      <label for="id_filter_chipset" class="block text-sm font-medium mb-1">Chipset</label>
+      <select id="id_filter_chipset" onchange="location.href='?chipset='+this.value+'{% if selected_type %}&type={{ selected_type }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}'"
               class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm">
         <option value="">All Chipsets</option>
         {% for cs in chipsets %}

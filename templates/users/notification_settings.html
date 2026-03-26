@@ -37,8 +37,8 @@
           <span class="text-sm">New posts from followed authors</span>
         </label>
         <div class="pt-2">
-          <label class="block text-sm font-medium mb-1">Email Frequency</label>
-          <select name="email_frequency"
+          <label for="id_email_frequency" class="block text-sm font-medium mb-1">Email Frequency</label>
+          <select name="email_frequency" id="id_email_frequency"
                   class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
             <option value="instant" {% if preferences.email_frequency == "instant" %}selected{% endif %}>Instant</option>
             <option value="daily" {% if preferences.email_frequency == "daily" %}selected{% endif %}>Daily digest</option>

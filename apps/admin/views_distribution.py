@@ -20,12 +20,14 @@ from apps.distribution.api import get_settings as dist_get_settings
 from apps.distribution.forms import SocialAccountForm
 from apps.distribution.models import (
     ContentVariant,
+    GeneratedVideo,
     ShareJob,
     ShareLog,
     SharePlan,
     SocialAccount,
 )
 from apps.distribution.tasks import enqueue_pending_for_account
+from apps.users.models_social import SocialPostingAccount
 
 __all__ = [
     "admin_suite_distribution",
@@ -51,6 +53,7 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
         "logs_24h": 0,
     }
     message = ""
+    active_tab = request.GET.get("tab", "accounts")
     query = (request.GET.get("q") or "").strip()
     account_form = SocialAccountForm()
 
@@ -88,22 +91,257 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
                 jid = request.POST.get("job_id")
                 ShareJob.objects.filter(pk=jid).update(status="cancelled")
                 message = "Job cancelled."
+            elif action == "create_posting_account":
+                platform = request.POST.get("platform", "").strip()
+                acct_name = request.POST.get("posting_account_name", "").strip()
+                if not platform:
+                    message = "Platform is required."
+                elif not acct_name:
+                    message = "Account name is required."
+                else:
+                    auth_info = SocialPostingAccount.get_auth_info(platform)
+                    auth_type = auth_info.get("auth_type", "oauth2")
+                    acct = SocialPostingAccount.objects.create(
+                        platform=platform,
+                        account_name=acct_name,
+                        auth_type=auth_type,
+                        destination_type=request.POST.get("destination_type", "page"),
+                        destination_name=request.POST.get(
+                            "destination_name", ""
+                        ).strip(),
+                        destination_id=request.POST.get("destination_id", "").strip(),
+                        status="unconfigured",
+                        created_by=request.user,
+                    )
+                    # Set credentials based on auth type
+                    if auth_type == "api_token":
+                        bot_token = request.POST.get("bot_token", "").strip()
+                        if bot_token:
+                            acct.set_bot_token(bot_token)
+                            acct.status = "active"
+                    elif auth_type == "webhook":
+                        webhook_url = request.POST.get("webhook_url", "").strip()
+                        if webhook_url:
+                            acct.set_webhook_url(webhook_url)
+                            acct.status = "active"
+                    elif auth_type == "access_token":
+                        access_token = request.POST.get(
+                            "posting_access_token", ""
+                        ).strip()
+                        if access_token:
+                            acct.set_access_token(access_token)
+                            acct.status = "active"
+                    elif auth_type in ("api_key_secret", "oauth2"):
+                        api_key = request.POST.get("api_key", "").strip()
+                        api_secret = request.POST.get("api_secret", "").strip()
+                        if api_key:
+                            acct.set_api_key(api_key)
+                        if api_secret:
+                            acct.set_api_secret(api_secret)
+                    acct.save()
+                    if auth_info.get("requires_oauth"):
+                        message = f"Created {acct.get_platform_display()}. Configure OAuth in account settings."  # type: ignore[attr-defined]
+                    else:
+                        message = f"Created {acct.get_platform_display()} account."  # type: ignore[attr-defined]
+            elif action == "toggle_posting_account":
+                paid = request.POST.get("posting_account_id")
+                pa = SocialPostingAccount.objects.filter(id=paid).first()
+                if pa:
+                    pa.is_enabled = not pa.is_enabled
+                    if not pa.is_enabled:
+                        pa.status = "disabled"
+                    elif pa.has_credentials:
+                        pa.status = "active"
+                    pa.save(update_fields=["is_enabled", "status", "updated_at"])
+                    state = "enabled" if pa.is_enabled else "disabled"
+                    message = f"{pa.account_name} {state}."
+            elif action == "test_posting_connection":
+                paid = request.POST.get("posting_account_id")
+                pa = SocialPostingAccount.objects.filter(id=paid).first()
+                if pa:
+                    _ok, msg = pa.test_connection()
+                    message = f"{pa.get_platform_display()}: {msg}"  # type: ignore[attr-defined]
             elif action == "generate_video":
                 post_id = request.POST.get("post_id")
                 if post_id:
-                    from apps.distribution.tasks import generate_video_scripts
+                    from apps.blog.models import Post as BlogPost
+                    from apps.distribution.services import (
+                        create_video_variants_for_post,
+                    )
 
-                    generate_video_scripts.delay(int(post_id))
-                    message = "Video script generation queued."
+                    post_obj = BlogPost.objects.filter(pk=int(post_id)).first()
+                    if post_obj:
+                        results = create_video_variants_for_post(post_obj)
+                        message = f"Generated {len(results)} video script(s)."
+                    else:
+                        message = f"Post {post_id} not found."
                 else:
                     message = "Post ID required for video generation."
+            elif action == "bulk_generate_video":
+                post_ids = request.POST.getlist("video_post_ids")
+                if post_ids:
+                    from apps.blog.models import Post as BlogPost
+                    from apps.distribution.services import (
+                        create_video_variants_for_post,
+                    )
+
+                    count = 0
+                    for pid in post_ids:
+                        post_obj = BlogPost.objects.filter(pk=int(pid)).first()
+                        if post_obj:
+                            create_video_variants_for_post(post_obj)
+                            count += 1
+                    message = f"Generated video scripts for {count} post(s)."
+                else:
+                    message = "Select at least one topic."
+            elif action == "toggle_distribution_setting":
+                from apps.distribution.models import DistributionSettings
+
+                field = request.POST.get("field", "")
+                allowed = {
+                    "distribution_enabled",
+                    "auto_fanout_on_publish",
+                    "allow_indexing_jobs",
+                    "enable_firmware_auto_distribution",
+                    "require_admin_approval",
+                }
+                if field in allowed:
+                    ds = DistributionSettings.get_solo()
+                    current = getattr(ds, field, False)
+                    setattr(ds, field, not current)
+                    ds.save(update_fields=[field])
+                    state = "enabled" if not current else "disabled"
+                    label = field.replace("_", " ").title()
+                    message = f"{label} {state}."
+                else:
+                    message = "Unknown setting."
+            elif action == "delete_video_script":
+                vid = request.POST.get("video_script_id")
+                if vid:
+                    deleted = ContentVariant.objects.filter(
+                        pk=vid, variant_type="video_script"
+                    ).delete()
+                    message = (
+                        "Video script deleted." if deleted[0] else "Script not found."
+                    )
+            elif action == "render_video":
+                active_tab = "video"
+                post_id = request.POST.get("post_id")
+                platform = request.POST.get("platform", "").strip()
+                auto_pub = bool(request.POST.get("auto_publish"))
+                if post_id:
+                    from apps.blog.models import Post as BlogPost
+                    from apps.distribution.video_generator import (
+                        generate_all_platform_videos as gen_all_videos,
+                    )
+                    from apps.distribution.video_generator import (
+                        generate_video_for_post,
+                    )
+
+                    post_obj = BlogPost.objects.filter(pk=int(post_id)).first()
+                    if post_obj:
+                        if platform:
+                            video = generate_video_for_post(
+                                post_obj,
+                                platform,
+                                auto_publish=auto_pub,
+                                created_by=request.user,
+                            )
+                            message = f"Video rendered for {platform} (ID: {video.pk})."
+                        else:
+                            videos = gen_all_videos(
+                                post_obj,
+                                auto_publish=auto_pub,
+                                created_by=request.user,
+                            )
+                            message = (
+                                f"Rendered {len(videos)} video(s) across platforms."
+                            )
+                    else:
+                        message = f"Post {post_id} not found."
+                else:
+                    message = "Post ID required."
+            elif action == "bulk_render_videos":
+                active_tab = "video"
+                post_ids = request.POST.getlist("video_post_ids")
+                if post_ids:
+                    from apps.blog.models import Post as BlogPost
+                    from apps.distribution.video_generator import (
+                        generate_all_platform_videos as gen_all_videos,
+                    )
+
+                    count = 0
+                    for pid in post_ids:
+                        post_obj = BlogPost.objects.filter(pk=int(pid)).first()
+                        if post_obj:
+                            gen_all_videos(post_obj, created_by=request.user)
+                            count += 1
+                    message = (
+                        f"Rendered videos for {count} post(s) across all platforms."
+                    )
+                else:
+                    message = "Select at least one post."
+            elif action == "rerender_video":
+                active_tab = "video"
+                vid = request.POST.get("video_id")
+                if vid:
+                    gv = (
+                        GeneratedVideo.objects.filter(pk=vid)
+                        .select_related("post")
+                        .first()
+                    )
+                    if gv:
+                        from apps.distribution.video_generator import (
+                            generate_video_for_post,
+                        )
+
+                        video = generate_video_for_post(
+                            gv.post,
+                            gv.platform,
+                            created_by=request.user,
+                        )
+                        message = (
+                            f"Re-rendered {gv.get_platform_display()} (ID: {video.pk})."  # type: ignore[attr-defined]
+                        )
+                    else:
+                        message = "Video not found."
+            elif action == "delete_video":
+                active_tab = "video"
+                vid = request.POST.get("video_id")
+                if vid:
+                    gv = GeneratedVideo.objects.filter(pk=vid).first()
+                    if gv:
+                        # Delete the file from storage
+                        if gv.video_file:
+                            gv.video_file.delete(save=False)
+                        if gv.thumbnail:
+                            gv.thumbnail.delete(save=False)
+                        gv.delete()
+                        message = "Video deleted."
+                    else:
+                        message = "Video not found."
+            elif action == "publish_video":
+                active_tab = "video"
+                vid = request.POST.get("video_id")
+                if vid:
+                    gv = GeneratedVideo.objects.filter(pk=vid).first()
+                    if gv:
+                        gv.publish_queued = True
+                        gv.save(update_fields=["publish_queued"])
+                        message = f"Video queued for publishing to {gv.get_platform_display()}."  # type: ignore[attr-defined]
+                    else:
+                        message = "Video not found."
         except Exception as exc:
             logger.warning("Admin suite distribution action failed: %s", exc)
-            message = "Action failed."
+            message = f"Action failed: {exc}"
 
     try:
         dist_settings = dist_get_settings()
         stats["accounts"] = SocialAccount.objects.count()
+        stats["posting_accounts"] = SocialPostingAccount.objects.count()
+        stats["posting_active"] = SocialPostingAccount.objects.filter(
+            status="active"
+        ).count()
         stats["plans"] = SharePlan.objects.count()
         stats["jobs_pending"] = ShareJob.objects.filter(status="pending").count()
         stats["jobs_failed"] = ShareJob.objects.filter(status="failed").count()
@@ -112,12 +350,18 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
         stats["logs_24h"] = ShareLog.objects.filter(created_at__gte=since).count()
 
         account_qs = SocialAccount.objects.order_by("channel", "account_name")
+        posting_account_qs = SocialPostingAccount.objects.order_by(
+            "platform", "account_name"
+        )
         plan_qs = SharePlan.objects.order_by("-created_at")
         jobs_qs = ShareJob.objects.order_by("-created_at")
         logs_qs = ShareLog.objects.order_by("-created_at")
         if query:
             account_qs = account_qs.filter(
                 Q(channel__icontains=query) | Q(account_name__icontains=query)
+            )
+            posting_account_qs = posting_account_qs.filter(
+                Q(platform__icontains=query) | Q(account_name__icontains=query)
             )
             plan_qs = plan_qs.filter(Q(post__title__icontains=query))
             jobs_qs = jobs_qs.filter(
@@ -128,9 +372,21 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
             )
 
         accounts = account_qs[:50]
+        posting_accounts = list(posting_account_qs[:50])
         plans = plan_qs[:50]
         jobs = jobs_qs[:50]
         logs = logs_qs[:50]
+
+        # Group posting accounts by platform
+        posting_by_platform: dict[str, list[SocialPostingAccount]] = {}
+        for pa in posting_accounts:
+            posting_by_platform.setdefault(pa.platform, []).append(pa)
+
+        # Platform info for creation form
+        platform_info = {
+            key: SocialPostingAccount.get_auth_info(key)
+            for key, _ in SocialPostingAccount.PLATFORM_CHOICES
+        }
 
         video_scripts = (
             ContentVariant.objects.filter(variant_type="video_script")
@@ -140,11 +396,56 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
         stats["video_scripts"] = ContentVariant.objects.filter(
             variant_type="video_script"
         ).count()
+
+        # Generated videos (actual rendered video files)
+        generated_videos = GeneratedVideo.objects.select_related("post").order_by(
+            "-created_at"
+        )[:50]
+        stats["videos_total"] = GeneratedVideo.objects.count()
+        stats["videos_completed"] = GeneratedVideo.objects.filter(
+            status="completed"
+        ).count()
+        stats["videos_rendering"] = GeneratedVideo.objects.filter(
+            status__in=["rendering", "processing"]
+        ).count()
+        stats["videos_queued"] = GeneratedVideo.objects.filter(status="queued").count()
+        stats["videos_failed"] = GeneratedVideo.objects.filter(status="failed").count()
     except Exception as exc:
-        logger.debug("Admin suite distribution snapshot failed: %s", exc)
+        logger.warning(
+            "Admin suite distribution snapshot failed: %s", exc, exc_info=True
+        )
         dist_settings = {}
         accounts = plans = jobs = logs = video_scripts = []
-        message = "Unable to load distribution data."
+        generated_videos = []
+        posting_accounts = []
+        posting_by_platform = {}
+        platform_info = {}
+        message = f"Unable to load distribution data: {exc}"
+
+    # Trending topics for video generation
+    trending_posts: list[object] = []
+    trending_topics: list[object] = []
+    try:
+        from apps.blog.models import Post
+
+        trending_posts = list(
+            Post.objects.filter(status="published")
+            .order_by("-views_count")[:15]
+            .values("id", "title", "views_count", "created_at")
+        )
+    except Exception:
+        logger.debug("Failed to load trending posts", exc_info=True)
+
+    try:
+        from apps.forum.models import ForumTopic
+
+        trending_topics = list(
+            ForumTopic.objects.filter(is_removed=False)
+            .order_by("-view_count", "-reply_count")[:15]
+            .values("id", "title", "view_count", "reply_count", "created_at")
+        )
+    except Exception:
+        logger.debug("Failed to load trending forum topics", exc_info=True)
 
     return _render_admin(
         request,
@@ -152,12 +453,21 @@ def admin_suite_distribution(request: HttpRequest) -> HttpResponse:
         {
             "stats": stats,
             "accounts": accounts,
+            "posting_accounts": posting_accounts,
+            "posting_by_platform": posting_by_platform,
+            "platform_choices": SocialPostingAccount.PLATFORM_CHOICES,
+            "platform_info": platform_info,
+            "destination_choices": SocialPostingAccount.DESTINATION_TYPE_CHOICES,
             "plans": plans,
             "jobs": jobs,
             "logs": logs,
             "video_scripts": video_scripts,
+            "generated_videos": generated_videos,
+            "trending_posts": trending_posts,
+            "trending_topics": trending_topics,
             "q": query,
             "message": message,
+            "active_tab": active_tab,
             "dist_settings": dist_settings,
             "account_form": account_form,
         },
@@ -189,8 +499,6 @@ def admin_suite_social_posting(request: HttpRequest) -> HttpResponse:
     """
     if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
         raise _ADMIN_DISABLED
-
-    from apps.users.models_social import SocialPostingAccount
 
     message = ""
 
@@ -370,8 +678,6 @@ def admin_suite_social_posting_detail(
     """
     if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
         raise _ADMIN_DISABLED
-
-    from apps.users.models_social import SocialPostingAccount
 
     try:
         account = SocialPostingAccount.objects.get(id=account_id)

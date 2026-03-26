@@ -1187,11 +1187,54 @@ def admin_suite_ads_campaigns(request: HttpRequest) -> HttpResponse:
             if action == "create":
                 name = (request.POST.get("name") or "").strip()[:255]
                 if name:
+                    from decimal import Decimal, InvalidOperation
+
+                    from django.utils.dateparse import parse_datetime
+
+                    try:
+                        budget = Decimal(request.POST.get("budget") or "0")
+                    except (InvalidOperation, ValueError):
+                        budget = Decimal("0")
+                    start_raw = (request.POST.get("start_at") or "").strip()
+                    end_raw = (request.POST.get("end_at") or "").strip()
                     Campaign.objects.create(
                         name=name,
+                        type=(request.POST.get("type") or "direct")[:20],
+                        budget=budget,
+                        daily_cap=int(request.POST.get("daily_cap") or 0),
+                        total_cap=int(request.POST.get("total_cap") or 0),
+                        priority=int(request.POST.get("priority") or 0),
+                        weight=max(1, int(request.POST.get("weight") or 1)),
+                        start_at=parse_datetime(start_raw) if start_raw else None,
+                        end_at=parse_datetime(end_raw) if end_raw else None,
                         is_active=bool(request.POST.get("is_active")),
                     )
                     message = f"Campaign '{name}' created."
+            elif action == "update":
+                campaign_id = request.POST.get("campaign_id")
+                camp = Campaign.objects.filter(pk=campaign_id).first()
+                if camp:
+                    from decimal import Decimal, InvalidOperation
+
+                    from django.utils.dateparse import parse_datetime
+
+                    camp.name = (request.POST.get("name") or camp.name).strip()[:255]
+                    camp.type = (request.POST.get("type") or camp.type)[:20]
+                    try:
+                        camp.budget = Decimal(request.POST.get("budget") or "0")
+                    except (InvalidOperation, ValueError):
+                        pass
+                    camp.daily_cap = int(request.POST.get("daily_cap") or 0)
+                    camp.total_cap = int(request.POST.get("total_cap") or 0)
+                    camp.priority = int(request.POST.get("priority") or 0)
+                    camp.weight = max(1, int(request.POST.get("weight") or 1))
+                    start_raw = (request.POST.get("start_at") or "").strip()
+                    end_raw = (request.POST.get("end_at") or "").strip()
+                    camp.start_at = parse_datetime(start_raw) if start_raw else None
+                    camp.end_at = parse_datetime(end_raw) if end_raw else None
+                    camp.is_active = bool(request.POST.get("is_active"))
+                    camp.save()
+                    message = f"Campaign '{camp.name}' updated."
             elif action == "toggle":
                 campaign_id = request.POST.get("campaign_id")
                 camp = Campaign.objects.filter(pk=campaign_id).first()
@@ -1285,16 +1328,20 @@ def admin_suite_ads_placements(request: HttpRequest) -> HttpResponse:
                 name = (request.POST.get("name") or "").strip()[:255]
                 slug = (request.POST.get("slug") or "").strip()[:255]
                 page_context = (request.POST.get("page_context") or "").strip()[:255]
+                allowed_types = (request.POST.get("allowed_types") or "").strip()
+                allowed_sizes = (request.POST.get("allowed_sizes") or "").strip()
                 if name and slug:
                     AdPlacement.objects.create(
                         name=name,
                         slug=slug,
                         page_context=page_context,
+                        allowed_types=allowed_types,
+                        allowed_sizes=allowed_sizes,
                         is_active=True,
                         is_enabled=True,
                     )
                     message = f"Placement '{name}' created."
-            elif action == "toggle":
+            elif action in ("toggle", "toggle_placement"):
                 placement_id = request.POST.get("placement_id")
                 pl = AdPlacement.objects.filter(pk=placement_id).first()
                 if pl:
@@ -1312,22 +1359,14 @@ def admin_suite_ads_placements(request: HttpRequest) -> HttpResponse:
             message = f"Action failed: {exc}"
 
     try:
+        from django.db.models import Count
+
         from apps.ads.models import AdPlacement
 
         placements = list(
             AdPlacement.objects.filter(is_deleted=False)
+            .annotate(assignment_count=Count("assignments"))
             .order_by("name")
-            .values(
-                "id",
-                "name",
-                "slug",
-                "page_context",
-                "is_active",
-                "is_enabled",
-                "allowed_types",
-                "allowed_sizes",
-                "created_at",
-            )
         )
     except Exception as exc:
         logger.debug("Failed to load placements: %s", exc)
@@ -1362,9 +1401,34 @@ def admin_suite_ads_creatives(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         action = request.POST.get("action")
         try:
-            from apps.ads.models import AdCreative
+            from apps.ads.models import AdCreative, Campaign
 
-            if action == "toggle":
+            if action == "create":
+                name = (request.POST.get("name") or "").strip()[:255]
+                campaign_id = request.POST.get("campaign_id")
+                campaign = (
+                    Campaign.objects.filter(pk=campaign_id).first()
+                    if campaign_id
+                    else None
+                )
+                if name and campaign:
+                    AdCreative.objects.create(
+                        campaign=campaign,
+                        name=name,
+                        creative_type=(request.POST.get("creative_type") or "banner")[
+                            :20
+                        ],
+                        html=(request.POST.get("html") or ""),
+                        image_url=(request.POST.get("image_url") or "")[:200],
+                        click_url=(request.POST.get("click_url") or "")[:200],
+                        weight=max(1, int(request.POST.get("weight") or 1)),
+                        is_active=bool(request.POST.get("is_active")),
+                        is_enabled=True,
+                    )
+                    message = f"Creative '{name}' created."
+                elif not campaign:
+                    message = "Campaign is required to create a creative."
+            elif action in ("toggle", "toggle_creative"):
                 creative_id = request.POST.get("creative_id")
                 cr = AdCreative.objects.filter(pk=creative_id).first()
                 if cr:
@@ -1373,28 +1437,67 @@ def admin_suite_ads_creatives(request: HttpRequest) -> HttpResponse:
                     message = (
                         f"Creative {'activated' if cr.is_active else 'deactivated'}."
                     )
+            elif action == "delete":
+                creative_id = request.POST.get("creative_id")
+                AdCreative.objects.filter(pk=creative_id).update(is_deleted=True)
+                message = "Creative deleted."
+            elif action == "assign":
+                creative_id = request.POST.get("creative_id")
+                placement_id = request.POST.get("placement_id")
+                if creative_id and placement_id:
+                    from apps.ads.models import PlacementAssignment
+
+                    _, created = PlacementAssignment.objects.get_or_create(
+                        creative_id=creative_id,
+                        placement_id=placement_id,
+                        defaults={"weight": int(request.POST.get("weight") or 1)},
+                    )
+                    message = (
+                        "Creative assigned to placement."
+                        if created
+                        else "Assignment already exists."
+                    )
         except Exception as exc:
             logger.warning("Creative action failed: %s", exc)
             message = f"Action failed: {exc}"
 
+    campaigns_list = []
     try:
-        from apps.ads.models import AdCreative
+        from apps.ads.models import AdCreative, Campaign
+
+        campaigns_list = list(
+            Campaign.objects.filter(is_active=True)
+            .order_by("name")
+            .values("id", "name")
+        )
 
         creatives = list(
             AdCreative.objects.filter(is_deleted=False)
+            .select_related("campaign")
             .order_by("-created_at")[:100]
-            .values(
-                "id", "name", "creative_type", "is_active", "is_enabled", "created_at"
-            )
         )
     except Exception as exc:
         logger.debug("Failed to load creatives: %s", exc)
+
+    placements_list = []
+    try:
+        from apps.ads.models import AdPlacement
+
+        placements_list = list(
+            AdPlacement.objects.filter(is_deleted=False)
+            .order_by("name")
+            .values("id", "name", "slug")
+        )
+    except Exception as exc:
+        logger.debug("Failed to load placements for assignment: %s", exc)
 
     return _render_admin(
         request,
         "admin_suite/ads_creatives.html",
         {
             "creatives": creatives,
+            "campaigns_list": campaigns_list,
+            "placements_list": placements_list,
             "message": message,
         },
         nav_active="ads",
@@ -1752,6 +1855,304 @@ def admin_suite_firmwares_downloads(request: HttpRequest) -> HttpResponse:
             ("Downloads", None),
         ),
         subtitle="Download Management",
+    )
+
+
+# =============================================================================
+# FLASHING TOOLS & GUIDES
+# =============================================================================
+
+
+@csrf_protect
+@staff_member_required
+def admin_suite_flashing_tools(request: HttpRequest) -> HttpResponse:
+    """Flashing tools catalog + guide template management."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):
+        raise _ADMIN_DISABLED
+
+    from apps.firmwares.models import (
+        Brand,
+        FlashingGuideTemplate,
+        FlashingTool,
+        FlashingToolCategory,
+        GeneratedFlashingGuide,
+    )
+
+    message = ""
+    active_tab = request.GET.get("tab", "tools")
+
+    # ── POST actions ──
+    if request.method == "POST":
+        action = request.POST.get("action")
+        try:
+            if action == "save_category":
+                cat_id = request.POST.get("category_id")
+                name = request.POST.get("name", "").strip()
+                slug = request.POST.get("slug", "").strip()
+                description = request.POST.get("description", "").strip()
+                icon = request.POST.get("icon", "wrench").strip()
+                sort_order = int(request.POST.get("sort_order", "0") or "0")
+                if name and slug:
+                    if cat_id:
+                        FlashingToolCategory.objects.filter(pk=cat_id).update(
+                            name=name,
+                            slug=slug,
+                            description=description,
+                            icon=icon,
+                            sort_order=sort_order,
+                        )
+                        message = f"Category '{name}' updated."
+                    else:
+                        FlashingToolCategory.objects.create(
+                            name=name,
+                            slug=slug,
+                            description=description,
+                            icon=icon,
+                            sort_order=sort_order,
+                        )
+                        message = f"Category '{name}' created."
+                active_tab = "categories"
+
+            elif action == "delete_category":
+                cat_id = request.POST.get("category_id")
+                cat = FlashingToolCategory.objects.filter(pk=cat_id).first()
+                if cat:
+                    cat.delete()
+                    message = "Category deleted."
+                active_tab = "categories"
+
+            elif action == "save_tool":
+                tool_id = request.POST.get("tool_id")
+                name = request.POST.get("name", "").strip()
+                slug = request.POST.get("slug", "").strip()
+                cat_id = request.POST.get("category_id")
+                tool_type = request.POST.get("tool_type", "free")
+                platform = request.POST.get("platform", "windows")
+                risk_level = request.POST.get("risk_level", "safe")
+                description = request.POST.get("description", "").strip()
+                download_url = request.POST.get("download_url", "").strip()
+                official_url = request.POST.get("official_url", "").strip()
+                version = request.POST.get("version", "").strip()
+                instructions = request.POST.get("instructions", "").strip()
+                is_free = request.POST.get("is_free") == "on"
+                is_featured = request.POST.get("is_featured") == "on"
+
+                category = FlashingToolCategory.objects.filter(pk=cat_id).first()
+                if name and slug and category:
+                    defaults = {
+                        "name": name,
+                        "slug": slug,
+                        "category": category,
+                        "tool_type": tool_type,
+                        "platform": platform,
+                        "risk_level": risk_level,
+                        "description": description,
+                        "download_url": download_url,
+                        "official_url": official_url,
+                        "version": version,
+                        "instructions": instructions,
+                        "is_free": is_free,
+                        "is_featured": is_featured,
+                    }
+                    if tool_id:
+                        FlashingTool.objects.filter(pk=tool_id).update(**defaults)
+                        message = f"Tool '{name}' updated."
+                    else:
+                        FlashingTool.objects.create(**defaults)
+                        message = f"Tool '{name}' created."
+                active_tab = "tools"
+
+            elif action == "delete_tool":
+                tool_id = request.POST.get("tool_id")
+                tool = FlashingTool.objects.filter(pk=tool_id).first()
+                if tool:
+                    tool.delete()
+                    message = "Tool deleted."
+                active_tab = "tools"
+
+            elif action == "toggle_tool":
+                tool_id = request.POST.get("tool_id")
+                tool = FlashingTool.objects.filter(pk=tool_id).first()
+                if tool:
+                    tool.is_active = not tool.is_active
+                    tool.save(update_fields=["is_active"])
+                    state = "enabled" if tool.is_active else "disabled"
+                    message = f"Tool '{tool.name}' {state}."
+                active_tab = "tools"
+
+            elif action == "save_template":
+                tmpl_id = request.POST.get("template_id")
+                title_template = request.POST.get("title_template", "").strip()
+                body_template = request.POST.get("body_template", "").strip()
+                summary_template = request.POST.get("summary_template", "").strip()
+                guide_type = request.POST.get("guide_type", "stock_flash")
+                brand_id = request.POST.get("brand_id") or None
+                chipset_filter = request.POST.get("chipset_filter", "").strip()
+                auto_generate = request.POST.get("auto_generate") == "on"
+                auto_publish = request.POST.get("auto_publish") == "on"
+
+                brand = Brand.objects.filter(pk=brand_id).first() if brand_id else None
+                if title_template and body_template:
+                    defaults: dict[str, Any] = {
+                        "title_template": title_template,
+                        "body_template": body_template,
+                        "summary_template": summary_template,
+                        "guide_type": guide_type,
+                        "brand": brand,
+                        "chipset_filter": chipset_filter,
+                        "auto_generate": auto_generate,
+                        "auto_publish": auto_publish,
+                    }
+                    if tmpl_id:
+                        FlashingGuideTemplate.objects.filter(pk=tmpl_id).update(
+                            **defaults
+                        )
+                        message = "Guide template updated."
+                    else:
+                        FlashingGuideTemplate.objects.create(**defaults)
+                        message = "Guide template created."
+                active_tab = "guides"
+
+            elif action == "delete_template":
+                tmpl_id = request.POST.get("template_id")
+                tmpl = FlashingGuideTemplate.objects.filter(pk=tmpl_id).first()
+                if tmpl:
+                    tmpl.delete()
+                    message = "Guide template deleted."
+                active_tab = "guides"
+
+            elif action == "generate_guides":
+                tmpl_id = request.POST.get("template_id")
+                use_ai = request.POST.get("use_ai") == "on"
+                limit = int(request.POST.get("limit", "10") or "10")
+                tmpl = FlashingGuideTemplate.objects.filter(pk=tmpl_id).first()
+                if tmpl:
+                    from apps.firmwares.guide_service import (
+                        generate_guides_for_template,
+                    )
+
+                    results = generate_guides_for_template(
+                        tmpl, use_ai=use_ai, limit=limit
+                    )
+                    message = f"Generated {len(results)} flashing guide(s)."
+                active_tab = "guides"
+
+            elif action == "bulk_generate":
+                use_ai = request.POST.get("use_ai") == "on"
+                limit = int(request.POST.get("limit", "20") or "20")
+                templates = FlashingGuideTemplate.objects.filter(
+                    is_active=True, auto_generate=True
+                )
+                total = 0
+                for tmpl in templates:
+                    from apps.firmwares.guide_service import (
+                        generate_guides_for_template,
+                    )
+
+                    results = generate_guides_for_template(
+                        tmpl, use_ai=use_ai, limit=limit
+                    )
+                    total += len(results)
+                message = f"Bulk generation complete: {total} guide(s) created."
+                active_tab = "guides"
+
+        except Exception as exc:
+            logger.exception("Flashing tools action failed: %s", exc)
+            message = f"Error: {exc}"
+
+    # ── Load data ──
+    from apps.firmwares.guide_service import get_tool_stats
+
+    stats = get_tool_stats()
+
+    # Tools tab — sortable columns
+    from django.db.models import Q as _Q
+
+    q = _admin_search(request)
+    tools_qs = FlashingTool.objects.select_related("category").all()
+    if q:
+        tools_qs = tools_qs.filter(
+            _Q(name__icontains=q)
+            | _Q(description__icontains=q)
+            | _Q(category__name__icontains=q)
+        )
+    tools_qs, sort_field, sort_dir = _admin_sort(
+        request,
+        tools_qs,
+        {
+            "name": "name",
+            "category": "category__name",
+            "type": "tool_type",
+            "platform": "platform",
+            "risk": "risk_level",
+            "version": "version",
+            "created": "created_at",
+        },
+        default_sort="-created_at",
+    )
+    tools_page = _admin_paginate(request, tools_qs, per_page=25)
+
+    # Categories tab
+    from django.db.models import Count
+
+    categories = FlashingToolCategory.objects.annotate(
+        tool_count=Count("tools")
+    ).order_by("sort_order", "name")
+
+    # Guides tab — sortable templates
+    templates_qs = FlashingGuideTemplate.objects.select_related("brand").all()
+    templates_qs, tmpl_sort, tmpl_dir = _admin_sort(
+        request,
+        templates_qs,
+        {
+            "type": "guide_type",
+            "brand": "brand__name",
+            "created": "created_at",
+        },
+        default_sort="-created_at",
+    )
+    templates_page = _admin_paginate(request, templates_qs, per_page=25)
+
+    generated_qs = GeneratedFlashingGuide.objects.select_related(
+        "template", "brand", "model", "post"
+    ).order_by("-created_at")
+    generated_page = _admin_paginate(request, generated_qs, per_page=25)
+
+    # Brands for dropdown
+    brands = Brand.objects.order_by("name")
+
+    return _render_admin(
+        request,
+        "admin_suite/flashing_tools.html",
+        {
+            "stats": stats,
+            "tools": tools_page,
+            "tools_page": tools_page,
+            "categories": categories,
+            "templates": templates_page,
+            "templates_page": templates_page,
+            "generated_guides": generated_page,
+            "generated_page": generated_page,
+            "brands": brands,
+            "active_tab": active_tab,
+            "q": q,
+            "sort": sort_field,
+            "dir": sort_dir,
+            "tmpl_sort": tmpl_sort,
+            "tmpl_dir": tmpl_dir,
+            "message": message,
+            "tool_types": FlashingTool.ToolType.choices,
+            "platforms": FlashingTool.Platform.choices,
+            "risk_levels": FlashingTool.RiskLevel.choices,
+            "guide_types": FlashingGuideTemplate.GuideType.choices,
+        },
+        nav_active="flashing_tools",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("Firmwares", "admin_suite:firmwares"),
+            ("Flashing Tools & Guides", None),
+        ),
+        subtitle="Flashing Tools Catalog & Auto-Generated Guides",
     )
 
 

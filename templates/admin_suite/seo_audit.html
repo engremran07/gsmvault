@@ -1,0 +1,126 @@
+{% extends "layouts/admin.html" %}
+{% block title %}SEO Audit Dashboard — Admin{% endblock %}
+{% block page_header %}
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight flex items-center gap-2">
+      <i data-lucide="shield-check" class="w-6 h-6 text-[var(--color-accent)]"></i>SEO Audit Dashboard
+    </h1>
+    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+  </div>
+  <a href="{% url 'admin_suite:seo' %}" class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] text-xs font-semibold hover:bg-[var(--color-bg-secondary)] transition-all btn-press">
+    <i data-lucide="settings" class="w-3.5 h-3.5 inline mr-1"></i>SEO Settings
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{# ── Overall Health Score ─────────────────────────────────────── #}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 stagger-children">
+  {% include "components/_admin_kpi_card.html" with icon="activity" color=overview.score_color value=overview.avg_score label="Overall Score" stagger=0 %}
+  {% include "components/_admin_kpi_card.html" with icon="file-text" color="blue" value=overview.total_content label="Total Content" stagger=1 %}
+  {% include "components/_admin_kpi_card.html" with icon="alert-circle" color="red" value=overview.total_errors label="SEO Errors" stagger=2 %}
+  {% include "components/_admin_kpi_card.html" with icon="alert-triangle" color="amber" value=overview.total_warnings label="SEO Warnings" stagger=3 %}
+</div>
+
+{# ── Content Type Breakdown ───────────────────────────────────── #}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 stagger-children">
+  {% for type_key, info in overview.by_type.items %}
+  <a href="{% url 'admin_suite:seo_audit_type' content_type=type_key %}"
+     class="glass rounded-xl p-5 hover-lift animate-in group cursor-pointer transition-all"
+     style="--stagger:{{ forloop.counter0|add:4 }}">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+        {% if type_key == "posts" %}Blog Posts
+        {% elif type_key == "brands" %}Brands
+        {% elif type_key == "models" %}Device Models
+        {% elif type_key == "firmwares" %}Firmware Files
+        {% elif type_key == "topics" %}Forum Topics
+        {% endif %}
+      </span>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors"></i>
+    </div>
+    {# Score ring #}
+    <div class="flex items-center gap-4">
+      <div class="relative w-14 h-14 shrink-0">
+        <svg class="w-14 h-14 -rotate-90" viewBox="0 0 56 56">
+          <circle cx="28" cy="28" r="24" fill="none" stroke="var(--color-border)" stroke-width="4" opacity="0.2"/>
+          <circle cx="28" cy="28" r="24" fill="none"
+                  stroke="{% if info.score_color == 'emerald' %}rgb(52,211,153){% elif info.score_color == 'amber' %}rgb(251,191,36){% else %}rgb(248,113,113){% endif %}"
+                  stroke-width="4" stroke-linecap="round"
+                  stroke-dasharray="{% widthratio info.avg_score 100 151 %} 151"/>
+        </svg>
+        <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-{{ info.score_color }}-400">{{ info.avg_score }}</span>
+      </div>
+      <div class="space-y-1 text-xs">
+        <div class="text-[var(--color-text-muted)]">{{ info.count }} items</div>
+        {% if info.errors %}<div class="text-red-400">{{ info.errors }} errors</div>{% endif %}
+        {% if info.warnings %}<div class="text-amber-400">{{ info.warnings }} warnings</div>{% endif %}
+        {% if not info.errors and not info.warnings %}<div class="text-emerald-400">All clear</div>{% endif %}
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+{# ── Duplicate Titles Section ─────────────────────────────────── #}
+{% if duplicates %}
+<div class="glass rounded-xl p-6 mb-8 animate-in" style="--stagger:9">
+  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+    <i data-lucide="copy" class="w-4 h-4 text-red-400"></i>Duplicate Titles Detected
+  </h3>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {% for type_key, dups in duplicates.items %}
+    <div class="p-4 rounded-lg bg-[var(--color-bg-secondary)]/50">
+      <span class="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-2 block">
+        {% if type_key == "posts" %}Blog Posts{% elif type_key == "brands" %}Brands{% elif type_key == "models" %}Models{% elif type_key == "topics" %}Forum Topics{% endif %}
+      </span>
+      <div class="space-y-1">
+        {% for dup in dups %}
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-[var(--color-text-primary)] truncate mr-2">{{ dup.title }}</span>
+          <span class="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 font-bold shrink-0">×{{ dup.count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{# ── Quick Audit by Type ─ Inline HTMX ──────────────────────── #}
+<div x-data="{ activeType: '' }" class="animate-in" style="--stagger:10">
+  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+    <i data-lucide="scan" class="w-4 h-4 text-[var(--color-accent)]"></i>Quick Inline Audit
+  </h3>
+  <div class="flex gap-2 flex-wrap mb-4">
+    {% for type_key, info in overview.by_type.items %}
+    <button
+      @click="activeType = activeType === '{{ type_key }}' ? '' : '{{ type_key }}'"
+      :class="activeType === '{{ type_key }}' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'bg-[var(--color-bg-tertiary)]/60 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'"
+      class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"
+      hx-get="{% url 'admin_suite:seo_audit_type' content_type=type_key %}?sort=score&dir=asc"
+      hx-target="#quick-audit-results"
+      hx-trigger="click"
+      hx-swap="innerHTML"
+      hx-indicator="#audit-loading">
+      {% if type_key == "posts" %}Posts{% elif type_key == "brands" %}Brands{% elif type_key == "models" %}Models{% elif type_key == "firmwares" %}Firmware{% elif type_key == "topics" %}Topics{% endif %}
+      <span class="ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-{{ info.score_color }}-500/15 text-{{ info.score_color }}-400">{{ info.avg_score }}</span>
+    </button>
+    {% endfor %}
+  </div>
+
+  <div id="audit-loading" class="htmx-indicator flex items-center justify-center py-8">
+    <div class="animate-spin rounded-full h-6 w-6 border-2 border-[var(--color-accent)] border-t-transparent"></div>
+    <span class="ml-2 text-sm text-[var(--color-text-muted)]">Running SEO checks...</span>
+  </div>
+
+  <div id="quick-audit-results" class="glass rounded-xl overflow-hidden">
+    <div class="py-12 text-center text-[var(--color-text-muted)]">
+      <i data-lucide="mouse-pointer-click" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
+      <p class="text-sm">Select a content type above to run inline SEO checks</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

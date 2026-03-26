@@ -1,7 +1,19 @@
 import logging
 from datetime import timedelta
 
-from celery import shared_task
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
+
 from django.apps import apps
 from django.db import transaction
 from django.utils import timezone
@@ -204,7 +216,7 @@ def health_check_service_accounts(self):
     return {"healthy": healthy_count, "unhealthy": unhealthy_count}
 
 
-@shared_task
+@shared_task(soft_time_limit=120, time_limit=180)
 def update_shared_drive_health():
     """
     Periodic task (runs every 15 minutes) to update shared drive health status
@@ -219,7 +231,7 @@ def update_shared_drive_health():
     return drives.count()
 
 
-@shared_task
+@shared_task(soft_time_limit=120, time_limit=180)
 def generate_quota_analytics():
     """
     Daily task to generate quota usage analytics
@@ -246,7 +258,7 @@ def generate_quota_analytics():
     return created_count
 
 
-@shared_task
+@shared_task(soft_time_limit=300, time_limit=600)
 def verify_storage_integrity():
     """
     Daily task to verify random sample of stored files
@@ -254,6 +266,8 @@ def verify_storage_integrity():
     import random
 
     from .models import FirmwareStorageLocation
+    from .services import ServiceAccountRouter
+    from .services.gdrive import GoogleDriveService
 
     # Get random sample of 10 files
     all_files = list(
@@ -278,7 +292,7 @@ def verify_storage_integrity():
             ).get(id=file_id)
 
             # Get service account for this drive
-            router = ServiceAccountRouter()  # type: ignore[name-defined]  # noqa: F821
+            router = ServiceAccountRouter()
             sa = router.get_best_service_account(
                 required_gb=0.1,
                 preferred_drive_id=str(storage_loc.shared_drive.id)
@@ -289,7 +303,7 @@ def verify_storage_integrity():
             if not sa:
                 continue
 
-            gdrive_service = GoogleDriveService(sa)  # type: ignore[name-defined]  # noqa: F821
+            gdrive_service = GoogleDriveService(sa)
 
             # Verify file exists and MD5 matches
             is_valid = gdrive_service.verify_file_integrity(

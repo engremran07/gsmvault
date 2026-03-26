@@ -110,6 +110,24 @@ class ForumCategory(models.Model):
         default=False, help_text="Only invited users can see"
     )
 
+    # Optional device-scope links (naming convention: title = marketing name only)
+    brand_link = models.ForeignKey(
+        "firmwares.Brand",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="forum_categories",
+        help_text="Link to firmware brand — category title should be brand marketing name only (e.g. 'Samsung', not 'Samsung Firmware')",
+    )
+    model_link = models.ForeignKey(
+        "firmwares.Model",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="forum_model_categories",
+        help_text="Link to firmware model — category title should be model marketing name only (e.g. 'Galaxy S24 Ultra')",
+    )
+
     # Denormalised counts
     topic_count = models.PositiveIntegerField(default=0)
     reply_count = models.PositiveIntegerField(default=0)

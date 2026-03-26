@@ -79,8 +79,8 @@
     {# Settings row — hidden while running #}
     <div x-show="!running" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mb-4">
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">Strategy</label>
-        <select name="strategy"
+        <label for="id_strategy" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">Strategy</label>
+        <select name="strategy" id="id_strategy"
                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
           <option value="brand_walk" selected>Brand Walk (full catalogue)</option>
           <option value="search_targeted">Search Targeted (filters)</option>
@@ -89,8 +89,8 @@
         </select>
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">Sample Size (per brand)</label>
-        <input type="number" name="sample_size" min="1" max="500" placeholder="All devices"
+        <label for="id_sample_size" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">Sample Size (per brand)</label>
+        <input type="number" name="sample_size" id="id_sample_size" autocomplete="off" min="1" max="500" placeholder="All devices"
                class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
       </div>
       <div class="space-y-2">

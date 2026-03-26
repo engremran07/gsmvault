@@ -1,0 +1,50 @@
+{# templates/shop/product_list.html — Browse products #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Products — Shop{% endblock %}
+{% block meta_description %}Browse firmware products, token packs, and services.{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+      <i data-lucide="shopping-bag" class="w-8 h-8 text-[var(--color-accent)]"></i>
+      Products
+    </h1>
+    <p class="text-[var(--color-text-secondary)] mt-1">Token packs, firmware bundles, and premium services</p>
+  </div>
+  <a href="{% url 'shop_public:pricing' %}"
+     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text-primary)] font-semibold hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+    <i data-lucide="credit-card" class="w-4 h-4"></i> View Plans
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{% if products %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for product in products %}
+  <a href="{% url 'shop_public:product_detail' slug=product.slug %}"
+     class="group rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/50 transition-all hover:shadow-lg">
+    <div class="flex items-start justify-between gap-2 mb-3">
+      <h3 class="text-base font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
+        {{ product.name }}
+      </h3>
+      <span class="shrink-0 text-xs font-medium rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] px-2 py-0.5 capitalize">
+        {{ product.get_product_type_display }}
+      </span>
+    </div>
+    {% if product.description %}
+    <p class="text-sm text-[var(--color-text-secondary)] line-clamp-3 mb-4">{{ product.description }}</p>
+    {% endif %}
+    <div class="flex items-center justify-between">
+      <span class="text-xl font-bold text-[var(--color-accent)]">${{ product.price }}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="shopping-bag" message="No products available yet" %}
+{% endif %}
+{% endblock %}

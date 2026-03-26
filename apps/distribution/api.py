@@ -22,6 +22,8 @@ def get_settings() -> dict[str, Any]:
             "max_retries": cfg.max_retries,
             "retry_backoff_seconds": cfg.retry_backoff_seconds,
             "allow_indexing_jobs": cfg.allow_indexing_jobs,
+            "enable_firmware_auto_distribution": cfg.enable_firmware_auto_distribution,
+            "require_admin_approval": cfg.require_admin_approval,
         }
     except Exception:
         return {
@@ -31,6 +33,8 @@ def get_settings() -> dict[str, Any]:
             "max_retries": 3,
             "retry_backoff_seconds": 1800,
             "allow_indexing_jobs": False,
+            "enable_firmware_auto_distribution": True,
+            "require_admin_approval": False,
         }
 
 

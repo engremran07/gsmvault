@@ -25,12 +25,14 @@
 </style>
 {% endblock %}
 
-{% block extra_js %}
-{# Chart.js v4.4.7 — local vendor copy, admin analytics charts only #}
+{% block pre_alpine %}
 <script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"
         nonce="{{ request.csp_nonce }}" defer></script>
 <script src="{% static 'js/src/admin-charts.js' %}"
         nonce="{{ request.csp_nonce }}" defer></script>
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/src/admin.js' %}" defer nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}
 

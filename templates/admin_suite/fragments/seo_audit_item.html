@@ -1,0 +1,61 @@
+{# HTMX Fragment — Single item inline SEO audit detail #}
+{% if result %}
+<td colspan="5" class="p-0">
+  <div class="mx-4 my-3 p-4 rounded-xl bg-[var(--color-bg-secondary)]/60 border border-[var(--color-border)]/20 animate-in animate-in-visible">
+    <div class="flex items-center justify-between mb-3">
+      <h4 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="scan-line" class="w-4 h-4 text-[var(--color-accent)]"></i>
+        SEO Audit: {{ result.item_title }}
+      </h4>
+      <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold
+        {% if result.score >= 80 %}bg-emerald-500/10 text-emerald-400
+        {% elif result.score >= 60 %}bg-amber-500/10 text-amber-400
+        {% else %}bg-red-500/10 text-red-400{% endif %}">
+        Score: {{ result.score }}/100
+      </span>
+    </div>
+    {% if result.issues %}
+    <div class="space-y-2">
+      {% for issue in result.issues %}
+      <div class="flex items-start gap-3 p-2.5 rounded-lg
+        {% if issue.severity == 'error' %}bg-red-500/5 border border-red-500/10
+        {% elif issue.severity == 'warning' %}bg-amber-500/5 border border-amber-500/10
+        {% else %}bg-blue-500/5 border border-blue-500/10{% endif %}">
+        <div class="shrink-0 mt-0.5">
+          {% if issue.severity == "error" %}<i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i>
+          {% elif issue.severity == "warning" %}<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i>
+          {% else %}<i data-lucide="info" class="w-4 h-4 text-blue-400"></i>{% endif %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium
+            {% if issue.severity == 'error' %}text-red-400
+            {% elif issue.severity == 'warning' %}text-amber-400
+            {% else %}text-blue-400{% endif %}">
+            {{ issue.message }}
+          </p>
+          {% if issue.field %}
+          <span class="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Field: <code class="bg-[var(--color-bg-tertiary)] px-1 py-0.5 rounded">{{ issue.field }}</code></span>
+          {% endif %}
+        </div>
+        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase
+          {% if issue.severity == 'error' %}bg-red-500/10 text-red-400
+          {% elif issue.severity == 'warning' %}bg-amber-500/10 text-amber-400
+          {% else %}bg-blue-500/10 text-blue-400{% endif %}">
+          {{ issue.severity }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-emerald-400 text-sm">
+      <i data-lucide="check-circle-2" class="w-5 h-5 inline mr-1"></i>
+      No SEO issues found — this item is fully optimized.
+    </div>
+    {% endif %}
+  </div>
+</td>
+{% else %}
+<td colspan="5" class="p-4 text-center text-sm text-[var(--color-text-muted)]">
+  <i data-lucide="alert-circle" class="w-4 h-4 inline mr-1 text-amber-400"></i>Could not load audit details.
+</td>
+{% endif %}

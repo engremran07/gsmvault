@@ -109,6 +109,8 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "total_posts": 0,
         "published_posts": 0,
         "total_brands": 0,
+        "total_models": 0,
+        "total_variants": 0,
         "total_firmwares": 0,
         "total_downloads": 0,
         "pending_comments": 0,
@@ -116,6 +118,16 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "active_campaigns": 0,
         "total_pages": 0,
         "storage_providers": 0,
+        # Forum
+        "forum_topics": 0,
+        "forum_replies": 0,
+        "forum_open_flags": 0,
+        # Flashing tools & guides
+        "flashing_tools": 0,
+        "flashing_guides": 0,
+        "guide_templates": 0,
+        # Video generation
+        "generated_videos": 0,
     }
 
     # Users
@@ -141,12 +153,27 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
 
     # Firmwares
     try:
-        from apps.firmwares.models import Brand, OfficialFirmware
+        from apps.firmwares.models import (
+            Brand,
+            FlashingGuideTemplate,
+            FlashingTool,
+            GeneratedFlashingGuide,
+            OfficialFirmware,
+            Variant,
+        )
+        from apps.firmwares.models import (
+            Model as FirmwareModel,
+        )
 
         kpi["total_brands"] = Brand.objects.count()
+        kpi["total_models"] = FirmwareModel.objects.count()
+        kpi["total_variants"] = Variant.objects.count()
         kpi["total_firmwares"] = OfficialFirmware.objects.filter(is_active=True).count()
         total_dl = OfficialFirmware.objects.aggregate(total=Sum("download_count"))
         kpi["total_downloads"] = total_dl.get("total") or 0
+        kpi["flashing_tools"] = FlashingTool.objects.count()
+        kpi["guide_templates"] = FlashingGuideTemplate.objects.count()
+        kpi["flashing_guides"] = GeneratedFlashingGuide.objects.count()
     except Exception:  # noqa: S110
         pass
 
@@ -193,6 +220,24 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
         kpi["storage_providers"] = CloudStorageProvider.objects.filter(
             is_active=True
         ).count()
+    except Exception:  # noqa: S110
+        pass
+
+    # Forum
+    try:
+        from apps.forum.models import ForumFlag, ForumReply, ForumTopic
+
+        kpi["forum_topics"] = ForumTopic.objects.count()
+        kpi["forum_replies"] = ForumReply.objects.count()
+        kpi["forum_open_flags"] = ForumFlag.objects.filter(is_resolved=False).count()
+    except Exception:  # noqa: S110
+        pass
+
+    # Video generation
+    try:
+        from apps.distribution.models import GeneratedVideo
+
+        kpi["generated_videos"] = GeneratedVideo.objects.count()
     except Exception:  # noqa: S110
         pass
 
@@ -305,18 +350,17 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "login_policy": "mfa_if_high",
     }
     try:
-        from security_suite.security import (  # type: ignore[import-not-found]
-            conf as sec_conf,
-        )
+        from apps.security.models import SecurityConfig
 
+        sec_conf = SecurityConfig.get_solo()  # type: ignore[attr-defined]
         security_status.update(
             {
-                "devices_enabled": sec_conf.get("DEVICES_ENABLED", True),
-                "bots_enabled": sec_conf.get("BOTS_ENABLED", True),
-                "risk_enabled": sec_conf.get("RISK_ENABLED", True),
-                "login_policy": sec_conf.get(
-                    "DEFAULT_LOGIN_RISK_POLICY", "mfa_if_high"
+                "devices_enabled": getattr(
+                    sec_conf, "device_fingerprinting_enabled", True
                 ),
+                "bots_enabled": getattr(sec_conf, "crawler_guard_enabled", True),
+                "risk_enabled": getattr(sec_conf, "login_risk_enabled", True),
+                "login_policy": getattr(sec_conf, "login_risk_policy", "mfa_if_high"),
             }
         )
     except Exception:  # noqa: S110
@@ -387,6 +431,21 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
     except Exception:  # noqa: S110
         pass
 
+    widget_forum: list[dict[str, str]] = []
+    try:
+        from apps.forum.models import ForumTopic
+
+        for t in ForumTopic.objects.select_related("user").order_by("-created_at")[:4]:
+            widget_forum.append(
+                {
+                    "title": t.title,
+                    "subtitle": f"by {t.user}" if t.user else "anonymous",
+                    "date": t.created_at.strftime("%b %d") if t.created_at else "",
+                }
+            )
+    except Exception:  # noqa: S110
+        pass
+
     import json
 
     return _render_admin(
@@ -406,6 +465,7 @@ def admin_suite(request: HttpRequest) -> HttpResponse:  # noqa: F405
             "widget_categories": widget_categories,
             "widget_brands": widget_brands,
             "widget_scraper_runs": widget_scraper_runs,
+            "widget_forum": widget_forum,
         },
         nav_active="overview",
         breadcrumb=_make_breadcrumb(("Admin Home", None)),

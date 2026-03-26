@@ -1,11 +1,24 @@
 """
-Celery/Django-Q tasks for tag operations.
+Celery tasks for tag operations.
 Background processing for analytics, trending, and notifications.
 """
 
 from __future__ import annotations
 
 import logging
+
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
 
 from django.contrib.auth import get_user_model
 
@@ -16,6 +29,7 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+@shared_task(acks_late=True, soft_time_limit=120, time_limit=180)
 def update_trending_tags_hourly():
     """
     Update hourly trending tags.
@@ -26,6 +40,7 @@ def update_trending_tags_hourly():
     logger.info("Updated hourly trending tags")
 
 
+@shared_task(acks_late=True, soft_time_limit=120, time_limit=180)
 def update_trending_tags_daily():
     """
     Update daily trending tags.
@@ -36,6 +51,7 @@ def update_trending_tags_daily():
     logger.info("Updated daily trending tags")
 
 
+@shared_task(acks_late=True, soft_time_limit=120, time_limit=180)
 def update_trending_tags_weekly():
     """
     Update weekly trending tags.
@@ -46,6 +62,7 @@ def update_trending_tags_weekly():
     logger.info("Updated weekly trending tags")
 
 
+@shared_task(acks_late=True, soft_time_limit=120, time_limit=180)
 def update_trending_tags_monthly():
     """
     Update monthly trending tags.
@@ -56,6 +73,7 @@ def update_trending_tags_monthly():
     logger.info("Updated monthly trending tags")
 
 
+@shared_task(acks_late=True, soft_time_limit=30, time_limit=60)
 def update_tag_analytics(tag_id: int):
     """
     Update analytics for specific tag.
@@ -65,6 +83,7 @@ def update_tag_analytics(tag_id: int):
     logger.info(f"Updated analytics for tag {tag_id}")
 
 
+@shared_task(acks_late=True, soft_time_limit=300, time_limit=600)
 def update_all_tag_analytics():
     """
     Update analytics for all active tags.
@@ -84,6 +103,7 @@ def update_all_tag_analytics():
     logger.info(f"Updated analytics for {tags.count()} tags")
 
 
+@shared_task(acks_late=True, soft_time_limit=300, time_limit=600)
 def discover_tag_relationships():
     """
     Discover related tags based on co-occurrence.

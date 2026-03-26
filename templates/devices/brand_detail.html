@@ -86,6 +86,7 @@
              name="q"
              value="{{ search_query }}"
              placeholder="Search by name, codename, model code, chipset..."
+             aria-label="Search models"
              hx-get="{% url 'firmwares:brand_detail' slug=brand.slug %}"
              hx-trigger="keyup changed delay:300ms"
              hx-target="#model-grid"
@@ -96,6 +97,7 @@
 
     {# Sort dropdown #}
     <select name="sort"
+            aria-label="Sort order"
             hx-get="{% url 'firmwares:brand_detail' slug=brand.slug %}"
             hx-trigger="change"
             hx-target="#model-grid"
@@ -109,6 +111,7 @@
 
     {# Status filter #}
     <select name="status"
+            aria-label="Filter by status"
             hx-get="{% url 'firmwares:brand_detail' slug=brand.slug %}"
             hx-trigger="change"
             hx-target="#model-grid"

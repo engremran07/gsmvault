@@ -1,0 +1,78 @@
+{# templates/marketplace/my_listings.html — Seller dashboard: manage own listings #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}My Listings — Marketplace{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+      <i data-lucide="package" class="w-8 h-8 text-[var(--color-accent)]"></i>
+      My Listings
+    </h1>
+    <p class="text-[var(--color-text-secondary)] mt-1">
+      {% if seller.display_name %}{{ seller.display_name }}{% else %}{{ seller.user.username }}{% endif %}
+      {% if seller.verified %}
+      <i data-lucide="badge-check" class="w-4 h-4 text-[var(--color-success)] inline"></i>
+      {% endif %}
+      &middot; {{ active_count }} active listing{{ active_count|pluralize }} &middot; {{ total_sales }} total sale{{ total_sales|pluralize }}
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{# ── Listings Table ── #}
+{% if listings %}
+<div class="overflow-x-auto rounded-xl border border-[var(--color-border)]">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)] text-left text-xs uppercase tracking-wider">
+        <th class="px-4 py-3">Title</th>
+        <th class="px-4 py-3">Price</th>
+        <th class="px-4 py-3">Status</th>
+        <th class="px-4 py-3">Views</th>
+        <th class="px-4 py-3">Sales</th>
+        <th class="px-4 py-3">Created</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-[var(--color-border)]/50">
+      {% for listing in listings %}
+      <tr class="bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
+        <td class="px-4 py-3">
+          <a href="{% url 'marketplace_public:listing_detail' pk=listing.pk %}"
+             class="text-[var(--color-text-primary)] font-medium hover:text-[var(--color-accent)] transition-colors">
+            {{ listing.title }}
+          </a>
+          {% if listing.is_featured %}
+          <span class="ml-1 text-xs font-medium text-[var(--color-warning)]">★</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          {% if listing.discount_price %}
+          <span class="text-[var(--color-success)] font-bold">${{ listing.discount_price }}</span>
+          <span class="text-[var(--color-text-muted)] line-through text-xs ml-1">${{ listing.price }}</span>
+          {% else %}
+          <span class="font-bold">${{ listing.price }}</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          {% if listing.is_active %}
+          <span class="inline-flex items-center gap-1 text-xs font-medium rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)] px-2 py-0.5">Active</span>
+          {% else %}
+          <span class="inline-flex items-center gap-1 text-xs font-medium rounded-full bg-[var(--color-text-muted)]/10 text-[var(--color-text-muted)] px-2 py-0.5">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ listing.view_count }}</td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ listing.sale_count }}</td>
+        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ listing.created_at|date:"M d, Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="package" message="You haven't created any listings yet" %}
+{% endif %}
+{% endblock %}

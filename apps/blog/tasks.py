@@ -8,7 +8,20 @@ from __future__ import annotations
 import logging
 
 import requests
-from celery import shared_task
+
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
+
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -231,7 +244,7 @@ def sync_tag_usage_counts(tag_ids: list[int]) -> dict:
     return stats
 
 
-@shared_task
+@shared_task(soft_time_limit=120, time_limit=180)
 def generate_ai_post(topic: str, user_id: int) -> int | None:
     """
     Generate a blog post using AI based on a topic.
@@ -299,7 +312,7 @@ def generate_ai_post(topic: str, user_id: int) -> int | None:
         return None
 
 
-@shared_task
+@shared_task(soft_time_limit=300, time_limit=600)
 def auto_translate_post(post_id: int) -> dict:
     """
     Automatically translate a blog post into all enabled languages.

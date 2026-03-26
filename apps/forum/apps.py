@@ -10,6 +10,16 @@ class ForumConfig(AppConfig):
     def ready(self) -> None:
         from . import signals  # noqa: F401
 
+        # Connect blog→forum auto-link (creates ForumTopic on blog publish)
+        try:
+            from apps.core.signals import blog_post_published
+
+            from .event_handlers import handle_post_published
+
+            blog_post_published.connect(handle_post_published)
+        except Exception:  # noqa: S110
+            pass
+
         # Register forum sitemaps
         try:
             from apps.pages.sitemap_registry import register_sitemap

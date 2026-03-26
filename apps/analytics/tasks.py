@@ -6,7 +6,19 @@ Automated aggregation and real-time updates
 import logging
 from datetime import timedelta
 
-from celery import shared_task
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
+
 from django.db.models import Count
 from django.utils import timezone
 
@@ -124,7 +136,7 @@ def aggregate_daily_metrics(self, date=None):
         raise self.retry(exc=exc, countdown=300)  # noqa: B904
 
 
-@shared_task
+@shared_task(soft_time_limit=60, time_limit=120)
 def update_realtime_metrics():
     """
     Update real-time metrics snapshot.

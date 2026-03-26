@@ -404,6 +404,95 @@ def fetch_via_websearch(url: str, *, timeout: int = 20) -> FetchResult:
         )
 
 
+def fetch_via_tls_client(
+    url: str,
+    *,
+    client_id: str = "chrome_131",
+    timeout: int = 20,
+    proxy: str | None = None,
+) -> FetchResult:
+    """Fetch using tls_client with JA3 fingerprint impersonation."""
+    method_name = f"tls_client/{client_id}"
+    try:
+        import tls_client  # type: ignore[import-untyped]
+
+        session = tls_client.Session(client_identifier=client_id)  # type: ignore[arg-type]
+        if proxy:
+            session.proxies = {"http": proxy, "https": proxy}
+        ua = random.choice(USER_AGENTS)  # noqa: S311
+        resp = session.get(
+            url,
+            headers={
+                "User-Agent": ua,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+                "Accept-Encoding": "gzip, deflate, br",
+                "DNT": "1",
+                "Upgrade-Insecure-Requests": "1",
+            },
+            timeout_seconds=timeout,
+        )
+        status: int = resp.status_code or 0  # type: ignore[assignment]
+        body: str = resp.text or ""  # type: ignore[assignment]
+        headers_dict = {k.lower(): v for k, v in resp.headers.items()}
+        retry_after = _parse_retry_after(headers_dict)
+        is_banned = _check_ban(status, body)
+
+        return FetchResult(
+            status_code=status,
+            html=body,
+            method_name=method_name,
+            url=url,
+            retry_after=retry_after,
+            is_banned=is_banned,
+        )
+    except Exception as exc:
+        return FetchResult(
+            status_code=0,
+            html="",
+            method_name=method_name,
+            url=url,
+            error=str(exc),
+        )
+
+
+def fetch_via_cloudscraper(
+    url: str, *, timeout: int = 20, proxy: str | None = None
+) -> FetchResult:
+    """Fetch using cloudscraper — bypasses Cloudflare UAM/JS challenges."""
+    method_name = "cloudscraper"
+    try:
+        import cloudscraper  # type: ignore[import-untyped]
+
+        scraper = cloudscraper.create_scraper(
+            browser={"browser": "chrome", "platform": "windows", "mobile": False}
+        )
+        kwargs: dict[str, Any] = {"timeout": timeout}
+        if proxy:
+            kwargs["proxies"] = {"http": proxy, "https": proxy}
+        resp = scraper.get(url, **kwargs)
+        headers_dict = {k.lower(): v for k, v in resp.headers.items()}
+        retry_after = _parse_retry_after(headers_dict)
+        is_banned = _check_ban(resp.status_code, resp.text)
+
+        return FetchResult(
+            status_code=resp.status_code,
+            html=resp.text,
+            method_name=method_name,
+            url=url,
+            retry_after=retry_after,
+            is_banned=is_banned,
+        )
+    except Exception as exc:
+        return FetchResult(
+            status_code=0,
+            html="",
+            method_name=method_name,
+            url=url,
+            error=str(exc),
+        )
+
+
 # ---------------------------------------------------------------------------
 # FetchChain — cascading fallback
 # ---------------------------------------------------------------------------
@@ -434,6 +523,16 @@ _DEFAULT_CHAIN: list[_MethodConfig] = [
     _MethodConfig(
         "curl_cffi/edge101", "fetch_via_curl_cffi", 50, {"impersonate": "edge101"}
     ),
+    _MethodConfig(
+        "tls_client/chrome_131", "fetch_via_tls_client", 52, {"client_id": "chrome_131"}
+    ),
+    _MethodConfig(
+        "tls_client/firefox_131",
+        "fetch_via_tls_client",
+        54,
+        {"client_id": "firefox_131"},
+    ),
+    _MethodConfig("cloudscraper", "fetch_via_cloudscraper", 56, {}),
     _MethodConfig("wayback", "fetch_via_wayback", 60, {}),
     _MethodConfig("websearch", "fetch_via_websearch", 65, {}),
     _MethodConfig("httpx", "fetch_via_httpx", 70, {}),
@@ -445,6 +544,8 @@ _FETCH_FNS: dict[str, Any] = {
     "fetch_via_httpx": fetch_via_httpx,
     "fetch_via_wayback": fetch_via_wayback,
     "fetch_via_websearch": fetch_via_websearch,
+    "fetch_via_tls_client": fetch_via_tls_client,
+    "fetch_via_cloudscraper": fetch_via_cloudscraper,
 }
 
 
@@ -685,6 +786,20 @@ def probe_available_methods() -> dict[str, bool]:
         available["httpx"] = True
     except ImportError:
         available["httpx"] = False
+
+    try:
+        import tls_client  # type: ignore[import-untyped]  # noqa: F401
+
+        available["tls_client"] = True
+    except ImportError:
+        available["tls_client"] = False
+
+    try:
+        import cloudscraper  # type: ignore[import-untyped]  # noqa: F401
+
+        available["cloudscraper"] = True
+    except ImportError:
+        available["cloudscraper"] = False
 
     try:
         from scrapling.fetchers import (

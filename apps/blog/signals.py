@@ -137,3 +137,19 @@ def connect_signals():
                 logger.info(f"Queued ad content scan for post {instance.pk}")
             except Exception as e:
                 logger.debug("Failed to queue ad scan for post %s: %s", instance.pk, e)
+
+        # Emit blog_post_published Django signal for cross-app listeners
+        # (forum auto-topic, SEO sync, tag updates, etc.)
+        if is_published and not instance.forum_topic_id:
+            try:
+                from apps.core.signals import blog_post_published
+
+                blog_post_published.send(
+                    sender=Post, post=instance, user=instance.author
+                )
+            except Exception as e:
+                logger.debug(
+                    "Failed to emit blog_post_published for %s: %s",
+                    instance.pk,
+                    e,
+                )

@@ -590,6 +590,7 @@ def post_detail(request: HttpRequest, slug: str) -> HttpResponse:
 
     # If this is a firmware-linked post, fetch live firmware data
     firmware_table_data = None
+    flashing_tools = None
     if post.firmware_model_id:  # type: ignore[attr-defined]
         try:
             from apps.firmwares.public_views import get_all_firmwares_for_model
@@ -597,6 +598,74 @@ def post_detail(request: HttpRequest, slug: str) -> HttpResponse:
             firmware_table_data = get_all_firmwares_for_model(post.firmware_model)
         except Exception:  # noqa: S110
             pass
+        # Fetch recommended flashing tools for this brand/chipset
+        try:
+            from apps.firmwares.models import FlashingTool
+
+            brand = post.firmware_brand
+            if brand:
+                tools_qs = (
+                    FlashingTool.objects.filter(is_active=True, supported_brands=brand)
+                    .select_related("category")
+                    .distinct()[:12]
+                )
+                flashing_tools = list(tools_qs)
+                if not flashing_tools:
+                    # Fallback: featured tools
+                    flashing_tools = list(
+                        FlashingTool.objects.filter(
+                            is_active=True, is_featured=True
+                        ).select_related("category")[:8]
+                    )
+        except Exception:  # noqa: S110
+            pass
+    elif post.firmware_brand_id:  # type: ignore[attr-defined]
+        # Brand-only posts (no specific model)
+        try:
+            from apps.firmwares.models import FlashingTool
+
+            flashing_tools = list(
+                FlashingTool.objects.filter(
+                    is_active=True, supported_brands=post.firmware_brand
+                )
+                .select_related("category")
+                .distinct()[:12]
+            )
+        except Exception:  # noqa: S110
+            pass
+
+    # Forum discussion link
+    forum_discussion_url = None
+    if post.forum_topic_id:  # type: ignore[attr-defined]
+        try:
+            from django.urls import reverse
+
+            forum_discussion_url = reverse(
+                "forum:topic_detail",
+                kwargs={
+                    "pk": post.forum_topic_id,  # type: ignore[attr-defined]
+                    "slug": post.forum_topic.slug,  # type: ignore[union-attr]
+                },
+            )
+        except Exception:  # noqa: S110
+            pass
+
+    # Ad gate: check if this post requires watching an ad before reading
+    ad_gate_required = False
+    ad_gate_config = None
+    if post.ad_gate_config_id:  # type: ignore[attr-defined]
+        auto_triggered = (
+            post.ad_gate_min_views > 0 and post.views_count >= post.ad_gate_min_views
+        )
+        is_staff = getattr(request.user, "is_staff", False)
+        session_key = f"ad_gate_{post.slug}"
+        if (
+            (post.ad_gate_enabled or auto_triggered)
+            and not request.session.get(session_key)
+            and not is_staff
+        ):
+            ad_gate_required = True
+            ad_gate_config = post.ad_gate_config
 
     return render(
         request,
@@ -615,8 +684,51 @@ def post_detail(request: HttpRequest, slug: str) -> HttpResponse:
             "canonical_url": canonical,
             "current_locale": current_locale,
             "firmware_table_data": firmware_table_data,
+            "flashing_tools": flashing_tools,
+            "forum_discussion_url": forum_discussion_url,
+            "ad_gate_required": ad_gate_required,
+            "ad_gate_config": ad_gate_config,
         },
     )
+
+
+@require_POST
+def ad_gate_complete(request: HttpRequest, slug: str) -> HttpResponse:
+    """Mark the ad gate as completed for a blog post.
+
+    Sets a session flag so the user can read the full article.
+    Tracks the view in ``RewardedAdView`` if user is authenticated.
+    """
+    post = get_object_or_404(Post, slug__iexact=slug)
+    session_key = f"ad_gate_{post.slug}"
+
+    # Record rewarded view for authenticated users
+    if request.user.is_authenticated and post.ad_gate_config_id:  # type: ignore[attr-defined]
+        try:
+            from apps.ads.models import RewardedAdView
+
+            today_count = RewardedAdView.objects.filter(
+                user=request.user,
+                config=post.ad_gate_config,
+                viewed_at__date=timezone.now().date(),
+            ).count()
+            daily_limit = (
+                post.ad_gate_config.daily_limit_per_user  # type: ignore[union-attr]
+                if post.ad_gate_config
+                else 5
+            )
+            if today_count < daily_limit:
+                RewardedAdView.objects.create(
+                    user=request.user,
+                    config=post.ad_gate_config,
+                    completed=True,
+                    credits_earned=getattr(post.ad_gate_config, "reward_amount", 0),
+                )
+        except Exception:  # noqa: S110
+            pass
+
+    request.session[session_key] = True
+    return redirect("blog:post_detail", slug=post.slug)
 
 
 @require_GET

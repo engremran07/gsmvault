@@ -606,20 +606,7 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_BEAT_SCHEDULE = {
-    "distribution_pump_due": {
-        "task": "distribution.pump_due_jobs",
-        "schedule": 60.0,
-    },
-    "distribution_retry_failed": {
-        "task": "distribution.retry_failed_jobs",
-        "schedule": 300.0,
-    },
-    "blog_catchup_missing_posts": {
-        "task": "apps.firmwares.tasks.catchup_missing_blog_posts",
-        "schedule": 3600.0,  # Every hour — catches signal failures
-    },
-}
+# Beat schedule is defined in app/celery.py — do NOT duplicate here.
 
 # Distribution defaults
 DISTRIBUTION_CHANNELS = [

@@ -45,10 +45,3 @@
 <script src="{% static 'js/src/ads.js' %}"
         nonce="{{ request.csp_nonce }}" defer></script>
 
-{# Alpine.js Intersect v3.14.9 — entrance animations on scroll (before Alpine core) #}
-<script defer src="{% static 'vendor/alpinejs/intersect.min.js' %}"
-        nonce="{{ request.csp_nonce }}"></script>
-
-{# Alpine.js v3.14.9 — MUST be last deferred script so all stores are registered when it auto-initializes #}
-<script defer src="{% static 'vendor/alpinejs/alpine.min.js' %}"
-        nonce="{{ request.csp_nonce }}"></script>

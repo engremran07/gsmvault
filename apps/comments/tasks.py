@@ -1,11 +1,24 @@
 """
-Celery/Django-Q tasks for comment operations.
+Celery tasks for comment operations.
 Background processing for moderation, notifications, and analytics.
 """
 
 from __future__ import annotations
 
 import logging
+
+try:
+    from celery import shared_task
+except Exception:  # pragma: no cover - fallback when Celery not installed
+
+    def shared_task(*dargs, **dkwargs):  # type: ignore[assignment]
+        def decorator(func):
+            return func
+
+        if dargs and callable(dargs[0]):
+            return dargs[0]
+        return decorator
+
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,6 +32,11 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
+@shared_task(
+    acks_late=True,
+    soft_time_limit=60,
+    time_limit=120,
+)
 def moderate_comment(comment_id: int):
     """
     AI moderation task for new comments.
@@ -57,6 +75,7 @@ def moderate_comment(comment_id: int):
     )
 
 
+@shared_task(acks_late=True, soft_time_limit=60, time_limit=120)
 def remoderate_comment(comment_id: int):
     """
     Re-moderate edited comment.
@@ -64,6 +83,7 @@ def remoderate_comment(comment_id: int):
     moderate_comment(comment_id)  # Same logic
 
 
+@shared_task(acks_late=True, soft_time_limit=30, time_limit=60)
 def update_comment_analytics(comment_id: int):
     """
     Update analytics for comment.
@@ -72,6 +92,7 @@ def update_comment_analytics(comment_id: int):
     service.update_comment_analytics(comment_id)
 
 
+@shared_task(acks_late=True, soft_time_limit=30, time_limit=60)
 def notify_comment_reaction(comment_id: int, user_id: int, reaction_type: str):
     """
     Notify comment author about reaction.
@@ -102,6 +123,7 @@ def notify_comment_reaction(comment_id: int, user_id: int, reaction_type: str):
         logger.exception(f"Failed to send reaction notification: {e}")
 
 
+@shared_task(acks_late=True, soft_time_limit=30, time_limit=60)
 def notify_comment_award(comment_id: int, award_type: str):
     """
     Notify comment author about award.
@@ -126,6 +148,7 @@ def notify_comment_award(comment_id: int, award_type: str):
         logger.exception(f"Failed to send award notification: {e}")
 
 
+@shared_task(acks_late=True, soft_time_limit=30, time_limit=60)
 def notify_mention(comment_id: int, user_id: int):
     """
     Notify user they were mentioned in comment.

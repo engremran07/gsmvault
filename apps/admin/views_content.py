@@ -698,7 +698,7 @@ def _get_ad_network_types() -> list[tuple[str, str]]:
 
 @staff_member_required  # noqa: F405
 def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
-    """Ads read-only dashboard: placements, creatives, events stats."""
+    """Ads dashboard: placements, creatives, scanner, exclusions."""
     if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
         raise _ADMIN_DISABLED  # noqa: F405
 
@@ -707,12 +707,19 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "creatives": 0,
         "impressions_24h": 0,
         "clicks_24h": 0,
+        "pending_discoveries": 0,
+        "excluded_templates": 0,
     }
     message = ""
     if request.method == "POST":
         action = request.POST.get("action")
         try:
-            from apps.ads.models import AdCreative, AdNetwork, AdPlacement
+            from apps.ads.models import (
+                AdCreative,
+                AdNetwork,
+                AdPlacement,
+                TemplateAdExclusion,
+            )
 
             if action == "disable_placement":
                 pid = request.POST.get("placement_id")
@@ -776,8 +783,69 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
 
                 scan_data = scan_templates_for_placements()
                 scanned = scan_data.get("scanned", 0)
-                created = scan_data.get("created", 0)
-                message = f"Scan complete: {scanned} public templates scanned, {created} new placements discovered."
+                discoveries = scan_data.get("discoveries", 0)
+                excluded = scan_data.get("excluded", 0)
+                message = (
+                    f"Scan complete: {scanned} templates scanned, "
+                    f"{discoveries} new discoveries pending review"
+                    + (f", {excluded} excluded" if excluded else "")
+                    + "."
+                )
+            elif action == "approve_discovery":
+                from apps.ads.services.scanner import approve_discovery
+
+                did = request.POST.get("discovery_id")
+                if did:
+                    result = approve_discovery(int(did), request.user)
+                    if result["status"] == "success":
+                        message = "Discovery approved — placement created."
+                    else:
+                        message = f"Approval failed: {result.get('reason', 'unknown')}"
+            elif action == "reject_discovery":
+                from apps.ads.services.scanner import reject_discovery
+
+                did = request.POST.get("discovery_id")
+                if did:
+                    result = reject_discovery(int(did), request.user)
+                    if result["status"] == "success":
+                        message = "Discovery rejected."
+                    else:
+                        message = f"Rejection failed: {result.get('reason', 'unknown')}"
+            elif action == "bulk_approve_discoveries":
+                from apps.ads.services.scanner import bulk_approve_discoveries
+
+                ids = request.POST.getlist("discovery_ids")
+                if ids:
+                    int_ids = [int(i) for i in ids if i.isdigit()]
+                    result = bulk_approve_discoveries(int_ids, request.user)
+                    message = f"Bulk approve: {result['approved']} approved, {result['errors']} errors."
+            elif action == "bulk_reject_discoveries":
+                from apps.ads.services.scanner import bulk_reject_discoveries
+
+                ids = request.POST.getlist("discovery_ids")
+                if ids:
+                    int_ids = [int(i) for i in ids if i.isdigit()]
+                    result = bulk_reject_discoveries(int_ids, request.user)
+                    message = f"Bulk reject: {result['rejected']} rejected, {result['errors']} errors."
+            elif action == "exclude_template":
+                import nh3
+
+                tpl_path = nh3.clean(request.POST.get("template_path", ""), tags=set())
+                reason = nh3.clean(request.POST.get("reason", ""), tags=set())
+                if tpl_path:
+                    TemplateAdExclusion.objects.get_or_create(
+                        template_path=tpl_path,
+                        defaults={
+                            "reason": reason,
+                            "excluded_by": request.user,
+                        },
+                    )
+                    message = f"Template '{tpl_path}' excluded from ads."
+            elif action == "remove_exclusion":
+                eid = request.POST.get("exclusion_id")
+                if eid:
+                    TemplateAdExclusion.objects.filter(pk=eid).delete()
+                    message = "Exclusion removed."
         except Exception as exc:
             logger.warning("Admin suite ads toggle/save failed: %s", exc)  # noqa: F405
             message = "Action failed."
@@ -839,12 +907,36 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
         creatives_page = None
         networks_page = None
 
-    # Load recent auto-scan results
+    # Load recent auto-scan results with discoveries
     scan_results = []
+    pending_discoveries = []
+    exclusions = []
     try:
-        from apps.ads.models import AutoAdsScanResult
+        from apps.ads.models import (
+            AutoAdsScanResult,
+            ScanDiscovery,
+            TemplateAdExclusion,
+        )
 
-        scan_results = list(AutoAdsScanResult.objects.order_by("-created_at")[:25])
+        scan_results = list(
+            AutoAdsScanResult.objects.prefetch_related("discoveries").order_by(
+                "-created_at"
+            )[:30]
+        )
+        pending_discoveries = list(
+            ScanDiscovery.objects.filter(status="pending")
+            .select_related("scan_result")
+            .order_by("-confidence")[:50]
+        )
+        exclusions = list(
+            TemplateAdExclusion.objects.select_related("excluded_by").order_by(
+                "template_path"
+            )
+        )
+        stats["pending_discoveries"] = ScanDiscovery.objects.filter(
+            status="pending"
+        ).count()
+        stats["excluded_templates"] = TemplateAdExclusion.objects.count()
     except Exception:  # noqa: S110
         pass
 
@@ -861,6 +953,8 @@ def admin_suite_ads(request: HttpRequest) -> HttpResponse:  # noqa: F405
             "networks_page": networks_page,
             "network_types": _get_ad_network_types(),
             "scan_results": scan_results,
+            "pending_discoveries": pending_discoveries,
+            "exclusions": exclusions,
             "message": message,
             "q": q,
             "sort": sort_field,
@@ -1131,6 +1225,149 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
             ("SEO", None),
         ),
         subtitle="Redirects, sitemaps, and SEO automation",
+    )
+
+
+@staff_member_required  # noqa: F405
+def admin_suite_seo_audit(request: HttpRequest) -> HttpResponse:  # noqa: F405
+    """SEO Audit Dashboard — live on-site SEO health checks."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
+        raise _ADMIN_DISABLED  # noqa: F405
+
+    from apps.seo.audit_service import get_duplicate_titles, get_seo_overview
+
+    overview = get_seo_overview()
+    duplicates = get_duplicate_titles()
+
+    return _render_admin(
+        request,
+        "admin_suite/seo_audit.html",
+        {
+            "overview": overview,
+            "duplicates": duplicates,
+        },
+        nav_active="seo_audit",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("SEO", "admin_suite:seo"),
+            ("Audit Dashboard", None),
+        ),
+        subtitle="Real-time on-site SEO health checks",
+    )
+
+
+@staff_member_required  # noqa: F405
+def admin_suite_seo_audit_type(request: HttpRequest, content_type: str) -> HttpResponse:  # noqa: F405, E501
+    """SEO Audit — per-content-type detail list with search/sort."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
+        raise _ADMIN_DISABLED  # noqa: F405
+
+    allowed_types = {"posts", "brands", "models", "firmwares", "topics"}
+    if content_type not in allowed_types:
+        raise Http404("Invalid content type")  # noqa: F405
+
+    from apps.seo.audit_service import get_content_type_audit
+
+    q = _admin_search(request)
+    sort = request.GET.get("sort", "score")
+    direction = request.GET.get("dir", "asc")
+
+    results = get_content_type_audit(
+        content_type, search=q, sort_by=sort, sort_dir=direction
+    )
+
+    # Paginate
+    page_obj = _admin_paginate(request, results, per_page=50)
+
+    labels = {
+        "posts": "Blog Posts",
+        "brands": "Brands",
+        "models": "Device Models",
+        "firmwares": "Firmware Files",
+        "topics": "Forum Topics",
+    }
+
+    ctx = {
+        "content_type": content_type,
+        "type_label": labels.get(content_type, content_type.title()),
+        "results": page_obj,
+        "results_page": page_obj,
+        "total_results": len(results),
+        "q": q,
+        "sort": sort,
+        "dir": direction,
+    }
+
+    if request.headers.get("HX-Request"):
+        return render(request, "admin_suite/fragments/seo_audit_table.html", ctx)  # noqa: F405
+
+    return _render_admin(
+        request,
+        "admin_suite/seo_audit_type.html",
+        ctx,
+        nav_active="seo_audit",
+        breadcrumb=_make_breadcrumb(
+            ("Admin Home", "admin_suite:admin_suite"),
+            ("SEO", "admin_suite:seo"),
+            ("Audit Dashboard", "admin_suite:seo_audit"),
+            (labels.get(content_type, content_type.title()), None),
+        ),
+        subtitle=f"SEO health checks for {labels.get(content_type, content_type)}",
+    )
+
+
+@staff_member_required  # noqa: F405
+def admin_suite_seo_audit_item(
+    request: HttpRequest,  # noqa: F405
+    content_type: str,
+    item_id: str,
+) -> HttpResponse:  # noqa: F405
+    """HTMX fragment — single item inline audit detail."""
+    if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
+        raise _ADMIN_DISABLED  # noqa: F405
+
+    from apps.seo.audit_service import (
+        audit_brand,
+        audit_firmware,
+        audit_model,
+        audit_post,
+        audit_topic,
+    )
+
+    result = None
+    try:
+        if content_type == "posts":
+            from apps.blog.models import Post
+
+            obj = Post.objects.get(pk=int(item_id))
+            result = audit_post(obj)
+        elif content_type == "brands":
+            from apps.firmwares.models import Brand
+
+            obj = Brand.objects.get(pk=int(item_id))
+            result = audit_brand(obj)
+        elif content_type == "models":
+            from apps.firmwares.models import Model
+
+            obj = Model.objects.get(pk=int(item_id))
+            result = audit_model(obj)
+        elif content_type == "firmwares":
+            from apps.firmwares.models import OfficialFirmware
+
+            obj = OfficialFirmware.objects.get(pk=item_id)
+            result = audit_firmware(obj)
+        elif content_type == "topics":
+            from apps.forum.models import ForumTopic
+
+            obj = ForumTopic.objects.get(pk=int(item_id))
+            result = audit_topic(obj)
+    except Exception:
+        logger.debug("SEO audit item lookup failed: %s/%s", content_type, item_id)  # noqa: F405
+
+    return render(  # noqa: F405
+        request,
+        "admin_suite/fragments/seo_audit_item.html",
+        {"result": result.to_dict() if result else None},
     )
 
 

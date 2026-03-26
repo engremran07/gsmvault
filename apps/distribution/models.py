@@ -340,6 +340,213 @@ class DistributionSettings(SingletonModel):
         }
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# Generated Video — actual video files from blog posts
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class GeneratedVideo(models.Model):
+    """
+    Actual rendered video file generated from a blog post via headless browser
+    recording + FFmpeg post-processing. One video per post per platform format.
+    """
+
+    class Platform(models.TextChoices):
+        YOUTUBE = "youtube", "YouTube (16:9 landscape)"
+        YOUTUBE_SHORTS = "youtube_shorts", "YouTube Shorts (9:16 vertical)"
+        TIKTOK = "tiktok", "TikTok (9:16 vertical)"
+        INSTAGRAM_REELS = "instagram_reels", "Instagram Reels (9:16 vertical)"
+        FACEBOOK = "facebook", "Facebook (16:9 landscape)"
+        LINKEDIN = "linkedin", "LinkedIn (16:9 landscape)"
+        TWITTER = "twitter", "Twitter/X (16:9 landscape)"
+
+    class Status(models.TextChoices):
+        QUEUED = "queued", "Queued"
+        RENDERING = "rendering", "Rendering"
+        PROCESSING = "processing", "Post-Processing"
+        COMPLETED = "completed", "Completed"
+        FAILED = "failed", "Failed"
+        PUBLISHING = "publishing", "Publishing"
+        PUBLISHED = "published", "Published"
+
+    class Orientation(models.TextChoices):
+        LANDSCAPE = "landscape", "Landscape (16:9)"
+        PORTRAIT = "portrait", "Portrait (9:16)"
+        SQUARE = "square", "Square (1:1)"
+
+    post = models.ForeignKey(
+        "blog.Post",
+        on_delete=models.CASCADE,
+        related_name="generated_videos",
+    )
+    platform = models.CharField(max_length=32, choices=Platform.choices)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.QUEUED
+    )
+    orientation = models.CharField(
+        max_length=16, choices=Orientation.choices, default=Orientation.LANDSCAPE
+    )
+
+    # Video file
+    video_file = models.FileField(
+        upload_to="generated_videos/%Y/%m/",
+        blank=True,
+        default="",
+        help_text="Rendered MP4 video file.",
+    )
+    thumbnail = models.ImageField(
+        upload_to="generated_videos/thumbs/%Y/%m/",
+        blank=True,
+        default="",
+        help_text="Auto-generated thumbnail from video.",
+    )
+
+    # Video metadata
+    width = models.PositiveIntegerField(default=0)
+    height = models.PositiveIntegerField(default=0)
+    duration_seconds = models.FloatField(default=0)
+    file_size_bytes = models.PositiveBigIntegerField(default=0)
+    fps = models.PositiveIntegerField(default=30)
+
+    # Script / content data driving the video
+    script_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="AI-generated script: title, hook, scenes[], cta, hashtags.",
+    )
+    style_config = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="MrBeast-style config: transitions, text_style, music_mood, pacing.",
+    )
+
+    # Publishing
+    publish_queued = models.BooleanField(
+        default=False,
+        help_text="If True, auto-publish to platform once rendering completes.",
+    )
+    published_url = models.URLField(
+        blank=True,
+        default="",
+        help_text="URL on the platform after successful upload.",
+    )
+    external_id = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        help_text="Platform video ID (YouTube video ID, TikTok post ID, etc.).",
+    )
+
+    # Error tracking
+    error_message = models.TextField(blank=True, default="")
+    attempt_count = models.PositiveIntegerField(default=0)
+
+    # Audit
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="generated_videos",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    rendered_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Generated Video"
+        verbose_name_plural = "Generated Videos"
+        unique_together = [("post", "platform")]
+        indexes = [
+            models.Index(fields=["status"]),
+            models.Index(fields=["platform", "status"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.post_id}:{self.platform}:{self.status}"  # type: ignore[attr-defined]
+
+    @property
+    def is_playable(self) -> bool:
+        return bool(self.video_file and self.status == self.Status.COMPLETED)
+
+    @property
+    def resolution(self) -> str:
+        if self.width and self.height:
+            return f"{self.width}x{self.height}"
+        return "—"
+
+    @property
+    def file_size_mb(self) -> str:
+        if self.file_size_bytes:
+            return f"{self.file_size_bytes / (1024 * 1024):.1f} MB"
+        return "—"
+
+    @classmethod
+    def get_platform_specs(cls, platform: str) -> dict:
+        """Return rendering specs for a target platform (MrBeast-style production)."""
+        specs = {
+            cls.Platform.YOUTUBE: {
+                "width": 1920,
+                "height": 1080,
+                "orientation": cls.Orientation.LANDSCAPE,
+                "fps": 30,
+                "max_duration": 600,
+                "style": "cinematic",
+            },
+            cls.Platform.YOUTUBE_SHORTS: {
+                "width": 1080,
+                "height": 1920,
+                "orientation": cls.Orientation.PORTRAIT,
+                "fps": 30,
+                "max_duration": 60,
+                "style": "fast_paced",
+            },
+            cls.Platform.TIKTOK: {
+                "width": 1080,
+                "height": 1920,
+                "orientation": cls.Orientation.PORTRAIT,
+                "fps": 30,
+                "max_duration": 60,
+                "style": "trending",
+            },
+            cls.Platform.INSTAGRAM_REELS: {
+                "width": 1080,
+                "height": 1920,
+                "orientation": cls.Orientation.PORTRAIT,
+                "fps": 30,
+                "max_duration": 90,
+                "style": "visual_first",
+            },
+            cls.Platform.FACEBOOK: {
+                "width": 1280,
+                "height": 720,
+                "orientation": cls.Orientation.LANDSCAPE,
+                "fps": 30,
+                "max_duration": 180,
+                "style": "story_driven",
+            },
+            cls.Platform.LINKEDIN: {
+                "width": 1920,
+                "height": 1080,
+                "orientation": cls.Orientation.LANDSCAPE,
+                "fps": 30,
+                "max_duration": 120,
+                "style": "professional",
+            },
+            cls.Platform.TWITTER: {
+                "width": 1280,
+                "height": 720,
+                "orientation": cls.Orientation.LANDSCAPE,
+                "fps": 30,
+                "max_duration": 140,
+                "style": "punchy",
+            },
+        }
+        return specs.get(platform, specs[cls.Platform.YOUTUBE])  # type: ignore[arg-type]
+
+
 class WebSubSubscription(models.Model):
     topic_url = models.URLField()
     hub_url = models.URLField()

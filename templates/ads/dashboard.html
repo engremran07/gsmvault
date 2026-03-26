@@ -41,7 +41,7 @@
         <input type="checkbox" name="affiliate_enabled" value="1" {% if affiliate_enabled %}checked{% endif %} class="rounded border-[var(--color-border)] text-[var(--color-accent)]">
         <span>Affiliates</span>
       </label>
-      <select name="ad_aggressiveness_level" class="text-xs rounded bg-[var(--color-bg-tertiary)] border-[var(--color-border)] text-[var(--color-text-primary)] px-2 py-1">
+      <select name="ad_aggressiveness_level" aria-label="Ad aggressiveness level" class="text-xs rounded bg-[var(--color-bg-tertiary)] border-[var(--color-border)] text-[var(--color-text-primary)] px-2 py-1">
         <option value="minimal" {% if ad_aggressiveness_level == "minimal" %}selected{% endif %}>Minimal</option>
         <option value="balanced" {% if ad_aggressiveness_level == "balanced" %}selected{% endif %}>Balanced</option>
         <option value="aggressive" {% if ad_aggressiveness_level == "aggressive" %}selected{% endif %}>Aggressive</option>

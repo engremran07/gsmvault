@@ -24,22 +24,22 @@
   <h3 class="font-semibold text-[var(--color-text-primary)] mb-3">Issue Warning</h3>
   <form method="post" action="{% url 'forum:issue_warning' %}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
     {% csrf_token %}
-    <input type="number" name="user_id" required placeholder="User ID"
+    <input type="number" name="user_id" required placeholder="User ID" aria-label="User ID"
            class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none">
-    <select name="severity"
+    <select name="severity" aria-label="Warning severity"
             class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none">
       <option value="minor">Minor</option>
       <option value="moderate">Moderate</option>
       <option value="serious">Serious</option>
       <option value="final">Final Warning</option>
     </select>
-    <input type="number" name="points" value="1" min="0" max="100" placeholder="Points"
+    <input type="number" name="points" value="1" min="0" max="100" placeholder="Points" aria-label="Warning points"
            class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none">
     <button type="submit"
             class="px-6 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 transition-colors">
       Issue Warning
     </button>
-    <textarea name="reason" required placeholder="Reason for warning…" rows="2"
+    <textarea name="reason" required placeholder="Reason for warning…" rows="2" aria-label="Warning reason"
               class="sm:col-span-2 lg:col-span-4 px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none resize-y"></textarea>
   </form>
 </div>

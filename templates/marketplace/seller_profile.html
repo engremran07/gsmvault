@@ -1,0 +1,76 @@
+{# templates/marketplace/seller_profile.html — Public seller profile page #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}{{ seller.display_name|default:seller.user.username }} — Marketplace Seller{% endblock %}
+
+{% block page_header %}
+{% include "components/_breadcrumb.html" with items="Marketplace,/marketplace/;Seller Profile" %}
+{% endblock %}
+
+{% block page_content %}
+{# ── Seller Header ── #}
+<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+    <div class="w-16 h-16 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
+      <i data-lucide="user" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    </div>
+    <div class="flex-1">
+      <h1 class="text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+        {% if seller.display_name %}{{ seller.display_name }}{% else %}{{ seller.user.username }}{% endif %}
+        {% if seller.verified %}
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-[var(--color-success)] bg-[var(--color-success)]/10 px-2.5 py-0.5 rounded-full">
+          <i data-lucide="badge-check" class="w-4 h-4"></i> Verified
+        </span>
+        {% endif %}
+      </h1>
+      {% if seller.bio %}
+      <p class="text-[var(--color-text-secondary)] mt-1 max-w-2xl">{{ seller.bio }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Stats row #}
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+    {% include "components/_stat_card.html" with icon="shopping-cart" color="cyan" value=seller.total_sales label="Total Sales" %}
+    {% include "components/_stat_card.html" with icon="star" color="yellow" value=seller.rating|floatformat:1 label="Rating" %}
+    {% include "components/_stat_card.html" with icon="package" color="blue" value=listings|length label="Listings" %}
+    {% include "components/_stat_card.html" with icon="calendar" color="green" value=seller.created_at|date:"M Y" label="Joined" %}
+  </div>
+</div>
+
+{# ── Seller's Listings ── #}
+{% include "components/_section_header.html" with title="Listings" subtitle="All active listings from this seller" %}
+
+{% if listings %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+  {% for listing in listings %}
+  <a href="{% url 'marketplace_public:listing_detail' pk=listing.pk %}"
+     class="group rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)]/50 transition-all hover:shadow-lg">
+    <div class="flex items-start justify-between gap-2 mb-3">
+      <h3 class="text-base font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
+        {{ listing.title }}
+      </h3>
+      {% if listing.is_featured %}
+      <span class="shrink-0 text-xs font-medium rounded-full bg-[var(--color-warning)]/15 text-[var(--color-warning)] px-2 py-0.5">Featured</span>
+      {% endif %}
+    </div>
+    <div class="flex items-baseline gap-2 mb-2">
+      {% if listing.discount_price %}
+      <span class="text-lg font-bold text-[var(--color-success)]">${{ listing.discount_price }}</span>
+      <span class="text-sm text-[var(--color-text-muted)] line-through">${{ listing.price }}</span>
+      {% else %}
+      <span class="text-lg font-bold text-[var(--color-accent)]">${{ listing.price }}</span>
+      {% endif %}
+    </div>
+    <div class="flex items-center gap-3 text-xs text-[var(--color-text-muted)]">
+      <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> {{ listing.view_count }}</span>
+      <span class="flex items-center gap-1"><i data-lucide="shopping-cart" class="w-3 h-3"></i> {{ listing.sale_count }}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="package" message="No listings yet" %}
+{% endif %}
+{% endblock %}

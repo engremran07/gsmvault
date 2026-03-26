@@ -152,3 +152,93 @@ def generate_video_scripts(
         extra={"post": post_id, "count": len(variants)},
     )
     return len(variants)
+
+
+# ── Actual video rendering tasks ──────────────────────────────────────────
+
+
+@shared_task(
+    name="distribution.render_video",
+    bind=True,
+    acks_late=True,
+    max_retries=2,
+    default_retry_delay=120,
+    soft_time_limit=600,  # 10 minutes per video
+    time_limit=720,
+)
+def render_video(
+    self,
+    post_id: int,
+    platform: str,
+    *,
+    auto_publish: bool = False,
+    user_id: int | None = None,
+) -> int | None:
+    """Render an actual video file for a blog post on a specific platform."""
+    from apps.blog.models import Post
+
+    from .video_generator import generate_video_for_post
+
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        logger.warning("render_video: Post %s not found", post_id)
+        return None
+
+    user = None
+    if user_id:
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        user = User.objects.filter(pk=user_id).first()
+
+    try:
+        video = generate_video_for_post(
+            post, platform, auto_publish=auto_publish, created_by=user
+        )
+        logger.info(
+            "distribution.video.rendered",
+            extra={"post": post_id, "platform": platform, "video_id": video.pk},
+        )
+        return video.pk
+    except Exception as exc:
+        logger.exception("render_video failed: post=%s platform=%s", post_id, platform)
+        raise self.retry(exc=exc) from exc
+
+
+@shared_task(
+    name="distribution.render_all_platform_videos",
+    bind=True,
+    acks_late=True,
+    soft_time_limit=120,
+    time_limit=180,
+)
+def render_all_platform_videos(
+    self,
+    post_id: int,
+    *,
+    platforms: list[str] | None = None,
+    auto_publish: bool = False,
+    user_id: int | None = None,
+) -> int:
+    """Fan out video rendering for all platforms. Each platform renders in its own task."""
+    from .models import GeneratedVideo
+
+    if platforms is None:
+        platforms = [p.value for p in GeneratedVideo.Platform]
+
+    count = 0
+    for platform in platforms:
+        render_video.delay(
+            post_id,
+            platform,
+            auto_publish=auto_publish,
+            user_id=user_id,
+        )
+        count += 1
+
+    logger.info(
+        "distribution.render_all.dispatched",
+        extra={"post": post_id, "count": count},
+    )
+    return count

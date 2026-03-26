@@ -1,0 +1,60 @@
+{# templates/shop/order_history.html — User order history #}
+{% extends "layouts/default.html" %}
+{% load static %}
+
+{% block title %}Order History — Shop{% endblock %}
+
+{% block page_header %}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
+      <i data-lucide="receipt" class="w-8 h-8 text-[var(--color-accent)]"></i>
+      Order History
+    </h1>
+  </div>
+  <a href="{% url 'shop_public:my_subscriptions' %}"
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+    <i data-lucide="crown" class="w-4 h-4"></i> My Subscription
+  </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+{% if orders %}
+<div class="space-y-4">
+  {% for order in orders %}
+  <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-mono text-[var(--color-text-muted)]">
+          #{{ order.pk }}
+        </span>
+        <span class="inline-flex items-center gap-1 text-xs font-medium rounded-full px-2.5 py-0.5
+          {% if order.status == 'paid' %}bg-[var(--color-success)]/10 text-[var(--color-success)]{% elif order.status == 'pending' %}bg-[var(--color-warning)]/10 text-[var(--color-warning)]{% elif order.status == 'refunded' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}bg-[var(--color-error)]/10 text-[var(--color-error)]{% endif %} capitalize">
+          {{ order.get_status_display }}
+        </span>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-[var(--color-text-muted)]">
+        <span>{{ order.created_at|date:"M d, Y" }}</span>
+        <span class="font-bold text-[var(--color-text-primary)]">${{ order.total }} {{ order.currency }}</span>
+      </div>
+    </div>
+    {% if order.items.all %}
+    <div class="border-t border-[var(--color-border)]/50 pt-3">
+      {% for item in order.items.all %}
+      <div class="flex items-center justify-between py-1 text-sm">
+        <span class="text-[var(--color-text-secondary)]">
+          {{ item.product.name }} &times; {{ item.quantity }}
+        </span>
+        <span class="text-[var(--color-text-primary)]">${{ item.line_total }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+{% include "components/_empty_state.html" with icon="receipt" message="No orders yet" action_url="/shop/products/" action_text="Browse Products" %}
+{% endif %}
+{% endblock %}

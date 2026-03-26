@@ -103,6 +103,73 @@
   </div>
 </div>
 
+{# ═══ Extended KPI Cards Row: Forum / Flashing / Video / Catalog ═══ #}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger-children">
+  {# Forum KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 0"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+        <i data-lucide="message-square" class="w-5 h-5 text-purple-400"></i>
+      </div>
+      <span class="badge badge-accent text-[10px]">{{ kpi.forum_replies }} replies</span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.forum_topics }})" x-text="display.toLocaleString()">
+      {{ kpi.forum_topics }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Forum Topics</p>
+  </div>
+
+  {# Flashing Tools KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-orange-500/15 flex items-center justify-center">
+        <i data-lucide="wrench" class="w-5 h-5 text-orange-400"></i>
+      </div>
+      <span class="badge badge-warning text-[10px]">{{ kpi.flashing_guides }} guides</span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.flashing_tools }})" x-text="display.toLocaleString()">
+      {{ kpi.flashing_tools }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Flashing Tools</p>
+  </div>
+
+  {# Video Generation KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-pink-500/15 flex items-center justify-center">
+        <i data-lucide="video" class="w-5 h-5 text-pink-400"></i>
+      </div>
+      <span class="badge badge-info text-[10px]">{{ kpi.guide_templates }} templates</span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.generated_videos }})" x-text="display.toLocaleString()">
+      {{ kpi.generated_videos }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Generated Videos</p>
+  </div>
+
+  {# Device Catalog KPI #}
+  <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-teal-500/15 flex items-center justify-center">
+        <i data-lucide="smartphone" class="w-5 h-5 text-teal-400"></i>
+      </div>
+      <span class="badge badge-success text-[10px]">{{ kpi.total_variants }} variants</span>
+    </div>
+    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+         x-data="animatedCounter({{ kpi.total_models }})" x-text="display.toLocaleString()">
+      {{ kpi.total_models }}
+    </div>
+    <p class="text-xs text-[var(--color-text-muted)] mt-1">Device Models</p>
+  </div>
+</div>
+
 {# ═══ Charts Row ═══ #}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
   {# User Registrations Chart (2/3 width) #}
@@ -282,12 +349,39 @@
         </div>
         <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.storage_providers }}</span>
       </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4 text-purple-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Forum Topics</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.forum_topics }}</span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="wrench" class="w-4 h-4 text-orange-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Flashing Tools</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.flashing_tools }}</span>
+      </div>
+      <div class="h-px bg-[var(--color-border)]/40"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="video" class="w-4 h-4 text-pink-400"></i>
+          <span class="text-xs text-[var(--color-text-secondary)]">Generated Videos</span>
+        </div>
+        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.generated_videos }}</span>
+      </div>
     </div>
   </div>
 </div>
 
 {# ═══ Content Widgets (3-4 entries + See More) ═══ #}
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
   {# Recent Blog Posts #}
   <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 9"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
@@ -401,6 +495,37 @@
     <a href="{% url 'admin_suite:scraper' %}"
        class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
       See all runs →
+    </a>
+  </div>
+
+  {# Forum Topics #}
+  <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 13"
+       x-data x-intersect.once="$el.classList.add('animate-in-visible')">
+    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+        <i data-lucide="message-square" class="w-4 h-4 text-purple-400"></i> Forum Topics
+      </h3>
+      <span class="text-[10px] text-[var(--color-text-muted)]">{{ kpi.forum_topics }} total</span>
+    </div>
+    <div class="divide-y divide-[var(--color-border)]/40">
+      {% for topic in widget_forum %}
+      <div class="px-5 py-2.5 hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
+        <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ topic.title }}</p>
+        <div class="flex items-center justify-between mt-0.5">
+          <span class="text-[10px] text-[var(--color-text-muted)]">{{ topic.subtitle }}</span>
+          {% if topic.date %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ topic.date }}</span>{% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="px-5 py-6 text-center">
+        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
+        <p class="text-[10px] text-[var(--color-text-muted)]">No forum topics yet</p>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'admin_suite:forum' %}"
+       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+      See all topics →
     </a>
   </div>
 </div>

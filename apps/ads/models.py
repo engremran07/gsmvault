@@ -312,7 +312,27 @@ class AutoAdsScanResult(TimestampedModel):
     for ad placement based on content structure, user behavior, and revenue potential.
     """
 
-    template_path = models.CharField(max_length=255)
+    class ReviewStatus(models.TextChoices):
+        PENDING = "pending", "Pending Review"
+        APPROVED = "approved", "Approved"
+        PARTIAL = "partial", "Partially Approved"
+        REJECTED = "rejected", "Rejected"
+        EXCLUDED = "excluded", "Template Excluded"
+
+    class TemplateType(models.TextChoices):
+        PAGE = "page", "Static Page"
+        LIST = "list", "List / Index"
+        DETAIL = "detail", "Detail / Single"
+        SEARCH = "search", "Search Results"
+        UTILITY = "utility", "Utility / Form"
+        COMPONENT = "component", "Component / Partial"
+
+    class TrafficEstimate(models.TextChoices):
+        HIGH = "high", "High Traffic"
+        MEDIUM = "medium", "Medium Traffic"
+        LOW = "low", "Low Traffic"
+
+    template_path = models.CharField(max_length=255, db_index=True)
     suggested_placements = models.JSONField(
         default=list, help_text="List of suggested placement locations."
     )
@@ -334,11 +354,168 @@ class AutoAdsScanResult(TimestampedModel):
     applied = models.BooleanField(default=False)
     applied_at = models.DateTimeField(null=True, blank=True)
 
+    # ── Enhanced scanner fields ──
+    review_status = models.CharField(
+        max_length=20,
+        choices=ReviewStatus.choices,
+        default=ReviewStatus.PENDING,
+        db_index=True,
+        help_text="Admin review status for this scan result.",
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ads_reviewed_scans",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    template_type = models.CharField(
+        max_length=20,
+        choices=TemplateType.choices,
+        default=TemplateType.PAGE,
+        help_text="Auto-classified template type.",
+    )
+    estimated_traffic = models.CharField(
+        max_length=10,
+        choices=TrafficEstimate.choices,
+        default=TrafficEstimate.MEDIUM,
+        help_text="Estimated traffic level for this template.",
+    )
+    viewport_zones = models.JSONField(
+        default=list,
+        help_text="Detected viewport zones (above-fold, sidebar, mid-content, etc.).",
+    )
+    ad_density_warning = models.BooleanField(
+        default=False,
+        help_text="True if template already has high ad density.",
+    )
+    extends_chain = models.JSONField(
+        default=list,
+        help_text="Template inheritance chain (extends/includes).",
+    )
+    total_discoveries = models.PositiveIntegerField(
+        default=0,
+        help_text="Number of individual placement discoveries from this scan.",
+    )
+
     class Meta:
         ordering = ["-created_at"]
+        db_table = "ads_autoadsscanresult"
+        verbose_name = "Auto-Ads Scan Result"
+        verbose_name_plural = "Auto-Ads Scan Results"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Scan: {self.template_path} ({self.created_at})"
+
+
+class ScanDiscovery(TimestampedModel):
+    """
+    Individual ad placement discovery from a template scan.
+
+    Each discovery represents a single potential ad zone found during scanning.
+    Admin must approve discoveries before they become live AdPlacement records.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+    scan_result = models.ForeignKey(
+        AutoAdsScanResult,
+        on_delete=models.CASCADE,
+        related_name="discoveries",
+    )
+    placement_code = models.CharField(
+        max_length=120,
+        help_text="Proposed placement code (e.g. blog-post-detail-sidebar-top).",
+    )
+    placement_name = models.CharField(max_length=200)
+    zone = models.CharField(
+        max_length=60,
+        blank=True,
+        default="",
+        help_text="Viewport zone: above-fold, mid-content, sidebar, footer, sticky.",
+    )
+    allowed_types = models.CharField(max_length=100, default="banner,native,html")
+    allowed_sizes = models.CharField(max_length=100, blank=True, default="")
+    description = models.TextField(blank=True, default="")
+    confidence = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        help_text="Confidence score 0–100 for this specific placement.",
+    )
+    rationale = models.TextField(blank=True, default="")
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ads_reviewed_discoveries",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    placement = models.ForeignKey(
+        "AdPlacement",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ads_source_discovery",
+        help_text="Created AdPlacement after approval.",
+    )
+
+    class Meta:
+        ordering = ["-confidence"]
+        db_table = "ads_scandiscovery"
+        verbose_name = "Scan Discovery"
+        verbose_name_plural = "Scan Discoveries"
+
+    def __str__(self) -> str:
+        return f"{self.placement_code} ({self.get_status_display()})"  # type: ignore[attr-defined]
+
+
+class TemplateAdExclusion(TimestampedModel):
+    """
+    Permanently excludes a template from ad placement scanning and serving.
+
+    Admin can mark templates as ad-free. The scanner respects exclusions and
+    skips these templates on future scans.
+    """
+
+    template_path = models.CharField(
+        max_length=255,
+        unique=True,
+        db_index=True,
+        help_text="Template path relative to templates/ root.",
+    )
+    reason = models.TextField(
+        blank=True,
+        default="",
+        help_text="Why this template is excluded from ads.",
+    )
+    excluded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ads_template_exclusions",
+    )
+
+    class Meta:
+        ordering = ["template_path"]
+        db_table = "ads_templateadexclusion"
+        verbose_name = "Template Ad Exclusion"
+        verbose_name_plural = "Template Ad Exclusions"
+
+    def __str__(self) -> str:
+        return f"Excluded: {self.template_path}"
 
 
 # ==================== AFFILIATE PRODUCTS ====================

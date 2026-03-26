@@ -37,16 +37,16 @@
     <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Basic Info</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div>
-        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Name</label>
-        <input type="text" name="name" required class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+        <label for="id_pkg_name" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Name</label>
+        <input type="text" name="name" id="id_pkg_name" autocomplete="off" required class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Slug</label>
-        <input type="text" name="slug" required class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+        <label for="id_pkg_slug" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Slug</label>
+        <input type="text" name="slug" id="id_pkg_slug" autocomplete="off" required class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Tier Level</label>
-        <select name="tier_level" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+        <label for="id_tier_level" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Tier Level</label>
+        <select name="tier_level" id="id_tier_level" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
           {% for value, label in tier_levels %}
           <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
@@ -55,49 +55,49 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div>
-        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Badge Color</label>
-        <input type="text" name="badge_color" value="blue" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+        <label for="id_badge_color" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Badge Color</label>
+        <input type="text" name="badge_color" id="id_badge_color" autocomplete="off" value="blue" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Badge Icon</label>
-        <input type="text" name="badge_icon" value="package" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+        <label for="id_badge_icon" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Badge Icon</label>
+        <input type="text" name="badge_icon" id="id_badge_icon" autocomplete="off" value="package" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
       </div>
       <div>
-        <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Sort Order</label>
-        <input type="number" name="sort_order" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+        <label for="id_sort_order" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Sort Order</label>
+        <input type="number" name="sort_order" id="id_sort_order" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
       </div>
     </div>
     <div class="mb-6">
-      <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Description</label>
-      <textarea name="description" rows="2" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"></textarea>
+      <label for="id_description" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Description</label>
+      <textarea name="description" id="id_description" rows="2" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"></textarea>
     </div>
 
     {# Pricing #}
     <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Pricing</h3>
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly ($)</label>
-        <input type="number" step="0.01" name="price_monthly" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_price_monthly" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly ($)</label>
+        <input type="number" step="0.01" name="price_monthly" id="id_price_monthly" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Quarterly ($)</label>
-        <input type="number" step="0.01" name="price_quarterly" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_price_quarterly" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Quarterly ($)</label>
+        <input type="number" step="0.01" name="price_quarterly" id="id_price_quarterly" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Yearly ($)</label>
-        <input type="number" step="0.01" name="price_yearly" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_price_yearly" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Yearly ($)</label>
+        <input type="number" step="0.01" name="price_yearly" id="id_price_yearly" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Lifetime ($)</label>
-        <input type="number" step="0.01" name="price_lifetime" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_price_lifetime" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Lifetime ($)</label>
+        <input type="number" step="0.01" name="price_lifetime" id="id_price_lifetime" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Credits</label>
-        <input type="number" step="0.01" name="credit_price" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_credit_price" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Credits</label>
+        <input type="number" step="0.01" name="credit_price" id="id_credit_price" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Trial Days</label>
-        <input type="number" name="trial_days" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_trial_days" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Trial Days</label>
+        <input type="number" name="trial_days" id="id_trial_days" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
     </div>
 
@@ -105,27 +105,27 @@
     <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Download Quotas</h3>
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Daily Downloads</label>
-        <input type="number" name="daily_download_limit" value="5" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_daily_download_limit" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Daily Downloads</label>
+        <input type="number" name="daily_download_limit" id="id_daily_download_limit" autocomplete="off" value="5" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
         <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly Downloads</label>
-        <input type="number" name="monthly_download_limit" value="50" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_monthly_download_limit" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly Downloads</label>
+        <input type="number" name="monthly_download_limit" id="id_monthly_download_limit" autocomplete="off" value="50" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
         <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Max File Size (MB)</label>
-        <input type="number" name="max_file_size_mb" value="500" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_max_file_size_mb" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Max File Size (MB)</label>
+        <input type="number" name="max_file_size_mb" id="id_max_file_size_mb" autocomplete="off" value="500" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Daily BW (MB)</label>
-        <input type="number" name="daily_bandwidth_mb" value="2048" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_daily_bandwidth_mb" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Daily BW (MB)</label>
+        <input type="number" name="daily_bandwidth_mb" id="id_daily_bandwidth_mb" autocomplete="off" value="2048" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
         <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly BW (MB)</label>
-        <input type="number" name="monthly_bandwidth_mb" value="20480" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_monthly_bandwidth_mb" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Monthly BW (MB)</label>
+        <input type="number" name="monthly_bandwidth_mb" id="id_monthly_bandwidth_mb" autocomplete="off" value="20480" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
         <p class="text-[10px] text-[var(--color-text-muted)] mt-1">-1 = unlimited</p>
       </div>
     </div>
@@ -134,17 +134,17 @@
     <h3 class="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Speed &amp; Concurrency</h3>
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Speed Cap (KB/s)</label>
-        <input type="number" name="max_download_speed_kbps" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_max_download_speed_kbps" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Speed Cap (KB/s)</label>
+        <input type="number" name="max_download_speed_kbps" id="id_max_download_speed_kbps" autocomplete="off" value="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
         <p class="text-[10px] text-[var(--color-text-muted)] mt-1">0 = no limit</p>
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Concurrent Downloads</label>
-        <input type="number" name="max_concurrent_downloads" value="1" min="1" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_max_concurrent_downloads" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Concurrent Downloads</label>
+        <input type="number" name="max_concurrent_downloads" id="id_max_concurrent_downloads" autocomplete="off" value="1" min="1" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Cooldown (seconds)</label>
-        <input type="number" name="cooldown_seconds" value="60" min="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
+        <label for="id_cooldown_seconds" class="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Cooldown (seconds)</label>
+        <input type="number" name="cooldown_seconds" id="id_cooldown_seconds" autocomplete="off" value="60" min="0" class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] tabular-nums">
       </div>
     </div>
 
