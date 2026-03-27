@@ -692,6 +692,27 @@ def post_detail(request: HttpRequest, slug: str) -> HttpResponse:
     )
 
 
+@require_GET
+def ad_gate_view(request: HttpRequest, slug: str) -> HttpResponse:
+    """Return the ad-gate HTMX fragment for a blog post.
+
+    If the gate is no longer required (staff, already unlocked), redirect
+    to the full post instead of rendering the fragment.
+    """
+    post = get_object_or_404(Post, slug__iexact=slug)
+    session_key = f"ad_gate_{post.slug}"
+    is_staff = getattr(request.user, "is_staff", False)
+
+    if is_staff or request.session.get(session_key) or not post.ad_gate_config_id:  # type: ignore[attr-defined]
+        return redirect("blog:post_detail", slug=post.slug)
+
+    return render(
+        request,
+        "blog/fragments/ad_gate.html",
+        {"post": post, "ad_gate_config": post.ad_gate_config},
+    )
+
+
 @require_POST
 def ad_gate_complete(request: HttpRequest, slug: str) -> HttpResponse:
     """Mark the ad gate as completed for a blog post.

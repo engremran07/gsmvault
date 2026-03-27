@@ -58,6 +58,73 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
+# Trust level enforcement
+# ---------------------------------------------------------------------------
+
+
+class ForumPermissionError(PermissionError):
+    """Raised when a user's trust level doesn't permit the action."""
+
+
+def _get_user_trust_config(user: AbstractBaseUser) -> ForumTrustLevel | None:
+    """Return the ForumTrustLevel config for the user's current level."""
+    profile = ForumUserProfile.objects.filter(user=user).first()
+    level = profile.trust_level if profile else TrustLevelChoices.NEW_USER
+    return ForumTrustLevel.objects.filter(level=level).first()
+
+
+def _check_daily_topic_limit(user: AbstractBaseUser) -> None:
+    """Raise ForumPermissionError if user has exceeded daily topic limit."""
+    trust_cfg = _get_user_trust_config(user)
+    if not trust_cfg:
+        return  # No trust levels configured — allow all
+    today = timezone.now().date()
+    today_count = ForumTopic.objects.filter(user=user, created_at__date=today).count()
+    if today_count >= trust_cfg.max_daily_topics:
+        raise ForumPermissionError(
+            f"Daily topic limit reached ({trust_cfg.max_daily_topics}). "
+            "Try again tomorrow or increase your trust level."
+        )
+
+
+def _check_daily_reply_limit(user: AbstractBaseUser) -> None:
+    """Raise ForumPermissionError if user has exceeded daily reply limit."""
+    trust_cfg = _get_user_trust_config(user)
+    if not trust_cfg:
+        return
+    today = timezone.now().date()
+    today_count = ForumReply.objects.filter(user=user, created_at__date=today).count()
+    if today_count >= trust_cfg.max_daily_replies:
+        raise ForumPermissionError(
+            f"Daily reply limit reached ({trust_cfg.max_daily_replies}). "
+            "Try again tomorrow or increase your trust level."
+        )
+
+
+def _check_poll_permission(user: AbstractBaseUser) -> None:
+    """Raise ForumPermissionError if user's trust level forbids poll creation."""
+    trust_cfg = _get_user_trust_config(user)
+    if trust_cfg and not trust_cfg.can_create_polls:
+        raise ForumPermissionError("Your trust level does not allow creating polls.")
+
+
+def _check_attachment_permission(user: AbstractBaseUser) -> None:
+    """Raise ForumPermissionError if user's trust level forbids uploading attachments."""
+    trust_cfg = _get_user_trust_config(user)
+    if trust_cfg and not trust_cfg.can_upload_attachments:
+        raise ForumPermissionError(
+            "Your trust level does not allow uploading attachments."
+        )
+
+
+def _check_banned(user: AbstractBaseUser) -> None:
+    """Raise ForumPermissionError if user is forum-banned."""
+    profile = ForumUserProfile.objects.filter(user=user).first()
+    if profile and profile.is_currently_banned:
+        raise ForumPermissionError("You are currently banned from the forum.")
+
+
+# ---------------------------------------------------------------------------
 # Markdown rendering
 # ---------------------------------------------------------------------------
 
@@ -132,6 +199,8 @@ def create_topic(
     content: str,
     ip_address: str | None = None,
 ) -> ForumTopic:
+    _check_banned(user)
+    _check_daily_topic_limit(user)
     content_html = render_markdown(content)
     topic = ForumTopic.objects.create(
         category=category,
@@ -235,6 +304,8 @@ def create_reply(
     content: str,
     ip_address: str | None = None,
 ) -> ForumReply:
+    _check_banned(user)
+    _check_daily_reply_limit(user)
     content_html = render_markdown(content)
     reply = ForumReply.objects.create(
         topic=topic,

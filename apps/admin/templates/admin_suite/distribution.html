@@ -357,6 +357,102 @@
           </div>
         </div>
       </div>
+      {# ── Trending Forum Topics (inspiration) ── #}
+      {% if trending_topics %}
+      <div class="mt-4">
+        <h4 class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 flex items-center gap-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5 text-violet-400"></i>Trending Forum Topics</h4>
+        <div class="space-y-1 max-h-48 overflow-y-auto pr-1">
+          {% for t in trending_topics %}
+          <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <div class="flex-1 min-w-0">
+              <span class="text-xs text-[var(--color-text-primary)] font-medium block truncate">{{ t.title }}</span>
+              <span class="text-[10px] text-[var(--color-text-muted)]">{{ t.view_count }} views &middot; {{ t.reply_count }} replies &middot; {{ t.created_at|timesince }} ago</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="text-[10px] text-[var(--color-text-muted)] mt-2"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1 text-amber-400"></i>Write a blog post about trending topics, then generate videos from it.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    {# ═══ AI Video Scripts ═══ #}
+    <div class="glass rounded-xl overflow-hidden mb-6">
+      <div class="px-4 py-3 border-b border-[var(--color-border)]/20 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><i data-lucide="scroll-text" class="w-4 h-4 text-violet-400"></i>AI Video Scripts<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ video_scripts|length }}</span></h3>
+      </div>
+      <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-[var(--color-border)]/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Hook</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Scenes</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Generated</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        </tr></thead>
+        <tbody class="divide-y divide-[var(--color-border)]/10">
+          {% for vs in video_scripts %}
+          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[180px]">{{ vs.post.title|truncatechars:40 }}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ vs.get_channel_display }}</span></td>
+            <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)] truncate max-w-[200px]">{{ vs.payload.hook|default:"—" }}</td>
+            <td class="py-3 px-4 text-center text-xs text-[var(--color-text-muted)]">{{ vs.payload.scenes|length|default:"0" }}</td>
+            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ vs.generated_at|timesince }} ago</td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button @click="expandedVideo = expandedVideo === {{ vs.pk }} ? null : {{ vs.pk }}" class="px-2 py-1 rounded text-[9px] font-semibold bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors btn-press" title="View script"><i data-lucide="eye" class="w-3 h-3 inline"></i></button>
+                <form method="post" class="inline" onsubmit="return confirm('Delete this script?')">{% csrf_token %}
+                  <input type="hidden" name="action" value="delete_video_script">
+                  <input type="hidden" name="video_script_id" value="{{ vs.pk }}">
+                  <button type="submit" class="px-2 py-1 rounded text-[9px] font-semibold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors btn-press" title="Delete"><i data-lucide="trash-2" class="w-3 h-3 inline"></i></button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {# ── Expanded Script Detail ── #}
+          <tr x-show="expandedVideo === {{ vs.pk }}" x-cloak x-transition>
+            <td colspan="6" class="px-4 py-4 bg-[var(--color-bg-tertiary)]/30">
+              <div class="space-y-3">
+                {% if vs.payload.hook %}<div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">Hook</span><p class="text-xs text-[var(--color-text-primary)] mt-1">{{ vs.payload.hook_emoji|default:"" }} {{ vs.payload.hook }}</p></div>{% endif %}
+                {% if vs.payload.scenes %}
+                <div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">Scenes</span>
+                  <div class="mt-2 space-y-2">
+                    {% for scene in vs.payload.scenes %}
+                    <div class="p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 border border-[var(--color-border)]/10">
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 text-[10px] font-bold flex items-center justify-center">{{ forloop.counter }}</span>
+                        {% if scene.duration_seconds %}<span class="text-[9px] text-[var(--color-text-muted)]">{{ scene.duration_seconds }}s</span>{% endif %}
+                        {% if scene.effect %}<span class="px-1.5 py-0.5 rounded text-[9px] bg-pink-500/10 text-pink-400">{{ scene.effect }}</span>{% endif %}
+                      </div>
+                      {% if scene.narration %}<p class="text-xs text-[var(--color-text-primary)]"><i data-lucide="mic" class="w-3 h-3 inline mr-1 text-[var(--color-text-muted)]"></i>{{ scene.narration }}</p>{% endif %}
+                      {% if scene.visual_description %}<p class="text-[11px] text-[var(--color-text-secondary)] mt-1"><i data-lucide="image" class="w-3 h-3 inline mr-1 text-[var(--color-text-muted)]"></i>{{ scene.visual_description }}</p>{% endif %}
+                      {% if scene.text_emphasis %}<p class="text-[11px] text-amber-400 mt-1"><i data-lucide="type" class="w-3 h-3 inline mr-1"></i>{{ scene.text_emphasis }}</p>{% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
+                {% if vs.payload.cta %}<div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">CTA</span><p class="text-xs text-[var(--color-text-primary)] mt-1">{{ vs.payload.cta_emoji|default:"" }} {{ vs.payload.cta }}{% if vs.payload.cta_sub %} <span class="text-[var(--color-text-muted)]">— {{ vs.payload.cta_sub }}</span>{% endif %}</p></div>{% endif %}
+                <div class="flex flex-wrap gap-2 pt-1">
+                  {% if vs.payload.duration_seconds %}<span class="px-2 py-0.5 rounded-full text-[9px] bg-blue-500/10 text-blue-400"><i data-lucide="clock" class="w-3 h-3 inline mr-0.5"></i>{{ vs.payload.duration_seconds }}s total</span>{% endif %}
+                  {% if vs.payload.pacing %}<span class="px-2 py-0.5 rounded-full text-[9px] bg-emerald-500/10 text-emerald-400">{{ vs.payload.pacing }}</span>{% endif %}
+                  {% if vs.payload.music_mood %}<span class="px-2 py-0.5 rounded-full text-[9px] bg-pink-500/10 text-pink-400"><i data-lucide="music" class="w-3 h-3 inline mr-0.5"></i>{{ vs.payload.music_mood }}</span>{% endif %}
+                </div>
+                {% if vs.payload.hashtags %}<p class="text-[10px] text-[var(--color-accent)] mt-1">{% for tag in vs.payload.hashtags %}#{{ tag }} {% endfor %}</p>{% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">
+            <i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+            <p class="text-sm font-medium mb-1">No video scripts generated yet</p>
+            <p class="text-[10px] mt-1">Generate scripts by selecting blog posts above</p>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
     </div>
 
     {# ═══ Video Preview Modal ═══ #}

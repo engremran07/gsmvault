@@ -1431,3 +1431,47 @@ def download_attachment(request: HttpRequest, attachment_pk: int) -> HttpRespons
     attachment = get_object_or_404(ForumAttachment, pk=attachment_pk)
     services.increment_download_count(attachment)
     return redirect(attachment.file.url)
+
+
+# ---------------------------------------------------------------------------
+# 4PDA — Attachment upload
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_POST
+def upload_attachment(request: HttpRequest, reply_pk: int) -> HttpResponse:
+    """Upload a file attachment to an existing reply."""
+    from .forms import AttachmentUploadForm
+
+    reply = get_object_or_404(ForumReply, pk=reply_pk)
+    user = cast("AbstractBaseUser", request.user)
+
+    # Permission check: only reply author or staff
+    if reply.user_id != user.pk and not getattr(user, "is_staff", False):  # type: ignore[attr-defined]
+        return HttpResponseForbidden("You cannot attach files to this reply.")
+
+    # Trust level check
+    try:
+        services._check_attachment_permission(user)
+    except services.ForumPermissionError as exc:
+        messages.error(request, str(exc))
+        return redirect("forum:topic_detail", pk=reply.topic.pk, slug=reply.topic.slug)  # type: ignore[union-attr]
+
+    form = AttachmentUploadForm(request.POST, request.FILES)
+    if form.is_valid():
+        uploaded = form.cleaned_data["file"]
+        ForumAttachment.objects.create(
+            reply=reply,
+            user=user,
+            file=uploaded,
+            filename=uploaded.name,
+            content_type=getattr(uploaded, "content_type", ""),
+            file_size=uploaded.size,
+        )
+        messages.success(request, "Attachment uploaded successfully.")
+    else:
+        for err in form.errors.values():
+            messages.error(request, str(err[0]))
+
+    return redirect("forum:topic_detail", pk=reply.topic.pk, slug=reply.topic.slug)  # type: ignore[union-attr]

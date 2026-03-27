@@ -1,13 +1,17 @@
+import json
+import logging
 import os
 import shutil
 import uuid
 import zipfile
 from pathlib import Path
+from typing import Any
 
 from django.conf import settings
 from django.db import transaction
 
-from .ai_client import AIClient
+from apps.core.ai import CoreAiService
+
 from .crypto import decrypt_password, encrypt_password
 from .models import (
     Brand,
@@ -22,7 +26,8 @@ from .models import (
     Variant,
 )
 
-ai_client = AIClient()
+logger = logging.getLogger(__name__)
+_ai = CoreAiService()
 
 MAX_UPLOAD_BYTES = getattr(
     settings, "FIRMWARE_MAX_UPLOAD_BYTES", 100 * 1024 * 1024
@@ -138,6 +143,30 @@ def attempt_extraction(pf: PendingFirmware) -> None:
     pf.save(update_fields=["password_validation_status", "extraction_status"])
 
 
+def _analyze_firmware(file_path: str, *, password: str | None = None) -> dict[str, Any]:
+    """AI-powered firmware analysis — delegates to CoreAiService."""
+    prompt = (
+        f"Analyze the firmware file at '{file_path}'. "
+        "Extract brand, model, variant, category (official/engineering/"
+        "readback/modified/other), subtype, chipset, and partition list."
+    )
+    if password:
+        prompt += " The archive is password-protected."
+    try:
+        result = _ai.generate_text(prompt)
+        logger.info("AI analysis completed for %s", file_path)
+        try:
+            data = json.loads(result)
+            if isinstance(data, dict):
+                return data
+        except (json.JSONDecodeError, TypeError):
+            pass
+        return {}
+    except Exception:
+        logger.exception("AI firmware analysis failed for %s", file_path)
+        return {}
+
+
 def run_ai_analysis(pf: PendingFirmware) -> None:
     pw = (
         decrypt_password(pf.encrypted_password)
@@ -145,7 +174,7 @@ def run_ai_analysis(pf: PendingFirmware) -> None:
         else None
     )
     try:
-        result = ai_client.analyze_firmware(pf.stored_file_path, password=pw)
+        result = _analyze_firmware(pf.stored_file_path, password=pw)
     except Exception:
         pf.metadata = {**pf.metadata, "ai_error": "analysis_failed"}
         pf.save(update_fields=["metadata"])

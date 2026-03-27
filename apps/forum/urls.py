@@ -139,4 +139,10 @@ urlpatterns = [
         views.download_attachment,
         name="download_attachment",
     ),
+    # Attachment upload
+    path(
+        "reply/<int:reply_pk>/attachment/upload/",
+        views.upload_attachment,
+        name="upload_attachment",
+    ),
 ]

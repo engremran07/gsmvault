@@ -238,3 +238,45 @@ class DeviceLinkForm(forms.Form):
         widget=forms.HiddenInput,
         required=False,
     )
+
+
+class AttachmentUploadForm(forms.Form):
+    """Upload a file attachment to a reply."""
+
+    file = forms.FileField(
+        help_text="Max 10 MB. Allowed: images, archives, documents.",
+    )
+
+    ALLOWED_EXTENSIONS = (
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp",
+        ".svg",
+        ".zip",
+        ".rar",
+        ".7z",
+        ".tar",
+        ".gz",
+        ".pdf",
+        ".txt",
+        ".log",
+        ".md",
+    )
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+    def clean_file(self) -> object:
+        f = self.cleaned_data["file"]
+        name = getattr(f, "name", "")
+        ext = "." + name.rsplit(".", 1)[-1].lower() if "." in name else ""
+        if ext not in self.ALLOWED_EXTENSIONS:
+            raise forms.ValidationError(
+                f"File type '{ext}' is not allowed. "
+                f"Allowed: {', '.join(self.ALLOWED_EXTENSIONS)}"
+            )
+        if f.size > self.MAX_FILE_SIZE:
+            raise forms.ValidationError(
+                f"File too large ({f.size // 1024 // 1024} MB). Max is 10 MB."
+            )
+        return f

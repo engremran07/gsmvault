@@ -44,6 +44,9 @@ def _on_reply_created(data: dict[str, object]) -> None:
     except Exception:
         logger.debug("Gamification event failed for reply_created")
 
+    # --- Notify topic subscribers ---
+    _notify_topic_subscribers(data)
+
 
 def _on_like_received(data: dict[str, object]) -> None:
     """Award XP to the reply author when their reply is liked."""
@@ -142,6 +145,65 @@ def _on_trust_level_changed(data: dict[str, object]) -> None:
         )
     except Exception:
         logger.debug("Gamification event failed for trust_level_changed")
+
+
+def _notify_topic_subscribers(data: dict[str, object]) -> None:
+    """Create in-app notifications for all topic subscribers (except the author)."""
+    topic_id = data.get("topic_id")
+    reply_author_id = data.get("user_id")
+    reply_id = data.get("reply_id")
+    if not topic_id or not reply_author_id:
+        return
+
+    try:
+        from apps.forum.models import ForumTopicSubscription, NotifyFrequency
+        from apps.users.models import Notification
+
+        subscriptions = (
+            ForumTopicSubscription.objects.filter(
+                topic_id=topic_id,
+                frequency=NotifyFrequency.IMMEDIATELY,
+            )
+            .exclude(user_id=reply_author_id)
+            .select_related("topic", "user")
+        )
+
+        if not subscriptions.exists():
+            return
+
+        # Fetch reply author display name
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()  # noqa: N806
+        author = User.objects.filter(pk=reply_author_id).first()
+        author_name = getattr(author, "username", "Someone")
+
+        notifications = []
+        for sub in subscriptions:
+            topic_title = sub.topic.title[:80]
+            notifications.append(
+                Notification(
+                    recipient=sub.user,
+                    title=f"New reply in: {topic_title}",
+                    message=f"{author_name} replied to a topic you are following.",
+                    action_type="reply",
+                    icon="message-circle",
+                    actor=author,
+                )
+            )
+
+        if notifications:
+            Notification.objects.bulk_create(notifications, ignore_conflicts=True)
+            logger.debug(
+                "Dispatched %d subscriber notifications for topic %s reply %s",
+                len(notifications),
+                topic_id,
+                reply_id,
+            )
+    except Exception:
+        logger.debug(
+            "Failed to dispatch subscriber notifications for topic %s", topic_id
+        )
 
 
 def register_event_handlers() -> None:

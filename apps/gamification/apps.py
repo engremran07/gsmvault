@@ -6,3 +6,8 @@ class GamificationConfig(AppConfig):
     name = "apps.gamification"
     label = "gamification"
     verbose_name = "Gamification"
+
+    def ready(self) -> None:
+        from . import signals  # noqa: F401
+
+        signals.register_event_handlers()

@@ -109,36 +109,11 @@
     </div>
     <div class="relative mt-6">
       <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[var(--color-bg-primary)] pointer-events-none" style="height: 120px; bottom: 0; top: auto;"></div>
-      <div class="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 text-center mt-4"
-           x-data="{ watching: false, countdown: {{ ad_gate_config.min_watch_seconds|default:30 }}, done: false }"
-           x-cloak>
-        <i data-lucide="lock" class="w-8 h-8 mx-auto mb-3 text-[var(--color-accent)]"></i>
-        <h3 class="text-lg font-bold mb-2">Unlock Full Article</h3>
-        <p class="text-sm text-[var(--color-text-secondary)] mb-4">
-          Watch a short ad to unlock the complete article.
-        </p>
-        <template x-if="!watching && !done">
-          <button @click="watching = true; let t = setInterval(() => { countdown--; if (countdown <= 0) { clearInterval(t); done = true; watching = false; } }, 1000)"
-                  class="px-6 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition">
-            <i data-lucide="play" class="w-4 h-4 inline mr-1"></i> Watch Ad
-          </button>
-        </template>
-        <template x-if="watching">
-          <div>
-            <div class="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2 mb-3">
-              <div class="bg-[var(--color-accent)] h-2 rounded-full transition-all" :style="'width:' + (100 - (countdown / {{ ad_gate_config.min_watch_seconds|default:30 }}) * 100) + '%'"></div>
-            </div>
-            <p class="text-sm text-[var(--color-text-muted)]">Please wait <span x-text="countdown"></span>s…</p>
-          </div>
-        </template>
-        <template x-if="done">
-          <form method="post" action="{% url 'blog:ad_gate_complete' post.slug %}">
-            {% csrf_token %}
-            <button type="submit" class="px-6 py-2 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-500 transition">
-              <i data-lucide="unlock" class="w-4 h-4 inline mr-1"></i> Unlock Article
-            </button>
-          </form>
-        </template>
+      <div id="ad-gate-container"
+           hx-get="{% url 'blog:ad_gate_view' post.slug %}"
+           hx-trigger="load"
+           hx-swap="innerHTML">
+        {% include "components/_loading.html" with text="Loading ad gate…" %}
       </div>
     </div>
     {% else %}
