@@ -155,3 +155,10 @@ celerybeat.pid
 #######################################
 .well-known/
 sw.js
+
+#######################################
+# REFERENCE / EXTERNAL PROJECTS
+#######################################
+Docs/
+docs/
+reference/
