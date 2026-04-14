@@ -2,8 +2,8 @@
 {% block title %}Distribution — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Distribution</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
-  <a href="{% url 'admin_suite:social_posting' %}" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="send" class="w-3.5 h-3.5 inline mr-1"></i>Social Posting</a>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Distribution</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:social_posting' %}" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="send" class="w-3.5 h-3.5 inline mr-1"></i>Social Posting</a>
 </div>
 {% endblock %}
 {% block page_content %}
@@ -19,13 +19,13 @@
 
 {# ── Auto-Publishing Status Banner ── #}
 <div class="mb-6 glass rounded-xl p-4 flex flex-wrap items-center gap-4 animate-in" style="--stagger:7" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]"><i data-lucide="radio" class="w-4 h-4 text-[var(--color-accent)]"></i>Auto-Publishing</div>
+  <div class="flex items-center gap-2 text-sm font-semibold text-(--color-text-primary)"><i data-lucide="radio" class="w-4 h-4 text-(--color-accent)"></i>Auto-Publishing</div>
   <div class="flex flex-wrap items-center gap-3">
     {% if dist_settings.distribution_enabled %}<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Distribution ON</span>{% else %}<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20"><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>Distribution OFF</span>{% endif %}
     {% if dist_settings.auto_fanout_on_publish %}<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Auto-Fanout ON</span>{% else %}<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Auto-Fanout OFF</span>{% endif %}
     {% if dist_settings.allow_indexing_jobs %}<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">Indexing ON</span>{% endif %}
   </div>
-  <div class="ml-auto"><a href="{% url 'admin_suite:distribution_settings' %}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-colors btn-press"><i data-lucide="settings" class="w-3.5 h-3.5 inline mr-1"></i>Configure</a></div>
+  <div class="ml-auto"><a href="{% url 'admin_suite:distribution_settings' %}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-(--color-accent) hover:bg-accent/10 transition-colors btn-press"><i data-lucide="settings" class="w-3.5 h-3.5 inline mr-1"></i>Configure</a></div>
 </div>
 
 {% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
@@ -33,41 +33,41 @@
 {% include "components/_admin_search.html" with placeholder="Search distribution..." q=q %}
 
 <div x-data="{ tab: new URLSearchParams(window.location.search).get('tab') || '{{ active_tab|default:"accounts" }}' }" class="animate-in" style="--stagger:5" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
-    <button @click="tab='accounts'" :class="tab==='accounts' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Accounts</button>
-    <button @click="tab='plans'" :class="tab==='plans' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Plans</button>
-    <button @click="tab='jobs'" :class="tab==='jobs' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Jobs</button>
-    <button @click="tab='logs'" :class="tab==='logs' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Logs</button>
-    <button @click="tab='video'" :class="tab==='video' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="film" class="w-3 h-3 inline mr-1"></i>Videos</button>
-    <button @click="tab='settings'" :class="tab==='settings' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="settings" class="w-3 h-3 inline mr-1"></i>Settings</button>
+  <div class="flex gap-1 mb-6 bg-(--color-bg-tertiary)/40 rounded-xl p-1 w-fit">
+    <button @click="tab='accounts'" :class="tab==='accounts' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Accounts</button>
+    <button @click="tab='plans'" :class="tab==='plans' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Plans</button>
+    <button @click="tab='jobs'" :class="tab==='jobs' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Jobs</button>
+    <button @click="tab='logs'" :class="tab==='logs' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Logs</button>
+    <button @click="tab='video'" :class="tab==='video' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="film" class="w-3 h-3 inline mr-1"></i>Videos</button>
+    <button @click="tab='settings'" :class="tab==='settings' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="settings" class="w-3 h-3 inline mr-1"></i>Settings</button>
   </div>
   <div x-show="tab==='accounts'" x-cloak x-transition.opacity x-data="{ showAddForm: false, selectedPlatform: '', platformData: {} }">
     {# ── Connected Posting Accounts (SocialPostingAccount) ── #}
     <div class="space-y-3 mb-6">
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><i data-lucide="link" class="w-4 h-4 text-[var(--color-accent)]"></i>Platform Accounts<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ stats.posting_accounts }}</span></h3>
-        <button @click="showAddForm = !showAddForm" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Account</button>
+        <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2"><i data-lucide="link" class="w-4 h-4 text-(--color-accent)"></i>Platform Accounts<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ stats.posting_accounts }}</span></h3>
+        <button @click="showAddForm = !showAddForm" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Account</button>
       </div>
       {% for platform, accts in posting_by_platform.items %}
       <div class="glass rounded-xl p-4" x-data="{ open: true }">
         <button @click="open = !open" class="flex items-center justify-between w-full text-left">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center"><i data-lucide="share-2" class="w-4 h-4 text-blue-400"></i></div>
-            <h4 class="text-sm font-semibold text-[var(--color-text-primary)] capitalize">{{ platform }}</h4>
+            <h4 class="text-sm font-semibold text-(--color-text-primary) capitalize">{{ platform }}</h4>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ accts|length }}</span>
           </div>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform" :class="open ? 'rotate-180' : ''"></i>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) transition-transform" :class="open ? 'rotate-180' : ''"></i>
         </button>
         <div x-show="open" x-cloak x-transition class="mt-3 space-y-2">
           {% for pa in accts %}
-          <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50 hover:bg-[var(--color-bg-tertiary)] transition-colors group">
+          <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50 hover:bg-(--color-bg-tertiary) transition-colors group">
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="text-sm font-medium text-[var(--color-text-primary)]">{{ pa.account_name|default:"Unnamed" }}</span>
+                  <span class="text-sm font-medium text-(--color-text-primary)">{{ pa.account_name|default:"Unnamed" }}</span>
                   {% if pa.status == "active" %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400">Active</span>{% elif pa.status == "token_expired" %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/10 text-amber-400">Token Expired</span>{% elif pa.status == "error" %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-red-500/10 text-red-400">Error</span>{% elif pa.status == "unconfigured" %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-zinc-500/10 text-zinc-400">Unconfigured</span>{% elif pa.status == "disabled" %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-zinc-500/10 text-zinc-400">Disabled</span>{% else %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-blue-500/10 text-blue-400">{{ pa.get_status_display }}</span>{% endif %}
                 </div>
-                <div class="flex items-center gap-3 mt-1 text-[10px] text-[var(--color-text-muted)]">
+                <div class="flex items-center gap-3 mt-1 text-[10px] text-(--color-text-muted)">
                   <span>{{ pa.get_auth_type_display }}</span>
                   <span>&middot;</span>
                   {% if pa.has_credentials %}<span class="text-emerald-400"><i data-lucide="key" class="w-3 h-3 inline"></i> Keys set</span>{% else %}<span class="text-amber-400"><i data-lucide="key" class="w-3 h-3 inline"></i> No keys</span>{% endif %}
@@ -85,7 +85,7 @@
                 <input type="hidden" name="posting_account_id" value="{{ pa.id }}">
                 <button type="submit" name="action" value="toggle_posting_account" class="hidden group-hover:inline-flex px-2 py-1 rounded text-[9px] font-semibold {% if pa.is_enabled %}bg-amber-500/10 text-amber-400 hover:bg-amber-500/20{% else %}bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20{% endif %} transition-colors btn-press">{% if pa.is_enabled %}Disable{% else %}Enable{% endif %}</button>
               </form>
-              <a href="{% url 'admin_suite:social_posting_detail' pa.id %}" class="px-2 py-1 rounded text-[9px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors btn-press"><i data-lucide="settings" class="w-3 h-3 inline mr-0.5"></i>Configure</a>
+              <a href="{% url 'admin_suite:social_posting_detail' pa.id %}" class="px-2 py-1 rounded text-[9px] font-semibold bg-accent/10 text-(--color-accent) hover:bg-accent/20 transition-colors btn-press"><i data-lucide="settings" class="w-3 h-3 inline mr-0.5"></i>Configure</a>
             </div>
           </div>
           {% endfor %}
@@ -93,95 +93,95 @@
       </div>
       {% empty %}
       <div class="glass rounded-xl p-8 text-center">
-        <i data-lucide="link" class="w-8 h-8 mx-auto mb-3 text-[var(--color-text-muted)] opacity-40"></i>
-        <p class="text-sm text-[var(--color-text-muted)] mb-1">No platform accounts configured</p>
-        <p class="text-xs text-[var(--color-text-muted)]">Add accounts with API keys to enable auto-posting</p>
+        <i data-lucide="link" class="w-8 h-8 mx-auto mb-3 text-(--color-text-muted) opacity-40"></i>
+        <p class="text-sm text-(--color-text-muted) mb-1">No platform accounts configured</p>
+        <p class="text-xs text-(--color-text-muted)">Add accounts with API keys to enable auto-posting</p>
       </div>
       {% endfor %}
     </div>
 
     {# ── Add Account Form (hidden by default) ── #}
     <div x-show="showAddForm" x-cloak x-transition class="glass rounded-xl p-6 mb-6">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>Add Platform Account</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>Add Platform Account</h3>
       <form method="post" class="space-y-4">{% csrf_token %}
         <input type="hidden" name="action" value="create_posting_account">
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
-            <label for="id_platform" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Platform</label>
-            <select name="platform" id="id_platform" x-model="selectedPlatform" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label for="id_platform" class="block text-xs font-medium text-(--color-text-muted) mb-1">Platform</label>
+            <select name="platform" id="id_platform" x-model="selectedPlatform" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               <option value="">Select platform...</option>
               {% for val, label in platform_choices %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
             </select>
-            <p class="mt-1 text-[10px] text-[var(--color-text-muted)]" x-show="!selectedPlatform"><i data-lucide="info" class="w-3 h-3 inline mr-0.5 text-[var(--color-accent)]"></i> Select a platform to see API credential fields</p>
+            <p class="mt-1 text-[10px] text-(--color-text-muted)" x-show="!selectedPlatform"><i data-lucide="info" class="w-3 h-3 inline mr-0.5 text-(--color-accent)"></i> Select a platform to see API credential fields</p>
           </div>
           <div>
-            <label for="id_posting_account_name" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Account Name</label>
-            <input type="text" name="posting_account_name" id="id_posting_account_name" autocomplete="off" placeholder="My Twitter Account" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" required>
+            <label for="id_posting_account_name" class="block text-xs font-medium text-(--color-text-muted) mb-1">Account Name</label>
+            <input type="text" name="posting_account_name" id="id_posting_account_name" autocomplete="off" placeholder="My Twitter Account" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors" required>
           </div>
         </div>
         <div class="grid sm:grid-cols-3 gap-4">
           <div>
-            <label for="id_destination_type" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Destination Type</label>
-            <select name="destination_type" id="id_destination_type" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label for="id_destination_type" class="block text-xs font-medium text-(--color-text-muted) mb-1">Destination Type</label>
+            <select name="destination_type" id="id_destination_type" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               {% for val, label in destination_choices %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
             </select>
           </div>
           <div>
-            <label for="id_destination_id" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Destination ID</label>
-            <input type="text" name="destination_id" id="id_destination_id" autocomplete="off" placeholder="Page ID, Channel ID..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label for="id_destination_id" class="block text-xs font-medium text-(--color-text-muted) mb-1">Destination ID</label>
+            <input type="text" name="destination_id" id="id_destination_id" autocomplete="off" placeholder="Page ID, Channel ID..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label for="id_destination_name" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Destination Name</label>
-            <input type="text" name="destination_name" id="id_destination_name" autocomplete="off" placeholder="My Page Name" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label for="id_destination_name" class="block text-xs font-medium text-(--color-text-muted) mb-1">Destination Name</label>
+            <input type="text" name="destination_name" id="id_destination_name" autocomplete="off" placeholder="My Page Name" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
         </div>
 
         {# Platform-specific credential fields (shown dynamically) #}
         <template x-if="selectedPlatform === 'telegram'">
-          <div class="border-t border-[var(--color-border)]/30 pt-4">
-            <p class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bot" class="w-3.5 h-3.5 text-blue-400"></i>Telegram Bot Token</p>
-            <p class="text-[10px] text-[var(--color-text-muted)] mb-2">Create a bot via <a href="https://t.me/BotFather" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">@BotFather</a> and add it as admin to your channel/group.</p>
+          <div class="border-t border-(--color-border)/30 pt-4">
+            <p class="text-xs font-semibold text-(--color-text-muted) mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bot" class="w-3.5 h-3.5 text-blue-400"></i>Telegram Bot Token</p>
+            <p class="text-[10px] text-(--color-text-muted) mb-2">Create a bot via <a href="https://t.me/BotFather" target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">@BotFather</a> and add it as admin to your channel/group.</p>
             <div class="grid sm:grid-cols-2 gap-4">
-              <div><label for="id_bot_token" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Bot Token</label><input type="password" name="bot_token" id="id_bot_token" autocomplete="off" placeholder="123456:ABC-DEF..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
-              <div><label for="id_tg_chat_id" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Chat/Channel ID</label><input type="text" name="destination_id" id="id_tg_chat_id" autocomplete="off" placeholder="@channel or -100..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
+              <div><label for="id_bot_token" class="block text-xs font-medium text-(--color-text-muted) mb-1">Bot Token</label><input type="password" name="bot_token" id="id_bot_token" autocomplete="off" placeholder="123456:ABC-DEF..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
+              <div><label for="id_tg_chat_id" class="block text-xs font-medium text-(--color-text-muted) mb-1">Chat/Channel ID</label><input type="text" name="destination_id" id="id_tg_chat_id" autocomplete="off" placeholder="@channel or -100..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
             </div>
           </div>
         </template>
         <template x-if="selectedPlatform === 'discord'">
-          <div class="border-t border-[var(--color-border)]/30 pt-4">
-            <p class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="message-circle" class="w-3.5 h-3.5 text-indigo-400"></i>Discord Webhook</p>
-            <p class="text-[10px] text-[var(--color-text-muted)] mb-2">Create a webhook in your Discord channel settings → Integrations → Webhooks.</p>
-            <div><label for="id_webhook_url" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Webhook URL</label><input type="url" name="webhook_url" id="id_webhook_url" autocomplete="off" placeholder="https://discord.com/api/webhooks/..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
+          <div class="border-t border-(--color-border)/30 pt-4">
+            <p class="text-xs font-semibold text-(--color-text-muted) mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="message-circle" class="w-3.5 h-3.5 text-indigo-400"></i>Discord Webhook</p>
+            <p class="text-[10px] text-(--color-text-muted) mb-2">Create a webhook in your Discord channel settings → Integrations → Webhooks.</p>
+            <div><label for="id_webhook_url" class="block text-xs font-medium text-(--color-text-muted) mb-1">Webhook URL</label><input type="url" name="webhook_url" id="id_webhook_url" autocomplete="off" placeholder="https://discord.com/api/webhooks/..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
           </div>
         </template>
         <template x-if="selectedPlatform === 'medium'">
-          <div class="border-t border-[var(--color-border)]/30 pt-4">
-            <p class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="pen-tool" class="w-3.5 h-3.5 text-green-400"></i>Medium Integration Token</p>
-            <p class="text-[10px] text-[var(--color-text-muted)] mb-2">Get from <a href="https://medium.com/me/settings/security" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">Medium Settings → Security</a>.</p>
-            <div><label for="id_medium_token" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Integration Token</label><input type="password" name="posting_access_token" id="id_medium_token" autocomplete="off" placeholder="Enter Medium token..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
+          <div class="border-t border-(--color-border)/30 pt-4">
+            <p class="text-xs font-semibold text-(--color-text-muted) mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="pen-tool" class="w-3.5 h-3.5 text-green-400"></i>Medium Integration Token</p>
+            <p class="text-[10px] text-(--color-text-muted) mb-2">Get from <a href="https://medium.com/me/settings/security" target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">Medium Settings → Security</a>.</p>
+            <div><label for="id_medium_token" class="block text-xs font-medium text-(--color-text-muted) mb-1">Integration Token</label><input type="password" name="posting_access_token" id="id_medium_token" autocomplete="off" placeholder="Enter Medium token..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
           </div>
         </template>
         <template x-if="selectedPlatform === 'whatsapp'">
-          <div class="border-t border-[var(--color-border)]/30 pt-4">
-            <p class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5 text-green-400"></i>WhatsApp Business API</p>
-            <p class="text-[10px] text-[var(--color-text-muted)] mb-2">Setup via <a href="https://business.facebook.com/wa/manage/" target="_blank" rel="noopener" class="text-[var(--color-accent)] hover:underline">WhatsApp Business Manager</a>.</p>
-            <div><label for="id_wa_token" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Access Token</label><input type="password" name="posting_access_token" id="id_wa_token" autocomplete="off" placeholder="Enter token..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
+          <div class="border-t border-(--color-border)/30 pt-4">
+            <p class="text-xs font-semibold text-(--color-text-muted) mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="phone" class="w-3.5 h-3.5 text-green-400"></i>WhatsApp Business API</p>
+            <p class="text-[10px] text-(--color-text-muted) mb-2">Setup via <a href="https://business.facebook.com/wa/manage/" target="_blank" rel="noopener" class="text-(--color-accent) hover:underline">WhatsApp Business Manager</a>.</p>
+            <div><label for="id_wa_token" class="block text-xs font-medium text-(--color-text-muted) mb-1">Access Token</label><input type="password" name="posting_access_token" id="id_wa_token" autocomplete="off" placeholder="Enter token..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
           </div>
         </template>
         <template x-if="['twitter', 'facebook', 'linkedin', 'instagram', 'reddit', 'pinterest', 'tumblr', 'threads'].includes(selectedPlatform)">
-          <div class="border-t border-[var(--color-border)]/30 pt-4">
-            <p class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="shield" class="w-3.5 h-3.5 text-violet-400"></i>OAuth2 / API Credentials</p>
-            <p class="text-[10px] text-[var(--color-text-muted)] mb-2">Enter your app credentials. After saving, configure OAuth authorization in the account detail page.</p>
+          <div class="border-t border-(--color-border)/30 pt-4">
+            <p class="text-xs font-semibold text-(--color-text-muted) mb-3 uppercase tracking-wider flex items-center gap-2"><i data-lucide="shield" class="w-3.5 h-3.5 text-violet-400"></i>OAuth2 / API Credentials</p>
+            <p class="text-[10px] text-(--color-text-muted) mb-2">Enter your app credentials. After saving, configure OAuth authorization in the account detail page.</p>
             <div class="grid sm:grid-cols-2 gap-4">
-              <div><label for="id_api_key" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">API Key / Client ID</label><input type="password" name="api_key" id="id_api_key" autocomplete="off" placeholder="Enter key..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
-              <div><label for="id_api_secret" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">API Secret / Client Secret</label><input type="password" name="api_secret" id="id_api_secret" autocomplete="off" placeholder="Enter secret..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors font-mono"></div>
+              <div><label for="id_api_key" class="block text-xs font-medium text-(--color-text-muted) mb-1">API Key / Client ID</label><input type="password" name="api_key" id="id_api_key" autocomplete="off" placeholder="Enter key..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
+              <div><label for="id_api_secret" class="block text-xs font-medium text-(--color-text-muted) mb-1">API Secret / Client Secret</label><input type="password" name="api_secret" id="id_api_secret" autocomplete="off" placeholder="Enter secret..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors font-mono"></div>
             </div>
           </div>
         </template>
 
         <div class="flex items-center justify-between pt-2">
-          <button type="button" @click="showAddForm = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors">Cancel</button>
-          <button type="submit" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>Create Account</button>
+          <button type="button" @click="showAddForm = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-(--color-text-muted) hover:text-(--color-text-primary) transition-colors">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>Create Account</button>
         </div>
       </form>
     </div>
@@ -189,17 +189,17 @@
     {# ── Legacy Distribution Accounts (SocialAccount) ── #}
     {% if accounts %}
     <div class="glass rounded-xl overflow-hidden">
-      <div class="px-4 py-3 border-b border-[var(--color-border)]/20">
-        <h3 class="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider flex items-center gap-2"><i data-lucide="database" class="w-3.5 h-3.5"></i>Distribution Pipeline Accounts</h3>
+      <div class="px-4 py-3 border-b border-(--color-border)/20">
+        <h3 class="text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider flex items-center gap-2"><i data-lucide="database" class="w-3.5 h-3.5"></i>Distribution Pipeline Accounts</h3>
       </div>
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Account</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th><th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for a in accounts %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+        <thead><tr class="border-b border-(--color-border)/20"><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Channel</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Account</th><th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Active</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Created</th><th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th></tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">{% for a in accounts %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
           <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ a.get_channel_display }}</span></td>
-          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ a.account_name|default:"—" }}</td>
+          <td class="py-3 px-4 font-medium text-(--color-text-primary)">{{ a.account_name|default:"—" }}</td>
           <td class="py-3 px-4 text-center">{% if a.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ a.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ a.created_at|timesince }} ago</td>
           <td class="py-3 px-4 text-right">
             <form method="post" class="inline">{% csrf_token %}
               <input type="hidden" name="account_id" value="{{ a.pk }}">
@@ -216,14 +216,14 @@
     <div class="glass rounded-xl overflow-hidden">
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channels</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Scheduled</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for p in plans %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[200px]">{{ p.post.title|default:p.post_id|truncatechars:40 }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.channels|join:", "|truncatechars:30 }}</td>
+        <thead><tr class="border-b border-(--color-border)/20"><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Post</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Channels</th><th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Scheduled</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Created</th></tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">{% for p in plans %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 font-medium text-(--color-text-primary) truncate max-w-[200px]">{{ p.post.title|default:p.post_id|truncatechars:40 }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ p.channels|join:", "|truncatechars:30 }}</td>
           <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if p.status == 'sent' %}bg-emerald-500/10 text-emerald-400{% elif p.status == 'failed' %}bg-red-500/10 text-red-400{% elif p.status == 'pending' %}bg-amber-500/10 text-amber-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ p.get_status_display }}</span></td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.schedule_at|default:"Immediate" }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.created_at|timesince }} ago</td>
-        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="calendar" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No distribution plans</p></td></tr>{% endfor %}</tbody>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ p.schedule_at|default:"Immediate" }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ p.created_at|timesince }} ago</td>
+        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-(--color-text-muted)"><i data-lucide="calendar" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No distribution plans</p></td></tr>{% endfor %}</tbody>
       </table>
       </div>
     </div>
@@ -232,19 +232,19 @@
     <div class="glass rounded-xl overflow-hidden">
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Attempts</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Error</th><th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for j in jobs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+        <thead><tr class="border-b border-(--color-border)/20"><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Channel</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Post</th><th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Attempts</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Created</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Error</th><th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th></tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">{% for j in jobs %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
           <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ j.get_channel_display }}</span></td>
-          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[160px]">{{ j.post.title|default:j.post_id|truncatechars:30 }}</td>
+          <td class="py-3 px-4 font-medium text-(--color-text-primary) truncate max-w-40">{{ j.post.title|default:j.post_id|truncatechars:30 }}</td>
           <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if j.status == 'sent' %}bg-emerald-500/10 text-emerald-400{% elif j.status == 'failed' %}bg-red-500/10 text-red-400{% elif j.status == 'pending' %}bg-amber-500/10 text-amber-400{% else %}bg-blue-500/10 text-blue-400{% endif %}">{{ j.get_status_display }}</span></td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ j.attempt_count }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ j.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ j.attempt_count }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ j.created_at|timesince }} ago</td>
           <td class="py-3 px-4 text-xs text-red-400 truncate max-w-[200px]">{{ j.last_error|default:"—" }}</td>
           <td class="py-3 px-4 text-right">
             {% if j.status == 'failed' %}
             <form method="post" class="inline">{% csrf_token %}
               <input type="hidden" name="job_id" value="{{ j.pk }}">
-              <button type="submit" name="action" value="retry_job" class="text-xs text-[var(--color-accent)] hover:underline mr-2">Retry</button>
+              <button type="submit" name="action" value="retry_job" class="text-xs text-(--color-accent) hover:underline mr-2">Retry</button>
               <button type="submit" name="action" value="cancel_job" class="text-xs text-red-400 hover:underline">Cancel</button>
             </form>
             {% elif j.status == 'pending' %}
@@ -254,7 +254,7 @@
             </form>
             {% else %}—{% endif %}
           </td>
-        </tr>{% empty %}<tr><td colspan="7" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="send" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No distribution jobs</p></td></tr>{% endfor %}</tbody>
+        </tr>{% empty %}<tr><td colspan="7" class="py-8 text-center text-(--color-text-muted)"><i data-lucide="send" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No distribution jobs</p></td></tr>{% endfor %}</tbody>
       </table>
       </div>
     </div>
@@ -263,14 +263,14 @@
     <div class="glass rounded-xl overflow-hidden">
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Job</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Level</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Message</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Response</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Time</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">{% for l in logs %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">#{{ l.job_id }}</td>
+        <thead><tr class="border-b border-(--color-border)/20"><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Job</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Level</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Message</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Response</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Time</th></tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">{% for l in logs %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">#{{ l.job_id }}</td>
           <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if l.level == 'error' %}bg-red-500/10 text-red-400{% elif l.level == 'warning' %}bg-amber-500/10 text-amber-400{% else %}bg-emerald-500/10 text-emerald-400{% endif %}">{{ l.level }}</span></td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-primary)] truncate max-w-[300px]">{{ l.message|truncatechars:80 }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ l.response_code|default:"—" }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ l.created_at|timesince }} ago</td>
-        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No logs in last 24h</p></td></tr>{% endfor %}</tbody>
+          <td class="py-3 px-4 text-xs text-(--color-text-primary) truncate max-w-[300px]">{{ l.message|truncatechars:80 }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ l.response_code|default:"—" }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ l.created_at|timesince }} ago</td>
+        </tr>{% empty %}<tr><td colspan="5" class="py-8 text-center text-(--color-text-muted)"><i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-40"></i><p>No logs in last 24h</p></td></tr>{% endfor %}</tbody>
       </table>
       </div>
     </div>
@@ -280,38 +280,38 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
       <div class="glass rounded-xl p-4 text-center">
         <div class="text-2xl font-bold text-emerald-400">{{ stats.videos_completed }}</div>
-        <div class="text-[10px] text-[var(--color-text-muted)] mt-1">Completed</div>
+        <div class="text-[10px] text-(--color-text-muted) mt-1">Completed</div>
       </div>
       <div class="glass rounded-xl p-4 text-center">
         <div class="text-2xl font-bold text-amber-400">{{ stats.videos_rendering }}</div>
-        <div class="text-[10px] text-[var(--color-text-muted)] mt-1">Rendering</div>
+        <div class="text-[10px] text-(--color-text-muted) mt-1">Rendering</div>
       </div>
       <div class="glass rounded-xl p-4 text-center">
         <div class="text-2xl font-bold text-blue-400">{{ stats.videos_queued }}</div>
-        <div class="text-[10px] text-[var(--color-text-muted)] mt-1">Queued</div>
+        <div class="text-[10px] text-(--color-text-muted) mt-1">Queued</div>
       </div>
       <div class="glass rounded-xl p-4 text-center">
         <div class="text-2xl font-bold text-red-400">{{ stats.videos_failed }}</div>
-        <div class="text-[10px] text-[var(--color-text-muted)] mt-1">Failed</div>
+        <div class="text-[10px] text-(--color-text-muted) mt-1">Failed</div>
       </div>
     </div>
 
     {# ═══ Generate Videos from Blog Posts ═══ #}
     <div class="glass rounded-xl p-5 mb-6">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-[var(--color-accent)]"></i>Generate Videos from Blog Posts</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-(--color-accent)"></i>Generate Videos from Blog Posts</h3>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {# Blog Posts #}
         <div>
-          <h4 class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 flex items-center gap-1.5"><i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-400"></i>Top Blog Posts</h4>
+          <h4 class="text-xs font-semibold text-(--color-text-muted) mb-3 flex items-center gap-1.5"><i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-400"></i>Top Blog Posts</h4>
           <form method="post">{% csrf_token %}
             <input type="hidden" name="action" value="bulk_render_videos">
             <div class="space-y-1 mb-3 max-h-72 overflow-y-auto pr-1">
               {% for p in trending_posts %}
-              <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-bg-tertiary)]/50 transition-colors cursor-pointer group">
-                <input type="checkbox" name="video_post_ids" value="{{ p.id }}" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+              <label class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-(--color-bg-tertiary)/50 transition-colors cursor-pointer group">
+                <input type="checkbox" name="video_post_ids" value="{{ p.id }}" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
                 <div class="flex-1 min-w-0">
-                  <span class="text-xs text-[var(--color-text-primary)] font-medium block truncate">{{ p.title }}</span>
-                  <span class="text-[10px] text-[var(--color-text-muted)]">{{ p.views_count }} views &middot; {{ p.created_at|timesince }} ago</span>
+                  <span class="text-xs text-(--color-text-primary) font-medium block truncate">{{ p.title }}</span>
+                  <span class="text-[10px] text-(--color-text-muted)">{{ p.views_count }} views &middot; {{ p.created_at|timesince }} ago</span>
                 </div>
                 <button type="button" @click.stop="
                   fetch(window.location.pathname, {
@@ -321,19 +321,19 @@
                   }).then(() => window.location.reload())
                 " class="hidden group-hover:inline-flex px-2 py-0.5 rounded text-[9px] font-semibold bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 transition-colors btn-press" title="Render for all platforms"><i data-lucide="video" class="w-3 h-3 inline mr-0.5"></i>Render</button>
               </label>
-              {% empty %}<p class="text-xs text-[var(--color-text-muted)] py-2 text-center">No published posts yet</p>{% endfor %}
+              {% empty %}<p class="text-xs text-(--color-text-muted) py-2 text-center">No published posts yet</p>{% endfor %}
             </div>
-            {% if trending_posts %}<button type="submit" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="video" class="w-3 h-3 inline mr-1"></i>Render for Selected</button>{% endif %}
+            {% if trending_posts %}<button type="submit" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="video" class="w-3 h-3 inline mr-1"></i>Render for Selected</button>{% endif %}
           </form>
         </div>
         {# Manual by Post ID + Platform Picker #}
         <div>
-          <h4 class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 flex items-center gap-1.5"><i data-lucide="wand-2" class="w-3.5 h-3.5 text-pink-400"></i>Render by Post ID</h4>
+          <h4 class="text-xs font-semibold text-(--color-text-muted) mb-3 flex items-center gap-1.5"><i data-lucide="wand-2" class="w-3.5 h-3.5 text-pink-400"></i>Render by Post ID</h4>
           <form method="post" class="space-y-3">{% csrf_token %}
             <input type="hidden" name="action" value="render_video">
             <div class="flex gap-2">
-              <input type="number" name="post_id" placeholder="Post ID" required class="flex-1 px-3 py-2 rounded-lg text-xs bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] border border-[var(--color-border)]/30 focus:border-[var(--color-accent)] focus:outline-none">
-              <select name="platform" class="px-3 py-2 rounded-lg text-xs bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] border border-[var(--color-border)]/30 focus:border-[var(--color-accent)] focus:outline-none">
+              <input type="number" name="post_id" placeholder="Post ID" required class="flex-1 px-3 py-2 rounded-lg text-xs bg-(--color-bg-secondary) text-(--color-text-primary) border border-(--color-border)/30 focus:border-(--color-accent) focus:outline-none">
+              <select name="platform" class="px-3 py-2 rounded-lg text-xs bg-(--color-bg-secondary) text-(--color-text-primary) border border-(--color-border)/30 focus:border-(--color-accent) focus:outline-none">
                 <option value="">All Platforms</option>
                 <option value="youtube">YouTube (16:9)</option>
                 <option value="youtube_shorts">YouTube Shorts (9:16)</option>
@@ -345,11 +345,11 @@
               </select>
             </div>
             <div class="flex items-center gap-3">
-              <label class="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
-                <input type="checkbox" name="auto_publish" value="1" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+              <label class="flex items-center gap-2 text-xs text-(--color-text-muted)">
+                <input type="checkbox" name="auto_publish" value="1" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
                 Auto-publish when ready
               </label>
-              <button type="submit" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all ml-auto"><i data-lucide="clapperboard" class="w-3 h-3 inline mr-1"></i>Render Video</button>
+              <button type="submit" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all ml-auto"><i data-lucide="clapperboard" class="w-3 h-3 inline mr-1"></i>Render Video</button>
             </div>
           </form>
           <div class="mt-4 p-3 rounded-lg bg-blue-500/5 border border-blue-500/10">
@@ -360,45 +360,45 @@
       {# ── Trending Forum Topics (inspiration) ── #}
       {% if trending_topics %}
       <div class="mt-4">
-        <h4 class="text-xs font-semibold text-[var(--color-text-muted)] mb-3 flex items-center gap-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5 text-violet-400"></i>Trending Forum Topics</h4>
+        <h4 class="text-xs font-semibold text-(--color-text-muted) mb-3 flex items-center gap-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5 text-violet-400"></i>Trending Forum Topics</h4>
         <div class="space-y-1 max-h-48 overflow-y-auto pr-1">
           {% for t in trending_topics %}
-          <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-(--color-bg-tertiary)/50 transition-colors">
             <div class="flex-1 min-w-0">
-              <span class="text-xs text-[var(--color-text-primary)] font-medium block truncate">{{ t.title }}</span>
-              <span class="text-[10px] text-[var(--color-text-muted)]">{{ t.view_count }} views &middot; {{ t.reply_count }} replies &middot; {{ t.created_at|timesince }} ago</span>
+              <span class="text-xs text-(--color-text-primary) font-medium block truncate">{{ t.title }}</span>
+              <span class="text-[10px] text-(--color-text-muted)">{{ t.view_count }} views &middot; {{ t.reply_count }} replies &middot; {{ t.created_at|timesince }} ago</span>
             </div>
           </div>
           {% endfor %}
         </div>
-        <p class="text-[10px] text-[var(--color-text-muted)] mt-2"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1 text-amber-400"></i>Write a blog post about trending topics, then generate videos from it.</p>
+        <p class="text-[10px] text-(--color-text-muted) mt-2"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1 text-amber-400"></i>Write a blog post about trending topics, then generate videos from it.</p>
       </div>
       {% endif %}
     </div>
 
     {# ═══ AI Video Scripts ═══ #}
     <div class="glass rounded-xl overflow-hidden mb-6">
-      <div class="px-4 py-3 border-b border-[var(--color-border)]/20 flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><i data-lucide="scroll-text" class="w-4 h-4 text-violet-400"></i>AI Video Scripts<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ video_scripts|length }}</span></h3>
+      <div class="px-4 py-3 border-b border-(--color-border)/20 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2"><i data-lucide="scroll-text" class="w-4 h-4 text-violet-400"></i>AI Video Scripts<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ video_scripts|length }}</span></h3>
       </div>
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Channel</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Hook</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Scenes</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Generated</th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        <thead><tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Post</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Channel</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Hook</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Scenes</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Generated</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for vs in video_scripts %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-            <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[180px]">{{ vs.post.title|truncatechars:40 }}</td>
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-3 px-4 font-medium text-(--color-text-primary) truncate max-w-[180px]">{{ vs.post.title|truncatechars:40 }}</td>
             <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ vs.get_channel_display }}</span></td>
-            <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)] truncate max-w-[200px]">{{ vs.payload.hook|default:"—" }}</td>
-            <td class="py-3 px-4 text-center text-xs text-[var(--color-text-muted)]">{{ vs.payload.scenes|length|default:"0" }}</td>
-            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ vs.generated_at|timesince }} ago</td>
+            <td class="py-3 px-4 text-xs text-(--color-text-secondary) truncate max-w-[200px]">{{ vs.payload.hook|default:"—" }}</td>
+            <td class="py-3 px-4 text-center text-xs text-(--color-text-muted)">{{ vs.payload.scenes|length|default:"0" }}</td>
+            <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ vs.generated_at|timesince }} ago</td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-1">
                 <button @click="expandedVideo = expandedVideo === {{ vs.pk }} ? null : {{ vs.pk }}" class="px-2 py-1 rounded text-[9px] font-semibold bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors btn-press" title="View script"><i data-lucide="eye" class="w-3 h-3 inline"></i></button>
@@ -412,39 +412,39 @@
           </tr>
           {# ── Expanded Script Detail ── #}
           <tr x-show="expandedVideo === {{ vs.pk }}" x-cloak x-transition>
-            <td colspan="6" class="px-4 py-4 bg-[var(--color-bg-tertiary)]/30">
+            <td colspan="6" class="px-4 py-4 bg-(--color-bg-tertiary)/30">
               <div class="space-y-3">
-                {% if vs.payload.hook %}<div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">Hook</span><p class="text-xs text-[var(--color-text-primary)] mt-1">{{ vs.payload.hook_emoji|default:"" }} {{ vs.payload.hook }}</p></div>{% endif %}
+                {% if vs.payload.hook %}<div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">Hook</span><p class="text-xs text-(--color-text-primary) mt-1">{{ vs.payload.hook_emoji|default:"" }} {{ vs.payload.hook }}</p></div>{% endif %}
                 {% if vs.payload.scenes %}
                 <div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">Scenes</span>
                   <div class="mt-2 space-y-2">
                     {% for scene in vs.payload.scenes %}
-                    <div class="p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 border border-[var(--color-border)]/10">
+                    <div class="p-3 rounded-lg bg-(--color-bg-secondary)/50 border border-(--color-border)/10">
                       <div class="flex items-center gap-2 mb-1">
                         <span class="w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 text-[10px] font-bold flex items-center justify-center">{{ forloop.counter }}</span>
-                        {% if scene.duration_seconds %}<span class="text-[9px] text-[var(--color-text-muted)]">{{ scene.duration_seconds }}s</span>{% endif %}
+                        {% if scene.duration_seconds %}<span class="text-[9px] text-(--color-text-muted)">{{ scene.duration_seconds }}s</span>{% endif %}
                         {% if scene.effect %}<span class="px-1.5 py-0.5 rounded text-[9px] bg-pink-500/10 text-pink-400">{{ scene.effect }}</span>{% endif %}
                       </div>
-                      {% if scene.narration %}<p class="text-xs text-[var(--color-text-primary)]"><i data-lucide="mic" class="w-3 h-3 inline mr-1 text-[var(--color-text-muted)]"></i>{{ scene.narration }}</p>{% endif %}
-                      {% if scene.visual_description %}<p class="text-[11px] text-[var(--color-text-secondary)] mt-1"><i data-lucide="image" class="w-3 h-3 inline mr-1 text-[var(--color-text-muted)]"></i>{{ scene.visual_description }}</p>{% endif %}
+                      {% if scene.narration %}<p class="text-xs text-(--color-text-primary)"><i data-lucide="mic" class="w-3 h-3 inline mr-1 text-(--color-text-muted)"></i>{{ scene.narration }}</p>{% endif %}
+                      {% if scene.visual_description %}<p class="text-[11px] text-(--color-text-secondary) mt-1"><i data-lucide="image" class="w-3 h-3 inline mr-1 text-(--color-text-muted)"></i>{{ scene.visual_description }}</p>{% endif %}
                       {% if scene.text_emphasis %}<p class="text-[11px] text-amber-400 mt-1"><i data-lucide="type" class="w-3 h-3 inline mr-1"></i>{{ scene.text_emphasis }}</p>{% endif %}
                     </div>
                     {% endfor %}
                   </div>
                 </div>
                 {% endif %}
-                {% if vs.payload.cta %}<div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">CTA</span><p class="text-xs text-[var(--color-text-primary)] mt-1">{{ vs.payload.cta_emoji|default:"" }} {{ vs.payload.cta }}{% if vs.payload.cta_sub %} <span class="text-[var(--color-text-muted)]">— {{ vs.payload.cta_sub }}</span>{% endif %}</p></div>{% endif %}
+                {% if vs.payload.cta %}<div><span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider">CTA</span><p class="text-xs text-(--color-text-primary) mt-1">{{ vs.payload.cta_emoji|default:"" }} {{ vs.payload.cta }}{% if vs.payload.cta_sub %} <span class="text-(--color-text-muted)">— {{ vs.payload.cta_sub }}</span>{% endif %}</p></div>{% endif %}
                 <div class="flex flex-wrap gap-2 pt-1">
                   {% if vs.payload.duration_seconds %}<span class="px-2 py-0.5 rounded-full text-[9px] bg-blue-500/10 text-blue-400"><i data-lucide="clock" class="w-3 h-3 inline mr-0.5"></i>{{ vs.payload.duration_seconds }}s total</span>{% endif %}
                   {% if vs.payload.pacing %}<span class="px-2 py-0.5 rounded-full text-[9px] bg-emerald-500/10 text-emerald-400">{{ vs.payload.pacing }}</span>{% endif %}
                   {% if vs.payload.music_mood %}<span class="px-2 py-0.5 rounded-full text-[9px] bg-pink-500/10 text-pink-400"><i data-lucide="music" class="w-3 h-3 inline mr-0.5"></i>{{ vs.payload.music_mood }}</span>{% endif %}
                 </div>
-                {% if vs.payload.hashtags %}<p class="text-[10px] text-[var(--color-accent)] mt-1">{% for tag in vs.payload.hashtags %}#{{ tag }} {% endfor %}</p>{% endif %}
+                {% if vs.payload.hashtags %}<p class="text-[10px] text-(--color-accent) mt-1">{% for tag in vs.payload.hashtags %}#{{ tag }} {% endfor %}</p>{% endif %}
               </div>
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">
+          <tr><td colspan="6" class="py-8 text-center text-(--color-text-muted)">
             <i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
             <p class="text-sm font-medium mb-1">No video scripts generated yet</p>
             <p class="text-[10px] mt-1">Generate scripts by selecting blog posts above</p>
@@ -458,23 +458,23 @@
     {# ═══ Video Preview Modal ═══ #}
     <template x-if="previewVideo">
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" @click.self="previewVideo = null" @keydown.escape.window="previewVideo = null">
-        <div class="relative bg-[var(--color-bg-primary)] rounded-2xl shadow-2xl max-w-3xl w-full mx-4 overflow-hidden">
-          <div class="flex items-center justify-between p-4 border-b border-[var(--color-border)]/20">
-            <h3 class="text-sm font-semibold text-[var(--color-text-primary)]" x-text="previewVideo.title"></h3>
-            <button @click="previewVideo = null" class="p-1 rounded-lg hover:bg-[var(--color-bg-tertiary)] transition-colors"><i data-lucide="x" class="w-4 h-4 text-[var(--color-text-muted)]"></i></button>
+        <div class="relative bg-(--color-bg-primary) rounded-2xl shadow-2xl max-w-3xl w-full mx-4 overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b border-(--color-border)/20">
+            <h3 class="text-sm font-semibold text-(--color-text-primary)" x-text="previewVideo.title"></h3>
+            <button @click="previewVideo = null" class="p-1 rounded-lg hover:bg-(--color-bg-tertiary) transition-colors"><i data-lucide="x" class="w-4 h-4 text-(--color-text-muted)"></i></button>
           </div>
           <div class="p-4 flex items-center justify-center bg-black">
             <video :src="previewVideo.url" controls autoplay class="max-h-[70vh] rounded-lg" style="max-width: 100%;">Your browser does not support video playback.</video>
           </div>
-          <div class="p-4 border-t border-[var(--color-border)]/20 flex items-center justify-between">
-            <div class="flex items-center gap-3 text-xs text-[var(--color-text-muted)]">
+          <div class="p-4 border-t border-(--color-border)/20 flex items-center justify-between">
+            <div class="flex items-center gap-3 text-xs text-(--color-text-muted)">
               <span x-text="previewVideo.platform"></span>
               <span>&middot;</span>
               <span x-text="previewVideo.resolution"></span>
               <span>&middot;</span>
               <span x-text="previewVideo.size"></span>
             </div>
-            <a :href="previewVideo.url" download class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press"><i data-lucide="download" class="w-3 h-3 inline mr-1"></i>Download</a>
+            <a :href="previewVideo.url" download class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press"><i data-lucide="download" class="w-3 h-3 inline mr-1"></i>Download</a>
           </div>
         </div>
       </div>
@@ -482,25 +482,25 @@
 
     {# ═══ Generated Videos Grid ═══ #}
     <div class="glass rounded-xl overflow-hidden">
-      <div class="px-4 py-3 border-b border-[var(--color-border)]/20 flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><i data-lucide="film" class="w-4 h-4 text-pink-400"></i>Generated Videos<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/10 text-pink-400">{{ generated_videos|length }}</span></h3>
+      <div class="px-4 py-3 border-b border-(--color-border)/20 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2"><i data-lucide="film" class="w-4 h-4 text-pink-400"></i>Generated Videos<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/10 text-pink-400">{{ generated_videos|length }}</span></h3>
       </div>
       <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Preview</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Post</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Platform</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Resolution</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Duration</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Size</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Rendered</th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        <thead><tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Preview</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Post</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Platform</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Resolution</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Duration</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Size</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Rendered</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for vid in generated_videos %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
             <td class="py-2 px-4">
               {% if vid.is_playable %}
               <button @click="previewVideo = { url: '{{ vid.video_file.url }}', title: '{{ vid.post.title|truncatechars:50|escapejs }}', platform: '{{ vid.get_platform_display }}', resolution: '{{ vid.resolution }}', size: '{{ vid.file_size_mb }}' }" class="w-16 h-10 rounded-lg bg-black flex items-center justify-center group cursor-pointer overflow-hidden relative">
@@ -508,16 +508,16 @@
                 <div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-colors"><i data-lucide="play" class="w-4 h-4 text-white"></i></div>
               </button>
               {% elif vid.status == "rendering" or vid.status == "processing" %}
-              <div class="w-16 h-10 rounded-lg bg-[var(--color-bg-tertiary)] flex items-center justify-center">
-                <div class="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin"></div>
+              <div class="w-16 h-10 rounded-lg bg-(--color-bg-tertiary) flex items-center justify-center">
+                <div class="w-4 h-4 border-2 border-(--color-accent) border-t-transparent rounded-full animate-spin"></div>
               </div>
               {% else %}
-              <div class="w-16 h-10 rounded-lg bg-[var(--color-bg-tertiary)] flex items-center justify-center">
-                <i data-lucide="video-off" class="w-4 h-4 text-[var(--color-text-muted)] opacity-40"></i>
+              <div class="w-16 h-10 rounded-lg bg-(--color-bg-tertiary) flex items-center justify-center">
+                <i data-lucide="video-off" class="w-4 h-4 text-(--color-text-muted) opacity-40"></i>
               </div>
               {% endif %}
             </td>
-            <td class="py-3 px-4 font-medium text-[var(--color-text-primary)] truncate max-w-[160px]">{{ vid.post.title|truncatechars:30 }}</td>
+            <td class="py-3 px-4 font-medium text-(--color-text-primary) truncate max-w-40">{{ vid.post.title|truncatechars:30 }}</td>
             <td class="py-3 px-4">
               {% if vid.orientation == "portrait" %}
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400"><i data-lucide="smartphone" class="w-3 h-3 inline mr-0.5"></i>{{ vid.get_platform_display }}</span>
@@ -535,10 +535,10 @@
               {% elif vid.status == "failed" %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400" title="{{ vid.error_message }}">Failed</span>
               {% endif %}
             </td>
-            <td class="py-3 px-4 text-center text-xs text-[var(--color-text-muted)]">{{ vid.resolution }}</td>
-            <td class="py-3 px-4 text-center text-xs text-[var(--color-text-muted)]">{% if vid.duration_seconds %}{{ vid.duration_seconds|floatformat:0 }}s{% else %}—{% endif %}</td>
-            <td class="py-3 px-4 text-center text-xs text-[var(--color-text-muted)]">{{ vid.file_size_mb }}</td>
-            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{% if vid.rendered_at %}{{ vid.rendered_at|timesince }} ago{% else %}—{% endif %}</td>
+            <td class="py-3 px-4 text-center text-xs text-(--color-text-muted)">{{ vid.resolution }}</td>
+            <td class="py-3 px-4 text-center text-xs text-(--color-text-muted)">{% if vid.duration_seconds %}{{ vid.duration_seconds|floatformat:0 }}s{% else %}—{% endif %}</td>
+            <td class="py-3 px-4 text-center text-xs text-(--color-text-muted)">{{ vid.file_size_mb }}</td>
+            <td class="py-3 px-4 text-xs text-(--color-text-muted)">{% if vid.rendered_at %}{{ vid.rendered_at|timesince }} ago{% else %}—{% endif %}</td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-1">
                 {% if vid.is_playable %}
@@ -558,7 +558,7 @@
                 <form method="post" class="inline" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').innerHTML='<span class=\'animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full\'></span>';">{% csrf_token %}
                   <input type="hidden" name="action" value="rerender_video">
                   <input type="hidden" name="video_id" value="{{ vid.pk }}">
-                  <button type="submit" class="px-2 py-1 rounded text-[9px] font-semibold bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors btn-press" title="Re-render"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>
+                  <button type="submit" class="px-2 py-1 rounded text-[9px] font-semibold bg-accent/10 text-(--color-accent) hover:bg-accent/20 transition-colors btn-press" title="Re-render"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>
                 </form>
                 <form method="post" class="inline" onsubmit="return confirm('Delete this video?')">{% csrf_token %}
                   <input type="hidden" name="action" value="delete_video">
@@ -572,7 +572,7 @@
           <tr><td colspan="9" class="px-4 py-2 bg-red-500/5"><p class="text-[10px] text-red-400 truncate"><i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i>{{ vid.error_message|truncatechars:120 }}</p></td></tr>
           {% endif %}
           {% empty %}
-          <tr><td colspan="9" class="py-12 text-center text-[var(--color-text-muted)]">
+          <tr><td colspan="9" class="py-12 text-center text-(--color-text-muted)">
             <i data-lucide="video" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
             <p class="text-sm font-medium mb-1">No videos generated yet</p>
             <p class="text-[10px] mt-1">Select blog posts above or enter a Post ID to render MrBeast-style videos for all platforms</p>
@@ -585,11 +585,11 @@
 
     {# ═══ How Video Generation Works ═══ #}
     <div class="mt-6 glass rounded-xl p-5" x-data="{ open: false }">
-      <button @click="open = !open" class="w-full flex items-center justify-between text-sm font-semibold text-[var(--color-text-primary)]">
-        <span class="flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-[var(--color-accent)]"></i>How Video Generation Works</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform" :class="open && 'rotate-180'"></i>
+      <button @click="open = !open" class="w-full flex items-center justify-between text-sm font-semibold text-(--color-text-primary)">
+        <span class="flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-(--color-accent)"></i>How Video Generation Works</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) transition-transform" :class="open && 'rotate-180'"></i>
       </button>
-      <div x-show="open" x-cloak x-transition class="mt-4 text-xs text-[var(--color-text-secondary)] space-y-2">
+      <div x-show="open" x-cloak x-transition class="mt-4 text-xs text-(--color-text-secondary) space-y-2">
         <p><strong>1. AI Script:</strong> An AI generates a video script from the blog post — hook, scenes, CTA, and hashtags — tailored to the target platform.</p>
         <p><strong>2. Animated Presentation:</strong> A custom HTML presentation renders the script with MrBeast-style effects: bold text, gradient backgrounds, auto-paced scene transitions, progress bar.</p>
         <p><strong>3. Browser Recording:</strong> Playwright opens the presentation in a headless browser and records the viewport as video at native resolution.</p>
@@ -608,12 +608,12 @@
     <div class="grid md:grid-cols-2 gap-6">
       {# Quick Toggles #}
       <div class="glass rounded-xl p-6">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2"><i data-lucide="toggle-right" class="w-4 h-4 text-[var(--color-accent)]"></i>Quick Toggles</h3>
+        <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2"><i data-lucide="toggle-right" class="w-4 h-4 text-(--color-accent)"></i>Quick Toggles</h3>
         <div class="space-y-3">
           <form method="post" class="contents">{% csrf_token %}
             <input type="hidden" name="action" value="toggle_distribution_setting">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50 group">
-              <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Distribution Enabled</p><p class="text-xs text-[var(--color-text-muted)]">Master switch for all content distribution</p></div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50 group">
+              <div><p class="text-sm font-medium text-(--color-text-primary)">Distribution Enabled</p><p class="text-xs text-(--color-text-muted)">Master switch for all content distribution</p></div>
               <button type="submit" name="field" value="distribution_enabled" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors btn-press {% if dist_settings.distribution_enabled %}bg-emerald-500{% else %}bg-zinc-600{% endif %}" title="Toggle">
                 <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform {% if dist_settings.distribution_enabled %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
               </button>
@@ -621,8 +621,8 @@
           </form>
           <form method="post" class="contents">{% csrf_token %}
             <input type="hidden" name="action" value="toggle_distribution_setting">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50 group">
-              <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Auto-Fanout on Publish</p><p class="text-xs text-[var(--color-text-muted)]">Auto-queue distribution when blog posts are published</p></div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50 group">
+              <div><p class="text-sm font-medium text-(--color-text-primary)">Auto-Fanout on Publish</p><p class="text-xs text-(--color-text-muted)">Auto-queue distribution when blog posts are published</p></div>
               <button type="submit" name="field" value="auto_fanout_on_publish" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors btn-press {% if dist_settings.auto_fanout_on_publish %}bg-emerald-500{% else %}bg-zinc-600{% endif %}" title="Toggle">
                 <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform {% if dist_settings.auto_fanout_on_publish %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
               </button>
@@ -630,8 +630,8 @@
           </form>
           <form method="post" class="contents">{% csrf_token %}
             <input type="hidden" name="action" value="toggle_distribution_setting">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50 group">
-              <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Search Engine Indexing</p><p class="text-xs text-[var(--color-text-muted)]">Submit URLs to Google/Bing indexing APIs</p></div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50 group">
+              <div><p class="text-sm font-medium text-(--color-text-primary)">Search Engine Indexing</p><p class="text-xs text-(--color-text-muted)">Submit URLs to Google/Bing indexing APIs</p></div>
               <button type="submit" name="field" value="allow_indexing_jobs" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors btn-press {% if dist_settings.allow_indexing_jobs %}bg-emerald-500{% else %}bg-zinc-600{% endif %}" title="Toggle">
                 <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform {% if dist_settings.allow_indexing_jobs %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
               </button>
@@ -639,8 +639,8 @@
           </form>
           <form method="post" class="contents">{% csrf_token %}
             <input type="hidden" name="action" value="toggle_distribution_setting">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50 group">
-              <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Firmware Auto-Distribution</p><p class="text-xs text-[var(--color-text-muted)]">Auto-distribute firmware posts on create/update</p></div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50 group">
+              <div><p class="text-sm font-medium text-(--color-text-primary)">Firmware Auto-Distribution</p><p class="text-xs text-(--color-text-muted)">Auto-distribute firmware posts on create/update</p></div>
               <button type="submit" name="field" value="enable_firmware_auto_distribution" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors btn-press {% if dist_settings.enable_firmware_auto_distribution %}bg-emerald-500{% else %}bg-zinc-600{% endif %}" title="Toggle">
                 <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform {% if dist_settings.enable_firmware_auto_distribution %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
               </button>
@@ -648,27 +648,27 @@
           </form>
           <form method="post" class="contents">{% csrf_token %}
             <input type="hidden" name="action" value="toggle_distribution_setting">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50 group">
-              <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Require Admin Approval</p><p class="text-xs text-[var(--color-text-muted)]">Manual approval before executing distribution jobs</p></div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50 group">
+              <div><p class="text-sm font-medium text-(--color-text-primary)">Require Admin Approval</p><p class="text-xs text-(--color-text-muted)">Manual approval before executing distribution jobs</p></div>
               <button type="submit" name="field" value="require_admin_approval" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors btn-press {% if dist_settings.require_admin_approval %}bg-emerald-500{% else %}bg-zinc-600{% endif %}" title="Toggle">
                 <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform {% if dist_settings.require_admin_approval %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
               </button>
             </div>
           </form>
         </div>
-        <div class="mt-4 pt-4 border-t border-[var(--color-border)]/20">
-          <a href="{% url 'admin_suite:distribution_settings' %}" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all inline-flex items-center gap-2"><i data-lucide="settings" class="w-3.5 h-3.5"></i>Full Settings Page</a>
+        <div class="mt-4 pt-4 border-t border-(--color-border)/20">
+          <a href="{% url 'admin_suite:distribution_settings' %}" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all inline-flex items-center gap-2"><i data-lucide="settings" class="w-3.5 h-3.5"></i>Full Settings Page</a>
         </div>
       </div>
       {# Platform Summary #}
       <div class="glass rounded-xl p-6">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2"><i data-lucide="share-2" class="w-4 h-4 text-blue-400"></i>Platform Summary</h3>
+        <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2"><i data-lucide="share-2" class="w-4 h-4 text-blue-400"></i>Platform Summary</h3>
         <div class="space-y-2">
           {% for pa in posting_accounts %}
-          <div class="flex items-center justify-between p-2.5 rounded-lg bg-[var(--color-bg-tertiary)]/50 text-xs">
+          <div class="flex items-center justify-between p-2.5 rounded-lg bg-(--color-bg-tertiary)/50 text-xs">
             <div class="flex items-center gap-2.5">
-              <span class="font-semibold text-[var(--color-text-primary)] capitalize">{{ pa.get_platform_display }}</span>
-              <span class="text-[var(--color-text-muted)]">{{ pa.account_name }}</span>
+              <span class="font-semibold text-(--color-text-primary) capitalize">{{ pa.get_platform_display }}</span>
+              <span class="text-(--color-text-muted)">{{ pa.account_name }}</span>
             </div>
             <div class="flex items-center gap-2">
               {% if pa.has_credentials %}<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400"><i data-lucide="key" class="w-3 h-3 inline"></i> Keys</span>{% else %}<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400"><i data-lucide="alert-triangle" class="w-3 h-3 inline"></i> No keys</span>{% endif %}
@@ -677,14 +677,14 @@
           </div>
           {% empty %}
           <div class="text-center py-6">
-            <i data-lucide="link" class="w-6 h-6 mx-auto mb-2 text-[var(--color-text-muted)] opacity-40"></i>
-            <p class="text-xs text-[var(--color-text-muted)]">No platform accounts configured yet</p>
-            <button @click="tab='accounts'" class="mt-2 text-xs text-[var(--color-accent)] hover:underline">Go to Accounts tab</button>
+            <i data-lucide="link" class="w-6 h-6 mx-auto mb-2 text-(--color-text-muted) opacity-40"></i>
+            <p class="text-xs text-(--color-text-muted)">No platform accounts configured yet</p>
+            <button @click="tab='accounts'" class="mt-2 text-xs text-(--color-accent) hover:underline">Go to Accounts tab</button>
           </div>
           {% endfor %}
         </div>
         {% if posting_accounts %}
-        <div class="mt-3 pt-3 border-t border-[var(--color-border)]/20 flex items-center justify-between text-[10px] text-[var(--color-text-muted)]">
+        <div class="mt-3 pt-3 border-t border-(--color-border)/20 flex items-center justify-between text-[10px] text-(--color-text-muted)">
           <span>{{ stats.posting_accounts }} total &middot; {{ stats.posting_active }} active</span>
           <span>{% for pa in posting_accounts %}{% if not pa.has_credentials %}<span class="text-amber-400">{{ pa.account_name }}</span>{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}</span>
         </div>
@@ -693,11 +693,11 @@
     </div>
     {# How Auto-Publishing Works #}
     <div class="mt-6 glass rounded-xl p-5" x-data="{ open: false }">
-      <button @click="open = !open" class="w-full flex items-center justify-between text-sm font-semibold text-[var(--color-text-primary)]">
-        <span class="flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-[var(--color-accent)]"></i>How Auto-Publishing Works</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform" :class="open && 'rotate-180'"></i>
+      <button @click="open = !open" class="w-full flex items-center justify-between text-sm font-semibold text-(--color-text-primary)">
+        <span class="flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-(--color-accent)"></i>How Auto-Publishing Works</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) transition-transform" :class="open && 'rotate-180'"></i>
       </button>
-      <div x-show="open" x-cloak x-transition class="mt-4 text-xs text-[var(--color-text-secondary)] space-y-2">
+      <div x-show="open" x-cloak x-transition class="mt-4 text-xs text-(--color-text-secondary) space-y-2">
         <p><strong>1. Create Accounts:</strong> Go to <em>Accounts</em> tab → Add Account → Select a platform → Enter your API keys/tokens/credentials → Save.</p>
         <p><strong>2. Enable Distribution:</strong> Go to <em>Settings</em> → Distribution Settings → Enable "Distribution Enabled" and "Auto-Fanout on Publish".</p>
         <p><strong>3. Auto-Fanout:</strong> When a blog post is published, the system automatically creates a SharePlan with distribution jobs for each active platform account.</p>

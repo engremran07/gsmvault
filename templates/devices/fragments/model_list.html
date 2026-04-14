@@ -4,26 +4,26 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger-children">
   {% for model in models %}
   <a href="{% url 'firmwares:model_detail' brand_slug=brand.slug model_slug=model.slug %}"
-     class="group bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 hover:border-[var(--color-accent)] hover-lift animate-fade-in no-underline flex flex-col gap-2">
+     class="group bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 hover:border-(--color-accent) hover-lift animate-fade-in no-underline flex flex-col gap-2">
     <div class="flex items-center gap-3">
       {% if model.image_url %}
-      <div class="w-10 h-14 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] p-1 flex items-center justify-center overflow-hidden shrink-0">
+      <div class="w-10 h-14 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) p-1 flex items-center justify-center overflow-hidden shrink-0">
         <img src="{{ model.image_url }}" alt="{{ model.name }}" class="max-w-full max-h-full object-contain" loading="lazy" decoding="async">
       </div>
       {% else %}
-      <div class="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
-        <i data-lucide="smartphone" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+        <i data-lucide="smartphone" class="w-5 h-5 text-(--color-accent)"></i>
       </div>
       {% endif %}
       <div class="min-w-0">
-        <h3 class="font-semibold text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors truncate">
-          {{ model.display_name }}{% if model.codename %} <span class="font-normal text-[var(--color-text-muted)]">({{ model.codename }})</span>{% endif %}
+        <h3 class="font-semibold text-sm text-(--color-text-primary) group-hover:text-(--color-accent) transition-colors truncate">
+          {{ model.display_name }}{% if model.codename %} <span class="font-normal text-(--color-text-muted)">({{ model.codename }})</span>{% endif %}
         </h3>
-        {% if model.model_code %}<p class="text-[10px] text-[var(--color-text-muted)] font-mono truncate">{{ model.model_code }}</p>{% endif %}
+        {% if model.model_code %}<p class="text-[10px] text-(--color-text-muted) font-mono truncate">{{ model.model_code }}</p>{% endif %}
       </div>
     </div>
     {% if model.marketing_name and model.marketing_name != model.name and model.marketing_name != model.display_name %}
-    <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ model.marketing_name }}</p>
+    <p class="text-xs text-(--color-text-secondary) truncate">{{ model.marketing_name }}</p>
     {% endif %}
     {% if model.chipset %}
     <p class="text-[10px] text-violet-400 truncate"><i data-lucide="cpu" class="w-3 h-3 inline mr-0.5"></i>{{ model.chipset }}</p>
@@ -32,10 +32,10 @@
     {% if model.regions %}
     <div class="flex flex-wrap gap-1">
       {% for region in model.regions|slice:":3" %}
-      <span class="text-[9px] px-1.5 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-text-muted)] bg-[var(--color-bg-tertiary)]">{{ region }}</span>
+      <span class="text-[9px] px-1.5 py-0.5 rounded-full border border-(--color-border) text-(--color-text-muted) bg-(--color-bg-tertiary)">{{ region }}</span>
       {% endfor %}
       {% if model.regions|length > 3 %}
-      <span class="text-[9px] px-1.5 py-0.5 text-[var(--color-text-muted)]">+{{ model.regions|length|add:"-3" }}</span>
+      <span class="text-[9px] px-1.5 py-0.5 text-(--color-text-muted)">+{{ model.regions|length|add:"-3" }}</span>
       {% endif %}
     </div>
     {% endif %}
@@ -49,7 +49,7 @@
       {% if model.status == "discontinued" %}
       <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 font-medium">EOL</span>
       {% endif %}
-      <span class="text-[10px] text-[var(--color-text-muted)] ml-auto group-hover:text-[var(--color-accent)] transition-colors">View specs →</span>
+      <span class="text-[10px] text-(--color-text-muted) ml-auto group-hover:text-(--color-accent) transition-colors">View specs →</span>
     </div>
   </a>
   {% endfor %}

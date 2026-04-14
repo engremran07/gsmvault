@@ -7,16 +7,99 @@
 {% endblock %}
 
 {% block page_content %}
+
+{# ══════ Device Counter & Quota Card ══════ #}
+<div class="rounded-xl border border-accent/30 bg-(--color-bg-secondary) p-6 mb-8">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    {# Counter #}
+    <div class="text-center sm:text-left">
+      <p class="text-sm text-(--color-text-muted) mb-1">Registered Devices</p>
+      <p class="text-3xl font-bold tabular-nums">
+        <span class="{% if device_count >= max_devices %}text-(--color-error){% elif device_count > 0 %}text-(--color-accent){% else %}text-(--color-text-muted){% endif %}">{{ device_count }}</span>
+        <span class="text-base font-normal text-(--color-text-muted)">/ {{ max_devices }}</span>
+      </p>
+    </div>
+    {# Remaining #}
+    <div class="text-center sm:text-left">
+      <p class="text-sm text-(--color-text-muted) mb-1">Slots Remaining</p>
+      <p class="text-3xl font-bold tabular-nums {% if quota_remaining == 0 %}text-(--color-error){% else %}text-(--color-success){% endif %}">{{ quota_remaining }}</p>
+      {% if last_reset %}
+      <p class="text-xs text-(--color-text-muted) mt-1">Last reset: {{ last_reset|timesince }} ago</p>
+      {% endif %}
+    </div>
+    {# Progress Bar #}
+    <div class="flex flex-col justify-center">
+      {% include "components/_progress_bar.html" with value=device_count max=max_devices label="Device Quota" show_percent=True %}
+    </div>
+  </div>
+
+  {# Quota window info + Reset options #}
+  <div class="mt-6 pt-4 border-t border-(--color-border) flex flex-wrap items-center gap-4">
+    <p class="text-sm text-(--color-text-muted)">
+      {% include "components/_icon.html" with name="clock" size="14" class="inline -mt-0.5" %}
+      Quota window: <strong>{{ quota_window }}</strong>
+    </p>
+    {% if device_count >= max_devices %}
+    <div class="flex flex-wrap gap-2 ml-auto" x-data="{ showResetOptions: false }">
+      <button @click="showResetOptions = !showResetOptions"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg
+                     bg-(--color-accent) text-(--color-accent-text)
+                     hover:opacity-90 transition-opacity">
+        {% include "components/_icon.html" with name="refresh-cw" size="14" %}
+        Reset Device Counter
+      </button>
+      <div x-show="showResetOptions" x-cloak
+           class="w-full mt-2 rounded-lg border border-(--color-border) bg-(--color-bg-primary) p-4">
+        <p class="text-sm font-medium mb-3">Choose a reset method:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {# Watch Ad #}
+          <a href="{% url 'devices:device_events' %}"
+             class="flex items-center gap-2 p-3 rounded-lg border border-(--color-border)
+                    hover:border-(--color-accent) hover:bg-accent/5 transition-colors text-sm">
+            {% include "components/_icon.html" with name="play-circle" size="18" class="text-(--color-success)" %}
+            <div>
+              <p class="font-medium">Watch Ad</p>
+              <p class="text-xs text-(--color-text-muted)">Free — watch a rewarded ad</p>
+            </div>
+          </a>
+          {# Use Credits #}
+          <a href="{% url 'wallet:dashboard' %}"
+             class="flex items-center gap-2 p-3 rounded-lg border border-(--color-border)
+                    hover:border-(--color-accent) hover:bg-accent/5 transition-colors text-sm">
+            {% include "components/_icon.html" with name="coins" size="18" class="text-(--color-warning)" %}
+            <div>
+              <p class="font-medium">Use Credits</p>
+              <p class="text-xs text-(--color-text-muted)">Pay with wallet credits</p>
+            </div>
+          </a>
+          {# Premium Reset #}
+          <a href="{% url 'shop:product_list' %}"
+             class="flex items-center gap-2 p-3 rounded-lg border border-(--color-border)
+                    hover:border-(--color-accent) hover:bg-accent/5 transition-colors text-sm">
+            {% include "components/_icon.html" with name="credit-card" size="18" class="text-(--color-accent)" %}
+            <div>
+              <p class="font-medium">Upgrade Plan</p>
+              <p class="text-xs text-(--color-text-muted)">Get more device slots</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{# ══════ Device Cards ══════ #}
 {% if devices %}
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
   {% for device in devices %}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
     <div class="flex items-start justify-between">
       <div class="flex items-center gap-3">
         {% include "components/_icon.html" with name="smartphone" size="20" %}
         <div>
           <p class="font-medium">{{ device.name|default:device.device_type|default:"Unknown Device" }}</p>
-          <p class="text-xs text-[var(--color-text-muted)]">{{ device.os|default:"" }} {{ device.os_version|default:"" }}</p>
+          <p class="text-xs text-(--color-text-muted)">{{ device.os|default:"" }} {{ device.os_version|default:"" }}</p>
         </div>
       </div>
       {% if device.is_trusted %}
@@ -25,7 +108,7 @@
       {% include "components/_badge.html" with text="Untrusted" variant="warning" %}
       {% endif %}
     </div>
-    <div class="mt-3 space-y-1 text-sm text-[var(--color-text-muted)]">
+    <div class="mt-3 space-y-1 text-sm text-(--color-text-muted)">
       {% if device.browser %}<p>Browser: {{ device.browser }}</p>{% endif %}
       {% if device.last_seen %}<p>Last seen: {{ device.last_seen|timesince }} ago</p>{% endif %}
       {% if device.ip_address %}<p>IP: {{ device.ip_address }}</p>{% endif %}
@@ -43,7 +126,7 @@
             ">
         {% csrf_token %}
         <input type="hidden" name="device_id" value="{{ device.pk }}">
-        <button class="text-xs text-[var(--color-error)] hover:underline">Remove</button>
+        <button class="text-xs text-(--color-error) hover:underline">Remove</button>
       </form>
     </div>
   </div>

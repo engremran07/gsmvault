@@ -1,0 +1,177 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Every Monday at 6:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  dependency-audit:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit --format=json --output=/tmp/pip-audit.json 2>&1 || true
+          pip-audit --desc 2>&1 | tee /tmp/pip-audit.txt || true
+
+      - name: Check dependency chains
+        run: pip check 2>&1 | tee /tmp/pip-check.txt || true
+
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit-${{ github.run_id }}
+          path: |
+            /tmp/pip-audit.json
+            /tmp/pip-audit.txt
+            /tmp/pip-check.txt
+          retention-days: 90
+
+  code-scan:
+    name: Static Code Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install bandit
+        run: pip install bandit[toml]
+
+      - name: Run bandit on application code
+        run: |
+          bandit -r apps/ \
+            --format json \
+            --output /tmp/bandit-report.json \
+            --severity-level medium \
+            --confidence-level medium \
+            --exclude "*/tests*,*/migrations/*" \
+            2>&1 || true
+
+      - name: Run bandit (human-readable)
+        run: |
+          bandit -r apps/ \
+            --severity-level medium \
+            --confidence-level medium \
+            --exclude "*/tests*,*/migrations/*" \
+            2>&1 | tee /tmp/bandit-report.txt || true
+
+      - name: Upload bandit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report-${{ github.run_id }}
+          path: |
+            /tmp/bandit-report.json
+            /tmp/bandit-report.txt
+          retention-days: 90
+
+  secret-scan:
+    name: Secret Detection Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog secret scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified --json
+        continue-on-error: true
+
+      - name: Scan for common secret patterns
+        run: |
+          echo "### Scanning for hardcoded secrets..." | tee /tmp/secret-scan.txt
+          FOUND=0
+
+          # Check for common secret patterns in Python files
+          PATTERNS=(
+            "DJANGO_SECRET_KEY\s*=\s*['\"][^$]"
+            "password\s*=\s*['\"][^${\s]"
+            "api_key\s*=\s*['\"][^$]"
+            "SECRET\s*=\s*['\"][^$]"
+            "TOKEN\s*=\s*['\"][a-zA-Z0-9]"
+          )
+
+          for PATTERN in "${PATTERNS[@]}"; do
+            if grep -rn --include="*.py" -E "$PATTERN" apps/ app/ 2>/dev/null | grep -v "test" | grep -v "example" | grep -v "ci-"; then
+              echo "::warning::Potential secret found matching pattern: $PATTERN"
+              FOUND=$((FOUND + 1))
+            fi
+          done
+
+          if [ "$FOUND" -gt 0 ]; then
+            echo "::warning::Found $FOUND potential secret patterns. Review artifacts for details."
+          else
+            echo "No hardcoded secrets detected in application code."
+          fi | tee -a /tmp/secret-scan.txt
+
+      - name: Upload secret scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scan-${{ github.run_id }}
+          path: /tmp/secret-scan.txt
+          retention-days: 90
+
+  report:
+    name: Security Report
+    needs: [dependency-audit, code-scan, secret-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Weekly Security Scan Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Check | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Code Scan (Bandit) | ${{ needs.code-scan.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Secret Detection | ${{ needs.secret-scan.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "_Scan completed: $(date -u +%Y-%m-%dT%H:%M:%SZ)_" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create issue on failure
+        if: needs.dependency-audit.result == 'failure' || needs.code-scan.result == 'failure' || needs.secret-scan.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `[Security] Weekly scan detected issues — ${new Date().toISOString().split('T')[0]}`;
+            const body = `## Security Scan Results\n\n` +
+              `| Check | Status |\n|-------|--------|\n` +
+              `| Dependency Audit | ${{ needs.dependency-audit.result }} |\n` +
+              `| Code Scan | ${{ needs.code-scan.result }} |\n` +
+              `| Secret Detection | ${{ needs.secret-scan.result }} |\n\n` +
+              `[View run details](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['security', 'automated']
+            });

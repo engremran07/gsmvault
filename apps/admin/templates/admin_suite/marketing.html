@@ -2,54 +2,54 @@
 {% block title %}Marketing — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Marketing</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Marketing</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
 </div>
 {% endblock %}
 {% block page_content %}
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 stagger-children">
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:0" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3"><i data-lucide="layout" class="w-4 h-4 text-blue-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.placements|default:'0' }})" x-text="display.toLocaleString()">{{ stats.placements|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Placements</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)" x-data="animatedCounter({{ stats.placements|default:'0' }})" x-text="display.toLocaleString()">{{ stats.placements|default:"0" }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Placements</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:1" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center mb-3"><i data-lucide="image" class="w-4 h-4 text-violet-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.creatives|default:'0' }})" x-text="display.toLocaleString()">{{ stats.creatives|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Creatives</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)" x-data="animatedCounter({{ stats.creatives|default:'0' }})" x-text="display.toLocaleString()">{{ stats.creatives|default:"0" }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Creatives</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:2" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3"><i data-lucide="eye" class="w-4 h-4 text-emerald-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.impressions_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.impressions_24h|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Impressions 24h</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)" x-data="animatedCounter({{ stats.impressions_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.impressions_24h|default:"0" }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Impressions 24h</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:3" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3"><i data-lucide="mouse-pointer" class="w-4 h-4 text-amber-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.clicks_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.clicks_24h|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Clicks 24h</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)" x-data="animatedCounter({{ stats.clicks_24h|default:'0' }})" x-text="display.toLocaleString()">{{ stats.clicks_24h|default:"0" }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Clicks 24h</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:4" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center mb-3"><i data-lucide="corner-down-right" class="w-4 h-4 text-cyan-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.redirects|default:'0' }})" x-text="display.toLocaleString()">{{ stats.redirects|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Redirects</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)" x-data="animatedCounter({{ stats.redirects|default:'0' }})" x-text="display.toLocaleString()">{{ stats.redirects|default:"0" }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Redirects</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger:5" x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-9 h-9 rounded-xl bg-rose-500/15 flex items-center justify-center mb-3"><i data-lucide="map" class="w-4 h-4 text-rose-400"></i></div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]" x-data="animatedCounter({{ stats.sitemap_urls|default:'0' }})" x-text="display.toLocaleString()">{{ stats.sitemap_urls|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Sitemap URLs</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)" x-data="animatedCounter({{ stats.sitemap_urls|default:'0' }})" x-text="display.toLocaleString()">{{ stats.sitemap_urls|default:"0" }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Sitemap URLs</p>
   </div>
 </div>
 
 <div x-data="{ tab: 'placements' }" class="animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
-    <button @click="tab='placements'" :class="tab==='placements' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Placements</button>
-    <button @click="tab='redirects'" :class="tab==='redirects' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Redirects</button>
+  <div class="flex gap-1 mb-6 bg-(--color-bg-tertiary)/40 rounded-xl p-1 w-fit">
+    <button @click="tab='placements'" :class="tab==='placements' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Placements</button>
+    <button @click="tab='redirects'" :class="tab==='redirects' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Redirects</button>
   </div>
   <div x-show="tab==='placements'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Name</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Slug</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Context</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Updated</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
-          {% for p in placements %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ p.name }}</td><td class="py-3 px-4 text-xs font-mono text-[var(--color-text-muted)]">{{ p.slug }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ p.page_context }}</td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ p.updated_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No placements configured</td></tr>{% endfor %}
+        <thead><tr class="border-b border-(--color-border)/20"><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Name</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Slug</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Context</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Updated</th></tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">
+          {% for p in placements %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors"><td class="py-3 px-4 font-medium text-(--color-text-primary)">{{ p.name }}</td><td class="py-3 px-4 text-xs font-mono text-(--color-text-muted)">{{ p.slug }}</td><td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ p.page_context }}</td><td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ p.updated_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-(--color-text-muted)">No placements configured</td></tr>{% endfor %}
         </tbody>
       </table>
     </div>
@@ -57,9 +57,9 @@
   <div x-show="tab==='redirects'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20"><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Source</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Target</th><th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Type</th><th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Updated</th></tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
-          {% for r in redirects %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors"><td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ r.source }}</td><td class="py-3 px-4 font-mono text-xs text-[var(--color-text-secondary)]">{{ r.target }}</td><td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if r.is_permanent %}bg-blue-500/10 text-blue-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{% if r.is_permanent %}301{% else %}302{% endif %}</span></td><td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ r.updated_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">No redirects configured</td></tr>{% endfor %}
+        <thead><tr class="border-b border-(--color-border)/20"><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Source</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Target</th><th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Type</th><th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Updated</th></tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">
+          {% for r in redirects %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors"><td class="py-3 px-4 font-mono text-xs text-(--color-text-primary)">{{ r.source }}</td><td class="py-3 px-4 font-mono text-xs text-(--color-text-secondary)">{{ r.target }}</td><td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if r.is_permanent %}bg-blue-500/10 text-blue-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{% if r.is_permanent %}301{% else %}302{% endif %}</span></td><td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ r.updated_at|timesince }} ago</td></tr>{% empty %}<tr><td colspan="4" class="py-8 text-center text-(--color-text-muted)">No redirects configured</td></tr>{% endfor %}
         </tbody>
       </table>
     </div>

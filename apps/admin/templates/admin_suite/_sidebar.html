@@ -1,20 +1,20 @@
-﻿{# admin_suite/_sidebar.html â€” Comprehensive admin sidebar with live badges #}
+{# admin_suite/_sidebar.html — Comprehensive admin sidebar with live badges #}
 {% load humanize %}
 <nav class="flex-1 px-3 py-4 space-y-0.5 text-[13px] overflow-y-auto">
 
-  {# â”€â”€ Dashboard â”€â”€ #}
+  {# ── Dashboard ── #}
   <a href="{% url 'admin_suite:dashboard' %}"
      class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group
-       {% if nav_active == 'overview' or nav_active == 'dashboard' %}active bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
-    <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 {% if nav_active == 'overview' or nav_active == 'dashboard' %}text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] group-hover:text-[var(--color-text-secondary)]{% endif %}"></i>
+       {% if nav_active == 'overview' or nav_active == 'dashboard' %}active bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
+    <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0 {% if nav_active == 'overview' or nav_active == 'dashboard' %}text-(--color-accent){% else %}text-(--color-text-muted) group-hover:text-(--color-text-secondary){% endif %}"></i>
     <span x-show="typeof sidebarOpen === 'undefined' || sidebarOpen" x-transition.opacity.duration.200ms class="truncate">Dashboard</span>
   </a>
 
-  {# â”€â”€ Pending Approval â”€â”€ #}
+  {# ── Pending Approval ── #}
   <a href="{% url 'admin_suite:pending_approval' %}"
      class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group
-       {% if nav_active == 'pending' %}active bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
-    <i data-lucide="clock" class="w-4 h-4 shrink-0 {% if nav_active == 'pending' %}text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] group-hover:text-[var(--color-text-secondary)]{% endif %}"></i>
+       {% if nav_active == 'pending' %}active bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
+    <i data-lucide="clock" class="w-4 h-4 shrink-0 {% if nav_active == 'pending' %}text-(--color-accent){% else %}text-(--color-text-muted) group-hover:text-(--color-text-secondary){% endif %}"></i>
     <span x-show="typeof sidebarOpen === 'undefined' || sidebarOpen" x-transition.opacity.duration.200ms class="truncate flex-1">Pending</span>
     {% if sidebar_pending_comments or sidebar_review_posts %}
     <span x-show="typeof sidebarOpen === 'undefined' || sidebarOpen" x-transition.opacity
@@ -24,13 +24,13 @@
     {% endif %}
   </a>
 
-  <div class="!my-2 border-t border-[var(--color-border)]/20"></div>
+  <div class="!my-2 border-t border-(--color-border)/20"></div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Security & Compliance â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Security & Compliance ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'security' or nav_active == 'security_events' or nav_active == 'crawlers' or nav_active == 'devices' or nav_active == 'risk_insights' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="shield" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Security</span>
@@ -40,31 +40,31 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:security' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'security' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:security' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'security' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="shield-alert" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
-      <a href="{% url 'admin_suite:security_events' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'security_events' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:security_events' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'security_events' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="alert-triangle" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate flex-1">Events</span>
         {% if sidebar_critical_events %}<span class="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/15 text-red-400 tabular-nums"><span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>{{ sidebar_critical_events }}</span>{% endif %}
       </a>
-      <a href="{% url 'admin_suite:devices' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'devices' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:devices' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'devices' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="fingerprint" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Devices</span></a>
-      <a href="{% url 'admin_suite:crawler_rules' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'crawlers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:crawler_rules' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'crawlers' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="bot" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Crawlers</span></a>
-      <a href="{% url 'admin_suite:risk_insights' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'risk_insights' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:risk_insights' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'risk_insights' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="activity" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Risk Insights</span></a>
     </div>
     <a href="{% url 'admin_suite:security' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'security' or nav_active == 'security_events' or nav_active == 'crawlers' or nav_active == 'devices' or nav_active == 'risk_insights' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'security' or nav_active == 'security_events' or nav_active == 'crawlers' or nav_active == 'devices' or nav_active == 'risk_insights' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="shield" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Users & Auth â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Users & Auth ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'users' or nav_active == 'staff' or nav_active == 'social' or nav_active == 'user_sessions' or nav_active == 'consent' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Users</span>
@@ -73,29 +73,29 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:users' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'users' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:users' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'users' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">All Users</span></a>
-      <a href="{% url 'admin_suite:staff_users' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'staff' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:staff_users' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'staff' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="user-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Staff</span></a>
-      <a href="{% url 'admin_suite:user_sessions' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'user_sessions' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:user_sessions' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'user_sessions' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="key" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Sessions</span></a>
-      <a href="{% url 'admin_suite:social_providers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'social' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:social_providers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'social' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="link" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Social Auth</span></a>
-      <a href="{% url 'admin_suite:consent' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'consent' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:consent' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'consent' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="clipboard-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Consent</span></a>
     </div>
     <a href="{% url 'admin_suite:users' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'users' or nav_active == 'staff' or nav_active == 'social' or nav_active == 'user_sessions' or nav_active == 'consent' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'users' or nav_active == 'staff' or nav_active == 'social' or nav_active == 'user_sessions' or nav_active == 'consent' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Content & CMS â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Content & CMS ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'content' or nav_active == 'blog' or nav_active == 'blog_posts' or nav_active == 'blog_categories' or nav_active == 'pages' or nav_active == 'comments' or nav_active == 'tags' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="file-text" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Content</span>
@@ -105,73 +105,73 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:content' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'content' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:content' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'content' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="layout-list" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
-      <a href="{% url 'admin_suite:blog' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'blog' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:blog' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'blog' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="pen-line" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate flex-1">Blog</span>
         {% if sidebar_review_posts %}<span class="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-400 tabular-nums">{{ sidebar_review_posts }}</span>{% endif %}</a>
-      <a href="{% url 'admin_suite:blog_posts' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'blog_posts' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:blog_posts' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'blog_posts' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="list" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">All Posts</span></a>
-      <a href="{% url 'admin_suite:blog_categories' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'blog_categories' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:blog_categories' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'blog_categories' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="folder" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Categories</span></a>
-      <a href="{% url 'admin_suite:pages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'pages' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:pages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'pages' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="layout" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Pages</span></a>
-      <a href="{% url 'admin_suite:comments' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'comments' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:comments' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'comments' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="message-square" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate flex-1">Comments</span>
         {% if sidebar_pending_comments %}<span class="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 tabular-nums">{{ sidebar_pending_comments }}</span>{% endif %}</a>
-      <a href="{% url 'admin_suite:tags' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'tags' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:tags' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'tags' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="tag" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Tags</span></a>
     </div>
     <a href="{% url 'admin_suite:blog' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'content' or nav_active == 'blog' or nav_active == 'blog_posts' or nav_active == 'blog_categories' or nav_active == 'pages' or nav_active == 'comments' or nav_active == 'tags' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'content' or nav_active == 'blog' or nav_active == 'blog_posts' or nav_active == 'blog_categories' or nav_active == 'pages' or nav_active == 'comments' or nav_active == 'tags' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="file-text" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# ═══════════════════════════════════════════ #}
-  {# ── SEO ── #}
-  {# ═══════════════════════════════════════════ #}
+  {# ------------------------------------------- #}
+  {# -- SEO -- #}
+  {# ------------------------------------------- #}
   <div x-data="{ seoOpen: {% if nav_active == 'seo' or nav_active == 'seo_audit' %}true{% else %}false{% endif %} }">
-    <button @click="seoOpen = !seoOpen" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'seo' or nav_active == 'seo_audit' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}"
+    <button @click="seoOpen = !seoOpen" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'seo' or nav_active == 'seo_audit' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}"
        x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="search" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">SEO</span>
       <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" :class="seoOpen && 'rotate-180'"></i>
     </button>
     <div x-show="seoOpen && (typeof sidebarOpen === 'undefined' || sidebarOpen)" x-cloak x-transition class="ml-7 mt-1 space-y-0.5">
-      <a href="{% url 'admin_suite:seo' %}" class="block px-3 py-1.5 rounded-md text-xs transition-all duration-200 {% if nav_active == 'seo' %}text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)]{% endif %}">
+      <a href="{% url 'admin_suite:seo' %}" class="block px-3 py-1.5 rounded-md text-xs transition-all duration-200 {% if nav_active == 'seo' %}text-(--color-accent) font-medium{% else %}text-(--color-text-muted) hover:text-(--color-text-secondary) hover:bg-(--color-sidebar-hover){% endif %}">
         <i data-lucide="settings" class="w-3 h-3 inline mr-1.5"></i>SEO Engine
       </a>
-      <a href="{% url 'admin_suite:seo_audit' %}" class="block px-3 py-1.5 rounded-md text-xs transition-all duration-200 {% if nav_active == 'seo_audit' %}text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)]{% endif %}">
+      <a href="{% url 'admin_suite:seo_audit' %}" class="block px-3 py-1.5 rounded-md text-xs transition-all duration-200 {% if nav_active == 'seo_audit' %}text-(--color-accent) font-medium{% else %}text-(--color-text-muted) hover:text-(--color-text-secondary) hover:bg-(--color-sidebar-hover){% endif %}">
         <i data-lucide="shield-check" class="w-3 h-3 inline mr-1.5"></i>SEO Audit
       </a>
     </div>
   </div>
   <a href="{% url 'admin_suite:seo' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'seo' or nav_active == 'seo_audit' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'seo' or nav_active == 'seo_audit' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
     <i data-lucide="search" class="w-4 h-4 shrink-0"></i>
   </a>
 
-  {# ═══════════════════════════════════════════ #}
-  {# ── Forum ── #}
-  {# ═══════════════════════════════════════════ #}
-  <a href="{% url 'admin_suite:forum' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'forum' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}"
+  {# ------------------------------------------- #}
+  {# -- Forum -- #}
+  {# ------------------------------------------- #}
+  <a href="{% url 'admin_suite:forum' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'forum' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}"
      x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
     <i data-lucide="message-circle" class="w-4 h-4 shrink-0"></i>
     <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Forum</span>
     {% if open_flags %}<span class="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500/15 text-red-400 tabular-nums">{{ open_flags }}</span>{% endif %}
   </a>
   <a href="{% url 'admin_suite:forum' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'forum' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'forum' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
     <i data-lucide="message-circle" class="w-4 h-4 shrink-0"></i>
   </a>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Firmwares â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Firmwares ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'firmwares' or nav_active == 'firmwares_brands' or nav_active == 'firmwares_models' or nav_active == 'firmwares_files' or nav_active == 'firmwares_downloads' or nav_active == 'flashing_tools' or nav_active == 'scraper' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="hard-drive" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Firmwares</span>
@@ -180,33 +180,33 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:firmwares' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:firmwares' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="gauge" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Dashboard</span></a>
-      <a href="{% url 'admin_suite:firmwares_brands' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_brands' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:firmwares_brands' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_brands' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="building-2" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Brands</span></a>
-      <a href="{% url 'admin_suite:firmwares_models' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_models' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:firmwares_models' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_models' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="smartphone" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Models</span></a>
-      <a href="{% url 'admin_suite:firmwares_files' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_files' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:firmwares_files' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_files' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="files" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Files</span></a>
-      <a href="{% url 'admin_suite:firmwares_downloads' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_downloads' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:firmwares_downloads' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares_downloads' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Downloads</span></a>
-      <a href="{% url 'admin_suite:flashing_tools' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'flashing_tools' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:flashing_tools' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'flashing_tools' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="wrench" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Flashing Tools</span></a>
-      <a href="{% url 'admin_suite:scraper' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'scraper' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:scraper' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'scraper' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="satellite-dish" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Scraper</span></a>
     </div>
     <a href="{% url 'admin_suite:firmwares' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares' or nav_active == 'firmwares_brands' or nav_active == 'firmwares_models' or nav_active == 'firmwares_files' or nav_active == 'firmwares_downloads' or nav_active == 'flashing_tools' or nav_active == 'scraper' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'firmwares' or nav_active == 'firmwares_brands' or nav_active == 'firmwares_models' or nav_active == 'firmwares_files' or nav_active == 'firmwares_downloads' or nav_active == 'flashing_tools' or nav_active == 'scraper' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="hard-drive" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Ads & Marketing â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Ads & Marketing ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'marketing' or nav_active == 'ads' or nav_active == 'ads_campaigns' or nav_active == 'ads_placements' or nav_active == 'ads_creatives' or nav_active == 'ads_analytics' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="megaphone" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Ads & Marketing</span>
@@ -215,31 +215,31 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:marketing' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketing' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:marketing' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketing' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
-      <a href="{% url 'admin_suite:ads' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ads' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="badge-dollar-sign" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Ads Hub</span></a>
-      <a href="{% url 'admin_suite:ads_campaigns' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_campaigns' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ads_campaigns' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_campaigns' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="rocket" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Campaigns</span></a>
-      <a href="{% url 'admin_suite:ads_placements' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_placements' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ads_placements' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_placements' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="layout-grid" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Placements</span></a>
-      <a href="{% url 'admin_suite:ads_creatives' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_creatives' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ads_creatives' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_creatives' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="image" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Creatives</span></a>
-      <a href="{% url 'admin_suite:ads_analytics' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_analytics' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ads_analytics' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ads_analytics' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="trending-up" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Analytics</span></a>
     </div>
     <a href="{% url 'admin_suite:marketing' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'marketing' or nav_active == 'ads' or nav_active == 'ads_campaigns' or nav_active == 'ads_placements' or nav_active == 'ads_creatives' or nav_active == 'ads_analytics' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'marketing' or nav_active == 'ads' or nav_active == 'ads_campaigns' or nav_active == 'ads_placements' or nav_active == 'ads_creatives' or nav_active == 'ads_analytics' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="megaphone" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Distribution â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Distribution ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'distribution' or nav_active == 'social_posting' or nav_active == 'distribution_settings' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="share-2" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Distribution</span>
@@ -248,27 +248,27 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:distribution' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'distribution' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:distribution' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'distribution' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="network" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
-      <a href="{% url 'admin_suite:social_posting' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'social_posting' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:social_posting' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'social_posting' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="send" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Social Posting</span></a>
-      <a href="{% url 'admin_suite:distribution_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'distribution_settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:distribution_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'distribution_settings' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="sliders" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Settings</span></a>
     </div>
     <a href="{% url 'admin_suite:distribution' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'distribution' or nav_active == 'social_posting' or nav_active == 'distribution_settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'distribution' or nav_active == 'social_posting' or nav_active == 'distribution_settings' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="share-2" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  <div class="!my-2 border-t border-[var(--color-border)]/20"></div>
+  <div class="!my-2 border-t border-(--color-border)/20"></div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Storage â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Storage ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'storage' or nav_active == 'storage_providers' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Storage</span>
@@ -277,23 +277,23 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:storage' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'storage' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:storage' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'storage' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="server" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Dashboard</span></a>
-      <a href="{% url 'admin_suite:storage_providers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'storage_providers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:storage_providers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'storage_providers' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="cloud" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Providers</span></a>
     </div>
     <a href="{% url 'admin_suite:storage' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'storage' or nav_active == 'storage_providers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'storage' or nav_active == 'storage_providers' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ AI & Intelligence â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── AI & Intelligence ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'ai' or nav_active == 'ai_endpoints' or nav_active == 'ai_knowledge' or nav_active == 'ai_workflows' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="brain" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">AI</span>
@@ -302,27 +302,27 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:ai_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:ai_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="settings" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Settings</span></a>
-      <a href="{% url 'admin_suite:ai_endpoints' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai_endpoints' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ai_endpoints' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai_endpoints' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="plug" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Endpoints</span></a>
-      <a href="{% url 'admin_suite:ai_knowledge' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai_knowledge' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ai_knowledge' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai_knowledge' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="book-open" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Knowledge</span></a>
-      <a href="{% url 'admin_suite:ai_workflows' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai_workflows' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:ai_workflows' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'ai_workflows' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="workflow" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Workflows</span></a>
     </div>
     <a href="{% url 'admin_suite:ai_settings' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'ai' or nav_active == 'ai_endpoints' or nav_active == 'ai_knowledge' or nav_active == 'ai_workflows' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'ai' or nav_active == 'ai_endpoints' or nav_active == 'ai_knowledge' or nav_active == 'ai_workflows' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="brain" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Economy & Credits â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── Economy & Credits ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'credit_pricing' or nav_active == 'shop' or nav_active == 'shop_packages' or nav_active == 'shop_orders' or nav_active == 'shop_subscriptions' or nav_active == 'shop_user_packages' or nav_active == 'marketplace' or nav_active == 'marketplace_sellers' or nav_active == 'marketplace_listings' or nav_active == 'marketplace_verifications' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Economy</span>
@@ -331,71 +331,71 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:credit_pricing' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:credit_pricing' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="circle-dollar-sign" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Credits</span></a>
       {# Shop sub-section #}
-      <span class="block px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]/60">Shop</span>
-      <a href="{% url 'admin_suite:shop' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <span class="block px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-(--color-text-muted)/60">Shop</span>
+      <a href="{% url 'admin_suite:shop' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="store" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
-      <a href="{% url 'admin_suite:shop_packages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_packages' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:shop_packages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_packages' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="package" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Packages</span></a>
-      <a href="{% url 'admin_suite:shop_orders' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_orders' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:shop_orders' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_orders' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="receipt" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Orders</span></a>
-      <a href="{% url 'admin_suite:shop_subscriptions' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_subscriptions' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:shop_subscriptions' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_subscriptions' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="repeat" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Subscriptions</span></a>
-      <a href="{% url 'admin_suite:shop_user_packages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_user_packages' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:shop_user_packages' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'shop_user_packages' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">User Packages</span></a>
       {# Marketplace sub-section #}
-      <span class="block px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]/60">Marketplace</span>
-      <a href="{% url 'admin_suite:marketplace' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <span class="block px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-(--color-text-muted)/60">Marketplace</span>
+      <a href="{% url 'admin_suite:marketplace' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="shopping-bag" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Overview</span></a>
-      <a href="{% url 'admin_suite:marketplace_sellers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_sellers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:marketplace_sellers' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_sellers' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="user-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Sellers</span></a>
-      <a href="{% url 'admin_suite:marketplace_listings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_listings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:marketplace_listings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_listings' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="list" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Listings</span></a>
-      <a href="{% url 'admin_suite:marketplace_verifications' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_verifications' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:marketplace_verifications' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'marketplace_verifications' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Verifications</span></a>
     </div>
     <a href="{% url 'admin_suite:shop' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' or nav_active == 'shop' or nav_active == 'shop_packages' or nav_active == 'marketplace' or nav_active == 'marketplace_sellers' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'credit_pricing' or nav_active == 'shop' or nav_active == 'shop_packages' or nav_active == 'marketplace' or nav_active == 'marketplace_sellers' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Audit Log â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  <a href="{% url 'admin_suite:audit_log' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'audit' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}"
+  {# ═══════════════════════════════════════════ #}
+  {# ── Audit Log ── #}
+  {# ═══════════════════════════════════════════ #}
+  <a href="{% url 'admin_suite:audit_log' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'audit' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}"
      x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
     <i data-lucide="scroll-text" class="w-4 h-4 shrink-0"></i>
     <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Audit Log</span>
   </a>
   <a href="{% url 'admin_suite:audit_log' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'audit' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'audit' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
     <i data-lucide="scroll-text" class="w-4 h-4 shrink-0"></i>
   </a>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ Celery â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  <a href="{% url 'admin_suite:celery' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'celery' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}"
+  {# ═══════════════════════════════════════════ #}
+  {# ── Celery ── #}
+  {# ═══════════════════════════════════════════ #}
+  <a href="{% url 'admin_suite:celery' %}" class="admin-nav-item flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'celery' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}"
      x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
     <i data-lucide="layers" class="w-4 h-4 shrink-0"></i>
     <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Celery</span>
   </a>
   <a href="{% url 'admin_suite:celery' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'celery' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+     class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'celery' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
     <i data-lucide="layers" class="w-4 h-4 shrink-0"></i>
   </a>
 
-  <div class="!my-2 border-t border-[var(--color-border)]/20"></div>
+  <div class="!my-2 border-t border-(--color-border)/20"></div>
 
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
-  {# â”€â”€ System Config â”€â”€ #}
-  {# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• #}
+  {# ═══════════════════════════════════════════ #}
+  {# ── System Config ── #}
+  {# ═══════════════════════════════════════════ #}
   <div x-data="{ open: {% if nav_active == 'settings' or nav_active == 'email_settings' or nav_active == 'i18n' or nav_active == 'features' or nav_active == 'devices_settings' or nav_active == 'registry' %}true{% else %}false{% endif %} }">
-    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)] transition-all duration-200"
+    <button @click="open = !open" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary) transition-all duration-200"
       x-show="typeof sidebarOpen === 'undefined' || sidebarOpen">
       <i data-lucide="settings" class="w-4 h-4 shrink-0"></i>
       <span class="flex-1 text-left text-xs font-semibold uppercase tracking-wider truncate">Config</span>
@@ -404,22 +404,22 @@
     <div x-show="(typeof sidebarOpen === 'undefined' || sidebarOpen) && open" x-transition:enter="transition-all duration-200 ease-out"
       x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
       x-transition:leave="transition-all duration-150 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-      class="mt-0.5 ml-3 space-y-0.5 border-l border-[var(--color-border)]/20 pl-3" x-cloak>
-      <a href="{% url 'admin_suite:settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      class="mt-0.5 ml-3 space-y-0.5 border-l border-(--color-border)/20 pl-3" x-cloak>
+      <a href="{% url 'admin_suite:settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'settings' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Site Settings</span></a>
-      <a href="{% url 'admin_suite:email_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'email_settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:email_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'email_settings' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="mail" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Email / SMTP</span></a>
-      <a href="{% url 'admin_suite:features' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'features' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:features' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'features' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="toggle-left" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Features</span></a>
-      <a href="{% url 'admin_suite:i18n' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'i18n' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:i18n' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'i18n' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="globe" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">i18n</span></a>
-      <a href="{% url 'admin_suite:devices_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'devices_settings' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:devices_settings' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'devices_settings' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="smartphone" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Devices</span></a>
-      <a href="{% url 'admin_suite:app_registry' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'registry' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-primary)]{% endif %}">
+      <a href="{% url 'admin_suite:app_registry' %}" class="admin-nav-item flex items-center gap-3 px-3 py-1.5 rounded-lg transition-all duration-200 {% if nav_active == 'registry' %}bg-accent/10 text-(--color-accent) font-medium{% else %}text-(--color-text-secondary) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-primary){% endif %}">
         <i data-lucide="box" class="w-3.5 h-3.5 shrink-0"></i><span class="truncate">Registry</span></a>
     </div>
     <a href="{% url 'admin_suite:settings' %}" x-show="!(typeof sidebarOpen === 'undefined' || sidebarOpen)"
-       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'settings' or nav_active == 'email_settings' or nav_active == 'i18n' or nav_active == 'features' or nav_active == 'devices_settings' or nav_active == 'registry' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)]{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text-secondary)]{% endif %}" x-cloak>
+       class="flex items-center justify-center px-3 py-2 rounded-lg transition-all duration-200 {% if nav_active == 'settings' or nav_active == 'email_settings' or nav_active == 'i18n' or nav_active == 'features' or nav_active == 'devices_settings' or nav_active == 'registry' %}bg-accent/10 text-(--color-accent){% else %}text-(--color-text-muted) hover:bg-(--color-sidebar-hover) hover:text-(--color-text-secondary){% endif %}" x-cloak>
       <i data-lucide="settings" class="w-4 h-4 shrink-0"></i>
     </a>
   </div>

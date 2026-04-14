@@ -1,0 +1,103 @@
+{# templates/site_settings/detail.html — Staff site settings overview #}
+{% extends "layouts/default.html" %}
+
+{% block title %}Site Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  {% include "components/_section_header.html" with title="Site Settings" subtitle="Current platform configuration" icon="settings" %}
+
+  <div class="space-y-6">
+    {# General Settings #}
+    <div class="rounded-lg border border-(--color-border) bg-(--color-surface) p-6">
+      <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+        <i data-lucide="globe" class="w-5 h-5 text-(--color-accent)"></i>
+        General
+      </h2>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% if site_settings.site_name %}
+        <div>
+          <dt class="text-sm font-medium text-(--color-text-muted)">Site Name</dt>
+          <dd class="text-(--color-text-primary)">{{ site_settings.site_name }}</dd>
+        </div>
+        {% endif %}
+        {% if site_settings.site_tagline %}
+        <div>
+          <dt class="text-sm font-medium text-(--color-text-muted)">Tagline</dt>
+          <dd class="text-(--color-text-primary)">{{ site_settings.site_tagline }}</dd>
+        </div>
+        {% endif %}
+        {% if site_settings.contact_email %}
+        <div>
+          <dt class="text-sm font-medium text-(--color-text-muted)">Contact Email</dt>
+          <dd class="text-(--color-text-primary)">{{ site_settings.contact_email }}</dd>
+        </div>
+        {% endif %}
+        {% if site_settings.default_language %}
+        <div>
+          <dt class="text-sm font-medium text-(--color-text-muted)">Language</dt>
+          <dd class="text-(--color-text-primary)">{{ site_settings.default_language }}</dd>
+        </div>
+        {% endif %}
+      </dl>
+    </div>
+
+    {# Feature Toggles #}
+    <div class="rounded-lg border border-(--color-border) bg-(--color-surface) p-6">
+      <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+        <i data-lucide="toggle-right" class="w-5 h-5 text-(--color-accent)"></i>
+        Features
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {% for key, val in site_settings.items %}
+          {% if val == True or val == False %}
+          <div class="flex items-center gap-2">
+            {% if val %}
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+            {% else %}
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            {% endif %}
+            <span class="text-sm text-(--color-text-secondary)">{{ key }}</span>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Verification Meta Tags #}
+    {% if meta_tags %}
+    <div class="rounded-lg border border-(--color-border) bg-(--color-surface) p-6">
+      <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+        <i data-lucide="code" class="w-5 h-5 text-(--color-accent)"></i>
+        Verification Meta Tags
+      </h2>
+      <div class="space-y-2">
+        {% for tag in meta_tags %}
+        <div class="p-3 rounded border border-(--color-border) bg-(--color-bg)">
+          <code class="text-sm text-(--color-text-secondary) break-all">{{ tag }}</code>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Verification Files #}
+    {% if verification_files %}
+    <div class="rounded-lg border border-(--color-border) bg-(--color-surface) p-6">
+      <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+        <i data-lucide="file-check" class="w-5 h-5 text-(--color-accent)"></i>
+        Verification Files
+      </h2>
+      <div class="space-y-2">
+        {% for file in verification_files %}
+        <div class="p-3 rounded border border-(--color-border) bg-(--color-bg) flex items-center gap-2">
+          <i data-lucide="file" class="w-4 h-4 text-(--color-text-muted)"></i>
+          <span class="text-sm text-(--color-text-secondary)">{{ file }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

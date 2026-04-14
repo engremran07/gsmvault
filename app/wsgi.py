@@ -17,6 +17,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+import app._platform_fix  # noqa: F401  # Python 3.13+ WMI fix
+
 # ---------------------------------------------------------------------
 # Enforce correct Django settings module
 # ---------------------------------------------------------------------

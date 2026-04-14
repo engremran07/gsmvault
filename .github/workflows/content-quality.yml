@@ -1,0 +1,182 @@
+name: Content Quality
+
+on:
+  push:
+    paths:
+      - 'apps/blog/**'
+      - 'apps/pages/**'
+      - 'apps/forum/**'
+
+permissions:
+  contents: read
+
+jobs:
+  quality-check:
+    name: Content Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check HTML sanitization imports
+        run: |
+          ERRORS=0
+          APPS=("apps/blog" "apps/pages" "apps/forum")
+
+          for app_dir in "${APPS[@]}"; do
+            if [ ! -d "$app_dir" ]; then
+              continue
+            fi
+
+            echo "--- Checking $app_dir ---"
+
+            # Check services.py for sanitization imports
+            for svc in $(find "$app_dir" -name 'services*.py' -type f); do
+              # If the service file handles HTML content, it should import sanitizers
+              if grep -qE '(html|content|body|text|description|message)' "$svc" 2>/dev/null; then
+                if grep -qE '(sanitize_html|sanitize_ad_code|nh3|sanitizers)' "$svc" 2>/dev/null; then
+                  echo "  ✓ $svc has sanitization imports"
+                else
+                  echo "  ⚠ $svc handles content but may be missing sanitization import"
+                fi
+              fi
+            done
+
+            # Check views.py for proper form handling
+            for view in $(find "$app_dir" -name 'views*.py' -type f); do
+              if grep -qE 'request\.POST' "$view" 2>/dev/null; then
+                if grep -qE '(form\.|serializer\.|clean|validate|sanitize)' "$view" 2>/dev/null; then
+                  echo "  ✓ $view uses form/serializer validation for POST data"
+                else
+                  echo "::warning::$view processes POST data without visible form/serializer validation"
+                  ERRORS=$((ERRORS + 1))
+                fi
+              fi
+            done
+          done
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::warning::$ERRORS potential sanitization issues found"
+          else
+            echo "✓ All content apps have proper sanitization patterns"
+          fi
+
+      - name: Verify no unsafe |safe usage without sanitization
+        run: |
+          ERRORS=0
+
+          echo "--- Scanning templates for |safe usage ---"
+          SAFE_USAGES=$(grep -rn '|safe' templates/blog/ templates/pages/ templates/forum/ 2>/dev/null || true)
+
+          if [ -z "$SAFE_USAGES" ]; then
+            echo "✓ No |safe filter usage found in content templates"
+          else
+            echo "$SAFE_USAGES" | while IFS= read -r line; do
+              FILE=$(echo "$line" | cut -d: -f1)
+              LINE_NUM=$(echo "$line" | cut -d: -f2)
+              CONTENT=$(echo "$line" | cut -d: -f3-)
+
+              # Check if sanitization is mentioned nearby or variable comes from sanitized source
+              if echo "$CONTENT" | grep -qE '(sanitize|cleaned|safe_content|rendered)'; then
+                echo "  ✓ $FILE:$LINE_NUM — |safe used with sanitized variable"
+              elif echo "$CONTENT" | grep -qE '(csrf_token|static|url )'; then
+                echo "  ✓ $FILE:$LINE_NUM — |safe used with Django built-in (OK)"
+              else
+                echo "::warning::$FILE:$LINE_NUM — |safe used without visible sanitization context: $(echo "$CONTENT" | head -c 100)"
+                ERRORS=$((ERRORS + 1))
+              fi
+            done
+          fi
+
+          # Also check for mark_safe in Python code
+          MARK_SAFE=$(grep -rn 'mark_safe' apps/blog/ apps/pages/ apps/forum/ 2>/dev/null || true)
+          if [ -n "$MARK_SAFE" ]; then
+            echo ""
+            echo "--- mark_safe() usage in content apps ---"
+            echo "$MARK_SAFE" | while IFS= read -r line; do
+              echo "::warning::$line — mark_safe() found; verify input is sanitized"
+              ERRORS=$((ERRORS + 1))
+            done
+          fi
+
+          echo ""
+          echo "Total potential |safe/mark_safe issues: $ERRORS"
+
+      - name: Check content models have proper Meta
+        run: |
+          ERRORS=0
+          APPS=("apps/blog/models.py" "apps/pages/models.py" "apps/forum/models.py")
+
+          for model_file in "${APPS[@]}"; do
+            if [ ! -f "$model_file" ]; then
+              echo "::warning::Model file not found: $model_file"
+              continue
+            fi
+
+            echo "--- Checking $model_file ---"
+
+            # Check for class Meta
+            META_COUNT=$(grep -c 'class Meta' "$model_file" 2>/dev/null || echo "0")
+            MODEL_COUNT=$(grep -cE '^class [A-Z].*\(.*Model' "$model_file" 2>/dev/null || echo "0")
+
+            echo "  Models: $MODEL_COUNT, Meta classes: $META_COUNT"
+
+            if [ "$MODEL_COUNT" -gt "$META_COUNT" ]; then
+              MISSING=$((MODEL_COUNT - META_COUNT))
+              echo "::warning::$model_file has $MISSING model(s) without class Meta"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # Check for __str__ methods
+            STR_COUNT=$(grep -c '__str__' "$model_file" 2>/dev/null || echo "0")
+            if [ "$MODEL_COUNT" -gt "$STR_COUNT" ]; then
+              MISSING=$((MODEL_COUNT - STR_COUNT))
+              echo "::warning::$model_file has $MISSING model(s) without __str__"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # Check for verbose_name in Meta
+            VERBOSE_COUNT=$(grep -c 'verbose_name' "$model_file" 2>/dev/null || echo "0")
+            if [ "$VERBOSE_COUNT" -eq 0 ] && [ "$MODEL_COUNT" -gt 0 ]; then
+              echo "::warning::$model_file has no verbose_name in any Meta class"
+              ERRORS=$((ERRORS + 1))
+            fi
+
+            # Check for db_table in Meta
+            DB_TABLE_COUNT=$(grep -c 'db_table' "$model_file" 2>/dev/null || echo "0")
+            echo "  db_table entries: $DB_TABLE_COUNT"
+
+            # Check for related_name on ForeignKey fields
+            FK_COUNT=$(grep -cE 'ForeignKey|ManyToManyField' "$model_file" 2>/dev/null || echo "0")
+            RELATED_COUNT=$(grep -c 'related_name' "$model_file" 2>/dev/null || echo "0")
+            if [ "$FK_COUNT" -gt "$RELATED_COUNT" ]; then
+              MISSING=$((FK_COUNT - RELATED_COUNT))
+              echo "::warning::$model_file has $MISSING FK/M2M field(s) without related_name"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo ""
+            echo "::warning::$ERRORS model quality issues found"
+          else
+            echo ""
+            echo "✓ All content models have proper Meta configuration"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Content Quality Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checks performed on content apps (blog, pages, forum):" >> "$GITHUB_STEP_SUMMARY"
+          echo "1. HTML sanitization imports present" >> "$GITHUB_STEP_SUMMARY"
+          echo "2. No unsafe \`|safe\` usage without sanitization" >> "$GITHUB_STEP_SUMMARY"
+          echo "3. Content models have proper Meta classes" >> "$GITHUB_STEP_SUMMARY"
+          echo "4. All models have \`__str__\`, \`verbose_name\`, \`related_name\`" >> "$GITHUB_STEP_SUMMARY"

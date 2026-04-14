@@ -8,30 +8,30 @@
 
 {% block page_content %}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-    <p class="text-sm text-[var(--color-text-muted)]">Total Notifications</p>
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+    <p class="text-sm text-(--color-text-muted)">Total Notifications</p>
     <p class="text-2xl font-bold mt-1">{{ total_notifications|default:"0" }}</p>
   </div>
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-    <p class="text-sm text-[var(--color-text-muted)]">Pending</p>
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+    <p class="text-sm text-(--color-text-muted)">Pending</p>
     <p class="text-2xl font-bold mt-1">{{ pending_count|default:"0" }}</p>
   </div>
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-    <p class="text-sm text-[var(--color-text-muted)]">Sent Today</p>
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+    <p class="text-sm text-(--color-text-muted)">Sent Today</p>
     <p class="text-2xl font-bold mt-1">{{ sent_today|default:"0" }}</p>
   </div>
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-    <p class="text-sm text-[var(--color-text-muted)]">Failed</p>
-    <p class="text-2xl font-bold mt-1 {% if failed_count %}text-[var(--color-error)]{% endif %}">{{ failed_count|default:"0" }}</p>
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+    <p class="text-sm text-(--color-text-muted)">Failed</p>
+    <p class="text-2xl font-bold mt-1 {% if failed_count %}text-(--color-error){% endif %}">{{ failed_count|default:"0" }}</p>
   </div>
 </div>
 
 {% if recent_notifications %}
 <section>
   <h2 class="text-lg font-semibold mb-4">Recent Notifications</h2>
-  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+  <div class="rounded-lg border border-(--color-border) overflow-hidden">
     <table class="w-full text-sm">
-      <thead class="bg-[var(--color-bg-secondary)]">
+      <thead class="bg-(--color-bg-secondary)">
         <tr>
           <th class="px-4 py-3 text-left font-medium">Type</th>
           <th class="px-4 py-3 text-left font-medium">Recipient</th>
@@ -40,11 +40,11 @@
           <th class="px-4 py-3 text-left font-medium">Sent At</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for notification in recent_notifications %}
-        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+        <tr class="hover:bg-(--color-bg-secondary) transition">
           <td class="px-4 py-3">{{ notification.type|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ notification.recipient|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted)">{{ notification.recipient|default:"—" }}</td>
           <td class="px-4 py-3">{{ notification.subject|default:"—"|truncatewords:8 }}</td>
           <td class="px-4 py-3">
             {% if notification.status == "sent" %}
@@ -57,7 +57,7 @@
             {% include "components/_badge.html" with text=notification.status variant="default" %}
             {% endif %}
           </td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ notification.sent_at|timesince|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted)">{{ notification.sent_at|timesince|default:"—" }}</td>
         </tr>
         {% endfor %}
       </tbody>

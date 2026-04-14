@@ -8,9 +8,9 @@
 
 {% block page_content %}
 {% if pairs %}
-<div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+<div class="rounded-lg border border-(--color-border) overflow-hidden">
   <table class="w-full text-sm">
-    <thead class="bg-[var(--color-bg-secondary)]">
+    <thead class="bg-(--color-bg-secondary)">
       <tr>
         <th class="px-4 py-3 text-left font-medium">Tag A</th>
         <th class="px-4 py-3 text-left font-medium">Tag B</th>
@@ -18,9 +18,9 @@
         <th class="px-4 py-3 text-right font-medium">Actions</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-[var(--color-border)]">
+    <tbody class="divide-y divide-(--color-border)">
       {% for pair in pairs %}
-      <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+      <tr class="hover:bg-(--color-bg-secondary) transition">
         <td class="px-4 py-3">
           {% include "components/_badge.html" with text=pair.tag_a variant="default" %}
         </td>
@@ -44,14 +44,14 @@
             {% csrf_token %}
             <input type="hidden" name="tag_a" value="{{ pair.tag_a_id }}">
             <input type="hidden" name="tag_b" value="{{ pair.tag_b_id }}">
-            <button type="submit" name="action" value="merge" class="text-xs text-[var(--color-accent)] hover:underline">Merge</button>
+            <button type="submit" name="action" value="merge" class="text-xs text-(--color-accent) hover:underline">Merge</button>
           </form>
-          <span class="mx-1 text-[var(--color-border)]">|</span>
+          <span class="mx-1 text-(--color-border)">|</span>
           <form method="post" class="inline">
             {% csrf_token %}
             <input type="hidden" name="tag_a" value="{{ pair.tag_a_id }}">
             <input type="hidden" name="tag_b" value="{{ pair.tag_b_id }}">
-            <button type="submit" name="action" value="dismiss" class="text-xs text-[var(--color-text-muted)] hover:underline">Dismiss</button>
+            <button type="submit" name="action" value="dismiss" class="text-xs text-(--color-text-muted) hover:underline">Dismiss</button>
           </form>
         </td>
       </tr>

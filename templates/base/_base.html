@@ -5,7 +5,7 @@
   {% include "ads/includes/_network_head_scripts.html" %}
   {% block extra_css %}{% endblock %}
 </head>
-<body class="m-0 p-0 bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] min-h-screen flex flex-col antialiased"
+<body class="m-0 p-0 bg-(--color-bg-primary) text-(--color-text-primary) min-h-screen flex flex-col antialiased"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>{% block site_nav %}{% include "base/_nav.html" %}{% endblock %}{% include "base/_messages.html" %}
   <main class="flex-1">
     {% block content %}{% endblock %}

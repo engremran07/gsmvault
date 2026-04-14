@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
+from functools import wraps
 from typing import TYPE_CHECKING, cast
 
 from django.contrib import messages
@@ -12,6 +13,9 @@ from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+
+from apps.core.utils.ip import get_client_ip as get_request_ip
+from apps.users.services.rate_limit import allow_action
 
 if TYPE_CHECKING:
     from django.contrib.auth.base_user import AbstractBaseUser
@@ -72,6 +76,37 @@ User = get_user_model()
 def _user(request: HttpRequest) -> AbstractBaseUser:
     """Cast request.user for type checker — only call after @login_required."""
     return cast("AbstractBaseUser", request.user)
+
+
+def _forum_rate_limit(
+    *,
+    scope: str,
+    max_attempts: int = 20,
+    window_seconds: int = 60,
+):
+    """Apply per-user/IP rate limiting to forum mutation views."""
+
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request: HttpRequest, *args, **kwargs):
+            key_parts = [f"scope:{scope}"]
+            if request.user.is_authenticated:
+                key_parts.append(f"user:{request.user.pk}")
+            key_parts.append(f"ip:{get_request_ip(request) or 'anon'}")
+            key = "forum:rl:" + ":".join(key_parts)
+
+            if not allow_action(
+                key,
+                max_attempts=max_attempts,
+                window_seconds=window_seconds,
+            ):
+                return HttpResponse("Too many requests.", status=429)
+
+            return view_func(request, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 # ---------------------------------------------------------------------------
@@ -388,6 +423,7 @@ def topic_create(request: HttpRequest, category_slug: str) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="reply_create", max_attempts=10, window_seconds=60)
 def reply_create(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk, is_removed=False)
 
@@ -474,6 +510,7 @@ def reply_history(request: HttpRequest, pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="toggle_like", max_attempts=60, window_seconds=60)
 def toggle_like(request: HttpRequest, reply_pk: int) -> HttpResponse:
     reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
     is_liked = services.toggle_like(reply, _user(request))
@@ -498,6 +535,7 @@ def toggle_like(request: HttpRequest, reply_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="toggle_favorite", max_attempts=30, window_seconds=60)
 def toggle_favorite(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk, is_removed=False)
     is_fav = services.toggle_favorite(topic, _user(request))
@@ -521,6 +559,7 @@ def toggle_favorite(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="bookmark_update", max_attempts=30, window_seconds=60)
 def bookmark_update(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
     try:
@@ -538,6 +577,7 @@ def bookmark_update(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="toggle_subscription", max_attempts=30, window_seconds=60)
 def toggle_subscription(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
     sub = ForumTopicSubscription.objects.filter(topic=topic, user=request.user).first()
@@ -567,6 +607,7 @@ def toggle_subscription(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="poll_vote", max_attempts=20, window_seconds=60)
 def poll_vote(request: HttpRequest, poll_pk: int) -> HttpResponse:
     poll = get_object_or_404(ForumPoll.objects.prefetch_related("choices"), pk=poll_pk)
 
@@ -589,6 +630,7 @@ def poll_vote(request: HttpRequest, poll_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="flag_content", max_attempts=10, window_seconds=60)
 def flag_content(request: HttpRequest) -> HttpResponse:
     form = FlagForm(request.POST)
     if form.is_valid():
@@ -778,10 +820,8 @@ def reply_remove(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 def _get_client_ip(request: HttpRequest) -> str | None:
-    xff = request.META.get("HTTP_X_FORWARDED_FOR")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
+    ip = get_request_ip(request)
+    return ip or None
 
 
 # ---------------------------------------------------------------------------
@@ -791,6 +831,7 @@ def _get_client_ip(request: HttpRequest) -> str | None:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="set_reaction", max_attempts=60, window_seconds=60)
 def set_reaction(request: HttpRequest, reply_pk: int) -> HttpResponse:
     reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
     reaction_id = request.POST.get("reaction_id")
@@ -829,6 +870,7 @@ def set_reaction(request: HttpRequest, reply_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="mark_solution", max_attempts=20, window_seconds=60)
 def mark_solution(request: HttpRequest, reply_pk: int) -> HttpResponse:
     reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
     topic = reply.topic
@@ -853,6 +895,7 @@ def mark_solution(request: HttpRequest, reply_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="unmark_solution", max_attempts=20, window_seconds=60)
 def unmark_solution(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
 
@@ -871,6 +914,7 @@ def unmark_solution(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="rate_topic", max_attempts=20, window_seconds=60)
 def rate_topic(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk, is_removed=False)
     form = TopicRatingForm(request.POST)
@@ -897,6 +941,7 @@ def rate_topic(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="update_tags", max_attempts=20, window_seconds=60)
 def update_tags(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
 
@@ -1200,6 +1245,7 @@ def warning_list(request: HttpRequest) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="edit_wiki_header", max_attempts=10, window_seconds=60)
 def edit_wiki_header(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk, is_removed=False)
 
@@ -1245,6 +1291,7 @@ def wiki_header_history(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="toggle_useful", max_attempts=30, window_seconds=60)
 def toggle_useful(request: HttpRequest, reply_pk: int) -> HttpResponse:
     reply = get_object_or_404(ForumReply, pk=reply_pk, is_removed=False)
     is_useful = services.toggle_useful_post(reply, _user(request))
@@ -1266,6 +1313,7 @@ def toggle_useful(request: HttpRequest, reply_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="add_faq", max_attempts=15, window_seconds=60)
 def add_faq(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
 
@@ -1295,6 +1343,7 @@ def add_faq(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="remove_faq", max_attempts=15, window_seconds=60)
 def remove_faq(request: HttpRequest, faq_pk: int) -> HttpResponse:
     faq = get_object_or_404(ForumFAQEntry, pk=faq_pk)
     topic = faq.topic
@@ -1322,6 +1371,7 @@ def remove_faq(request: HttpRequest, faq_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="add_changelog", max_attempts=15, window_seconds=60)
 def add_changelog(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
 
@@ -1351,6 +1401,7 @@ def add_changelog(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="remove_changelog", max_attempts=15, window_seconds=60)
 def remove_changelog(request: HttpRequest, entry_pk: int) -> HttpResponse:
     entry = get_object_or_404(ForumChangelog, pk=entry_pk)
     topic = entry.topic
@@ -1378,6 +1429,7 @@ def remove_changelog(request: HttpRequest, entry_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="change_topic_type", max_attempts=10, window_seconds=60)
 def change_topic_type(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
 
@@ -1400,6 +1452,7 @@ def change_topic_type(request: HttpRequest, topic_pk: int) -> HttpResponse:
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="link_device", max_attempts=10, window_seconds=60)
 def link_device(request: HttpRequest, topic_pk: int) -> HttpResponse:
     topic = get_object_or_404(ForumTopic, pk=topic_pk)
 
@@ -1440,6 +1493,7 @@ def download_attachment(request: HttpRequest, attachment_pk: int) -> HttpRespons
 
 @login_required
 @require_POST
+@_forum_rate_limit(scope="upload_attachment", max_attempts=10, window_seconds=60)
 def upload_attachment(request: HttpRequest, reply_pk: int) -> HttpResponse:
     """Upload a file attachment to an existing reply."""
     from .forms import AttachmentUploadForm

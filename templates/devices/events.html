@@ -8,9 +8,9 @@
 
 {% block page_content %}
 {% if events %}
-<div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+<div class="rounded-lg border border-(--color-border) overflow-hidden">
   <table class="w-full text-sm">
-    <thead class="bg-[var(--color-bg-secondary)]">
+    <thead class="bg-(--color-bg-secondary)">
       <tr>
         <th class="px-4 py-3 text-left font-medium">Event</th>
         <th class="px-4 py-3 text-left font-medium">Device</th>
@@ -18,9 +18,9 @@
         <th class="px-4 py-3 text-left font-medium">Time</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-[var(--color-border)]">
+    <tbody class="divide-y divide-(--color-border)">
       {% for event in events %}
-      <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+      <tr class="hover:bg-(--color-bg-secondary) transition">
         <td class="px-4 py-3">
           <div class="flex items-center gap-2">
             {% if event.event_type == "login" %}
@@ -35,9 +35,9 @@
             <span>{{ event.event_type|title }}</span>
           </div>
         </td>
-        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ event.device_name|default:"Unknown" }}</td>
-        <td class="px-4 py-3 text-[var(--color-text-muted)] font-mono text-xs">{{ event.ip_address|default:"—" }}</td>
-        <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ event.created_at|timesince }} ago</td>
+        <td class="px-4 py-3 text-(--color-text-muted)">{{ event.device_name|default:"Unknown" }}</td>
+        <td class="px-4 py-3 text-(--color-text-muted) font-mono text-xs">{{ event.ip_address|default:"—" }}</td>
+        <td class="px-4 py-3 text-(--color-text-muted)">{{ event.created_at|timesince }} ago</td>
       </tr>
       {% endfor %}
     </tbody>

@@ -1,0 +1,285 @@
+name: CI — Analyze, Test & Hygiene
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyse:
+    name: Flutter Analyze + Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.6'
+          channel: stable
+          cache: true
+
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" | base64 -d > app/android/app/google-services.json
+
+      - name: flutter pub get
+        run: cd app && flutter pub get
+
+      - name: dart format --set-exit-if-changed
+        run: cd app && dart format --set-exit-if-changed lib test
+
+      - name: flutter analyze
+        run: cd app && flutter analyze lib --no-pub
+
+  test:
+    name: Flutter Test
+    needs: analyse
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.6'
+          channel: stable
+          cache: true
+
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo "$GOOGLE_SERVICES_JSON" | base64 -d > app/android/app/google-services.json
+
+      - name: flutter pub get
+        run: cd app && flutter pub get
+
+      - name: flutter test
+        run: cd app && flutter test -r compact --coverage
+
+  hygiene:
+    name: Code Hygiene Gates
+    needs: analyse
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gate 1 — No raw Firestore collection literals
+        run: |
+          FOUND=$(grep -rn "\.collection('" app/lib/ | grep -v Collections\. | grep -v '//' | grep -v '\.rules' || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Raw Firestore collection literal detected (use Collections.* constants):"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No raw collection literals"
+
+      - name: Gate 2 — allTransactionsProvider invalidated on sign-out
+        run: |
+          if ! grep -q "allTransactionsProvider" app/lib/providers/auth_provider.dart; then
+            echo "❌ allTransactionsProvider not found in auth_provider.dart _invalidateRoleScopedProviders"
+            exit 1
+          fi
+          echo "✅ allTransactionsProvider present in auth_provider.dart"
+
+      - name: Gate 3 — No split-per-abi in READMEs (fat APK only)
+        run: |
+          FOUND=$(grep -rn "\-\-split-per-abi" README.md app/README.md AGENTS.md CLAUDE.md -- || true)
+          # Only flag if found in a build command context (not comment lines)
+          CMD=$(echo "$FOUND" | grep "flutter build" | grep -v "#" || true)
+          if [ -n "$CMD" ]; then
+            echo "❌ --split-per-abi found in build command (fat APK only):"
+            echo "$CMD"
+            exit 1
+          fi
+          echo "✅ No --split-per-abi in build commands"
+
+      - name: Gate 4 — No direct Firestore writes from screens/widgets
+        run: |
+          FOUND=$(grep -rn "FirebaseFirestore.instance" app/lib/screens/ app/lib/widgets/ 2>/dev/null | grep -v "//" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Direct Firestore write detected in screens/widgets:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No direct Firestore writes in screens/widgets"
+
+      - name: Gate 5 — L10n key parity (EN keys exist in AR and UR)
+        run: |
+          python3 - << 'EOF'
+          import re, sys
+
+          with open('app/lib/core/l10n/app_locale.dart', 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          # Split into language blocks (rough split by the locale map boundaries)
+          blocks = re.split(r"case 'en':|case 'ar':|case 'ur':", content)
+          if len(blocks) < 4:
+              print('❌ Could not parse 3 language blocks')
+              sys.exit(1)
+
+          def extract_keys(block):
+              return set(re.findall(r"'([a-z][a-z0-9_]+)':", block))
+
+          en_keys = extract_keys(blocks[1])
+          ar_keys = extract_keys(blocks[2])
+          ur_keys = extract_keys(blocks[3])
+
+          missing_ar = en_keys - ar_keys
+          missing_ur = en_keys - ur_keys
+
+          if missing_ar:
+              print(f'❌ {len(missing_ar)} keys missing from AR: {sorted(missing_ar)[:10]}')
+              sys.exit(1)
+          if missing_ur:
+              print(f'❌ {len(missing_ur)} keys missing from UR: {sorted(missing_ur)[:10]}')
+              sys.exit(1)
+
+          print(f'✅ L10n parity OK — {len(en_keys)} keys in all 3 languages')
+          EOF
+
+      - name: Gate 6 — PDF generation not on main thread
+        run: |
+          FOUND=$(grep -rn "PdfDocument\|makePdf\|pdf\.save\|computePdf" app/lib/screens/ app/lib/widgets/ 2>/dev/null | grep -v "Isolate\|compute\|spawn\|//" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Potential PDF generation on main thread (use Isolate.run):"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No PDF main-thread violations detected"
+
+      - name: Gate 7 — No hardcoded Colors.white/grey/red/black in screens/widgets
+        run: |
+          FOUND=$(grep -rn "Colors\.white\|Colors\.grey\|Colors\.red\|Colors\.black[^5]\|Colors\.black54" app/lib/screens/ app/lib/widgets/ 2>/dev/null | grep -v "//" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Hardcoded Color.* detected — use AppBrand.* or cs.* constants:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No hardcoded Colors.* in screens/widgets"
+
+      - name: Gate 8 — pubspec version == app_brand version
+        run: |
+          PUBSPEC_VER=$(grep '^version:' app/pubspec.yaml | sed 's/version: //' | tr -d '[:space:]')
+          BRAND_VER=$(grep 'static const String appVersion' app/lib/core/constants/app_brand.dart | sed "s/.*'\(.*\)';/\1/" | tr -d '[:space:]')
+          BRAND_BUILD=$(grep 'static const String buildNumber' app/lib/core/constants/app_brand.dart | sed "s/.*'\(.*\)';/\1/" | tr -d '[:space:]')
+          BRAND_COMBINED="${BRAND_VER}+${BRAND_BUILD}"
+          if [ "$PUBSPEC_VER" != "$BRAND_COMBINED" ]; then
+            echo "❌ Version mismatch: pubspec=$PUBSPEC_VER app_brand=$BRAND_COMBINED"
+            exit 1
+          fi
+          echo "✅ Version in sync: $PUBSPEC_VER"
+
+      - name: Gate 9 — widget_test.dart is not a placeholder
+        run: |
+          if grep -q "Text('OK')" app/test/widget_test.dart 2>/dev/null; then
+            echo "❌ widget_test.dart still contains placeholder smoke test — replace with real test"
+            exit 1
+          fi
+          echo "✅ widget_test.dart is not a placeholder"
+
+      - name: Gate 10 — No Colors.black with opacity patterns in screens
+        run: |
+          FOUND=$(grep -rn "Colors\.black\.with" app/lib/screens/ app/lib/widgets/ 2>/dev/null | grep -v "//" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Colors.black.with* opacity pattern detected — use cs.shadow or AppBrand constants:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No Colors.black.with* patterns in screens/widgets"
+
+      - name: Gate 11 — Zero markdown lint issues
+        run: |
+          npm install -g markdownlint-cli@0.43.0 --silent
+          FOUND=$(markdownlint "**/*.md" --ignore node_modules --ignore app/build --ignore functions/node_modules 2>&1 || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Markdown lint errors detected — zero problems tolerance:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ All markdown files lint-clean"
+
+      - name: Gate 12 — No untracked TODO/FIXME in production code
+        run: |
+          FOUND=$(grep -rn "TODO\|FIXME\|HACK" app/lib/ 2>/dev/null \
+            | grep -v "//.*\(RR-[0-9]\|PI-[0-9]\)" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Untracked TODO/FIXME in production code — add RR-/PI- reference:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No untracked TODO/FIXME in app/lib/"
+
+      - name: Gate 13 — No raw SnackBar in screens/widgets
+        run: |
+          FOUND=$(grep -rn "showSnackBar(SnackBar(" app/lib/screens/ app/lib/widgets/ 2>/dev/null | grep -v "//" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Raw SnackBar detected — use errorSnackBar/successSnackBar/infoSnackBar/warningSnackBar helpers:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No raw SnackBar in screens/widgets"
+
+      - name: Gate 14 — No context.go() for form screen routes
+        run: |
+          FOUND=$(grep -rn "context\.go('[^']*/(new\|edit)" app/lib/ 2>/dev/null | grep -v "//" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ context.go() used for form route — use context.push() for create/edit screens:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No context.go() for form routes"
+
+      - name: Gate 15 — No StateProvider (banned in Riverpod 3)
+        run: |
+          FOUND=$(grep -rn "StateProvider\b" app/lib/ --include="*.dart" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ StateProvider detected — banned in Riverpod 3. Use NotifierProvider<T,S> instead:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No StateProvider in codebase"
+
+      - name: Gate 16 — Firestore rules and indexes files are present and valid
+        run: |
+          if [ ! -f "firestore.rules" ]; then
+            echo "❌ firestore.rules file missing"
+            exit 1
+          fi
+          if [ ! -f "firestore.indexes.json" ]; then
+            echo "❌ firestore.indexes.json file missing"
+            exit 1
+          fi
+          # Validate indexes JSON is parseable
+          python3 -c "import json,sys; json.load(open('firestore.indexes.json'))" || {
+            echo "❌ firestore.indexes.json is not valid JSON"
+            exit 1
+          }
+          # Assert rules file is non-trivial (>10 lines)
+          LINES=$(wc -l < firestore.rules)
+          if [ "$LINES" -lt 10 ]; then
+            echo "❌ firestore.rules appears truncated (${LINES} lines)"
+            exit 1
+          fi
+          echo "✅ Firestore rules (${LINES} lines) and indexes present and valid"
+
+      - name: Gate 17 — No temp or debug artifacts tracked
+        run: |
+          FOUND=$(git ls-files | grep -E "auth-users\.json|check_locale\.(ps1|py)|debug\.log|\.flag$" || true)
+          if [ -n "$FOUND" ]; then
+            echo "❌ Temp/debug artifact is tracked by git — remove and add to .gitignore:"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "✅ No temp artifacts in tracked files"

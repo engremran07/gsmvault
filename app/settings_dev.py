@@ -26,13 +26,18 @@ except Exception:  # noqa: S110
 
 # PostgreSQL is required - provide safe defaults for local development
 os.environ.setdefault("DB_ENGINE", "django.db.backends.postgresql")
+os.environ.setdefault("DB_NAME", "appdb")
 os.environ.setdefault("DB_USER", "postgres")
+os.environ.setdefault("DB_PASSWORD", "postgres")
 os.environ.setdefault("DB_HOST", "localhost")
 os.environ.setdefault("DB_PORT", "5432")
 
 from .settings import *  # import production defaults  # noqa: F403
 
 # ============================================================
+# Database — add connect_timeout so dev never hangs
+# ============================================================
+DATABASES["default"]["OPTIONS"] = {"connect_timeout": 5}  # type: ignore[index]  # noqa: F405
 # Database - PostgreSQL Only
 # ============================================================
 # SQLite has been removed. PostgreSQL is required for development and production.
@@ -144,14 +149,38 @@ DEFAULT_FROM_EMAIL = "dev@localhost"
 
 
 # ============================================================
-# Caching (local memory)
+# Caching — use Redis when available, fall back to local memory
 # ============================================================
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "TIMEOUT": 300,
+try:
+    import redis as _redis_lib  # noqa: F811
+
+    _r = _redis_lib.Redis(host="localhost", port=6379, db=1, socket_connect_timeout=1)
+    _r.ping()
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,
+            },
+        }
     }
-}
+    del _r, _redis_lib
+except Exception:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "TIMEOUT": 300,
+        }
+    }
+
+# ============================================================
+# Celery — use Redis broker in dev (eager mode for fast tests)
+# ============================================================
+CELERY_BROKER_URL = "redis://localhost:6379/0"  # noqa: F405
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"  # noqa: F405
+CELERY_TASK_ALWAYS_EAGER = True  # Execute tasks synchronously in dev
 
 # ============================================================
 # Security headers (Content-Security-Policy extras)

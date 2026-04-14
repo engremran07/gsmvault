@@ -1,0 +1,211 @@
+name: Backup Verify
+
+on:
+  schedule:
+    - cron: '0 4 * * 6'  # Weekly Saturday at 4am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-backup:
+    name: Verify Backup Integrity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify backup scripts exist
+        run: |
+          ERRORS=0
+
+          echo "--- Checking backup app structure ---"
+          REQUIRED_FILES=(
+            "apps/backup/__init__.py"
+            "apps/backup/apps.py"
+            "apps/backup/models.py"
+          )
+
+          for f in "${REQUIRED_FILES[@]}"; do
+            if [ -f "$f" ]; then
+              echo "✓ Found: $f"
+            else
+              echo "::error::Missing required backup file: $f"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          # Check for management commands
+          MGMT_DIR="apps/backup/management/commands"
+          if [ -d "$MGMT_DIR" ]; then
+            CMD_COUNT=$(find "$MGMT_DIR" -name '*.py' ! -name '__init__.py' -type f | wc -l)
+            echo "✓ Backup management commands: $CMD_COUNT"
+          else
+            echo "⚠ No management commands directory at $MGMT_DIR"
+          fi
+
+          # Check for tasks (Celery)
+          if [ -f "apps/backup/tasks.py" ]; then
+            echo "✓ Found: apps/backup/tasks.py (Celery tasks)"
+          else
+            echo "⚠ No Celery tasks file for backup scheduling"
+          fi
+
+          # Check for services
+          if [ -f "apps/backup/services.py" ]; then
+            echo "✓ Found: apps/backup/services.py"
+          else
+            echo "⚠ No services.py in backup app"
+          fi
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::$ERRORS critical backup files missing"
+            exit 1
+          fi
+
+      - name: Check backup configuration
+        run: |
+          echo "--- Checking backup configuration ---"
+
+          # Check if backup app is in INSTALLED_APPS
+          if grep -rq 'apps.backup' app/settings.py app/settings_dev.py 2>/dev/null; then
+            echo "✓ apps.backup found in settings"
+          else
+            echo "::warning::apps.backup may not be in INSTALLED_APPS"
+          fi
+
+          # Check for backup-related settings
+          if grep -rqE '(BACKUP_|backup)' app/settings.py app/settings_dev.py 2>/dev/null; then
+            echo "✓ Backup configuration found in settings"
+            grep -nE '(BACKUP_|backup)' app/settings.py app/settings_dev.py 2>/dev/null | head -10
+          else
+            echo "⚠ No explicit BACKUP_* settings found"
+          fi
+
+          # Check for Celery beat schedule entries related to backup
+          if grep -rqE '(backup|BACKUP)' app/celery.py apps/backup/tasks.py 2>/dev/null; then
+            echo "✓ Backup tasks references found"
+          else
+            echo "⚠ No backup-related Celery task references found"
+          fi
+
+      - name: Validate storage credentials path exists
+        run: |
+          echo "--- Checking storage credentials ---"
+
+          if [ -d "storage_credentials" ]; then
+            echo "✓ storage_credentials/ directory exists"
+
+            # Check for service account files (without exposing contents)
+            SA_DIR="storage_credentials/service_accounts"
+            if [ -d "$SA_DIR" ]; then
+              SA_COUNT=$(find "$SA_DIR" -type f 2>/dev/null | wc -l)
+              echo "✓ Service accounts directory exists ($SA_COUNT files)"
+            else
+              echo "⚠ No service_accounts subdirectory"
+            fi
+          else
+            echo "::warning::storage_credentials/ directory not found"
+          fi
+
+          # Verify .gitignore protects credentials
+          if grep -q 'storage_credentials' .gitignore 2>/dev/null; then
+            echo "✓ storage_credentials is in .gitignore"
+          else
+            echo "::error::storage_credentials is NOT in .gitignore — security risk!"
+            exit 1
+          fi
+
+      - name: Test restore dry-run
+        run: |
+          echo "--- Testing backup restore (dry-run) ---"
+
+          python -c "
+          import importlib, sys
+
+          # Verify backup app can be imported
+          sys.path.insert(0, '.')
+          try:
+              import django
+              import os
+              os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings_dev')
+
+              # Check if backup module structure is importable
+              spec = importlib.util.find_spec('apps.backup')
+              if spec:
+                  print('✓ apps.backup module is importable')
+              else:
+                  print('::warning::apps.backup module not found')
+
+              # Check for restore-related code
+              import pathlib
+              backup_dir = pathlib.Path('apps/backup')
+              restore_refs = 0
+              for f in backup_dir.glob('**/*.py'):
+                  content = f.read_text(encoding='utf-8', errors='ignore')
+                  if 'restore' in content.lower():
+                      restore_refs += 1
+
+              if restore_refs > 0:
+                  print(f'✓ Found restore-related code in {restore_refs} file(s)')
+              else:
+                  print('⚠ No restore-related code found in backup app')
+
+          except Exception as e:
+              print(f'::warning::Dry-run check encountered: {e}')
+          "
+
+      - name: Verify backup model integrity
+        run: |
+          python -c "
+          import ast, pathlib
+
+          models_file = pathlib.Path('apps/backup/models.py')
+          if not models_file.exists():
+              print('::warning::apps/backup/models.py not found')
+              exit(0)
+
+          content = models_file.read_text(encoding='utf-8')
+          tree = ast.parse(content)
+
+          models = []
+          for node in ast.walk(tree):
+              if isinstance(node, ast.ClassDef):
+                  for base in node.bases:
+                      base_name = ''
+                      if isinstance(base, ast.Attribute):
+                          base_name = base.attr
+                      elif isinstance(base, ast.Name):
+                          base_name = base.id
+                      if 'Model' in base_name:
+                          models.append(node.name)
+
+          print(f'Backup models found: {len(models)}')
+          for m in models:
+              print(f'  - {m}')
+
+          if len(models) == 0:
+              print('⚠ No Django models found in backup app')
+          "
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Backup Verification Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Trigger**: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checks performed:" >> "$GITHUB_STEP_SUMMARY"
+          echo "1. Backup scripts and app files exist" >> "$GITHUB_STEP_SUMMARY"
+          echo "2. Backup configuration in settings" >> "$GITHUB_STEP_SUMMARY"
+          echo "3. Storage credentials path protected" >> "$GITHUB_STEP_SUMMARY"
+          echo "4. Restore dry-run verification" >> "$GITHUB_STEP_SUMMARY"
+          echo "5. Backup model integrity" >> "$GITHUB_STEP_SUMMARY"

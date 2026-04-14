@@ -2,8 +2,8 @@
 {% block title %}Email Settings — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Email Settings</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
-  <a href="{% url 'admin_suite:settings' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Settings</a>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Email Settings</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:settings' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Settings</a>
 </div>
 {% endblock %}
 {% block page_content %}
@@ -11,18 +11,18 @@
 
 <div class="max-w-2xl animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
   <div class="glass rounded-xl p-6">
-    <div class="flex items-center gap-3 mb-6"><div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center"><i data-lucide="mail" class="w-5 h-5 text-blue-400"></i></div><div><h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Gmail SMTP Configuration</h3><p class="text-xs text-[var(--color-text-muted)]">Configure Gmail app password for transactional emails</p></div></div>
+    <div class="flex items-center gap-3 mb-6"><div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center"><i data-lucide="mail" class="w-5 h-5 text-blue-400"></i></div><div><h3 class="text-sm font-semibold text-(--color-text-primary)">Gmail SMTP Configuration</h3><p class="text-xs text-(--color-text-muted)">Configure Gmail app password for transactional emails</p></div></div>
     <form method="post" class="space-y-5">{% csrf_token %}
-      <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50">
-        <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Enable Gmail SMTP</p><p class="text-xs text-[var(--color-text-muted)]">Toggle email sending via Gmail</p></div>
-        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="gmail_enabled" class="sr-only peer" {% if form.gmail_enabled.value %}checked{% endif %}><div class="w-11 h-6 bg-[var(--color-bg-tertiary)] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--color-text-muted)] after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-accent)] peer-checked:after:bg-[var(--color-accent-text)]"></div></label>
+      <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50">
+        <div><p class="text-sm font-medium text-(--color-text-primary)">Enable Gmail SMTP</p><p class="text-xs text-(--color-text-muted)">Toggle email sending via Gmail</p></div>
+        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="gmail_enabled" class="sr-only peer" {% if form.gmail_enabled.value %}checked{% endif %}><div class="w-11 h-6 bg-(--color-bg-tertiary) rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-(--color-text-muted) after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-(--color-accent) peer-checked:after:bg-(--color-accent-text)"></div></label>
       </div>
-      <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Gmail Username</label><input type="email" name="gmail_username" value="{{ form.gmail_username.value|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" placeholder="your@gmail.com"></div>
-      <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">App Password</label><input type="password" name="gmail_app_password" value="{{ form.gmail_app_password.value|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" placeholder="xxxx xxxx xxxx xxxx"></div>
-      <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">From Email</label><input type="email" name="gmail_from_email" value="{{ form.gmail_from_email.value|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" placeholder="noreply@yourdomain.com"></div>
+      <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Gmail Username</label><input type="email" name="gmail_username" value="{{ form.gmail_username.value|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors" placeholder="your@gmail.com"></div>
+      <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">App Password</label><input type="password" name="gmail_app_password" value="{{ form.gmail_app_password.value|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors" placeholder="xxxx xxxx xxxx xxxx"></div>
+      <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">From Email</label><input type="email" name="gmail_from_email" value="{{ form.gmail_from_email.value|default:'' }}" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors" placeholder="noreply@yourdomain.com"></div>
       <div class="flex justify-end gap-3 pt-2">
-        <button type="submit" name="action" value="test_email" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all">Send Test</button>
-        <button type="submit" name="action" value="save_email" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save</button>
+        <button type="submit" name="action" value="test_email" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all">Send Test</button>
+        <button type="submit" name="action" value="save_email" class="px-6 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save</button>
       </div>
     </form>
   </div>

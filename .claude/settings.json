@@ -1,0 +1,122 @@
+{
+  "model": "claude-sonnet-4-6",
+
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "app.settings_dev",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1"
+  },
+
+  "permissions": {
+    "allow": [
+      "Bash(& .venv\\Scripts\\python.exe -m ruff *)",
+      "Bash(& .venv\\Scripts\\python.exe manage.py check *)",
+      "Bash(& .venv\\Scripts\\python.exe manage.py showmigrations *)",
+      "Bash(& .venv\\Scripts\\python.exe manage.py shell_plus *)",
+      "Bash(& .venv\\Scripts\\python.exe manage.py collectstatic *)",
+      "Bash(& .venv\\Scripts\\python.exe manage.py seed_forum *)",
+      "Bash(& .venv\\Scripts\\python.exe -m pytest *)",
+      "Bash(& .venv\\Scripts\\python.exe -m pyright *)",
+      "Bash(& .venv\\Scripts\\pip.exe list *)",
+      "Bash(& .venv\\Scripts\\pip.exe show *)",
+      "Bash(& .venv\\Scripts\\pip.exe check)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git stash *)",
+      "Bash(git branch *)",
+      "Bash(git worktree *)",
+      "Bash(git show *)",
+      "Bash(Get-ChildItem *)",
+      "Bash(Get-Content *)",
+      "Bash(Test-Path *)",
+      "Bash(New-Item -ItemType Directory *)",
+      "Write(apps/**)",
+      "Write(templates/**)",
+      "Write(static/**)",
+      "Write(.claude/**)",
+      "Write(.github/**)",
+      "Write(CLAUDE.md)",
+      "Write(AGENTS.md)",
+      "Write(README.md)",
+      "Edit(apps/**)",
+      "Edit(templates/**)",
+      "Edit(static/**)",
+      "Edit(.claude/**)",
+      "Edit(.github/**)",
+      "Edit(CLAUDE.md)",
+      "Edit(AGENTS.md)",
+      "Edit(README.md)",
+      "Edit(.pre-commit-config.yaml)",
+      "Edit(pyproject.toml)",
+      "Edit(conftest.py)",
+      "Read(**)"
+    ],
+
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(Remove-Item -Recurse -Force *)",
+      "Bash(rd /s *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -fd *)",
+      "Bash(* --settings=app.settings_production *)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(iex *)",
+      "Bash(Invoke-Expression *)",
+      "Bash(& .venv\\Scripts\\pip.exe install * --no-deps)",
+      "Edit(apps/*/migrations/**)",
+      "Write(apps/*/migrations/**)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Read(.env)",
+      "Read(.env.**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa)",
+      "Read(**/id_ed25519)",
+      "Read(storage_credentials/**)"
+    ]
+  },
+
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NonInteractive -File .claude/hooks/post-edit-quality.ps1"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NonInteractive -File .claude/hooks/session-start.ps1"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NonInteractive -File .claude/hooks/secrets-scan.ps1"
+          }
+        ]
+      }
+    ]
+  }
+}

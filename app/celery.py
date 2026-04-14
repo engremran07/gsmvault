@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from celery import Celery
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings_dev")
 
 app = Celery("app")
 app.config_from_object("django.conf:settings", namespace="CELERY")

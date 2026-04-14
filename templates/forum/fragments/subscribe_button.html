@@ -1,4 +1,4 @@
 {# templates/forum/fragments/subscribe_button.html — Subscribe toggle (HTMX swappable) #}
-<button type="submit" class="p-2 rounded-lg hover:bg-[var(--color-bg-tertiary)] transition-colors" title="{% if is_subscribed %}Unsubscribe{% else %}Subscribe{% endif %}">
-  <i data-lucide="bell{% if not is_subscribed %}-off{% endif %}" class="w-5 h-5 {% if is_subscribed %}text-[var(--color-accent)]{% else %}text-[var(--color-text-secondary)]{% endif %}"></i>
+<button type="submit" class="p-2 rounded-lg hover:bg-(--color-bg-tertiary) transition-colors" title="{% if is_subscribed %}Unsubscribe{% else %}Subscribe{% endif %}">
+  <i data-lucide="bell{% if not is_subscribed %}-off{% endif %}" class="w-5 h-5 {% if is_subscribed %}text-(--color-accent){% else %}text-(--color-text-secondary){% endif %}"></i>
 </button>

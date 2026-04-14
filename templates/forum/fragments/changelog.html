@@ -1,21 +1,21 @@
 {# templates/forum/fragments/changelog.html — 4PDA firmware changelog display #}
 {% load static %}
 
-<div id="changelog" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5">
-  <h3 class="text-base font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+<div id="changelog" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5">
+  <h3 class="text-base font-semibold text-(--color-text-primary) flex items-center gap-2 mb-4">
     <i data-lucide="git-branch" class="w-5 h-5 text-purple-400"></i>
     Changelog
   </h3>
 
   <div class="space-y-4">
     {% for entry in changelog_entries %}
-    <div class="relative pl-6 border-l-2 border-[var(--color-border)]">
+    <div class="relative pl-6 border-l-2 border-(--color-border)">
       <div class="absolute left-[-5px] top-1 w-2.5 h-2.5 rounded-full bg-purple-400"></div>
       <div class="flex items-center justify-between mb-1">
         <span class="text-sm font-semibold text-purple-400">v{{ entry.version }}</span>
         <div class="flex items-center gap-2">
           {% if entry.released_at %}
-          <span class="text-xs text-[var(--color-text-secondary)]">{{ entry.released_at }}</span>
+          <span class="text-xs text-(--color-text-secondary)">{{ entry.released_at }}</span>
           {% endif %}
           {% if user.is_authenticated and user == topic.user or user.is_staff %}
           <form method="post"
@@ -32,12 +32,12 @@
           {% endif %}
         </div>
       </div>
-      <div class="prose prose-invert max-w-none text-sm text-[var(--color-text-secondary)]">
+      <div class="prose prose-invert max-w-none text-sm text-(--color-text-secondary)">
         {{ entry.changes_html|safe }}
       </div>
     </div>
     {% empty %}
-    <p class="text-[var(--color-text-secondary)] text-sm italic">No changelog entries yet.</p>
+    <p class="text-(--color-text-secondary) text-sm italic">No changelog entries yet.</p>
     {% endfor %}
   </div>
 </div>

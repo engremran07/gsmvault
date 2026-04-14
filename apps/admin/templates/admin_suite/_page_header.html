@@ -3,8 +3,8 @@
   {# Title row with optional action slot #}
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
     <div>
-      <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">{{ page_title|default:"Admin" }}</h1>
-      {% if subtitle %}<p class="text-sm text-[var(--color-text-muted)] mt-1">{{ subtitle }}</p>{% endif %}
+      <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">{{ page_title|default:"Admin" }}</h1>
+      {% if subtitle %}<p class="text-sm text-(--color-text-muted) mt-1">{{ subtitle }}</p>{% endif %}
     </div>
     {% block page_actions %}{% endblock %}
   </div>
@@ -14,7 +14,7 @@
   <div class="mt-4 flex items-center gap-3 px-4 py-3 rounded-xl border text-sm
     {% if 'error' in message|lower or 'fail' in message|lower %}bg-red-500/10 border-red-500/20 text-red-400
     {% elif 'success' in message|lower or 'saved' in message|lower or 'created' in message|lower or 'deleted' in message|lower %}bg-emerald-500/10 border-emerald-500/20 text-emerald-400
-    {% else %}bg-[var(--color-accent)]/10 border-[var(--color-accent)]/20 text-[var(--color-accent)]{% endif %}"
+    {% else %}bg-accent/10 border-accent/20 text-(--color-accent){% endif %}"
     x-data="{ show: true }" x-show="show" x-cloak
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">

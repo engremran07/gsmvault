@@ -4,6 +4,10 @@
 import os
 import sys
 
+# Must be first — fixes Python 3.13+ WMI deadlock on Windows before any
+# third-party library (Celery, Kombu) calls platform.system().
+import app._platform_fix  # noqa: F401
+
 
 def main():
     """Run administrative tasks."""

@@ -31,7 +31,7 @@
        x-transition:leave="transition ease-in duration-150"
        x-transition:leave-start="opacity-100 scale-100"
        x-transition:leave-end="opacity-0 scale-95"
-       class="relative bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] shadow-2xl max-h-[90vh] overflow-y-auto
+       class="relative bg-(--color-bg-secondary) rounded-xl border border-(--color-border) shadow-2xl max-h-[90vh] overflow-y-auto
          {% if size == 'sm' %}w-full max-w-sm
          {% elif size == 'lg' %}w-full max-w-2xl
          {% elif size == 'xl' %}w-full max-w-4xl
@@ -40,11 +40,11 @@
        @click.stop>
 
     {# Header #}
-    <div class="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-      <h3 class="text-lg font-semibold text-[var(--color-text-primary)]">{{ title }}</h3>
+    <div class="flex items-center justify-between p-4 border-b border-(--color-border)">
+      <h3 class="text-lg font-semibold text-(--color-text-primary)">{{ title }}</h3>
       {% if closable != "false" %}
       <button @click="open = false"
-              class="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+              class="text-(--color-text-muted) hover:text-(--color-text-primary) transition-colors"
               aria-label="Close dialog">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>

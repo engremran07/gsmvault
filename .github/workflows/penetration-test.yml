@@ -1,0 +1,211 @@
+name: Penetration Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      zap_scan:
+        description: "Run OWASP ZAP baseline scan"
+        required: false
+        default: true
+        type: boolean
+      target_url:
+        description: "Target URL for external scan (leave empty for local)"
+        required: false
+        type: string
+
+env:
+  PYTHON_VERSION: "3.12"
+  DJANGO_SETTINGS_MODULE: app.settings_dev
+  DJANGO_SECRET_KEY: ci-pentest-key-not-for-production
+  DB_ENGINE: django.db.backends.postgresql
+  DB_NAME: test_gsmvault
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  DB_HOST: localhost
+  DB_PORT: "5432"
+
+jobs:
+  pen-test:
+    name: Automated Penetration Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_gsmvault
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=app.settings_dev
+
+      - name: Django deployment security check
+        run: |
+          echo "### Django --deploy check" | tee /tmp/pentest-report.txt
+          python manage.py check --deploy --settings=app.settings_production 2>&1 | tee -a /tmp/pentest-report.txt || true
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_production
+          DJANGO_SECRET_KEY: ci-deploy-check-key-not-for-production
+          DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_gsmvault
+
+      - name: Security headers check
+        run: |
+          echo "" >> /tmp/pentest-report.txt
+          echo "### Security Headers Analysis" >> /tmp/pentest-report.txt
+
+          # Start Django server in background
+          python manage.py runserver 0.0.0.0:8000 --settings=app.settings_dev &
+          SERVER_PID=$!
+          sleep 5
+
+          # Check security headers
+          HEADERS=$(curl -sI http://localhost:8000/ 2>/dev/null || true)
+
+          EXPECTED_HEADERS=(
+            "X-Frame-Options"
+            "X-Content-Type-Options"
+            "X-XSS-Protection"
+            "Referrer-Policy"
+          )
+
+          for HEADER in "${EXPECTED_HEADERS[@]}"; do
+            if echo "$HEADERS" | grep -qi "$HEADER"; then
+              echo "PRESENT: $HEADER" >> /tmp/pentest-report.txt
+            else
+              echo "::warning::Missing security header: $HEADER"
+              echo "MISSING: $HEADER" >> /tmp/pentest-report.txt
+            fi
+          done
+
+          # Check for information disclosure headers
+          DISCLOSURE_HEADERS=("Server" "X-Powered-By")
+          for HEADER in "${DISCLOSURE_HEADERS[@]}"; do
+            if echo "$HEADERS" | grep -qi "$HEADER"; then
+              echo "::warning::Information disclosure header present: $HEADER"
+              echo "DISCLOSURE: $HEADER is present (consider removing)" >> /tmp/pentest-report.txt
+            fi
+          done
+
+          kill $SERVER_PID 2>/dev/null || true
+
+      - name: CSRF protection verification
+        run: |
+          echo "" >> /tmp/pentest-report.txt
+          echo "### CSRF Protection Check" >> /tmp/pentest-report.txt
+
+          # Check settings for CSRF configuration
+          python3 -c "
+          import os
+          os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings_dev')
+          import django
+          django.setup()
+          from django.conf import settings
+
+          checks = {
+              'CSRF_COOKIE_SECURE': getattr(settings, 'CSRF_COOKIE_SECURE', False),
+              'CSRF_COOKIE_HTTPONLY': getattr(settings, 'CSRF_COOKIE_HTTPONLY', False),
+              'CSRF_USE_SESSIONS': getattr(settings, 'CSRF_USE_SESSIONS', False),
+              'SESSION_COOKIE_SECURE': getattr(settings, 'SESSION_COOKIE_SECURE', False),
+              'SESSION_COOKIE_HTTPONLY': getattr(settings, 'SESSION_COOKIE_HTTPONLY', True),
+              'SECURE_BROWSER_XSS_FILTER': getattr(settings, 'SECURE_BROWSER_XSS_FILTER', False),
+              'SECURE_CONTENT_TYPE_NOSNIFF': getattr(settings, 'SECURE_CONTENT_TYPE_NOSNIFF', False),
+              'X_FRAME_OPTIONS': getattr(settings, 'X_FRAME_OPTIONS', 'SAMEORIGIN'),
+          }
+          for key, value in checks.items():
+              print(f'{key} = {value}')
+          " | tee -a /tmp/pentest-report.txt
+
+      - name: OWASP ZAP Baseline Scan
+        if: inputs.zap_scan == 'true'
+        run: |
+          echo "" >> /tmp/pentest-report.txt
+          echo "### OWASP ZAP Baseline Scan" >> /tmp/pentest-report.txt
+
+          # Start Django server
+          python manage.py runserver 0.0.0.0:8000 --settings=app.settings_dev &
+          SERVER_PID=$!
+          sleep 5
+
+          TARGET="${{ inputs.target_url }}"
+          if [ -z "$TARGET" ]; then
+            TARGET="http://localhost:8000"
+          fi
+
+          # Run ZAP baseline scan via Docker
+          docker run --rm --network=host \
+            -v /tmp:/zap/wrk:rw \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+              -t "$TARGET" \
+              -r /zap/wrk/zap-report.html \
+              -J /zap/wrk/zap-report.json \
+              -I \
+            2>&1 | tee -a /tmp/pentest-report.txt || true
+
+          kill $SERVER_PID 2>/dev/null || true
+        continue-on-error: true
+
+      - name: Bandit security scan
+        run: |
+          echo "" >> /tmp/pentest-report.txt
+          echo "### Bandit Static Analysis" >> /tmp/pentest-report.txt
+
+          pip install bandit[toml]
+          bandit -r apps/ \
+            --severity-level high \
+            --confidence-level high \
+            --exclude "*/tests*,*/migrations/*" \
+            2>&1 | tee -a /tmp/pentest-report.txt || true
+
+      - name: Upload penetration test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pentest-report-${{ github.run_id }}
+          path: |
+            /tmp/pentest-report.txt
+            /tmp/zap-report.html
+            /tmp/zap-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## Penetration Test Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Date**: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_STEP_SUMMARY"
+          echo "**ZAP Scan**: ${{ inputs.zap_scan }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          head -100 /tmp/pentest-report.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

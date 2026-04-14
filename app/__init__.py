@@ -7,6 +7,10 @@ This file marks the directory as a Python package and exposes:
     • Celery app instance for worker autodiscovery (required by django-celery-beat)
 """
 
+# Must be first — fixes Python 3.13+ WMI deadlock on Windows before Celery
+# calls platform.system() at import time.
+from . import _platform_fix  # noqa: F401
+
 # Celery bootstrap — required so Django finds the broker on startup and
 # autodiscover_tasks() runs for every INSTALLED_APP.
 from .celery import app as celery_app

@@ -47,6 +47,7 @@ def _ads_enabled() -> bool:
         settings_obj = _ads_settings()
         return bool(settings_obj.get("ads_enabled", False))
     except Exception:
+        logger.warning("ads_enabled check failed, falling back to feature flags")
         return feature_flags.ads_enabled()
 
 
@@ -55,6 +56,7 @@ def _has_ads_consent(request: HttpRequest) -> bool:
     try:
         return consent_check("ads", request)
     except Exception:
+        logger.warning("ads consent check failed, defaulting to no-consent")
         return False
 
 
@@ -65,6 +67,7 @@ def _log(request: HttpRequest, message: str, **extra):
     try:
         log_event(logger, "info", message, **payload)
     except Exception:
+        logger.debug("log_event call failed for: %s", message)
         return
 
 

@@ -1,7 +1,7 @@
 {# templates/forum/fragments/topic_tags.html — Tag chips for a topic #}
 <div class="flex items-center gap-2 flex-wrap">
   {% for tag in topic_tags %}
-  <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">
+  <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-(--color-accent)">
     <i data-lucide="hash" class="w-3 h-3"></i> {{ tag.name }}
   </span>
   {% endfor %}

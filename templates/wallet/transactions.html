@@ -7,16 +7,16 @@
 {% block page_header %}
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
-      <i data-lucide="list" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl font-bold text-(--color-text-primary) flex items-center gap-3">
+      <i data-lucide="list" class="w-8 h-8 text-(--color-accent)"></i>
       Transaction History
     </h1>
     {% if wallet %}
-    <p class="text-[var(--color-text-secondary)] mt-1">Balance: <strong class="text-[var(--color-success)]">{{ wallet.balance }}</strong> {{ wallet.currency }}</p>
+    <p class="text-(--color-text-secondary) mt-1">Balance: <strong class="text-(--color-success)">{{ wallet.balance }}</strong> {{ wallet.currency }}</p>
     {% endif %}
   </div>
   <a href="{% url 'wallet_public:dashboard' %}"
-     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors">
     <i data-lucide="wallet" class="w-4 h-4"></i> Back to Wallet
   </a>
 </div>

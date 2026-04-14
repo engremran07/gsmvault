@@ -2,30 +2,30 @@
 {# Loaded via hx-get into post_detail.html ad-gate placeholder #}
 {% load ads_tags %}
 
-<div class="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 text-center"
+<div class="rounded-lg border border-accent/30 bg-(--color-bg-secondary) p-6 text-center"
      x-data="{ watching: false, countdown: {{ ad_gate_config.min_watch_seconds|default:30 }}, total: {{ ad_gate_config.min_watch_seconds|default:30 }}, done: false }"
      x-cloak>
-  <i data-lucide="lock" class="w-8 h-8 mx-auto mb-3 text-[var(--color-accent)]"></i>
+  <i data-lucide="lock" class="w-8 h-8 mx-auto mb-3 text-(--color-accent)"></i>
   <h3 class="text-lg font-bold mb-2">Unlock Full Article</h3>
-  <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+  <p class="text-sm text-(--color-text-secondary) mb-4">
     Watch a short ad to unlock the complete article.
   </p>
 
   {# ── Stage 1: Start button ── #}
   <div x-show="!watching && !done" x-cloak>
     <button @click="watching = true; let t = setInterval(() => { countdown--; if (countdown <= 0) { clearInterval(t); done = true; watching = false; } }, 1000)"
-            class="px-6 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition">
+            class="px-6 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) font-semibold hover:bg-(--color-accent-hover) transition">
       <i data-lucide="play" class="w-4 h-4 inline mr-1"></i> Watch Ad
     </button>
   </div>
 
   {# ── Stage 2: Countdown ── #}
   <div x-show="watching" x-cloak>
-    <div class="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2 mb-3">
-      <div class="bg-[var(--color-accent)] h-2 rounded-full transition-all"
+    <div class="w-full bg-(--color-bg-tertiary) rounded-full h-2 mb-3">
+      <div class="bg-(--color-accent) h-2 rounded-full transition-all"
            :style="'width:' + (100 - (countdown / total) * 100) + '%'"></div>
     </div>
-    <p class="text-sm text-[var(--color-text-muted)]">
+    <p class="text-sm text-(--color-text-muted)">
       Please wait <span x-text="countdown"></span>s…
     </p>
   </div>

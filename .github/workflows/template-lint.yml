@@ -1,0 +1,171 @@
+name: Template Lint
+
+on:
+  push:
+    paths:
+      - "templates/**"
+  pull_request:
+    paths:
+      - "templates/**"
+
+concurrency:
+  group: template-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-templates:
+    name: Lint HTML Templates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for {% extends %} in fragment templates
+        run: |
+          echo "### Checking fragment templates for forbidden {% extends %} usage..."
+          VIOLATIONS=0
+          FRAGMENT_DIRS=$(find templates -type d -name "fragments" 2>/dev/null)
+
+          for DIR in $FRAGMENT_DIRS; do
+            FILES=$(find "$DIR" -name "*.html" 2>/dev/null)
+            for FILE in $FILES; do
+              if grep -qn '{% extends' "$FILE" 2>/dev/null; then
+                LINE=$(grep -n '{% extends' "$FILE" | head -1)
+                echo "::error file=${FILE}::HTMX fragment must NOT use {% extends %}: ${LINE}"
+                VIOLATIONS=$((VIOLATIONS + 1))
+              fi
+            done
+          done
+
+          if [ "$VIOLATIONS" -gt 0 ]; then
+            echo "::error::Found ${VIOLATIONS} fragment(s) with {% extends %}. HTMX fragments must be standalone snippets."
+            exit 1
+          fi
+          echo "All fragment templates are standalone (no {% extends %} found)."
+
+      - name: Check x-cloak on x-show elements
+        run: |
+          echo "### Checking Alpine.js elements for x-cloak..."
+          WARNINGS=0
+
+          find templates -name "*.html" -not -path "*/fragments/*" | while read -r FILE; do
+            # Find lines with x-show that lack x-cloak on the same element
+            # This is a heuristic: check if x-show appears without x-cloak on the same line or nearby
+            grep -n 'x-show=' "$FILE" 2>/dev/null | while read -r LINE; do
+              LINENUM=$(echo "$LINE" | cut -d: -f1)
+              CONTENT=$(echo "$LINE" | cut -d: -f2-)
+              if ! echo "$CONTENT" | grep -q 'x-cloak'; then
+                echo "::warning file=${FILE},line=${LINENUM}::x-show without x-cloak may cause FOUC"
+                WARNINGS=$((WARNINGS + 1))
+              fi
+            done
+          done
+          echo "x-cloak check complete."
+
+      - name: Check for inline styles
+        run: |
+          echo "### Checking for inline styles..."
+          VIOLATIONS=0
+
+          find templates -name "*.html" | while read -r FILE; do
+            MATCHES=$(grep -cn 'style="' "$FILE" 2>/dev/null || echo "0")
+            if [ "$MATCHES" -gt 0 ]; then
+              LINES=$(grep -n 'style="' "$FILE" 2>/dev/null)
+              while IFS= read -r LINE; do
+                LINENUM=$(echo "$LINE" | cut -d: -f1)
+                # Allow certain safe inline styles (e.g., dynamic widths from template vars)
+                CONTENT=$(echo "$LINE" | cut -d: -f2-)
+                if echo "$CONTENT" | grep -qE 'style="[^"]*\{\{'; then
+                  continue  # Skip dynamic template-injected styles
+                fi
+                echo "::warning file=${FILE},line=${LINENUM}::Inline style found — prefer Tailwind CSS classes"
+                VIOLATIONS=$((VIOLATIONS + 1))
+              done <<< "$LINES"
+            fi
+          done
+          echo "Found ${VIOLATIONS:-0} inline style warnings."
+
+      - name: Validate reusable component usage
+        run: |
+          echo "### Checking for inline patterns that should use components..."
+          VIOLATIONS=0
+
+          # Check for inline KPI cards that should use _admin_kpi_card.html
+          find templates/admin -name "*.html" 2>/dev/null | while read -r FILE; do
+            # Look for common KPI card inline patterns (stat value + label in a card)
+            if grep -qE '<div[^>]*class="[^"]*stat[^"]*"' "$FILE" 2>/dev/null; then
+              if ! grep -q '_admin_kpi_card' "$FILE" 2>/dev/null; then
+                echo "::warning file=${FILE}::Possible inline KPI card — consider using {% include 'components/_admin_kpi_card.html' %}"
+              fi
+            fi
+          done
+
+          # Check for inline pagination that should use _pagination.html
+          find templates -name "*.html" -not -path "*/components/*" | while read -r FILE; do
+            if grep -qE 'page_obj\.has_previous|page_obj\.has_next|paginator\.page_range' "$FILE" 2>/dev/null; then
+              if ! grep -q '_pagination' "$FILE" 2>/dev/null; then
+                echo "::warning file=${FILE}::Inline pagination found — consider using {% include 'components/_pagination.html' %}"
+              fi
+            fi
+          done
+
+          # Check for inline modal HTML that should use _modal.html
+          find templates -name "*.html" -not -path "*/components/*" | while read -r FILE; do
+            if grep -qE 'class="[^"]*modal[^"]*"' "$FILE" 2>/dev/null; then
+              if ! grep -q '_modal' "$FILE" 2>/dev/null && ! grep -q '_confirm_dialog' "$FILE" 2>/dev/null; then
+                echo "::warning file=${FILE}::Inline modal found — consider using {% include 'components/_modal.html' %}"
+              fi
+            fi
+          done
+
+          echo "Component usage check complete."
+
+      - name: Check for animation conflicts with x-show
+        run: |
+          echo "### Checking for Alpine x-show + animation class conflicts..."
+
+          find templates -name "*.html" | while read -r FILE; do
+            grep -n 'x-show=' "$FILE" 2>/dev/null | while read -r LINE; do
+              LINENUM=$(echo "$LINE" | cut -d: -f1)
+              CONTENT=$(echo "$LINE" | cut -d: -f2-)
+              if echo "$CONTENT" | grep -qE 'animate-|animation-'; then
+                echo "::warning file=${FILE},line=${LINENUM}::x-show with CSS animation class — animation may override display:none"
+              fi
+            done
+          done
+          echo "Animation conflict check complete."
+
+      - name: Check template block structure
+        run: |
+          echo "### Checking template block structure..."
+
+          # Verify page templates extend a base layout
+          find templates -name "*.html" \
+            -not -path "*/fragments/*" \
+            -not -path "*/components/*" \
+            -not -path "*/base/*" \
+            -not -path "*/layouts/*" \
+            -not -path "*/account/*" \
+            -not -name "robots.txt" \
+            -not -name "sitemap*" | while read -r FILE; do
+            # Check if it's a full page template (has <html> or {% block %})
+            if grep -q '{% block ' "$FILE" 2>/dev/null; then
+              if ! grep -q '{% extends' "$FILE" 2>/dev/null; then
+                echo "::warning file=${FILE}::Template has {% block %} but no {% extends %} — may be orphaned"
+              fi
+            fi
+          done
+          echo "Block structure check complete."
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## Template Lint Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Check | Description |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|-------------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Fragment extends | No {% extends %} in fragments/ |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| x-cloak | x-show elements have x-cloak |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Inline styles | Prefer Tailwind classes |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Component usage | Use reusable components |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Animation conflicts | No animate-* on x-show |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Block structure | Pages extend base layouts |" >> "$GITHUB_STEP_SUMMARY"

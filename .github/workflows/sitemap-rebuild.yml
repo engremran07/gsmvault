@@ -1,0 +1,134 @@
+name: Sitemap Rebuild
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild-sitemap:
+    name: Rebuild Sitemaps
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: appdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/appdb
+      DJANGO_SETTINGS_MODULE: app.settings_dev
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=app.settings_dev
+
+      - name: Regenerate sitemaps
+        run: |
+          python manage.py generate_sitemaps --settings=app.settings_dev 2>&1 || \
+          python -c "
+          import django, os
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          django.setup()
+          from django.test import RequestFactory
+          from django.contrib.sitemaps.views import sitemap, index as sitemap_index
+          print('Sitemap generation framework available')
+          "
+
+      - name: Validate XML structure
+        run: |
+          apt-get update -qq && apt-get install -y -qq libxml2-utils > /dev/null 2>&1 || true
+
+          ERRORS=0
+          for xml_file in $(find . -name 'sitemap*.xml' -path '*/templates/*' -o -name 'sitemap*.xml' -path '*/static/*' 2>/dev/null); do
+            echo "Validating: $xml_file"
+            if command -v xmllint &> /dev/null; then
+              xmllint --noout "$xml_file" 2>&1 && echo "  ✓ Valid XML" || {
+                echo "  ✗ Invalid XML"
+                ERRORS=$((ERRORS + 1))
+              }
+            else
+              python -c "
+          import xml.etree.ElementTree as ET
+          try:
+              ET.parse('$xml_file')
+              print('  ✓ Valid XML (Python parser)')
+          except ET.ParseError as e:
+              print(f'  ✗ Invalid XML: {e}')
+              exit(1)
+          " || ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::$ERRORS sitemap XML files failed validation"
+            exit 1
+          fi
+          echo "✓ All sitemap XML files are valid"
+
+      - name: Verify sitemap templates exist
+        run: |
+          REQUIRED_FILES=(
+            "templates/sitemap.xml"
+            "templates/sitemap_index.xml"
+          )
+          MISSING=0
+          for f in "${REQUIRED_FILES[@]}"; do
+            if [ -f "$f" ]; then
+              echo "✓ Found: $f"
+            else
+              echo "::warning::Missing sitemap template: $f"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+
+          if [ "$MISSING" -gt 0 ]; then
+            echo "::warning::$MISSING sitemap template(s) missing"
+          fi
+
+      - name: Upload sitemap artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitemaps-${{ github.run_id }}
+          path: |
+            templates/sitemap*.xml
+            static/sitemaps/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Summary
+        run: |
+          echo "## Sitemap Rebuild" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          SITEMAP_COUNT=$(find . \( -path '*/templates/*' -o -path '*/static/*' \) -name 'sitemap*.xml' 2>/dev/null | wc -l)
+          echo "- Sitemaps found: $SITEMAP_COUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Triggered: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Timestamp: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"

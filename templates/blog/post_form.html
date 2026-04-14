@@ -18,26 +18,26 @@
     {% include "components/_alert.html" with type="error" message=form.non_field_errors.0 %}
     {% endif %}
 
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 space-y-5">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6 space-y-5">
       <div>
         <label for="id_title" class="block text-sm font-medium mb-1">Title</label>
         <input type="text" name="title" id="id_title" required
-               class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+               class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                value="{{ form.title.value|default:'' }}">
-        {% if form.title.errors %}<p class="text-xs text-[var(--color-error)] mt-1">{{ form.title.errors.0 }}</p>{% endif %}
+        {% if form.title.errors %}<p class="text-xs text-(--color-error) mt-1">{{ form.title.errors.0 }}</p>{% endif %}
       </div>
 
       <div>
         <label for="id_summary" class="block text-sm font-medium mb-1">Summary</label>
         <textarea name="summary" id="id_summary" rows="2"
-                  class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">{{ form.summary.value|default:'' }}</textarea>
+                  class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition">{{ form.summary.value|default:'' }}</textarea>
       </div>
 
       <div>
         <label for="id_body" class="block text-sm font-medium mb-1">Content</label>
         <textarea name="body" id="id_body" rows="20" required
-                  class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">{{ form.body.value|default:'' }}</textarea>
-        {% if form.body.errors %}<p class="text-xs text-[var(--color-error)] mt-1">{{ form.body.errors.0 }}</p>{% endif %}
+                  class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-(--color-text-primary) font-mono text-sm focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition">{{ form.body.value|default:'' }}</textarea>
+        {% if form.body.errors %}<p class="text-xs text-(--color-error) mt-1">{{ form.body.errors.0 }}</p>{% endif %}
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -54,16 +54,16 @@
       <div>
         <label for="id_tags" class="block text-sm font-medium mb-1">Tags</label>
         {{ form.tags }}
-        <p class="text-xs text-[var(--color-text-muted)] mt-1">If left empty, tags will be auto-suggested.</p>
+        <p class="text-xs text-(--color-text-muted) mt-1">If left empty, tags will be auto-suggested.</p>
       </div>
     </div>
 
     <div class="flex gap-3">
       <button type="submit"
-              class="rounded-lg bg-[var(--color-accent)] px-6 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+              class="rounded-lg bg-(--color-accent) px-6 py-2.5 text-(--color-accent-text) font-medium hover:bg-(--color-accent-hover) transition">
         {% if editing %}Update Post{% else %}Save Post{% endif %}
       </button>
-      <a href="{% url 'blog:post_list' %}" class="rounded-lg border border-[var(--color-border)] px-6 py-2.5 hover:bg-[var(--color-bg-secondary)] transition">
+      <a href="{% url 'blog:post_list' %}" class="rounded-lg border border-(--color-border) px-6 py-2.5 hover:bg-(--color-bg-secondary) transition">
         Cancel
       </a>
     </div>

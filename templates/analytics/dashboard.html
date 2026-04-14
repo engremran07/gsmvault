@@ -5,7 +5,7 @@
 {% block page_header %}
 <div class="flex items-center justify-between">
   <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
-  <a href="{% url 'analytics:realtime_dashboard' %}" class="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+  <a href="{% url 'analytics:realtime_dashboard' %}" class="rounded-lg border border-(--color-border) px-4 py-2 text-sm hover:bg-(--color-bg-secondary) transition">
     {% include "components/_icon.html" with name="activity" size="14" %}
     Realtime
   </a>
@@ -28,16 +28,16 @@
 <section class="mb-8">
   <h2 class="text-lg font-semibold mb-4">Totals</h2>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-      <p class="text-sm text-[var(--color-text-muted)]">Total Page Views</p>
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+      <p class="text-sm text-(--color-text-muted)">Total Page Views</p>
       <p class="text-2xl font-bold mt-1">{{ total_page_views|default:"0" }}</p>
     </div>
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-      <p class="text-sm text-[var(--color-text-muted)]">Total Downloads</p>
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+      <p class="text-sm text-(--color-text-muted)">Total Downloads</p>
       <p class="text-2xl font-bold mt-1">{{ total_downloads|default:"0" }}</p>
     </div>
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5">
-      <p class="text-sm text-[var(--color-text-muted)]">Total Searches</p>
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5">
+      <p class="text-sm text-(--color-text-muted)">Total Searches</p>
       <p class="text-2xl font-bold mt-1">{{ total_searches|default:"0" }}</p>
     </div>
   </div>
@@ -47,9 +47,9 @@
 <section class="mb-8">
   <h2 class="text-lg font-semibold mb-4">Last 30 Days</h2>
   {% if last_30_days %}
-  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+  <div class="rounded-lg border border-(--color-border) overflow-hidden">
     <table class="w-full text-sm">
-      <thead class="bg-[var(--color-bg-secondary)]">
+      <thead class="bg-(--color-bg-secondary)">
         <tr>
           <th class="px-4 py-3 text-left font-medium">Date</th>
           <th class="px-4 py-3 text-right font-medium">Page Views</th>
@@ -57,9 +57,9 @@
           <th class="px-4 py-3 text-right font-medium">Searches</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for day in last_30_days %}
-        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+        <tr class="hover:bg-(--color-bg-secondary) transition">
           <td class="px-4 py-3">{{ day.date|date:"M d" }}</td>
           <td class="px-4 py-3 text-right">{{ day.page_views|default:"0" }}</td>
           <td class="px-4 py-3 text-right">{{ day.downloads|default:"0" }}</td>
@@ -78,30 +78,30 @@
 <section>
   <h2 class="text-lg font-semibold mb-4">Reports</h2>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <a href="{% url 'analytics:traffic_report' %}" class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)] transition group">
+    <a href="{% url 'analytics:traffic_report' %}" class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5 hover:border-(--color-accent) transition group">
       <div class="flex items-center gap-3">
         {% include "components/_icon.html" with name="trending-up" size="20" %}
         <div>
-          <p class="font-medium group-hover:text-[var(--color-accent)] transition">Traffic Report</p>
-          <p class="text-xs text-[var(--color-text-muted)]">Page views, sessions, referrers</p>
+          <p class="font-medium group-hover:text-(--color-accent) transition">Traffic Report</p>
+          <p class="text-xs text-(--color-text-muted)">Page views, sessions, referrers</p>
         </div>
       </div>
     </a>
-    <a href="{% url 'analytics:engagement_report' %}" class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)] transition group">
+    <a href="{% url 'analytics:engagement_report' %}" class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5 hover:border-(--color-accent) transition group">
       <div class="flex items-center gap-3">
         {% include "components/_icon.html" with name="heart" size="20" %}
         <div>
-          <p class="font-medium group-hover:text-[var(--color-accent)] transition">Engagement Report</p>
-          <p class="text-xs text-[var(--color-text-muted)]">Comments, shares, time on page</p>
+          <p class="font-medium group-hover:text-(--color-accent) transition">Engagement Report</p>
+          <p class="text-xs text-(--color-text-muted)">Comments, shares, time on page</p>
         </div>
       </div>
     </a>
-    <a href="{% url 'analytics:content_report' %}" class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-5 hover:border-[var(--color-accent)] transition group">
+    <a href="{% url 'analytics:content_report' %}" class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-5 hover:border-(--color-accent) transition group">
       <div class="flex items-center gap-3">
         {% include "components/_icon.html" with name="file-text" size="20" %}
         <div>
-          <p class="font-medium group-hover:text-[var(--color-accent)] transition">Content Report</p>
-          <p class="text-xs text-[var(--color-text-muted)]">Top posts, categories, authors</p>
+          <p class="font-medium group-hover:text-(--color-accent) transition">Content Report</p>
+          <p class="text-xs text-(--color-text-muted)">Top posts, categories, authors</p>
         </div>
       </div>
     </a>

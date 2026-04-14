@@ -11,7 +11,8 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.devices.models import Device, DeviceEvent
+from apps.devices.models import Device, DeviceConfig, DeviceEvent
+from apps.devices.models_quota import UserDeviceQuota
 from apps.devices.utils.device_fingerprint import make_os_fingerprint
 
 if TYPE_CHECKING:
@@ -319,7 +320,36 @@ def _collect_device_names(
 @login_required
 def my_devices(request: HttpRequest) -> HttpResponse:
     devices = Device.objects.filter(user=request.user).order_by("-last_seen_at")[:20]
-    return render(request, "devices/my_devices.html", {"devices": devices})
+    device_count = devices.count()
+
+    # Quota info: per-user override or global default
+    user_quota = UserDeviceQuota.objects.filter(user=request.user).first()
+    try:
+        config = DeviceConfig.get_solo()  # type: ignore[attr-defined]
+        max_default = config.max_devices_default or 5
+    except Exception:
+        max_default = 5
+
+    max_devices = (
+        user_quota.max_devices
+        if (user_quota and user_quota.max_devices)
+        else max_default
+    )
+    quota_window = user_quota.window if user_quota else "6m"
+    last_reset = user_quota.last_reset_at if user_quota else None
+
+    return render(
+        request,
+        "devices/my_devices.html",
+        {
+            "devices": devices,
+            "device_count": device_count,
+            "max_devices": max_devices,
+            "quota_window": quota_window,
+            "last_reset": last_reset,
+            "quota_remaining": max(0, max_devices - device_count),
+        },
+    )
 
 
 @staff_member_required(login_url="admin_suite:admin_suite_login")

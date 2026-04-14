@@ -1,8 +1,8 @@
 {# templates/forum/fragments/faq_entries.html — 4PDA FAQ entries sidebar #}
 {% load static %}
 
-<div id="faq-entries" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5">
-  <h3 class="text-base font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
+<div id="faq-entries" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5">
+  <h3 class="text-base font-semibold text-(--color-text-primary) flex items-center gap-2 mb-4">
     <i data-lucide="help-circle" class="w-5 h-5 text-amber-400"></i>
     FAQ
   </h3>
@@ -13,10 +13,10 @@
       <span class="text-amber-400 font-bold text-sm mt-0.5">Q:</span>
       <div class="flex-1">
         <a href="#reply-{{ entry.reply.pk }}"
-           class="text-[var(--color-accent)] hover:underline text-sm font-medium">
+           class="text-(--color-accent) hover:underline text-sm font-medium">
           {{ entry.question }}
         </a>
-        <p class="text-xs text-[var(--color-text-secondary)]">
+        <p class="text-xs text-(--color-text-secondary)">
           by {{ entry.reply.user }} — {{ entry.reply.created_at|timesince }} ago
         </p>
       </div>
@@ -35,7 +35,7 @@
       {% endif %}
     </div>
     {% empty %}
-    <p class="text-[var(--color-text-secondary)] text-sm italic">No FAQ entries yet.</p>
+    <p class="text-(--color-text-secondary) text-sm italic">No FAQ entries yet.</p>
     {% endfor %}
   </div>
 </div>

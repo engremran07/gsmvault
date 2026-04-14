@@ -9,19 +9,19 @@
 {% block page_header %}
 <div class="mb-6">
   {# Breadcrumb #}
-  <nav class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-4">
-    <a href="{% url 'forum:index' %}" class="hover:text-[var(--color-accent)]">Forum</a>
+  <nav class="flex items-center gap-2 text-sm text-(--color-text-secondary) mb-4">
+    <a href="{% url 'forum:index' %}" class="hover:text-(--color-accent)">Forum</a>
     <i data-lucide="chevron-right" class="w-3 h-3"></i>
-    <a href="{% url 'forum:category_detail' slug=topic.category.slug %}" class="hover:text-[var(--color-accent)]">{{ topic.category.title }}</a>
+    <a href="{% url 'forum:category_detail' slug=topic.category.slug %}" class="hover:text-(--color-accent)">{{ topic.category.title }}</a>
     <i data-lucide="chevron-right" class="w-3 h-3"></i>
-    <span class="text-[var(--color-text-primary)] truncate">{{ topic.title }}</span>
+    <span class="text-(--color-text-primary) truncate">{{ topic.title }}</span>
   </nav>
 
   <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+      <h1 class="text-2xl font-bold text-(--color-text-primary) flex items-center gap-2">
         {% if topic.is_pinned or topic.is_globally_pinned %}
-        <i data-lucide="pin" class="w-5 h-5 text-yellow-400 flex-shrink-0"></i>
+        <i data-lucide="pin" class="w-5 h-5 text-yellow-400 shrink-0"></i>
         {% endif %}
         {% if topic.prefix %}
         <span class="text-xs px-2 py-0.5 rounded font-normal {{ topic.prefix.css_class|default:'bg-blue-500/20 text-blue-400' }}">{{ topic.prefix.name }}</span>
@@ -36,8 +36,8 @@
         </span>
         {% endif %}
       </h1>
-      <p class="text-sm text-[var(--color-text-secondary)] mt-1">
-        Posted by <a href="{% url 'forum:user_topics' pk=topic.user.pk %}" class="text-[var(--color-accent)]">{{ topic.user.username }}</a>
+      <p class="text-sm text-(--color-text-secondary) mt-1">
+        Posted by <a href="{% url 'forum:user_topics' pk=topic.user.pk %}" class="text-(--color-accent)">{{ topic.user.username }}</a>
         · {{ topic.created_at|timesince }} ago
         · {{ topic.view_count }} views · {{ topic.reply_count }} replies
       </p>
@@ -55,9 +55,9 @@
 
     {# Action buttons #}
     {% if user.is_authenticated %}
-    <div class="flex items-center gap-2 flex-shrink-0">
+    <div class="flex items-center gap-2 shrink-0">
       {# Favorite #}
-      <form hx-post="{% url 'forum:toggle_favorite' topic_pk=topic.pk %}" hx-target="#fav-wrapper" hx-swap="innerHTML" hx-boost="false">
+      <form hx-post="{% url 'forum:toggle_favorite' topic_pk=topic.pk %}" hx-target="#fav-wrapper" hx-swap="innerHTML">
         {% csrf_token %}
         <div id="fav-wrapper">
           {% include "forum/fragments/favorite_button.html" %}
@@ -65,7 +65,7 @@
       </form>
 
       {# Subscribe #}
-      <form hx-post="{% url 'forum:toggle_subscription' topic_pk=topic.pk %}" hx-target="#sub-wrapper" hx-swap="innerHTML" hx-boost="false">
+      <form hx-post="{% url 'forum:toggle_subscription' topic_pk=topic.pk %}" hx-target="#sub-wrapper" hx-swap="innerHTML">
         {% csrf_token %}
         <div id="sub-wrapper">
           {% include "forum/fragments/subscribe_button.html" %}
@@ -75,33 +75,33 @@
       {# Staff actions #}
       {% if user.is_staff %}
       <div x-data="{ open: false }" class="relative">
-        <button @click="open = !open" class="p-2 rounded-lg hover:bg-[var(--color-bg-tertiary)] transition-colors">
-          <i data-lucide="more-vertical" class="w-5 h-5 text-[var(--color-text-secondary)]"></i>
+        <button @click="open = !open" class="p-2 rounded-lg hover:bg-(--color-bg-tertiary) transition-colors">
+          <i data-lucide="more-vertical" class="w-5 h-5 text-(--color-text-secondary)"></i>
         </button>
         <div x-show="open" x-cloak @click.outside="open = false"
-             class="absolute right-0 mt-2 w-48 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg shadow-lg z-10 py-1">
+             class="absolute right-0 mt-2 w-48 bg-(--color-bg-secondary) border border-(--color-border) rounded-lg shadow-lg z-10 py-1">
           {% if not topic.is_closed %}
           <form method="post" action="{% url 'forum:topic_close' pk=topic.pk %}">{% csrf_token %}
-            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)">
               <i data-lucide="lock" class="w-4 h-4 inline"></i> Close Topic
             </button>
           </form>
           {% else %}
           <form method="post" action="{% url 'forum:topic_reopen' pk=topic.pk %}">{% csrf_token %}
-            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)">
               <i data-lucide="unlock" class="w-4 h-4 inline"></i> Reopen Topic
             </button>
           </form>
           {% endif %}
           {% if not topic.is_pinned and not topic.is_globally_pinned %}
           <form method="post" action="{% url 'forum:topic_pin' pk=topic.pk %}">{% csrf_token %}
-            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)">
               <i data-lucide="pin" class="w-4 h-4 inline"></i> Pin Topic
             </button>
           </form>
           {% else %}
           <form method="post" action="{% url 'forum:topic_unpin' pk=topic.pk %}">{% csrf_token %}
-            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+            <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)">
               <i data-lucide="pin-off" class="w-4 h-4 inline"></i> Unpin Topic
             </button>
           </form>
@@ -109,32 +109,32 @@
           {# Move Topic #}
           <div x-data="{ showMove: false }">
             <button @click="showMove = !showMove" type="button"
-                    class="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)">
               <i data-lucide="move" class="w-4 h-4 inline"></i> Move Topic
             </button>
-            <div x-show="showMove" x-cloak class="px-4 py-2 border-t border-[var(--color-border)]">
+            <div x-show="showMove" x-cloak class="px-4 py-2 border-t border-(--color-border)">
               <form method="post" action="{% url 'forum:topic_move' pk=topic.pk %}" class="space-y-2">
                 {% csrf_token %}
                 <input type="number" name="to_category" required placeholder="Category ID"
-                       class="w-full px-2 py-1 text-xs rounded bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)]">
+                       class="w-full px-2 py-1 text-xs rounded bg-(--color-bg-tertiary) border border-(--color-border) text-(--color-text-primary)">
                 <input type="text" name="reason" placeholder="Reason"
-                       class="w-full px-2 py-1 text-xs rounded bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)]">
-                <button type="submit" class="text-xs px-3 py-1 rounded bg-[var(--color-accent)] text-[var(--color-accent-text)]">Move</button>
+                       class="w-full px-2 py-1 text-xs rounded bg-(--color-bg-tertiary) border border-(--color-border) text-(--color-text-primary)">
+                <button type="submit" class="text-xs px-3 py-1 rounded bg-(--color-accent) text-(--color-accent-text)">Move</button>
               </form>
             </div>
           </div>
           {# Merge Topic #}
           <div x-data="{ showMerge: false }">
             <button @click="showMerge = !showMerge" type="button"
-                    class="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+                    class="w-full text-left px-4 py-2 text-sm hover:bg-(--color-bg-tertiary) text-(--color-text-secondary)">
               <i data-lucide="git-merge" class="w-4 h-4 inline"></i> Merge Into…
             </button>
-            <div x-show="showMerge" x-cloak class="px-4 py-2 border-t border-[var(--color-border)]">
+            <div x-show="showMerge" x-cloak class="px-4 py-2 border-t border-(--color-border)">
               <form method="post" action="{% url 'forum:topic_merge' pk=topic.pk %}" class="space-y-2">
                 {% csrf_token %}
                 <input type="number" name="target_topic_id" required placeholder="Target topic ID"
-                       class="w-full px-2 py-1 text-xs rounded bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)]">
-                <button type="submit" class="text-xs px-3 py-1 rounded bg-[var(--color-accent)] text-[var(--color-accent-text)]">Merge</button>
+                       class="w-full px-2 py-1 text-xs rounded bg-(--color-bg-tertiary) border border-(--color-border) text-(--color-text-primary)">
+                <button type="submit" class="text-xs px-3 py-1 rounded bg-(--color-accent) text-(--color-accent-text)">Merge</button>
               </form>
             </div>
           </div>
@@ -153,9 +153,9 @@
 
 {# Polls #}
 {% for poll in polls %}
-<div class="mb-6 bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5">
-  <h3 class="font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
-    <i data-lucide="bar-chart-2" class="w-5 h-5 text-[var(--color-accent)]"></i>
+<div class="mb-6 bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5">
+  <h3 class="font-semibold text-(--color-text-primary) mb-3 flex items-center gap-2">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 text-(--color-accent)"></i>
     {{ poll.title }}
     {% if poll.is_secret %}<span class="text-xs px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">Secret</span>{% endif %}
     {% if not poll.is_open %}<span class="text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">Closed</span>{% endif %}
@@ -182,34 +182,33 @@
 
 {# Reply form #}
 {% if user.is_authenticated and not topic.is_closed %}
-<div class="mt-6 bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5">
-  <h3 class="font-semibold text-[var(--color-text-primary)] mb-3">Post a Reply</h3>
+<div class="mt-6 bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5">
+  <h3 class="font-semibold text-(--color-text-primary) mb-3">Post a Reply</h3>
   <form hx-post="{% url 'forum:reply_create' topic_pk=topic.pk %}"
         hx-target="#replies-list"
         hx-swap="beforeend"
-        hx-boost="false"
         hx-on::after-request="if(event.detail.successful) this.reset()">
     {% csrf_token %}
     <textarea name="content" rows="4" aria-label="Reply content"
-              class="w-full px-4 py-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:border-[var(--color-accent)] focus:outline-none resize-y"
+              class="w-full px-4 py-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-(--color-text-primary) placeholder-[var(--color-text-secondary)] focus:border-(--color-accent) focus:outline-none resize-y"
               placeholder="Write your reply (Markdown supported)…" required></textarea>
     <div class="flex justify-between items-center mt-3">
-      <span class="text-xs text-[var(--color-text-secondary)]">Markdown supported · @mention users</span>
+      <span class="text-xs text-(--color-text-secondary)">Markdown supported · @mention users</span>
       <button type="submit"
-              class="px-6 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition-colors">
+              class="px-6 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) font-medium hover:bg-(--color-accent-hover) transition-colors">
         Reply
       </button>
     </div>
   </form>
 </div>
 {% elif topic.is_closed %}
-<div class="mt-6 text-center py-6 text-[var(--color-text-secondary)]">
+<div class="mt-6 text-center py-6 text-(--color-text-secondary)">
   <i data-lucide="lock" class="w-6 h-6 mx-auto mb-2"></i>
   <p>This topic is closed. No new replies allowed.</p>
 </div>
 {% else %}
-<div class="mt-6 text-center py-6 text-[var(--color-text-secondary)]">
-  <a href="{% url 'users:account_login' %}" class="text-[var(--color-accent)] hover:underline">Sign in</a> to reply.
+<div class="mt-6 text-center py-6 text-(--color-text-secondary)">
+  <a href="{% url 'users:account_login' %}" class="text-(--color-accent) hover:underline">Sign in</a> to reply.
 </div>
 {% endif %}
 

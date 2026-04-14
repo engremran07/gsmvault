@@ -373,7 +373,27 @@ class ReplyViewSet(viewsets.ModelViewSet[ForumReply]):
 class TrustLevelSerializer(serializers.ModelSerializer[ForumTrustLevel]):
     class Meta:
         model = ForumTrustLevel
-        fields = "__all__"
+        fields = [
+            "id",
+            "level",
+            "title",
+            "color",
+            "min_topics_created",
+            "min_replies_posted",
+            "min_likes_received",
+            "min_likes_given",
+            "min_days_visited",
+            "min_topics_read",
+            "can_flag",
+            "can_create_polls",
+            "can_upload_attachments",
+            "can_send_private_messages",
+            "can_edit_own_posts",
+            "max_daily_topics",
+            "max_daily_replies",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 

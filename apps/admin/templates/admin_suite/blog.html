@@ -6,8 +6,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Blog</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Posts management &amp; publishing</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Blog</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Posts management &amp; publishing</p>
   </div>
   <div class="flex items-center gap-2">
     <a href="?new=1" class="btn btn-primary btn-press text-xs">
@@ -22,8 +22,8 @@
 
 {% block page_content %}
 {% if message %}
-<div class="glass rounded-xl p-4 mb-6 border-l-4 border-[var(--color-accent)]">
-  <p class="text-sm text-[var(--color-text-secondary)]">{{ message }}</p>
+<div class="glass rounded-xl p-4 mb-6 border-l-4 border-(--color-accent)">
+  <p class="text-sm text-(--color-text-secondary)">{{ message }}</p>
 </div>
 {% endif %}
 
@@ -43,7 +43,7 @@
   {# Status Doughnut (1/3) #}
   <div class="glass rounded-xl p-6 animate-in" style="--stagger: 4"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Post Status</h3>
+    <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">Post Status</h3>
     <div class="h-48" x-data="adminChart({
       type: 'doughnut',
       labels: ['Published', 'Draft', 'Scheduled', 'Archived'],
@@ -60,28 +60,28 @@
 <div class="glass rounded-xl p-5 mb-6 animate-in" style="--stagger: 5"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
   <div class="flex items-center gap-2 mb-3">
-    <i data-lucide="search" class="w-4 h-4 text-[var(--color-accent)]"></i>
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">SEO Health</h3>
+    <i data-lucide="search" class="w-4 h-4 text-(--color-accent)"></i>
+    <h3 class="text-sm font-semibold text-(--color-text-primary)">SEO Health</h3>
   </div>
   <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
     <div>
-      <p class="text-[10px] text-[var(--color-text-muted)] uppercase mb-1">Title Length</p>
+      <p class="text-[10px] text-(--color-text-muted) uppercase mb-1">Title Length</p>
       <span class="text-sm font-bold {% if seo_health.title_len > 30 and seo_health.title_len < 70 %}text-emerald-400{% else %}text-amber-400{% endif %}">{{ seo_health.title_len }}</span>
     </div>
     <div>
-      <p class="text-[10px] text-[var(--color-text-muted)] uppercase mb-1">Description</p>
+      <p class="text-[10px] text-(--color-text-muted) uppercase mb-1">Description</p>
       <span class="text-sm font-bold {% if seo_health.desc_len > 100 %}text-emerald-400{% else %}text-amber-400{% endif %}">{{ seo_health.desc_len }}</span>
     </div>
     <div>
-      <p class="text-[10px] text-[var(--color-text-muted)] uppercase mb-1">Words</p>
+      <p class="text-[10px] text-(--color-text-muted) uppercase mb-1">Words</p>
       <span class="text-sm font-bold {% if seo_health.word_count > 300 %}text-emerald-400{% else %}text-amber-400{% endif %}">{{ seo_health.word_count }}</span>
     </div>
     <div>
-      <p class="text-[10px] text-[var(--color-text-muted)] uppercase mb-1">Tags</p>
+      <p class="text-[10px] text-(--color-text-muted) uppercase mb-1">Tags</p>
       <span class="text-sm font-bold {% if seo_health.tag_count > 0 %}text-emerald-400{% else %}text-red-400{% endif %}">{{ seo_health.tag_count }}</span>
     </div>
     <div>
-      <p class="text-[10px] text-[var(--color-text-muted)] uppercase mb-1">Canonical</p>
+      <p class="text-[10px] text-(--color-text-muted) uppercase mb-1">Canonical</p>
       <span class="text-sm font-bold {% if seo_health.canonical %}text-emerald-400{% else %}text-amber-400{% endif %}">{{ seo_health.canonical|yesno:"Set,Missing" }}</span>
     </div>
   </div>
@@ -92,7 +92,7 @@
 {% if edit_post or request.GET.new %}
 <div class="glass rounded-xl p-6 mb-6 animate-in" style="--stagger: 5"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
+  <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">
     {% if edit_post %}Edit: {{ edit_post.title|truncatechars:40 }}{% else %}New Post{% endif %}
   </h3>
   <form method="post">
@@ -102,17 +102,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {% for field in form %}
       <div class="{% if field.name == 'body' or field.name == 'summary' %}md:col-span-2{% endif %}">
-        <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">{{ field.label }}</label>
+        <label class="block text-xs font-medium text-(--color-text-muted) mb-1">{{ field.label }}</label>
         {{ field }}
       </div>
       {% endfor %}
     </div>
     {% if suggested_tags %}
     <div class="mt-3">
-      <p class="text-xs text-[var(--color-text-muted)] mb-1">Suggested tags:</p>
+      <p class="text-xs text-(--color-text-muted) mb-1">Suggested tags:</p>
       <div class="flex flex-wrap gap-1">
         {% for tag in suggested_tags %}
-        <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] bg-[var(--color-accent)]/10 text-[var(--color-accent)]">{{ tag }}</span>
+        <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] bg-accent/10 text-(--color-accent)">{{ tag }}</span>
         {% endfor %}
       </div>
     </div>
@@ -136,58 +136,58 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)]/40">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+        <tr class="border-b border-(--color-border)/40">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">
             <a href="?sort=title&dir={% if sort == 'title' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Title {% if sort == 'title' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Title {% if sort == 'title' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden md:table-cell">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden md:table-cell">
             <a href="?sort=category&dir={% if sort == 'category' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Category {% if sort == 'category' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Category {% if sort == 'category' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">
             <a href="?sort=status&dir={% if sort == 'status' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Status {% if sort == 'status' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Status {% if sort == 'status' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden lg:table-cell">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden lg:table-cell">
             <a href="?sort=updated&dir={% if sort == 'updated' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Updated {% if sort == 'updated' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Updated {% if sort == 'updated' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Edit</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Edit</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]/20">
+      <tbody class="divide-y divide-(--color-border)/20">
         {% for post in posts %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors group">
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors group">
           <td class="py-3 px-4">
             <div class="flex items-center gap-2">
-              <i data-lucide="file-text" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
-              <span class="text-sm font-medium text-[var(--color-text-primary)] truncate max-w-[220px] group-hover:text-[var(--color-accent)] transition-colors">{{ post.title }}</span>
+              <i data-lucide="file-text" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
+              <span class="text-sm font-medium text-(--color-text-primary) truncate max-w-[220px] group-hover:text-(--color-accent) transition-colors">{{ post.title }}</span>
               {% if post.featured %}<i data-lucide="star" class="w-3 h-3 text-amber-400"></i>{% endif %}
             </div>
           </td>
-          <td class="py-3 px-4 hidden md:table-cell text-xs text-[var(--color-text-muted)]">{{ post.category|default:"—" }}</td>
+          <td class="py-3 px-4 hidden md:table-cell text-xs text-(--color-text-muted)">{{ post.category|default:"—" }}</td>
           <td class="py-3 px-4">
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium
               {% if post.status == 'published' %}bg-emerald-500/10 text-emerald-400
               {% elif post.status == 'draft' %}bg-amber-500/10 text-amber-400
               {% elif post.status == 'scheduled' %}bg-blue-500/10 text-blue-400
-              {% else %}bg-[var(--color-bg-primary)] text-[var(--color-text-muted)]{% endif %}">
-              <span class="w-1.5 h-1.5 rounded-full {% if post.status == 'published' %}bg-emerald-400{% elif post.status == 'draft' %}bg-amber-400{% elif post.status == 'scheduled' %}bg-blue-400{% else %}bg-[var(--color-text-muted)]{% endif %}"></span>
+              {% else %}bg-(--color-bg-primary) text-(--color-text-muted){% endif %}">
+              <span class="w-1.5 h-1.5 rounded-full {% if post.status == 'published' %}bg-emerald-400{% elif post.status == 'draft' %}bg-amber-400{% elif post.status == 'scheduled' %}bg-blue-400{% else %}bg-(--color-text-muted){% endif %}"></span>
               {{ post.get_status_display|default:post.status }}
             </span>
           </td>
-          <td class="py-3 px-4 hidden lg:table-cell text-xs text-[var(--color-text-muted)]">{{ post.updated_at|timesince }} ago</td>
+          <td class="py-3 px-4 hidden lg:table-cell text-xs text-(--color-text-muted)">{{ post.updated_at|timesince }} ago</td>
           <td class="py-3 px-4 text-right">
-            <a href="?post_id={{ post.pk }}" class="text-xs text-[var(--color-accent)] hover:underline">
+            <a href="?post_id={{ post.pk }}" class="text-xs text-(--color-accent) hover:underline">
               Edit <i data-lucide="pencil" class="w-3 h-3 inline"></i>
             </a>
           </td>
@@ -195,8 +195,8 @@
         {% empty %}
         <tr>
           <td colspan="5" class="py-12 text-center">
-            <i data-lucide="file-text" class="w-10 h-10 text-[var(--color-text-muted)] mx-auto mb-3"></i>
-            <p class="text-sm text-[var(--color-text-muted)]">No posts yet</p>
+            <i data-lucide="file-text" class="w-10 h-10 text-(--color-text-muted) mx-auto mb-3"></i>
+            <p class="text-sm text-(--color-text-muted)">No posts yet</p>
           </td>
         </tr>
         {% endfor %}
@@ -206,20 +206,20 @@
 
   {# Pagination #}
   {% if page_obj and page_obj.has_other_pages %}
-  <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-    <span class="text-xs text-[var(--color-text-muted)]">
+  <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+    <span class="text-xs text-(--color-text-muted)">
       {{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
     </span>
     <div class="flex items-center gap-1">
       {% if page_obj.has_previous %}
       <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
-         class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+         class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
       </a>
       {% endif %}
       {% if page_obj.has_next %}
       <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
-         class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+         class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
       </a>
       {% endif %}

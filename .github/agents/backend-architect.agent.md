@@ -35,6 +35,12 @@ You are the backend infrastructure orchestrator for this platform. You design an
 6. Full type hints on all public APIs
 7. Views return JSON (DRF) OR render templates (Django views) — never raw dicts
 8. Dissolved apps: import from target app only, never from stub
+9. Python file naming stays generic and canonical — no `_v2`, `_new`, `_backup`, `_refactor` variants
+10. For `apps.seo`, `apps.distribution`, and `apps.ads`, implement upgrades by extending existing modules and existing persisted data, never by parallel implementations
+11. Prefer in-place changes over file creation; new backend files require a clear architectural boundary need
+12. Keep frontend/backend/data contracts aligned — backend changes that affect UX must ship with matching template/component updates
+13. Preserve database and migration safety — no destructive schema shortcuts or hidden data-flow forks
+14. No-regression closure: backend work is incomplete until quality gate checks pass and behavior remains equivalent where intended
 
 ## Patterns
 

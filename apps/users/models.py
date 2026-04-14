@@ -25,7 +25,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 from solo.models import SingletonModel
@@ -119,13 +119,42 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email).strip().lower()
         username = (username or email.split("@")[0]).strip()[:150]
 
+        # Guard early to produce a clear message instead of a raw DB integrity traceback.
+        existing_username = (
+            self.model.objects.filter(username=username).only("id", "email").first()
+        )
+        if existing_username and str(existing_username.email).strip().lower() != email:
+            raise ValueError(
+                "Cannot create user: username "
+                f"'{username}' is already used by '{existing_username.email}'. "
+                "Use a different username or update that existing account."
+            )
+
+        existing_email = (
+            self.model.objects.filter(email__iexact=email)
+            .only("id", "username")
+            .first()
+        )
+        if existing_email and (existing_email.username or "") != username:
+            raise ValueError(
+                "Cannot create user: email "
+                f"'{email}' is already attached to username '{existing_email.username}'. "
+                "Use that username or update the existing account."
+            )
+
         with transaction.atomic():
-            user = self.model(email=email, username=username, **extra_fields)
-            if password:
-                user.set_password(password)
-            else:
-                user.set_unusable_password()
-            user.save(using=self._db)
+            try:
+                user = self.model(email=email, username=username, **extra_fields)
+                if password:
+                    user.set_password(password)
+                else:
+                    user.set_unusable_password()
+                user.save(using=self._db)
+            except IntegrityError as exc:
+                raise ValueError(
+                    "User creation failed due to a uniqueness conflict on username or email. "
+                    "Check existing accounts and retry with unique credentials."
+                ) from exc
         return user
 
     def create_user(

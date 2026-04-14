@@ -54,7 +54,7 @@
     {% if link_unknown %}
     <div class="flex items-center gap-3 p-3 rounded-lg bg-zinc-500/10 border border-zinc-500/20 text-sm">
       {% include "components/_icon.html" with name="help-circle" size="16" %}
-      <span class="text-[var(--color-text-muted)] font-medium">{{ link_unknown }} URL{{ link_unknown|pluralize }} not yet checked</span>
+      <span class="text-(--color-text-muted) font-medium">{{ link_unknown }} URL{{ link_unknown|pluralize }} not yet checked</span>
     </div>
     {% endif %}
   </div>
@@ -63,39 +63,39 @@
 
 {# ── Tabs ─────────────────────────────────────────────────────── #}
 <div x-data="{ tab: 'sitemap' }">
-  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit flex-wrap">
-    <button @click="tab='sitemap'" :class="tab==='sitemap' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Sitemap</button>
-    <button @click="tab='redirects'" :class="tab==='redirects' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Redirects</button>
-    <button @click="tab='suggestions'" :class="tab==='suggestions' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Link Suggestions</button>
-    <button @click="tab='serp'" :class="tab==='serp' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">SERP Preview</button>
+  <div class="flex gap-1 mb-6 bg-(--color-bg-tertiary)/40 rounded-xl p-1 w-fit flex-wrap">
+    <button @click="tab='sitemap'" :class="tab==='sitemap' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Sitemap</button>
+    <button @click="tab='redirects'" :class="tab==='redirects' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Redirects</button>
+    <button @click="tab='suggestions'" :class="tab==='suggestions' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">Link Suggestions</button>
+    <button @click="tab='serp'" :class="tab==='serp' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all">SERP Preview</button>
   </div>
 
   {# ── Sitemap Tab ──────────────────────────────────────────── #}
   <div x-show="tab==='sitemap'" x-cloak>
-    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]/20">
+    <div class="overflow-x-auto rounded-xl border border-(--color-border)/20">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">URL</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Freq</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Priority</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
+        <thead><tr class="border-b border-(--color-border)/20 bg-(--color-bg-secondary)/30">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">URL</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Freq</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Priority</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for s in sitemap_entries %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-            <td class="py-2 px-4 font-mono text-xs text-[var(--color-text-primary)] truncate max-w-[400px]">{{ s.url }}</td>
-            <td class="py-2 px-4 text-xs text-[var(--color-text-muted)]">{{ s.changefreq|default:"-" }}</td>
-            <td class="py-2 px-4 text-center text-xs text-[var(--color-text-muted)]">{{ s.priority|default:"-" }}</td>
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-2 px-4 font-mono text-xs text-(--color-text-primary) truncate max-w-[400px]">{{ s.url }}</td>
+            <td class="py-2 px-4 text-xs text-(--color-text-muted)">{{ s.changefreq|default:"-" }}</td>
+            <td class="py-2 px-4 text-center text-xs text-(--color-text-muted)">{{ s.priority|default:"-" }}</td>
             <td class="py-2 px-4 text-center">
               {% if s.last_status %}
                 {% if s.last_status >= 400 %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">{{ s.last_status }}</span>
                 {% elif s.last_status >= 300 %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">{{ s.last_status }}</span>
                 {% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">{{ s.last_status }}</span>{% endif %}
-              {% else %}<span class="text-xs text-[var(--color-text-muted)]">—</span>{% endif %}
+              {% else %}<span class="text-xs text-(--color-text-muted)">—</span>{% endif %}
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="4" class="py-8 text-center text-[var(--color-text-muted)]">{% include "components/_empty_state.html" with icon="map" message="No sitemap entries yet" %}</td></tr>
+          <tr><td colspan="4" class="py-8 text-center text-(--color-text-muted)">{% include "components/_empty_state.html" with icon="map" message="No sitemap entries yet" %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -104,22 +104,22 @@
 
   {# ── Redirects Tab ────────────────────────────────────────── #}
   <div x-show="tab==='redirects'" x-cloak>
-    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]/20">
+    <div class="overflow-x-auto rounded-xl border border-(--color-border)/20">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Source</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Target</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Type</th>
+        <thead><tr class="border-b border-(--color-border)/20 bg-(--color-bg-secondary)/30">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Source</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Target</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Type</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for r in redirects_list %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-            <td class="py-2 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ r.source }}</td>
-            <td class="py-2 px-4 font-mono text-xs text-[var(--color-text-secondary)]">{{ r.target }}</td>
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-2 px-4 font-mono text-xs text-(--color-text-primary)">{{ r.source }}</td>
+            <td class="py-2 px-4 font-mono text-xs text-(--color-text-secondary)">{{ r.target }}</td>
             <td class="py-2 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if r.is_permanent %}bg-blue-500/10 text-blue-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{% if r.is_permanent %}301{% else %}302{% endif %}</span></td>
           </tr>
           {% empty %}
-          <tr><td colspan="3" class="py-8 text-center text-[var(--color-text-muted)]">{% include "components/_empty_state.html" with icon="corner-down-right" message="No redirects configured" %}</td></tr>
+          <tr><td colspan="3" class="py-8 text-center text-(--color-text-muted)">{% include "components/_empty_state.html" with icon="corner-down-right" message="No redirects configured" %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -128,22 +128,22 @@
 
   {# ── Link Suggestions Tab ─────────────────────────────────── #}
   <div x-show="tab==='suggestions'" x-cloak>
-    <div class="overflow-x-auto rounded-xl border border-[var(--color-border)]/20">
+    <div class="overflow-x-auto rounded-xl border border-(--color-border)/20">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20 bg-[var(--color-bg-secondary)]/30">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Source Entity</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Target Entity</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Applied</th>
+        <thead><tr class="border-b border-(--color-border)/20 bg-(--color-bg-secondary)/30">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Source Entity</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Target Entity</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Applied</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for sg in suggestions %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-            <td class="py-2 px-4 text-xs text-[var(--color-text-primary)]">{{ sg.source }}</td>
-            <td class="py-2 px-4 text-xs text-[var(--color-text-secondary)]">{{ sg.target }}</td>
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-2 px-4 text-xs text-(--color-text-primary)">{{ sg.source }}</td>
+            <td class="py-2 px-4 text-xs text-(--color-text-secondary)">{{ sg.target }}</td>
             <td class="py-2 px-4 text-center">{% if sg.is_applied %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="3" class="py-8 text-center text-[var(--color-text-muted)]">{% include "components/_empty_state.html" with icon="link" message="No link suggestions" %}</td></tr>
+          <tr><td colspan="3" class="py-8 text-center text-(--color-text-muted)">{% include "components/_empty_state.html" with icon="link" message="No link suggestions" %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -155,26 +155,26 @@
     <div class="space-y-6">
       {% if serp_stats %}
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {% if serp_stats.title_length is not None %}<div class="p-4 rounded-lg border border-[var(--color-border)]/20">
-          <p class="text-xs text-[var(--color-text-muted)] mb-1">Title Length</p>
-          <p class="text-lg font-bold text-[var(--color-text-primary)]">{{ serp_stats.title_length }} <span class="text-xs text-[var(--color-text-muted)]">chars</span></p>
+        {% if serp_stats.title_length is not None %}<div class="p-4 rounded-lg border border-(--color-border)/20">
+          <p class="text-xs text-(--color-text-muted) mb-1">Title Length</p>
+          <p class="text-lg font-bold text-(--color-text-primary)">{{ serp_stats.title_length }} <span class="text-xs text-(--color-text-muted)">chars</span></p>
           {% if serp_stats.title_length > 60 %}<p class="text-xs text-amber-400 mt-1">Exceeds recommended 60 chars</p>{% elif serp_stats.title_length < 30 %}<p class="text-xs text-amber-400 mt-1">Below recommended minimum</p>{% else %}<p class="text-xs text-emerald-400 mt-1">Good length</p>{% endif %}
         </div>{% endif %}
-        {% if serp_stats.desc_length is not None %}<div class="p-4 rounded-lg border border-[var(--color-border)]/20">
-          <p class="text-xs text-[var(--color-text-muted)] mb-1">Description Length</p>
-          <p class="text-lg font-bold text-[var(--color-text-primary)]">{{ serp_stats.desc_length }} <span class="text-xs text-[var(--color-text-muted)]">chars</span></p>
+        {% if serp_stats.desc_length is not None %}<div class="p-4 rounded-lg border border-(--color-border)/20">
+          <p class="text-xs text-(--color-text-muted) mb-1">Description Length</p>
+          <p class="text-lg font-bold text-(--color-text-primary)">{{ serp_stats.desc_length }} <span class="text-xs text-(--color-text-muted)">chars</span></p>
           {% if serp_stats.desc_length > 160 %}<p class="text-xs text-amber-400 mt-1">Exceeds recommended 160 chars</p>{% elif serp_stats.desc_length < 50 %}<p class="text-xs text-amber-400 mt-1">Below recommended minimum</p>{% else %}<p class="text-xs text-emerald-400 mt-1">Good length</p>{% endif %}
         </div>{% endif %}
-        {% if serp_stats.keyword_density is not None %}<div class="p-4 rounded-lg border border-[var(--color-border)]/20">
-          <p class="text-xs text-[var(--color-text-muted)] mb-1">Keyword Density</p>
-          <p class="text-lg font-bold text-[var(--color-text-primary)]">{{ serp_stats.keyword_density }}%</p>
+        {% if serp_stats.keyword_density is not None %}<div class="p-4 rounded-lg border border-(--color-border)/20">
+          <p class="text-xs text-(--color-text-muted) mb-1">Keyword Density</p>
+          <p class="text-lg font-bold text-(--color-text-primary)">{{ serp_stats.keyword_density }}%</p>
         </div>{% endif %}
       </div>
       {% endif %}
 
       {% if heatmap %}
-      <div class="p-4 rounded-lg border border-[var(--color-border)]/20">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Crawl Heatmap</h3>
+      <div class="p-4 rounded-lg border border-(--color-border)/20">
+        <h3 class="text-sm font-semibold text-(--color-text-primary) mb-3">Crawl Heatmap</h3>
         <div class="flex flex-wrap gap-1">
           {% for page, count in heatmap.items %}
           <div class="px-2 py-1 rounded text-[10px] font-mono {% if count > 10 %}bg-red-500/20 text-red-400{% elif count > 5 %}bg-amber-500/20 text-amber-400{% else %}bg-emerald-500/20 text-emerald-400{% endif %}">{{ page|truncatechars:30 }} ({{ count }})</div>

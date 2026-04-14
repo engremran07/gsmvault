@@ -555,7 +555,7 @@ class VerificationFile(models.Model):
 # =====================================================================
 # THROUGH MODELS
 # =====================================================================
-class SiteSettingsMetaTagLink(models.Model):  # noqa: DJ008
+class SiteSettingsMetaTagLink(models.Model):
     site_settings = models.ForeignKey(
         SiteSettings, on_delete=models.CASCADE, related_name="meta_tag_links"
     )
@@ -572,8 +572,11 @@ class SiteSettingsMetaTagLink(models.Model):  # noqa: DJ008
             )
         ]
 
+    def __str__(self) -> str:
+        return f"MetaTag link: {self.meta_tag_id} \u2192 Site {self.site_settings_id}"  # type: ignore[attr-defined]
 
-class SiteSettingsVerificationFileLink(models.Model):  # noqa: DJ008
+
+class SiteSettingsVerificationFileLink(models.Model):
     site_settings = models.ForeignKey(
         SiteSettings, on_delete=models.CASCADE, related_name="verification_file_links"
     )
@@ -589,6 +592,9 @@ class SiteSettingsVerificationFileLink(models.Model):  # noqa: DJ008
                 fields=["site_settings", "verification_file"], name="site_file_link_idx"
             )
         ]
+
+    def __str__(self) -> str:
+        return f"File link: {self.verification_file_id} \u2192 Site {self.site_settings_id}"  # type: ignore[attr-defined]
 
 
 # =====================================================================

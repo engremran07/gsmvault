@@ -5,6 +5,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
+from apps.core.sanitizers import sanitize_html_content
+
 
 class Page(models.Model):
     """
@@ -86,6 +88,11 @@ class Page(models.Model):
 
     def __str__(self) -> str:
         return self.title or self.slug
+
+    def save(self, *args, **kwargs):  # noqa: DJ012
+        if self.content_format == "html":
+            self.content = sanitize_html_content(self.content)
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         """Return canonical URL for this page."""

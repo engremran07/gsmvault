@@ -1,0 +1,337 @@
+# AC Techs — Manual APK Build
+#
+# Builds a debug or release APK on demand and uploads it as a downloadable
+# artifact so you can side-load it directly onto a test device.
+#
+# How to use:
+#   GitHub → Actions → "Build APK" → Run workflow
+#   → choose build_type (debug | release)
+#   → click "Run workflow"
+#
+# After the workflow completes (~5-8 min), download the APK from the
+# "Artifacts" section of the run and install it with:
+#   adb install ac-techs-<type>-<run>.apk
+#
+# Optional repository secrets for debug builds:
+#   GOOGLE_SERVICES_JSON  — base64-encoded android/app/google-services.json
+#   FIREBASE_OPTIONS_DART — base64-encoded lib/firebase_options.dart
+# Debug builds can fall back to generated stubs when these are absent.
+#
+# Optional secrets (only needed for release builds):
+#   KEYSTORE_FILE         — base64-encoded release keystore
+#   KEYSTORE_PASSWORD     — keystore store password
+#   KEY_ALIAS             — key alias
+#   KEY_PASSWORD          — key password
+
+name: Build APK
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'APK build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+      flutter_version:
+        description: 'Optional exact Flutter version. Leave empty to use latest stable.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ inputs.build_type }} APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ─────────────────────────────────────────────────────────
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Resolve app version from pubspec
+        id: app_version
+        run: |
+          VERSION_LINE=$(grep -m1 '^version:' pubspec.yaml | sed 's/^version:[[:space:]]*//')
+          if [ -z "$VERSION_LINE" ]; then
+            echo "Unable to resolve version from pubspec.yaml"
+            exit 1
+          fi
+
+          VERSION_NAME=${VERSION_LINE%%+*}
+          VERSION_CODE=${VERSION_LINE##*+}
+
+          echo "full=$VERSION_LINE" >> "$GITHUB_OUTPUT"
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+
+      # ── Java ─────────────────────────────────────────────────────────────
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # ── Flutter ──────────────────────────────────────────────────────────
+      - name: Set up Flutter stable
+        if: ${{ inputs.flutter_version == '' }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.6'
+          channel: 'stable'
+          cache: true
+
+      - name: Set up Flutter ${{ inputs.flutter_version }}
+        if: ${{ inputs.flutter_version != '' }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ inputs.flutter_version }}
+          channel: 'stable'
+          cache: true
+
+      # ── Gradle cache (speeds up subsequent builds significantly) ──────────
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/*.kts') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      # ── Firebase secrets ─────────────────────────────────────────────────
+      - name: Resolve google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          APP_ID=$(grep -m1 'applicationId = "' android/app/build.gradle.kts | sed -E 's/.*applicationId = "([^"]+)".*/\1/')
+          if [ -z "$APP_ID" ]; then
+            echo "Unable to determine applicationId from android/app/build.gradle.kts"
+            exit 1
+          fi
+
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            if [ "${{ inputs.build_type }}" = "release" ]; then
+              echo "GOOGLE_SERVICES_JSON secret is required for release builds"
+              exit 1
+            fi
+
+            cat > android/app/google-services.json <<EOF
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "ci-stub",
+              "storage_bucket": "ci-stub.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:ci00000000000000",
+                  "android_client_info": {
+                    "package_name": "$APP_ID"
+                  }
+                },
+                "api_key": [
+                  {
+                    "current_key": "ci-debug-stub"
+                  }
+                ]
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+            echo "Using generated debug stub google-services.json"
+            exit 0
+          fi
+
+          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+          echo "Using google-services.json from secret"
+
+          if ! grep -q "\"package_name\":\"$APP_ID\"" android/app/google-services.json; then
+            echo "google-services.json is invalid or does not match applicationId $APP_ID"
+            exit 1
+          fi
+
+      - name: Resolve firebase_options.dart
+        env:
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+        run: |
+          mkdir -p lib
+
+          if [ -z "$FIREBASE_OPTIONS_DART" ]; then
+            if [ -f lib/firebase_options.dart ]; then
+              echo "Using checked-in lib/firebase_options.dart"
+              exit 0
+            fi
+
+            if [ "${{ inputs.build_type }}" = "release" ]; then
+              echo "FIREBASE_OPTIONS_DART secret is required for release builds"
+              exit 1
+            fi
+
+            cat > lib/firebase_options.dart <<'EOF'
+          // ignore_for_file: lines_longer_than_80_chars, avoid_classes_with_only_static_members
+          // CI debug stub - not used at runtime.
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform =>
+                throw UnsupportedError('CI debug stub only.');
+          }
+          EOF
+            echo "Using generated debug stub firebase_options.dart"
+            exit 0
+          fi
+
+          echo "$FIREBASE_OPTIONS_DART" | base64 --decode > lib/firebase_options.dart
+          echo "Using firebase_options.dart from FIREBASE_OPTIONS_DART secret"
+
+          if ! grep -q "class DefaultFirebaseOptions" lib/firebase_options.dart; then
+            echo "firebase_options.dart is invalid or missing DefaultFirebaseOptions"
+            exit 1
+          fi
+
+      # ── Release keystore (only for release builds) ────────────────────────
+      - name: Decode release keystore
+        if: inputs.build_type == 'release'
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        run: |
+          if [ -n "$KEYSTORE_FILE" ]; then
+            echo "$KEYSTORE_FILE" | base64 --decode > android/app/release.keystore
+          else
+            echo "⚠️  KEYSTORE_FILE secret not set — release APK will use debug signing."
+          fi
+
+      - name: Write key.properties
+        if: inputs.build_type == 'release'
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [ -n "$KEYSTORE_FILE" ]; then
+            cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=release.keystore
+          EOF
+          fi
+
+      # ── Flutter dependencies ──────────────────────────────────────────────
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Flutter analyse
+        run: flutter analyze --no-pub
+
+      - name: Set up Java 21 for Firestore emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: scripts/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('scripts/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-modules-
+
+      - name: Cache Firebase emulators
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('firebase.json') }}
+          restore-keys: ${{ runner.os }}-firebase-emulators-
+
+      - name: Install rules test dependencies
+        working-directory: scripts
+        run: npm ci
+
+      - name: Strict Firestore rules lint
+        working-directory: scripts
+        run: npm run lint:firestore-rules
+
+      - name: Strict Firestore rules tests
+        working-directory: scripts
+        run: npm test
+
+      - name: Restore Java 17 for Android build
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # ── Run tests before building ─────────────────────────────────────────
+      - name: Run tests
+        run: flutter test
+
+      # ── Build APK ─────────────────────────────────────────────────────────
+      - name: Build debug APK
+        if: inputs.build_type == 'debug'
+        run: flutter build apk --debug
+
+      - name: Build release APK
+        if: inputs.build_type == 'release'
+        run: flutter build apk --release --no-tree-shake-icons
+
+      # ── Stage artifact with a descriptive filename ────────────────────────
+      - name: Prepare artifact
+        run: |
+          mkdir -p /tmp/apk-output
+          if [ "${{ inputs.build_type }}" = "debug" ]; then
+            cp build/app/outputs/flutter-apk/app-debug.apk \
+               /tmp/apk-output/ac-techs-${{ steps.app_version.outputs.full }}-debug-run${{ github.run_number }}.apk
+          else
+            cp build/app/outputs/flutter-apk/app-release.apk \
+               /tmp/apk-output/ac-techs-${{ steps.app_version.outputs.full }}-release-run${{ github.run_number }}.apk
+          fi
+          ls -lh /tmp/apk-output/
+
+      # ── Upload APK artifact ───────────────────────────────────────────────
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ac-techs-${{ steps.app_version.outputs.full }}-${{ inputs.build_type }}-run${{ github.run_number }}
+          path: /tmp/apk-output/*.apk
+          retention-days: 30
+
+      # ── Print install instructions ────────────────────────────────────────
+      - name: Install instructions
+        run: |
+          echo ""
+          echo "╔══════════════════════════════════════════════════════════╗"
+          echo "║  APK BUILD COMPLETE — Install on your test device:       ║"
+          echo "╠══════════════════════════════════════════════════════════╣"
+          echo "║  1. Download the APK from the Artifacts section above    ║"
+          echo "║  2. Enable 'Install from unknown sources' on the device  ║"
+          echo "║  3. Transfer the APK to the device (USB / AirDrop / etc) ║"
+          echo "║  4. Tap the APK file to install                          ║"
+          echo "║                                                          ║"
+          echo "║  OR via ADB (USB debugging enabled):                     ║"
+          echo "║  adb install ac-techs-${{ inputs.build_type }}-run${{ github.run_number }}.apk  ║"
+          echo "╚══════════════════════════════════════════════════════════╝"
+          echo ""

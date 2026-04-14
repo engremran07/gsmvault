@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Commission, ReferralCode, ReferralTier
+from .models import Commission, ReferralClick, ReferralCode, ReferralTier
 
 
 @admin.register(ReferralTier)
@@ -19,3 +19,11 @@ class ReferralCodeAdmin(admin.ModelAdmin[ReferralCode]):
 class CommissionAdmin(admin.ModelAdmin[Commission]):
     list_display = ["referral_code", "referred_user", "amount", "status", "created_at"]
     list_filter = ["status"]
+
+
+@admin.register(ReferralClick)
+class ReferralClickAdmin(admin.ModelAdmin[ReferralClick]):
+    list_display = ["code", "converted", "converted_user", "created_at"]
+    list_filter = ["converted", "created_at"]
+    search_fields = ["code__code"]
+    readonly_fields = ["created_at"]

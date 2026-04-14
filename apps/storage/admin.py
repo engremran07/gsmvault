@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import (
+    CloudStorageProvider,
     DriveFileOrganization,
     FirmwareStorageLocation,
     ServiceAccount,
@@ -533,3 +534,10 @@ class DriveFileOrganizationAdmin(admin.ModelAdmin[DriveFileOrganization]):
 
 # Import timezone for last_used_display method
 from django.utils import timezone  # noqa: E402
+
+
+@admin.register(CloudStorageProvider)
+class CloudStorageProviderAdmin(admin.ModelAdmin[CloudStorageProvider]):
+    list_display = ["name", "provider", "auth_type", "status", "created_at"]
+    list_filter = ["provider", "status", "auth_type"]
+    search_fields = ["name", "provider"]

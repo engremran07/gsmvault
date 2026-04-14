@@ -2,10 +2,10 @@
      class="fixed bottom-0 inset-x-0 z-50 p-4"
      role="dialog" aria-label="Cookie consent"
      x-ref="consentBanner">
-  <div class="mx-auto max-w-4xl rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] shadow-2xl p-6 relative">
+  <div class="mx-auto max-w-4xl rounded-lg border border-(--color-border) bg-(--color-bg-primary) shadow-2xl p-6 relative">
     {# Dismiss button — hides banner for this page visit only, shows again next visit #}
     <button @click="showBanner = false" type="button"
-            class="absolute top-3 right-3 p-1 rounded-md text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] transition"
+            class="absolute top-3 right-3 p-1 rounded-md text-(--color-text-muted) hover:text-(--color-text-primary) hover:bg-(--color-bg-secondary) transition"
             aria-label="Dismiss cookie banner">
       {% include "components/_icon.html" with name="x" size="16" %}
     </button>
@@ -15,14 +15,14 @@
           {% include "components/_icon.html" with name="cookie" size="18" %}
           Cookie Consent
         </h3>
-        <p class="text-sm text-[var(--color-text-muted)] mt-1">
+        <p class="text-sm text-(--color-text-muted) mt-1">
           {{ consent_text|default:"We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies." }}
         </p>
       </div>
       {# Category checkboxes — toggled by "Customize" button #}
       {% if consent_categories %}
-      <div x-show="showCategories" x-cloak class="border-t border-[var(--color-border)] pt-3">
-        <p class="text-xs font-medium text-[var(--color-text-muted)] mb-2">Choose which cookies to allow:</p>
+      <div x-show="showCategories" x-cloak class="border-t border-(--color-border) pt-3">
+        <p class="text-xs font-medium text-(--color-text-muted) mb-2">Choose which cookies to allow:</p>
         <div class="flex flex-wrap gap-3">
           {% for slug, cat in consent_categories.items %}
           <label class="flex items-center gap-1.5 text-xs cursor-pointer">
@@ -30,9 +30,9 @@
                    data-consent-slug="{{ slug }}"
                    {% if cat.required %}checked disabled{% endif %}
                    {% if not cat.required %}checked{% endif %}
-                   class="rounded border-[var(--color-border)]">
+                   class="rounded border-(--color-border)">
             {{ cat.name }}
-            {% if cat.required %}<span class="text-[var(--color-text-muted)]">(Required)</span>{% endif %}
+            {% if cat.required %}<span class="text-(--color-text-muted)">(Required)</span>{% endif %}
           </label>
           {% endfor %}
         </div>
@@ -48,7 +48,7 @@
         ">
           {% csrf_token %}
           {% if consent_version %}<input type="hidden" name="version" value="{{ consent_version }}">{% endif %}
-          <button type="submit" class="rounded-lg bg-[var(--color-accent)] px-5 py-2 text-sm text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+          <button type="submit" class="rounded-lg bg-(--color-accent) px-5 py-2 text-sm text-(--color-accent-text) font-medium hover:bg-(--color-accent-hover) transition">
             Accept All
           </button>
         </form>
@@ -72,7 +72,7 @@
                     body: JSON.stringify(cats)
                   }).then(() => { showBanner = false; });
                 "
-                class="rounded-lg border border-[var(--color-accent)] px-5 py-2 text-sm text-[var(--color-accent)] font-medium hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] transition">
+                class="rounded-lg border border-(--color-accent) px-5 py-2 text-sm text-(--color-accent) font-medium hover:bg-(--color-accent) hover:text-(--color-accent-text) transition">
           Save Preferences
         </button>
         {# Customize toggle — shows/hides category checkboxes #}
@@ -80,7 +80,7 @@
                 x-show="!showCategories"
                 x-cloak
                 @click="showCategories = true"
-                class="rounded-lg border border-[var(--color-border)] px-5 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+                class="rounded-lg border border-(--color-border) px-5 py-2 text-sm hover:bg-(--color-bg-secondary) transition">
           Customize
         </button>
         {% endif %}
@@ -92,15 +92,15 @@
           }).then(() => { showBanner = false; })
         ">
           {% csrf_token %}
-          <button type="submit" class="rounded-lg border border-[var(--color-border)] px-5 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+          <button type="submit" class="rounded-lg border border-(--color-border) px-5 py-2 text-sm hover:bg-(--color-bg-secondary) transition">
             Reject Optional
           </button>
         </form>
       </div>
     </div>
     {% if policy %}
-    <p class="text-xs text-[var(--color-text-muted)] mt-3">
-      Read our <a href="{{ policy.url|default:'#' }}" class="text-[var(--color-accent)] hover:underline">Privacy Policy</a> for more information.
+    <p class="text-xs text-(--color-text-muted) mt-3">
+      Read our <a href="{{ policy.url|default:'#' }}" class="text-(--color-accent) hover:underline">Privacy Policy</a> for more information.
     </p>
     {% endif %}
   </div>

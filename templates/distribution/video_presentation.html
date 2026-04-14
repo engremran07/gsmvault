@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ title }}</title>
-<style>
+<style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>
   /* ══════════════════════════════════════════════════════════════════════
      CINEMATIC VIDEO PRESENTATION ENGINE
      Renders self-animating HTML recorded by Playwright headless browser.
@@ -1624,7 +1624,7 @@
     {% if outro_website %}<div class="outro-website">{{ outro_website }}</div>{% endif %}
   </div>
 
-  <script>
+  <script{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>
     /* ══════ CINEMATIC SLIDE ENGINE ══════ */
     const slides = document.querySelectorAll('.slide');
     const progress = document.getElementById('progress');

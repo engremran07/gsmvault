@@ -24,6 +24,8 @@ from __future__ import annotations
 import logging
 
 from django.contrib import admin, messages
+from django.core.exceptions import FieldError
+from django.db import DatabaseError
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils import timezone
@@ -38,7 +40,7 @@ try:
     from import_export.admin import ExportMixin  # type: ignore
 
     _HAS_IMPORT_EXPORT = True
-except Exception:
+except ImportError:
     ExportMixin = None
     _HAS_IMPORT_EXPORT = False
 
@@ -49,35 +51,28 @@ except Exception:
 from .models import (  # noqa: E402
     Announcement,
     CustomUser,
+    MFADevice,
     Notification,
     NotificationPreferences,
     PushSubscription,
+    SecurityQuestion,
     UsersSettings,
 )
 
 # ==========================================================================
 # FIXED BASE ADMIN CLASS
 # ==========================================================================
-"""
-Your earlier file used `BaseAdminClass = ExportMixin`, which FAILS because
-ExportMixin does NOT inherit from admin.ModelAdmin.
-
-THE FIX:
-    If import_export is available:
-        class BaseAdminClass(ExportMixin, admin.ModelAdmin)
-    else:
-        class BaseAdminClass(admin.ModelAdmin)
-
-This guarantees that @admin.register(...) always receives a ModelAdmin subclass.
-"""
+# If import_export is available:
+#   class BaseAdminClass(ExportMixin, admin.ModelAdmin)
+# else:
+#   class BaseAdminClass(admin.ModelAdmin)
+# This guarantees that @admin.register(...) always receives a ModelAdmin subclass.
 
 _ExportBase: type = ExportMixin if (_HAS_IMPORT_EXPORT and ExportMixin) else object
 
 
 class BaseAdminClass(_ExportBase, admin.ModelAdmin):  # type: ignore[misc]
     """Safe hybrid admin class — uses ExportMixin when import_export is installed."""
-
-    pass
 
 
 # ==========================================================================
@@ -160,7 +155,7 @@ class CustomUserAdmin(BaseAdminClass):  # type: ignore[misc]
         qs = super().get_queryset(request)
         try:
             return qs.prefetch_related("groups")
-        except Exception:
+        except (FieldError, DatabaseError):
             logger.debug("CustomUserAdmin.get_queryset prefetch failed", exc_info=True)
             return qs
 
@@ -182,7 +177,7 @@ class CustomUserAdmin(BaseAdminClass):  # type: ignore[misc]
             EmailAddress.objects.filter(user__in=queryset).update(
                 verified=True, primary=True
             )
-        except Exception:
+        except ImportError:
             logger.debug("EmailAddress sync skipped or failed", exc_info=True)
 
         if updated:
@@ -202,7 +197,7 @@ class CustomUserAdmin(BaseAdminClass):  # type: ignore[misc]
             from allauth.account.models import EmailAddress
 
             EmailAddress.objects.filter(user__in=queryset).update(verified=False)
-        except Exception:
+        except ImportError:
             logger.debug("EmailAddress unverify sync skipped or failed", exc_info=True)
         if count:
             self.message_user(request, _("%d user(s) marked unverified.") % count)
@@ -254,7 +249,7 @@ class NotificationAdmin(BaseAdminClass):
         qs = super().get_queryset(request)
         try:
             return qs.select_related("recipient")
-        except Exception:
+        except (FieldError, DatabaseError):
             logger.debug("NotificationAdmin.get_queryset failed", exc_info=True)
             return qs
 
@@ -265,7 +260,7 @@ class NotificationAdmin(BaseAdminClass):
         try:
             updated = queryset.filter(is_read=False).update(is_read=True)
             self.message_user(request, _("%d notifications marked as read.") % updated)
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to mark notifications read: %s", exc)
             self.message_user(
                 request,
@@ -274,7 +269,7 @@ class NotificationAdmin(BaseAdminClass):
             )
 
     def export_selected_as_csv(
-        self, request: HttpRequest, queryset: QuerySet[Notification]
+        self, request: HttpRequest, _queryset: QuerySet[Notification]
     ) -> None:
         """Provide export instructions to user."""
         self.message_user(
@@ -323,14 +318,14 @@ class AnnouncementAdmin(BaseAdminClass):
     def is_active_display(self, obj: Announcement):
         try:
             return "✅" if getattr(obj, "is_active", False) else "❌"
-        except Exception:
+        except (AttributeError, TypeError):
             return "—"
 
     def publish_selected(self, request, queryset):
         try:
             count = queryset.update(is_active=True)
             self.message_user(request, _("%d announcements published.") % count)
-        except Exception:
+        except DatabaseError:
             logger.exception("Failed to publish announcements")
             self.message_user(
                 request, _("Failed to publish announcements."), level=messages.ERROR
@@ -340,7 +335,7 @@ class AnnouncementAdmin(BaseAdminClass):
         try:
             count = queryset.update(is_active=False)
             self.message_user(request, _("%d announcements unpublished.") % count)
-        except Exception:
+        except DatabaseError:
             logger.exception("Failed to unpublish announcements")
             self.message_user(
                 request, _("Failed to unpublish announcements."), level=messages.ERROR
@@ -398,15 +393,15 @@ try:
         def has_add_permission(self, request):
             return False
 
-        def notification_stats(self, obj):
+        def notification_stats(self, _obj: object) -> str:
             """Display notification system statistics."""
             from django.utils.html import format_html
 
             try:
                 total_users = CustomUser.objects.filter(is_active=True).count()
-                prefs_count = NotificationPreferences.objects.count()
-                push_count = PushSubscription.objects.filter(is_active=True).count()
-                unread_notifs = Notification.objects.filter(is_read=False).count()
+                prefs_count = NotificationPreferences.objects.count()  # type: ignore[attr-defined]
+                push_count = PushSubscription.objects.filter(is_active=True).count()  # type: ignore[attr-defined]
+                unread_notifs = Notification.objects.filter(is_read=False).count()  # type: ignore[attr-defined]
 
                 return format_html(
                     "<strong>System Status:</strong><br/>"
@@ -423,10 +418,10 @@ try:
                     push_count,
                     unread_notifs,
                 )
-            except Exception as exc:
+            except DatabaseError as exc:
                 logger.exception("Failed to get notification stats: %s", exc)
                 return "Error loading stats"
-except Exception:
+except ImportError:
     logger.warning("solo not available; UsersSettings admin not registered")
 
 
@@ -582,7 +577,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Enabled all email notifications for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to enable email notifications: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -601,7 +596,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Disabled all email notifications for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to disable email notifications: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -614,7 +609,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Set instant email frequency for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to set email frequency: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -627,7 +622,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Set daily digest for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to set email frequency: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -640,7 +635,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Enabled push notifications for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to enable push: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -653,7 +648,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Disabled push notifications for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to disable push: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -670,7 +665,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Enabled quiet hours for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to enable quiet hours: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -683,7 +678,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Disabled quiet hours for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to disable quiet hours: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -709,7 +704,7 @@ class NotificationPreferencesAdmin(BaseAdminClass):
                 _("Reset preferences to defaults for %d users.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to reset preferences: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -857,7 +852,7 @@ class PushSubscriptionAdmin(BaseAdminClass):
                 _("Activated %d subscriptions.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to activate subscriptions: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -870,7 +865,7 @@ class PushSubscriptionAdmin(BaseAdminClass):
                 _("Deactivated %d subscriptions.") % updated,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except DatabaseError as exc:
             logger.exception("Failed to deactivate subscriptions: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -891,7 +886,7 @@ class PushSubscriptionAdmin(BaseAdminClass):
                         icon="bell",
                     )
                     success_count += 1
-                except Exception as exc:
+                except (OSError, RuntimeError, ValueError) as exc:
                     logger.warning("Failed to send test notification: %s", exc)
 
             self.message_user(
@@ -899,7 +894,7 @@ class PushSubscriptionAdmin(BaseAdminClass):
                 _("Sent test notifications to %d subscriptions.") % success_count,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except (ImportError, DatabaseError) as exc:
             logger.exception("Failed to send test notifications: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -920,7 +915,7 @@ class PushSubscriptionAdmin(BaseAdminClass):
                 _("Deleted %d old inactive subscriptions.") % count,
                 messages.SUCCESS,
             )
-        except Exception as exc:
+        except (DatabaseError, ValueError) as exc:
             logger.exception("Failed to cleanup subscriptions: %s", exc)
             self.message_user(request, _("Operation failed."), messages.ERROR)
 
@@ -1010,3 +1005,19 @@ class EnhancedSocialAppAdmin(BaseSocialAppAdmin):
         if obj:  # editing existing
             return ("provider",)
         return ()
+
+
+@admin.register(SecurityQuestion)
+class SecurityQuestionAdmin(admin.ModelAdmin[SecurityQuestion]):  # type: ignore[type-arg]
+    list_display = ["user", "question_key", "created_at"]
+    list_filter = ["question_key", "created_at"]
+    search_fields = ["user__email", "user__username"]
+    readonly_fields = ["created_at"]
+
+
+@admin.register(MFADevice)
+class MFADeviceAdmin(admin.ModelAdmin[MFADevice]):  # type: ignore[type-arg]
+    list_display = ["user", "device_type", "name", "is_active", "created_at"]
+    list_filter = ["device_type", "is_active"]
+    search_fields = ["user__email", "user__username", "name"]
+    readonly_fields = ["created_at", "last_used_at"]

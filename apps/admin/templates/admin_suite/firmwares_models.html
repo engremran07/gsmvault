@@ -2,8 +2,8 @@
 {% block title %}Firmware Models — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Firmware Models</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ total_count|default:"0" }} models</p></div>
-  <a href="{% url 'admin_suite:firmwares' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Firmwares</a>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Firmware Models</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ total_count|default:"0" }} models</p></div>
+  <a href="{% url 'admin_suite:firmwares' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Firmwares</a>
 </div>
 {% endblock %}
 {% block page_content %}
@@ -11,13 +11,13 @@
 
 <div class="flex items-center justify-between mb-4">
   <div></div>
-  <button @click="showAddModel = !showAddModel" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all"><i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Model</button>
+  <button @click="showAddModel = !showAddModel" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all"><i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Model</button>
 </div>
 
 {% if message %}<div class="glass rounded-xl p-3 mb-4 border-l-4 border-emerald-500 text-sm text-emerald-400 animate-in" style="--stagger:0">{{ message }}</div>{% endif %}
 
 <div x-show="showAddModel" x-cloak x-transition class="glass rounded-xl p-5 mb-6">
-  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Create New Model</h3>
+  <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">Create New Model</h3>
   <form method="post" x-data="{ showSpecs: false, showAvailability: false }">
     {% csrf_token %}
     <input type="hidden" name="action" value="create">
@@ -25,23 +25,23 @@
     {# === Row 1: Essential fields === #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label for="id_brand_id" class="block text-xs text-[var(--color-text-muted)] mb-1">Brand <span class="text-red-400">*</span></label>
-        <select name="brand_id" id="id_brand_id" required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_brand_id" class="block text-xs text-(--color-text-muted) mb-1">Brand <span class="text-red-400">*</span></label>
+        <select name="brand_id" id="id_brand_id" required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
           <option value="">Select brand…</option>
           {% for b in brands %}<option value="{{ b.id }}">{{ b.name }}</option>{% endfor %}
         </select>
       </div>
       <div>
-        <label for="id_model_name" class="block text-xs text-[var(--color-text-muted)] mb-1">Model Name <span class="text-red-400">*</span></label>
-        <input type="text" name="name" id="id_model_name" autocomplete="off" required maxlength="128" placeholder="e.g. Galaxy S24 Ultra" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_model_name" class="block text-xs text-(--color-text-muted) mb-1">Model Name <span class="text-red-400">*</span></label>
+        <input type="text" name="name" id="id_model_name" autocomplete="off" required maxlength="128" placeholder="e.g. Galaxy S24 Ultra" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_marketing_name" class="block text-xs text-[var(--color-text-muted)] mb-1">Marketing Name</label>
-        <input type="text" name="marketing_name" id="id_marketing_name" autocomplete="off" maxlength="255" placeholder="e.g. Samsung Galaxy S24 Ultra" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_marketing_name" class="block text-xs text-(--color-text-muted) mb-1">Marketing Name</label>
+        <input type="text" name="marketing_name" id="id_marketing_name" autocomplete="off" maxlength="255" placeholder="e.g. Samsung Galaxy S24 Ultra" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_model_status" class="block text-xs text-[var(--color-text-muted)] mb-1">Status</label>
-        <select name="status" id="id_model_status" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_model_status" class="block text-xs text-(--color-text-muted) mb-1">Status</label>
+        <select name="status" id="id_model_status" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
           <option value="available">Available</option>
           <option value="discontinued">Discontinued</option>
           <option value="upcoming">Upcoming</option>
@@ -53,115 +53,115 @@
     {# === Row 2: Identification === #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label for="id_codename" class="block text-xs text-[var(--color-text-muted)] mb-1">Codename</label>
-        <input type="text" name="codename" id="id_codename" autocomplete="off" maxlength="128" placeholder="e.g. spinel, SM-S911B" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_codename" class="block text-xs text-(--color-text-muted) mb-1">Codename</label>
+        <input type="text" name="codename" id="id_codename" autocomplete="off" maxlength="128" placeholder="e.g. spinel, SM-S911B" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_model_code" class="block text-xs text-[var(--color-text-muted)] mb-1">Model Code</label>
-        <input type="text" name="model_code" id="id_model_code" autocomplete="off" maxlength="64" placeholder="e.g. SM-S911B" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_model_code" class="block text-xs text-(--color-text-muted) mb-1">Model Code</label>
+        <input type="text" name="model_code" id="id_model_code" autocomplete="off" maxlength="64" placeholder="e.g. SM-S911B" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_model_codes" class="block text-xs text-[var(--color-text-muted)] mb-1">All Model Codes <span class="text-[10px] text-[var(--color-text-muted)]">(comma-separated)</span></label>
-        <input type="text" name="model_codes" id="id_model_codes" autocomplete="off" placeholder="SM-S911B, SM-S911U, SM-S911N" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_model_codes" class="block text-xs text-(--color-text-muted) mb-1">All Model Codes <span class="text-[10px] text-(--color-text-muted)">(comma-separated)</span></label>
+        <input type="text" name="model_codes" id="id_model_codes" autocomplete="off" placeholder="SM-S911B, SM-S911U, SM-S911N" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_also_known_as" class="block text-xs text-[var(--color-text-muted)] mb-1">Also Known As <span class="text-[10px] text-[var(--color-text-muted)]">(comma-separated)</span></label>
-        <input type="text" name="also_known_as" id="id_also_known_as" autocomplete="off" placeholder="POCO C81 Pro, Redmi A7 Pro" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_also_known_as" class="block text-xs text-(--color-text-muted) mb-1">Also Known As <span class="text-[10px] text-(--color-text-muted)">(comma-separated)</span></label>
+        <input type="text" name="also_known_as" id="id_also_known_as" autocomplete="off" placeholder="POCO C81 Pro, Redmi A7 Pro" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
     </div>
 
     {# === Row 3: Image & Description === #}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4">
       <div>
-        <label for="id_image_url" class="block text-xs text-[var(--color-text-muted)] mb-1">Image URL</label>
-        <input type="url" name="image_url" id="id_image_url" autocomplete="off" maxlength="500" placeholder="https://example.com/device.jpg" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_image_url" class="block text-xs text-(--color-text-muted) mb-1">Image URL</label>
+        <input type="url" name="image_url" id="id_image_url" autocomplete="off" maxlength="500" placeholder="https://example.com/device.jpg" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div class="lg:col-span-2">
-        <label for="id_model_description" class="block text-xs text-[var(--color-text-muted)] mb-1">Description</label>
-        <input type="text" name="description" id="id_model_description" autocomplete="off" placeholder="Model description for SEO" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+        <label for="id_model_description" class="block text-xs text-(--color-text-muted) mb-1">Description</label>
+        <input type="text" name="description" id="id_model_description" autocomplete="off" placeholder="Model description for SEO" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
     </div>
 
     {# === Collapsible: Specifications === #}
     <div class="mb-4">
-      <button type="button" @click="showSpecs = !showSpecs" class="flex items-center gap-2 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors mb-3">
+      <button type="button" @click="showSpecs = !showSpecs" class="flex items-center gap-2 text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-accent) transition-colors mb-3">
         <i data-lucide="cpu" class="w-3.5 h-3.5"></i>Specifications
         <i :data-lucide="showSpecs ? 'chevron-up' : 'chevron-down'" class="w-3 h-3"></i>
       </button>
       <div x-show="showSpecs" x-cloak x-transition class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
-          <label for="id_chipset" class="block text-xs text-[var(--color-text-muted)] mb-1">Chipset</label>
-          <input type="text" name="chipset" id="id_chipset" autocomplete="off" maxlength="256" placeholder="Mediatek Helio G100 (6nm)" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_chipset" class="block text-xs text-(--color-text-muted) mb-1">Chipset</label>
+          <input type="text" name="chipset" id="id_chipset" autocomplete="off" maxlength="256" placeholder="Mediatek Helio G100 (6nm)" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_cpu" class="block text-xs text-[var(--color-text-muted)] mb-1">CPU</label>
-          <input type="text" name="cpu" id="id_cpu" autocomplete="off" maxlength="256" placeholder="Octa-core 2x2.2 GHz Cortex-A76" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_cpu" class="block text-xs text-(--color-text-muted) mb-1">CPU</label>
+          <input type="text" name="cpu" id="id_cpu" autocomplete="off" maxlength="256" placeholder="Octa-core 2x2.2 GHz Cortex-A76" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_gpu" class="block text-xs text-[var(--color-text-muted)] mb-1">GPU</label>
-          <input type="text" name="gpu" id="id_gpu" autocomplete="off" maxlength="256" placeholder="Mali-G57 MC2" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_gpu" class="block text-xs text-(--color-text-muted) mb-1">GPU</label>
+          <input type="text" name="gpu" id="id_gpu" autocomplete="off" maxlength="256" placeholder="Mali-G57 MC2" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_network_technology" class="block text-xs text-[var(--color-text-muted)] mb-1">Network</label>
-          <input type="text" name="network_technology" id="id_network_technology" autocomplete="off" maxlength="128" placeholder="GSM / HSPA / LTE / 5G" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_network_technology" class="block text-xs text-(--color-text-muted) mb-1">Network</label>
+          <input type="text" name="network_technology" id="id_network_technology" autocomplete="off" maxlength="128" placeholder="GSM / HSPA / LTE / 5G" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_os_version" class="block text-xs text-[var(--color-text-muted)] mb-1">OS Version</label>
-          <input type="text" name="os_version" id="id_os_version" autocomplete="off" maxlength="128" placeholder="Android 15, HyperOS 2" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_os_version" class="block text-xs text-(--color-text-muted) mb-1">OS Version</label>
+          <input type="text" name="os_version" id="id_os_version" autocomplete="off" maxlength="128" placeholder="Android 15, HyperOS 2" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_display_size" class="block text-xs text-[var(--color-text-muted)] mb-1">Display Size</label>
-          <input type="text" name="display_size" id="id_display_size" autocomplete="off" maxlength="64" placeholder='6.67"' class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_display_size" class="block text-xs text-(--color-text-muted) mb-1">Display Size</label>
+          <input type="text" name="display_size" id="id_display_size" autocomplete="off" maxlength="64" placeholder='6.67"' class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_battery" class="block text-xs text-[var(--color-text-muted)] mb-1">Battery</label>
-          <input type="text" name="battery" id="id_battery" autocomplete="off" maxlength="64" placeholder="5160 mAh" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_battery" class="block text-xs text-(--color-text-muted) mb-1">Battery</label>
+          <input type="text" name="battery" id="id_battery" autocomplete="off" maxlength="64" placeholder="5160 mAh" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_dimensions" class="block text-xs text-[var(--color-text-muted)] mb-1">Dimensions</label>
-          <input type="text" name="dimensions" id="id_dimensions" autocomplete="off" maxlength="128" placeholder="164 x 75.7 x 7.8 mm" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_dimensions" class="block text-xs text-(--color-text-muted) mb-1">Dimensions</label>
+          <input type="text" name="dimensions" id="id_dimensions" autocomplete="off" maxlength="128" placeholder="164 x 75.7 x 7.8 mm" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_weight" class="block text-xs text-[var(--color-text-muted)] mb-1">Weight</label>
-          <input type="text" name="weight" id="id_weight" autocomplete="off" maxlength="64" placeholder="190 g" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_weight" class="block text-xs text-(--color-text-muted) mb-1">Weight</label>
+          <input type="text" name="weight" id="id_weight" autocomplete="off" maxlength="64" placeholder="190 g" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_ram_options" class="block text-xs text-[var(--color-text-muted)] mb-1">RAM Options <span class="text-[10px] text-[var(--color-text-muted)]">(comma-separated)</span></label>
-          <input type="text" name="ram_options" id="id_ram_options" autocomplete="off" placeholder="4GB, 6GB, 8GB, 12GB" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_ram_options" class="block text-xs text-(--color-text-muted) mb-1">RAM Options <span class="text-[10px] text-(--color-text-muted)">(comma-separated)</span></label>
+          <input type="text" name="ram_options" id="id_ram_options" autocomplete="off" placeholder="4GB, 6GB, 8GB, 12GB" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_storage_options" class="block text-xs text-[var(--color-text-muted)] mb-1">Storage Options <span class="text-[10px] text-[var(--color-text-muted)]">(comma-separated)</span></label>
-          <input type="text" name="storage_options" id="id_storage_options" autocomplete="off" placeholder="64GB, 128GB, 256GB" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_storage_options" class="block text-xs text-(--color-text-muted) mb-1">Storage Options <span class="text-[10px] text-(--color-text-muted)">(comma-separated)</span></label>
+          <input type="text" name="storage_options" id="id_storage_options" autocomplete="off" placeholder="64GB, 128GB, 256GB" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_colors" class="block text-xs text-[var(--color-text-muted)] mb-1">Colors <span class="text-[10px] text-[var(--color-text-muted)]">(comma-separated)</span></label>
-          <input type="text" name="colors" id="id_colors" autocomplete="off" placeholder="Black, Forest Green, Glacier Blue" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_colors" class="block text-xs text-(--color-text-muted) mb-1">Colors <span class="text-[10px] text-(--color-text-muted)">(comma-separated)</span></label>
+          <input type="text" name="colors" id="id_colors" autocomplete="off" placeholder="Black, Forest Green, Glacier Blue" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
       </div>
     </div>
 
     {# === Collapsible: Availability === #}
     <div class="mb-4">
-      <button type="button" @click="showAvailability = !showAvailability" class="flex items-center gap-2 text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors mb-3">
+      <button type="button" @click="showAvailability = !showAvailability" class="flex items-center gap-2 text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-accent) transition-colors mb-3">
         <i data-lucide="calendar" class="w-3.5 h-3.5"></i>Availability &amp; Regions
         <i :data-lucide="showAvailability ? 'chevron-up' : 'chevron-down'" class="w-3 h-3"></i>
       </button>
       <div x-show="showAvailability" x-cloak x-transition class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
-          <label for="id_announced_date" class="block text-xs text-[var(--color-text-muted)] mb-1">Announced Date</label>
-          <input type="date" name="announced_date" id="id_announced_date" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_announced_date" class="block text-xs text-(--color-text-muted) mb-1">Announced Date</label>
+          <input type="date" name="announced_date" id="id_announced_date" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_release_date" class="block text-xs text-[var(--color-text-muted)] mb-1">Release Date</label>
-          <input type="date" name="release_date" id="id_release_date" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_release_date" class="block text-xs text-(--color-text-muted) mb-1">Release Date</label>
+          <input type="date" name="release_date" id="id_release_date" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div>
-          <label for="id_regions" class="block text-xs text-[var(--color-text-muted)] mb-1">Regions <span class="text-[10px] text-[var(--color-text-muted)]">(comma-separated)</span></label>
-          <input type="text" name="regions" id="id_regions" autocomplete="off" placeholder="China, Global, EEA, India" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label for="id_regions" class="block text-xs text-(--color-text-muted) mb-1">Regions <span class="text-[10px] text-(--color-text-muted)">(comma-separated)</span></label>
+          <input type="text" name="regions" id="id_regions" autocomplete="off" placeholder="China, Global, EEA, India" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div class="flex items-end">
-          <label class="flex items-center gap-2 text-sm text-[var(--color-text-primary)] cursor-pointer">
-            <input type="checkbox" name="is_active" checked class="w-4 h-4 rounded border-[var(--color-border)]/30 accent-[var(--color-accent)]">
+          <label class="flex items-center gap-2 text-sm text-(--color-text-primary) cursor-pointer">
+            <input type="checkbox" name="is_active" checked class="w-4 h-4 rounded border-(--color-border)/30 accent-[var(--color-accent)]">
             Active
           </label>
         </div>
@@ -169,51 +169,51 @@
     </div>
 
     {# === Actions === #}
-    <div class="flex items-center gap-3 pt-2 border-t border-[var(--color-border)]/20">
-      <button type="submit" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all"><i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>Create Model</button>
-      <button type="button" @click="showAddModel = false" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] btn-press transition-all">Cancel</button>
+    <div class="flex items-center gap-3 pt-2 border-t border-(--color-border)/20">
+      <button type="submit" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all"><i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>Create Model</button>
+      <button type="button" @click="showAddModel = false" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-muted) hover:text-(--color-text-primary) btn-press transition-all">Cancel</button>
     </div>
   </form>
 </div>
 
 <div class="flex flex-col sm:flex-row gap-3 mb-6 animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
   <div class="glass rounded-xl p-3 flex items-center gap-2 flex-1">
-    <i data-lucide="search" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
-    <form method="get" class="flex-1"><input type="hidden" name="brand" value="{{ brand_filter|default:'' }}"><input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search models…" aria-label="Search models" class="w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none"></form>
+    <i data-lucide="search" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
+    <form method="get" class="flex-1"><input type="hidden" name="brand" value="{{ brand_filter|default:'' }}"><input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search models…" aria-label="Search models" class="w-full bg-transparent text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none"></form>
   </div>
   <div class="glass rounded-xl p-1 flex gap-1 overflow-x-auto">
-    <a href="?{% if query %}q={{ query }}{% endif %}" class="px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap {% if not brand_filter %}bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow{% else %}text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]{% endif %} transition-all btn-press">All</a>
-    {% for b in brands %}<a href="?brand={{ b.id }}{% if query %}&q={{ query }}{% endif %}" class="px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap {% if brand_filter == b.id|stringformat:'d' %}bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow{% else %}text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]{% endif %} transition-all btn-press">{{ b.name }}</a>{% endfor %}
+    <a href="?{% if query %}q={{ query }}{% endif %}" class="px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap {% if not brand_filter %}bg-(--color-accent) text-(--color-accent-text) shadow{% else %}text-(--color-text-muted) hover:text-(--color-text-primary){% endif %} transition-all btn-press">All</a>
+    {% for b in brands %}<a href="?brand={{ b.id }}{% if query %}&q={{ query }}{% endif %}" class="px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap {% if brand_filter == b.id|stringformat:'d' %}bg-(--color-accent) text-(--color-accent-text) shadow{% else %}text-(--color-text-muted) hover:text-(--color-text-primary){% endif %} transition-all btn-press">{{ b.name }}</a>{% endfor %}
   </div>
 </div>
 
 <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
   <table class="w-full text-sm">
-    <thead><tr class="border-b border-[var(--color-border)]/20">
-      <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=name&dir={% if sort == 'name' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Model {% if sort == 'name' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-      <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=brand&dir={% if sort == 'brand' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Brand {% if sort == 'brand' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-      <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] hidden md:table-cell">Codename</th>
-      <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] hidden lg:table-cell">Chipset</th>
-      <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] hidden sm:table-cell">Status</th>
-      <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=variants&dir={% if sort == 'variants' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="flex items-center gap-1 justify-end hover:text-[var(--color-accent)] transition-colors">Variants {% if sort == 'variants' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
+    <thead><tr class="border-b border-(--color-border)/20">
+      <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)"><a href="?sort=name&dir={% if sort == 'name' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Model {% if sort == 'name' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+      <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)"><a href="?sort=brand&dir={% if sort == 'brand' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Brand {% if sort == 'brand' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+      <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) hidden md:table-cell">Codename</th>
+      <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) hidden lg:table-cell">Chipset</th>
+      <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted) hidden sm:table-cell">Status</th>
+      <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)"><a href="?sort=variants&dir={% if sort == 'variants' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="flex items-center gap-1 justify-end hover:text-(--color-accent) transition-colors">Variants {% if sort == 'variants' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
     </tr></thead>
-    <tbody class="divide-y divide-[var(--color-border)]/10">
-      {% for m in models %}<tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-        <td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ m.name }}</td>
-        <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ m.brand.name|default:"-" }}</td>
-        <td class="py-3 px-4 text-xs text-[var(--color-text-muted)] hidden md:table-cell">{{ m.codename|default:"-" }}</td>
-        <td class="py-3 px-4 text-xs text-[var(--color-text-muted)] hidden lg:table-cell truncate max-w-[160px]">{{ m.chipset|default:"-" }}</td>
+    <tbody class="divide-y divide-(--color-border)/10">
+      {% for m in models %}<tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+        <td class="py-3 px-4 font-medium text-(--color-text-primary)">{{ m.name }}</td>
+        <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ m.brand.name|default:"-" }}</td>
+        <td class="py-3 px-4 text-xs text-(--color-text-muted) hidden md:table-cell">{{ m.codename|default:"-" }}</td>
+        <td class="py-3 px-4 text-xs text-(--color-text-muted) hidden lg:table-cell truncate max-w-[160px]">{{ m.chipset|default:"-" }}</td>
         <td class="py-3 px-4 text-center hidden sm:table-cell"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if m.status == 'available' %}bg-emerald-500/10 text-emerald-400{% elif m.status == 'discontinued' %}bg-red-500/10 text-red-400{% elif m.status == 'upcoming' %}bg-amber-500/10 text-amber-400{% else %}bg-slate-500/10 text-slate-400{% endif %}">{{ m.get_status_display|default:"Available" }}</span></td>
         <td class="py-3 px-4 text-right"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ m.variant_count|default:0 }}</span></td>
-      </tr>{% empty %}<tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">No models found</td></tr>{% endfor %}
+      </tr>{% empty %}<tr><td colspan="6" class="py-8 text-center text-(--color-text-muted)">No models found</td></tr>{% endfor %}
     </tbody>
   </table>
   {% if page_obj and page_obj.has_other_pages %}
-  <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-    <span class="text-xs text-[var(--color-text-muted)]">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+    <span class="text-xs text-(--color-text-muted)">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
     <div class="flex items-center gap-1">
-      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if brand_filter %}&brand={{ brand_filter }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
     </div>
   </div>
   {% endif %}

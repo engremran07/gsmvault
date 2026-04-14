@@ -18,7 +18,7 @@
     <ul class="space-y-2">
       {% for link in section.links %}
       <li>
-        <a href="{{ link.url }}" class="text-sm text-[var(--color-accent)] hover:underline flex items-center gap-1.5">
+        <a href="{{ link.url }}" class="text-sm text-(--color-accent) hover:underline flex items-center gap-1.5">
           {% include "components/_icon.html" with name="chevron-right" size="12" %}
           {{ link.title }}
         </a>

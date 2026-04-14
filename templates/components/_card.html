@@ -1,15 +1,15 @@
 {# templates/components/_card.html — Content card (firmware, blog post, product) #}
-<article class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:shadow-lg transition-shadow">
+<article class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6 hover:shadow-lg transition-shadow">
   {% if image %}
   <img src="{{ image }}" alt="{{ title }}" class="w-full h-40 sm:h-48 object-cover rounded-md mb-4" loading="lazy">
   {% endif %}
   <h3 class="text-lg font-semibold mb-2">
-    <a href="{{ url }}" class="hover:text-[var(--color-accent)] transition-colors">{{ title }}</a>
+    <a href="{{ url }}" class="hover:text-(--color-accent) transition-colors">{{ title }}</a>
   </h3>
   {% if description %}
-  <p class="text-[var(--color-text-secondary)] text-sm">{{ description|truncatewords:30 }}</p>
+  <p class="text-(--color-text-secondary) text-sm">{{ description|truncatewords:30 }}</p>
   {% endif %}
   {% if badge %}
-  <span class="inline-block mt-3 px-2 py-1 text-xs rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)]">{{ badge }}</span>
+  <span class="inline-block mt-3 px-2 py-1 text-xs rounded-full bg-accent/10 text-(--color-accent)">{{ badge }}</span>
   {% endif %}
 </article>

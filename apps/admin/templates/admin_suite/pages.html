@@ -6,8 +6,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Pages</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Static CMS pages</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Pages</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Static CMS pages</p>
   </div>
   {% if not edit_page %}
   <a href="?action=new" class="btn btn-primary btn-press text-xs inline-flex items-center gap-2">
@@ -19,8 +19,8 @@
 
 {% block page_content %}
 {% if message %}
-<div class="glass rounded-xl p-4 mb-6 border-l-4 border-[var(--color-accent)]">
-  <p class="text-sm text-[var(--color-text-secondary)]">{{ message }}</p>
+<div class="glass rounded-xl p-4 mb-6 border-l-4 border-(--color-accent)">
+  <p class="text-sm text-(--color-text-secondary)">{{ message }}</p>
 </div>
 {% endif %}
 
@@ -32,43 +32,43 @@
       <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3">
         <i data-lucide="file-text" class="w-5 h-5 text-blue-400"></i>
       </div>
-      <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+      <div class="text-2xl font-bold text-(--color-text-primary)"
            x-data="animatedCounter({{ stats.total }})" x-text="display.toLocaleString()">{{ stats.total }}</div>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">Total</p>
+      <p class="text-xs text-(--color-text-muted) mt-1">Total</p>
     </div>
     <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
          x-data x-intersect.once="$el.classList.add('animate-in-visible')">
       <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3">
         <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
       </div>
-      <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+      <div class="text-2xl font-bold text-(--color-text-primary)"
            x-data="animatedCounter({{ stats.published }})" x-text="display.toLocaleString()">{{ stats.published }}</div>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">Published</p>
+      <p class="text-xs text-(--color-text-muted) mt-1">Published</p>
     </div>
     <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
          x-data x-intersect.once="$el.classList.add('animate-in-visible')">
       <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3">
         <i data-lucide="pencil" class="w-5 h-5 text-amber-400"></i>
       </div>
-      <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+      <div class="text-2xl font-bold text-(--color-text-primary)"
            x-data="animatedCounter({{ stats.drafts }})" x-text="display.toLocaleString()">{{ stats.drafts }}</div>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">Drafts</p>
+      <p class="text-xs text-(--color-text-muted) mt-1">Drafts</p>
     </div>
     <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
          x-data x-intersect.once="$el.classList.add('animate-in-visible')">
       <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center mb-3">
         <i data-lucide="archive" class="w-5 h-5 text-red-400"></i>
       </div>
-      <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+      <div class="text-2xl font-bold text-(--color-text-primary)"
            x-data="animatedCounter({{ stats.archived }})" x-text="display.toLocaleString()">{{ stats.archived }}</div>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">Archived</p>
+      <p class="text-xs text-(--color-text-muted) mt-1">Archived</p>
     </div>
   </div>
 
   {# Status doughnut #}
   <div class="glass rounded-xl p-6 animate-in" style="--stagger: 4"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Page Status</h3>
+    <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">Page Status</h3>
     <div class="h-48" x-data="adminChart({
       type: 'doughnut',
       labels: ['Published', 'Drafts', 'Archived'],
@@ -87,7 +87,7 @@
   <div class="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
     <i data-lucide="map" class="w-4 h-4 text-emerald-400"></i>
   </div>
-  <p class="text-xs text-[var(--color-text-secondary)]"><span class="font-semibold text-emerald-400">{{ stats.sitemap }}</span> pages in sitemap</p>
+  <p class="text-xs text-(--color-text-secondary)"><span class="font-semibold text-emerald-400">{{ stats.sitemap }}</span> pages in sitemap</p>
 </div>
 {% endif %}
 
@@ -95,8 +95,8 @@
 {% if form %}
 <div class="glass rounded-xl p-6 mb-6 animate-in" style="--stagger: 6"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
-    <i data-lucide="{% if edit_page %}edit{% else %}plus{% endif %}" class="w-4 h-4 text-[var(--color-accent)]"></i>
+  <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+    <i data-lucide="{% if edit_page %}edit{% else %}plus{% endif %}" class="w-4 h-4 text-(--color-accent)"></i>
     {% if edit_page %}Edit "{{ edit_page.title }}"{% else %}Create Page{% endif %}
   </h3>
   <form method="post" class="space-y-4">
@@ -105,7 +105,7 @@
     <input type="hidden" name="action" value="save">
     {% for field in form %}
     <div>
-      <label class="block text-xs font-semibold text-[var(--color-text-muted)] mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      <label class="block text-xs font-semibold text-(--color-text-muted) mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
       {{ field }}
       {% if field.errors %}
       <p class="mt-1 text-xs text-red-400">{{ field.errors.0 }}</p>
@@ -130,47 +130,47 @@
 {# ═══ Pages Table ═══ #}
 <div id="admin-table-wrapper" class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 7"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="p-4 border-b border-[var(--color-border)]/40">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+  <div class="p-4 border-b border-(--color-border)/40">
+    <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
       <i data-lucide="file-text" class="w-4 h-4 text-blue-400"></i> All Pages
     </h3>
   </div>
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)]/20">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">
+        <tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">
             <a href="?sort=title&dir={% if sort == 'title' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Title {% if sort == 'title' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Title {% if sort == 'title' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">
             <a href="?sort=slug&dir={% if sort == 'slug' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Slug {% if sort == 'slug' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Slug {% if sort == 'slug' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">
             <a href="?sort=status&dir={% if sort == 'status' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center justify-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Status {% if sort == 'status' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center justify-center gap-1 hover:text-(--color-accent) transition-colors">
+              Status {% if sort == 'status' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">
             <a href="?sort=updated&dir={% if sort == 'updated' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">
-              Updated {% if sort == 'updated' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+               class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">
+              Updated {% if sort == 'updated' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
             </a>
           </th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]/10">
+      <tbody class="divide-y divide-(--color-border)/10">
         {% for page in pages %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 font-medium text-[var(--color-text-primary)]">{{ page.title }}</td>
-          <td class="py-3 px-4 text-xs font-mono text-[var(--color-text-muted)]">/{{ page.slug }}/</td>
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 font-medium text-(--color-text-primary)">{{ page.title }}</td>
+          <td class="py-3 px-4 text-xs font-mono text-(--color-text-muted)">/{{ page.slug }}/</td>
           <td class="py-3 px-4 text-center">
             {% if page.is_published %}
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">
@@ -182,13 +182,13 @@
             </span>
             {% endif %}
           </td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ page.updated_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ page.updated_at|timesince }} ago</td>
           <td class="py-3 px-4 text-right">
-            <a href="?page_id={{ page.pk }}" class="text-xs text-[var(--color-accent)] hover:underline">Edit</a>
+            <a href="?page_id={{ page.pk }}" class="text-xs text-(--color-accent) hover:underline">Edit</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="py-8 text-center text-xs text-[var(--color-text-muted)]">No pages</td></tr>
+        <tr><td colspan="5" class="py-8 text-center text-xs text-(--color-text-muted)">No pages</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -196,20 +196,20 @@
 
   {# Pagination #}
   {% if page_obj and page_obj.has_other_pages %}
-  <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-    <span class="text-xs text-[var(--color-text-muted)]">
+  <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+    <span class="text-xs text-(--color-text-muted)">
       {{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
     </span>
     <div class="flex items-center gap-1">
       {% if page_obj.has_previous %}
       <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
-         class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+         class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
       </a>
       {% endif %}
       {% if page_obj.has_next %}
       <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
-         class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+         class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
       </a>
       {% endif %}

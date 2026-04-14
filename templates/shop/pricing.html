@@ -7,10 +7,10 @@
 
 {% block page_header %}
 <div class="text-center mb-12">
-  <h1 class="text-3xl md:text-4xl font-bold text-[var(--color-text-primary)]">
+  <h1 class="text-3xl md:text-4xl font-bold text-(--color-text-primary)">
     Plans & Pricing
   </h1>
-  <p class="text-lg text-[var(--color-text-secondary)] mt-3 max-w-2xl mx-auto">
+  <p class="text-lg text-(--color-text-secondary) mt-3 max-w-2xl mx-auto">
     Choose the right plan for your firmware download needs. Upgrade anytime.
   </p>
 </div>
@@ -20,10 +20,10 @@
 {% if tiers %}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
   {% for tier in tiers %}
-  <div class="relative rounded-xl border {% if tier.is_featured %}border-[var(--color-accent)] ring-2 ring-[var(--color-accent)]/30{% else %}border-[var(--color-border)]{% endif %} bg-[var(--color-bg-secondary)] p-6 flex flex-col">
+  <div class="relative rounded-xl border {% if tier.is_featured %}border-(--color-accent) ring-2 ring-[var(--color-accent)]/30{% else %}border-(--color-border){% endif %} bg-(--color-bg-secondary) p-6 flex flex-col">
     {% if tier.is_featured %}
     <div class="absolute -top-3 left-1/2 -translate-x-1/2">
-      <span class="text-xs font-bold uppercase tracking-wider bg-[var(--color-accent)] text-[var(--color-accent-text)] px-3 py-1 rounded-full">
+      <span class="text-xs font-bold uppercase tracking-wider bg-(--color-accent) text-(--color-accent-text) px-3 py-1 rounded-full">
         Most Popular
       </span>
     </div>
@@ -32,13 +32,13 @@
     {# Tier name + badge #}
     <div class="text-center mb-6">
       {% if tier.badge_icon %}
-      <div class="w-12 h-12 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-3">
-        <i data-lucide="{{ tier.badge_icon }}" class="w-6 h-6 text-[var(--color-accent)]"></i>
+      <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="{{ tier.badge_icon }}" class="w-6 h-6 text-(--color-accent)"></i>
       </div>
       {% endif %}
-      <h3 class="text-xl font-bold text-[var(--color-text-primary)]">{{ tier.name }}</h3>
+      <h3 class="text-xl font-bold text-(--color-text-primary)">{{ tier.name }}</h3>
       {% if tier.description %}
-      <p class="text-sm text-[var(--color-text-secondary)] mt-1">{{ tier.description }}</p>
+      <p class="text-sm text-(--color-text-secondary) mt-1">{{ tier.description }}</p>
       {% endif %}
     </div>
 
@@ -46,15 +46,15 @@
     <div class="text-center mb-6">
       {% if tier.price_monthly %}
       <div class="flex items-baseline justify-center gap-1">
-        <span class="text-3xl font-bold text-[var(--color-text-primary)]">${{ tier.price_monthly }}</span>
-        <span class="text-sm text-[var(--color-text-muted)]">/mo</span>
+        <span class="text-3xl font-bold text-(--color-text-primary)">${{ tier.price_monthly }}</span>
+        <span class="text-sm text-(--color-text-muted)">/mo</span>
       </div>
       {% if tier.price_yearly %}
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">${{ tier.price_yearly }}/year (save {{ tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly }})</p>
+      <p class="text-xs text-(--color-text-muted) mt-1">${{ tier.price_yearly }}/year (save {{ tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly|add:tier.price_monthly }})</p>
       {% endif %}
       {% else %}
       <div class="flex items-baseline justify-center gap-1">
-        <span class="text-3xl font-bold text-[var(--color-success)]">Free</span>
+        <span class="text-3xl font-bold text-(--color-success)">Free</span>
       </div>
       {% endif %}
     </div>
@@ -62,82 +62,82 @@
     {# Feature list #}
     <ul class="space-y-2.5 flex-1 mb-6">
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="download" class="w-4 h-4 text-[var(--color-accent)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">
+        <i data-lucide="download" class="w-4 h-4 text-(--color-accent) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">
           {% if tier.daily_download_limit >= 0 %}{{ tier.daily_download_limit }} downloads/day{% else %}Unlimited downloads{% endif %}
         </span>
       </li>
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="hard-drive" class="w-4 h-4 text-[var(--color-accent)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">
+        <i data-lucide="hard-drive" class="w-4 h-4 text-(--color-accent) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">
           {% if tier.max_file_size_mb %}{{ tier.max_file_size_mb }}MB max file size{% else %}No file size limit{% endif %}
         </span>
       </li>
       {% if tier.ad_free %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="shield-check" class="w-4 h-4 text-[var(--color-success)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Ad-free experience</span>
+        <i data-lucide="shield-check" class="w-4 h-4 text-(--color-success) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Ad-free experience</span>
       </li>
       {% endif %}
       {% if tier.priority_queue %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="zap" class="w-4 h-4 text-[var(--color-warning)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Priority download queue</span>
+        <i data-lucide="zap" class="w-4 h-4 text-(--color-warning) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Priority download queue</span>
       </li>
       {% endif %}
       {% if tier.resume_support %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="refresh-cw" class="w-4 h-4 text-[var(--color-accent)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Download resume support</span>
+        <i data-lucide="refresh-cw" class="w-4 h-4 text-(--color-accent) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Download resume support</span>
       </li>
       {% endif %}
       {% if tier.api_access %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="code" class="w-4 h-4 text-[var(--color-accent)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">API access</span>
+        <i data-lucide="code" class="w-4 h-4 text-(--color-accent) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">API access</span>
       </li>
       {% endif %}
       {% if tier.direct_links %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="link" class="w-4 h-4 text-[var(--color-accent)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Direct download links</span>
+        <i data-lucide="link" class="w-4 h-4 text-(--color-accent) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Direct download links</span>
       </li>
       {% endif %}
       {# Firmware access #}
       {% if tier.access_official %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-success)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Official firmware</span>
+        <i data-lucide="check-circle" class="w-4 h-4 text-(--color-success) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Official firmware</span>
       </li>
       {% endif %}
       {% if tier.access_engineering %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-success)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Engineering firmware</span>
+        <i data-lucide="check-circle" class="w-4 h-4 text-(--color-success) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Engineering firmware</span>
       </li>
       {% endif %}
       {% if tier.access_readback %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-success)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Readback firmware</span>
+        <i data-lucide="check-circle" class="w-4 h-4 text-(--color-success) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Readback firmware</span>
       </li>
       {% endif %}
       {% if tier.access_modified %}
       <li class="flex items-center gap-2 text-sm">
-        <i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-success)] shrink-0"></i>
-        <span class="text-[var(--color-text-secondary)]">Modified/custom firmware</span>
+        <i data-lucide="check-circle" class="w-4 h-4 text-(--color-success) shrink-0"></i>
+        <span class="text-(--color-text-secondary)">Modified/custom firmware</span>
       </li>
       {% endif %}
     </ul>
 
     {# CTA #}
     {% if current_package and current_package.package == tier %}
-    <div class="text-center py-2.5 rounded-lg border border-[var(--color-success)] text-[var(--color-success)] text-sm font-semibold">
+    <div class="text-center py-2.5 rounded-lg border border-(--color-success) text-(--color-success) text-sm font-semibold">
       <i data-lucide="check" class="w-4 h-4 inline"></i> Current Plan
     </div>
     {% else %}
     <a href="#"
-       class="block text-center py-2.5 rounded-lg {% if tier.is_featured %}bg-[var(--color-accent)] text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)]{% else %}border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]{% endif %} font-semibold transition-colors text-sm">
+       class="block text-center py-2.5 rounded-lg {% if tier.is_featured %}bg-(--color-accent) text-(--color-accent-text) hover:bg-(--color-accent-hover){% else %}border border-(--color-border) text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent){% endif %} font-semibold transition-colors text-sm">
       {% if tier.price_monthly %}Get Started{% else %}Free Forever{% endif %}
     </a>
     {% endif %}
@@ -152,30 +152,30 @@
 <div class="mt-16 max-w-3xl mx-auto">
   {% include "components/_section_header.html" with title="Frequently Asked Questions" %}
   <div class="mt-6 space-y-4" x-data="{ open: null }">
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary)">
       <button @click="open = open === 1 ? null : 1" class="w-full flex items-center justify-between p-4 text-left">
-        <span class="text-sm font-medium text-[var(--color-text-primary)]">Can I upgrade or downgrade anytime?</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform" :class="open === 1 && 'rotate-180'"></i>
+        <span class="text-sm font-medium text-(--color-text-primary)">Can I upgrade or downgrade anytime?</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) transition-transform" :class="open === 1 && 'rotate-180'"></i>
       </button>
-      <div x-show="open === 1" x-cloak class="px-4 pb-4 text-sm text-[var(--color-text-secondary)]">
+      <div x-show="open === 1" x-cloak class="px-4 pb-4 text-sm text-(--color-text-secondary)">
         Yes! You can change your plan at any time. Upgrades take effect immediately; downgrades apply at the end of your billing cycle.
       </div>
     </div>
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary)">
       <button @click="open = open === 2 ? null : 2" class="w-full flex items-center justify-between p-4 text-left">
-        <span class="text-sm font-medium text-[var(--color-text-primary)]">What payment methods do you accept?</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform" :class="open === 2 && 'rotate-180'"></i>
+        <span class="text-sm font-medium text-(--color-text-primary)">What payment methods do you accept?</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) transition-transform" :class="open === 2 && 'rotate-180'"></i>
       </button>
-      <div x-show="open === 2" x-cloak class="px-4 pb-4 text-sm text-[var(--color-text-secondary)]">
+      <div x-show="open === 2" x-cloak class="px-4 pb-4 text-sm text-(--color-text-secondary)">
         We accept credit/debit cards, PayPal, and crypto payments. Platform wallet credits can also be used.
       </div>
     </div>
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary)">
       <button @click="open = open === 3 ? null : 3" class="w-full flex items-center justify-between p-4 text-left">
-        <span class="text-sm font-medium text-[var(--color-text-primary)]">Is there a free trial?</span>
-        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] transition-transform" :class="open === 3 && 'rotate-180'"></i>
+        <span class="text-sm font-medium text-(--color-text-primary)">Is there a free trial?</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) transition-transform" :class="open === 3 && 'rotate-180'"></i>
       </button>
-      <div x-show="open === 3" x-cloak class="px-4 pb-4 text-sm text-[var(--color-text-secondary)]">
+      <div x-show="open === 3" x-cloak class="px-4 pb-4 text-sm text-(--color-text-secondary)">
         Some plans include a free trial period. Check the plan details for trial availability and duration.
       </div>
     </div>

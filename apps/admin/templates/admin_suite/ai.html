@@ -2,11 +2,11 @@
 {% block title %}AI — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">AI</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">AI</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
   <div class="flex gap-2">
-    <a href="{% url 'admin_suite:ai_endpoints' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all">Endpoints</a>
-    <a href="{% url 'admin_suite:ai_knowledge' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all">Knowledge</a>
-    <a href="{% url 'admin_suite:ai_workflows' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all">Workflows</a>
+    <a href="{% url 'admin_suite:ai_endpoints' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all">Endpoints</a>
+    <a href="{% url 'admin_suite:ai_knowledge' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all">Knowledge</a>
+    <a href="{% url 'admin_suite:ai_workflows' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all">Workflows</a>
   </div>
 </div>
 {% endblock %}
@@ -17,7 +17,7 @@
   <div class="flex items-center gap-4 mb-6">
     <div class="w-12 h-12 rounded-2xl bg-violet-500/15 flex items-center justify-center"><i data-lucide="brain" class="w-6 h-6 text-violet-400"></i></div>
     <div>
-      <h3 class="text-lg font-bold text-[var(--color-text-primary)]">AI Provider Status</h3>
+      <h3 class="text-lg font-bold text-(--color-text-primary)">AI Provider Status</h3>
       <div class="flex gap-2 mt-1">
         {% if ai_status.enabled %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400"><span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span>Online</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">Offline</span>{% endif %}
         {% if ai_status.mock_mode %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">Mock Mode</span>{% endif %}
@@ -25,14 +25,14 @@
     </div>
   </div>
   <div class="grid sm:grid-cols-2 gap-4">
-    <div class="p-4 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Provider</p><p class="text-sm font-semibold text-[var(--color-text-primary)]">{{ ai_status.provider|default:"Not configured" }}</p></div>
-    <div class="p-4 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Model</p><p class="text-sm font-semibold text-[var(--color-text-primary)]">{{ ai_status.model|default:"Not set" }}</p></div>
+    <div class="p-4 rounded-lg bg-(--color-bg-tertiary)/50"><p class="text-xs text-(--color-text-muted) mb-1">Provider</p><p class="text-sm font-semibold text-(--color-text-primary)">{{ ai_status.provider|default:"Not configured" }}</p></div>
+    <div class="p-4 rounded-lg bg-(--color-bg-tertiary)/50"><p class="text-xs text-(--color-text-muted) mb-1">Model</p><p class="text-sm font-semibold text-(--color-text-primary)">{{ ai_status.model|default:"Not set" }}</p></div>
   </div>
 </div>
 
 <div class="glass rounded-xl p-6 animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="play" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>Test Completion</h3>
-  <form method="post" class="mb-4">{% csrf_token %}<button type="submit" name="action" value="test_ai" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">Run Test</button></form>
-  {% if sample_output %}<div class="p-4 rounded-lg bg-[var(--color-bg-tertiary)]/50 font-mono text-xs text-[var(--color-text-secondary)] whitespace-pre-wrap">{{ sample_output }}</div>{% endif %}
+  <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="play" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>Test Completion</h3>
+  <form method="post" class="mb-4">{% csrf_token %}<button type="submit" name="action" value="test_ai" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">Run Test</button></form>
+  {% if sample_output %}<div class="p-4 rounded-lg bg-(--color-bg-tertiary)/50 font-mono text-xs text-(--color-text-secondary) whitespace-pre-wrap">{{ sample_output }}</div>{% endif %}
 </div>
 {% endblock %}

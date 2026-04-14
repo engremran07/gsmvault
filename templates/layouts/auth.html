@@ -10,12 +10,12 @@
   <div class="w-full max-w-md">
     {# Logo / branding link #}
     <div class="text-center mb-6">
-      <a href="{% url 'home' %}" class="inline-flex items-center gap-2 text-[var(--color-accent)] font-bold text-xl">
+      <a href="{% url 'home' %}" class="inline-flex items-center gap-2 text-(--color-accent) font-bold text-xl">
         <i data-lucide="cpu" class="w-6 h-6"></i>
         {{ settings.site_name }}
       </a>
     </div>
-    <div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-8 shadow-lg">
+    <div class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-8 shadow-lg">
       {% block auth_header %}{% endblock %}
       {% block auth_content %}{% endblock %}
     </div>

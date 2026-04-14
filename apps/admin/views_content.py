@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,8 @@ from .views_shared import (
     _make_breadcrumb,
     _render_admin,
 )
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     pass
@@ -1080,6 +1083,8 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "entities": 0,
         "schemas": 0,
         "link_issues": 0,
+        "pending_suggestions": 0,
+        "active_batches": 0,
     }
     seo_settings: dict[str, Any] = {}  # noqa: F405
     message = ""
@@ -1087,7 +1092,13 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
     if request.method == "POST":
         action = request.POST.get("action")
         try:
-            from apps.seo.models import Redirect, SitemapEntry
+            from apps.seo.models import (
+                BatchOperation,
+                InterlinkExclusion,
+                LinkSuggestion,
+                Redirect,
+                SitemapEntry,
+            )
             from apps.seo.models_settings import SeoAutomationSettings
 
             if action == "disable_redirect":
@@ -1130,6 +1141,55 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
                     setattr(cfg, field, bool(request.POST.get(field)))
                 cfg.save()
                 message = "SEO automation settings saved."
+            elif action == "apply_suggestion":
+                sid = request.POST.get("suggestion_id")
+                if sid:
+                    LinkSuggestion.objects.filter(pk=sid, locked=False).update(
+                        is_applied=True
+                    )
+                    message = "Interlink suggestion applied."
+            elif action == "unapply_suggestion":
+                sid = request.POST.get("suggestion_id")
+                if sid:
+                    LinkSuggestion.objects.filter(pk=sid, locked=False).update(
+                        is_applied=False
+                    )
+                    message = "Interlink suggestion moved back to pending."
+            elif action == "lock_suggestion":
+                sid = request.POST.get("suggestion_id")
+                if sid:
+                    LinkSuggestion.objects.filter(pk=sid).update(locked=True)
+                    message = "Interlink suggestion locked."
+            elif action == "unlock_suggestion":
+                sid = request.POST.get("suggestion_id")
+                if sid:
+                    LinkSuggestion.objects.filter(pk=sid).update(locked=False)
+                    message = "Interlink suggestion unlocked."
+            elif action == "add_interlink_exclusion":
+                phrase = (request.POST.get("phrase") or "").strip()
+                source_pattern = (request.POST.get("source_pattern") or "").strip()
+                target_pattern = (request.POST.get("target_pattern") or "").strip()
+                reason = (request.POST.get("reason") or "").strip()
+                if phrase:
+                    InterlinkExclusion.objects.get_or_create(
+                        phrase=phrase,
+                        source_pattern=source_pattern,
+                        target_pattern=target_pattern,
+                        defaults={"reason": reason, "is_active": True},
+                    )
+                    message = "Interlink exclusion saved."
+            elif action == "remove_interlink_exclusion":
+                eid = request.POST.get("exclusion_id")
+                if eid:
+                    InterlinkExclusion.objects.filter(pk=eid).delete()
+                    message = "Interlink exclusion removed."
+            elif action == "cancel_batch":
+                bid = request.POST.get("batch_id")
+                if bid:
+                    BatchOperation.objects.filter(pk=bid).update(
+                        status=BatchOperation.Status.CANCELLED
+                    )
+                    message = "Batch operation cancelled."
             # sitemap entries are auto-fed; no manual save in admin
         except Exception as exc:
             logger.warning("Admin suite seo toggle failed: %s", exc)  # noqa: F405
@@ -1137,7 +1197,10 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
 
     try:
         from apps.seo.models import (
+            BatchOperation,
+            InterlinkExclusion,
             LinkableEntity,
+            LinkSuggestion,
             Metadata,
             Redirect,
             SchemaEntry,
@@ -1151,6 +1214,15 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
         stats["entities"] = LinkableEntity.objects.count()
         stats["schemas"] = SchemaEntry.objects.count()
         stats["link_issues"] = SitemapEntry.objects.filter(last_status__gte=400).count()
+        stats["pending_suggestions"] = LinkSuggestion.objects.filter(
+            is_active=True, is_applied=False
+        ).count()
+        stats["active_batches"] = BatchOperation.objects.filter(
+            status__in=[
+                BatchOperation.Status.PENDING,
+                BatchOperation.Status.RUNNING,
+            ]
+        ).count()
 
         q = _admin_search(request)
 
@@ -1181,6 +1253,24 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
         sitemap_page = _admin_paginate(
             request, sitemap_qs.order_by("-created_at"), per_page=25
         )
+
+        suggestions_qs = LinkSuggestion.objects.select_related("source", "target")
+        if q:
+            suggestions_qs = suggestions_qs.filter(
+                Q(source__title__icontains=q)
+                | Q(target__title__icontains=q)
+                | Q(source__slug__icontains=q)
+                | Q(target__slug__icontains=q)
+            )
+        suggestions_page = _admin_paginate(
+            request,
+            suggestions_qs.order_by("locked", "is_applied", "-score", "-updated_at"),
+            per_page=25,
+        )
+        exclusions = list(
+            InterlinkExclusion.objects.order_by("phrase", "source_pattern")[:30]
+        )
+        batches = list(BatchOperation.objects.order_by("-created_at")[:20])
         try:
             cfg = SeoAutomationSettings.get_solo()
             seo_settings = {
@@ -1196,6 +1286,26 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
             }
         except Exception:
             seo_settings = {}
+        try:
+            from apps.blog.models import Post
+            from apps.firmwares.models import Brand, Model, OfficialFirmware
+            from apps.forum.models import Topic
+
+            content_counts = {
+                "posts": Post.objects.count(),
+                "brands": Brand.objects.count(),
+                "models": Model.objects.count(),
+                "firmwares": OfficialFirmware.objects.count(),
+                "topics": Topic.objects.count(),
+            }
+        except Exception:
+            content_counts = {
+                "posts": 0,
+                "brands": 0,
+                "models": 0,
+                "firmwares": 0,
+                "topics": 0,
+            }
     except Exception as exc:
         logger.debug("Admin suite seo snapshot failed: %s", exc)  # noqa: F405
         q = ""
@@ -1203,6 +1313,16 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
         sort_dir = "asc"
         redirect_page = None
         sitemap_page = None
+        suggestions_page = None
+        exclusions = []
+        batches = []
+        content_counts = {
+            "posts": 0,
+            "brands": 0,
+            "models": 0,
+            "firmwares": 0,
+            "topics": 0,
+        }
 
     return _render_admin(
         request,
@@ -1213,7 +1333,12 @@ def admin_suite_seo(request: HttpRequest) -> HttpResponse:  # noqa: F405
             "redirect_page": redirect_page,
             "sitemap_entries": sitemap_page,
             "sitemap_page": sitemap_page,
+            "suggestions_page": suggestions_page,
+            "suggestions": suggestions_page,
+            "interlink_exclusions": exclusions,
+            "batch_operations": batches,
             "seo_settings": seo_settings,
+            "content_counts": content_counts,
             "message": message,
             "q": q,
             "sort": sort_field,
@@ -1275,6 +1400,23 @@ def admin_suite_seo_audit_type(request: HttpRequest, content_type: str) -> HttpR
     results = get_content_type_audit(
         content_type, search=q, sort_by=sort, sort_dir=direction
     )
+
+    # Inject edit_url into each result for audit table Edit button
+    _EDIT_URL_MAP = {
+        "posts": "admin_suite:blog",
+        "brands": "admin_suite:firmwares_brands",
+        "models": "admin_suite:firmwares_models",
+        "firmwares": "admin_suite:firmwares_files",
+        "topics": "admin_suite:forum",
+    }
+    try:
+        from django.urls import reverse
+
+        _list_url = reverse(_EDIT_URL_MAP.get(content_type, "admin_suite:seo_audit"))
+        for _item in results:
+            _item["edit_url"] = _list_url
+    except Exception:  # noqa: BLE001
+        logger.debug("Could not inject edit_url for content_type=%s", content_type)
 
     # Paginate
     page_obj = _admin_paginate(request, results, per_page=50)

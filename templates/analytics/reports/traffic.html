@@ -5,7 +5,7 @@
 {% block page_header %}
 <div class="flex items-center justify-between">
   <h1 class="text-2xl font-bold">Traffic Report</h1>
-  <a href="{% url 'analytics:dashboard' %}" class="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+  <a href="{% url 'analytics:dashboard' %}" class="rounded-lg border border-(--color-border) px-4 py-2 text-sm hover:bg-(--color-bg-secondary) transition">
     Back to Dashboard
   </a>
 </div>
@@ -13,23 +13,23 @@
 
 {% block page_content %}
 <div class="space-y-8">
-  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <section class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">Page Views Over Time</h2>
-    <div class="h-64 flex items-center justify-center text-[var(--color-text-muted)]">
+    <div class="h-64 flex items-center justify-center text-(--color-text-muted)">
       {% include "components/_empty_state.html" with icon="trending-up" title="Coming soon" description="Traffic charts and detailed page view analytics will be available here." %}
     </div>
   </section>
 
-  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <section class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">Top Referrers</h2>
-    <div class="h-48 flex items-center justify-center text-[var(--color-text-muted)]">
+    <div class="h-48 flex items-center justify-center text-(--color-text-muted)">
       {% include "components/_empty_state.html" with icon="external-link" title="No referrer data" description="Referral sources will appear once traffic starts flowing." %}
     </div>
   </section>
 
-  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <section class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">Geographic Distribution</h2>
-    <div class="h-48 flex items-center justify-center text-[var(--color-text-muted)]">
+    <div class="h-48 flex items-center justify-center text-(--color-text-muted)">
       {% include "components/_empty_state.html" with icon="globe" title="No geo data" description="Geographic visitor distribution will be shown here." %}
     </div>
   </section>

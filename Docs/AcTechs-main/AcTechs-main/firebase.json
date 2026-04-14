@@ -1,0 +1,103 @@
+{
+	"firestore": {
+		"rules": "firestore.rules",
+		"indexes": "firestore.indexes.json"
+	},
+	"hosting": {
+		"public": "build/web",
+		"ignore": [
+			"firebase.json",
+			"**/.*",
+			"**/node_modules/**"
+		],
+		"headers": [
+			{
+				"source": "/index.html",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache, no-store, must-revalidate"
+					}
+				]
+			},
+			{
+				"source": "/main.dart.js",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache, no-store, must-revalidate"
+					}
+				]
+			},
+			{
+				"source": "/flutter_bootstrap.js",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache, no-store, must-revalidate"
+					}
+				]
+			},
+			{
+				"source": "/flutter_service_worker.js",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache, no-store, must-revalidate"
+					}
+				]
+			},
+			{
+				"source": "/version.json",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache, no-store, must-revalidate"
+					}
+				]
+			},
+			{
+				"source": "/manifest.json",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						"value": "no-cache, no-store, must-revalidate"
+					}
+				]
+			}
+		],
+		"rewrites": [
+			{
+				"source": "**",
+				"destination": "/index.html"
+			}
+		]
+	},
+	"flutter": {
+		"platforms": {
+			"android": {
+				"default": {
+					"projectId": "actechs-d415e",
+					"appId": "1:493110256900:android:328c9f56d6f6a811569c51",
+					"fileOutput": "android/app/google-services.json"
+				},
+				"buildConfigurations": {
+					".": {
+						"projectId": "actechs-d415e",
+						"appId": "1:493110256900:android:759a954419dcffef569c51",
+						"fileOutput": "android/app/google-services.json"
+					}
+				}
+			},
+			"dart": {
+				"lib/firebase_options.dart": {
+					"projectId": "actechs-d415e",
+					"configurations": {
+						"android": "1:493110256900:android:759a954419dcffef569c51",
+						"web": "1:493110256900:web:8aa96a3450fad9c1569c51"
+					}
+				}
+			}
+		}
+	}
+}

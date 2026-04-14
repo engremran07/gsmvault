@@ -5,18 +5,18 @@
 {% block title %}Create Bounty — Request Firmware or Get Help{% endblock %}
 
 {% block page_header %}
-<nav class="flex items-center gap-2 text-sm text-[var(--color-text-muted)] mb-6">
-  <a href="{% url 'home' %}" class="hover:text-[var(--color-accent)]">Home</a>
+<nav class="flex items-center gap-2 text-sm text-(--color-text-muted) mb-6">
+  <a href="{% url 'home' %}" class="hover:text-(--color-accent)">Home</a>
   <i data-lucide="chevron-right" class="w-3 h-3"></i>
-  <a href="{% url 'bounty:bounty_list' %}" class="hover:text-[var(--color-accent)]">Bounties</a>
+  <a href="{% url 'bounty:bounty_list' %}" class="hover:text-(--color-accent)">Bounties</a>
   <i data-lucide="chevron-right" class="w-3 h-3"></i>
-  <span class="text-[var(--color-text-primary)]">Create</span>
+  <span class="text-(--color-text-primary)">Create</span>
 </nav>
-<h1 class="text-2xl font-bold text-[var(--color-text-primary)] mb-2 flex items-center gap-3">
-  <i data-lucide="plus-circle" class="w-7 h-7 text-[var(--color-accent)]"></i>
+<h1 class="text-2xl font-bold text-(--color-text-primary) mb-2 flex items-center gap-3">
+  <i data-lucide="plus-circle" class="w-7 h-7 text-(--color-accent)"></i>
   Create a Bounty
 </h1>
-<p class="text-[var(--color-text-secondary)] mb-6">Request specific firmware or ask for help with flashing/unlocking issues.</p>
+<p class="text-(--color-text-secondary) mb-6">Request specific firmware or ask for help with flashing/unlocking issues.</p>
 {% endblock %}
 
 {% block page_content %}
@@ -26,33 +26,33 @@
 
     {# Request Type Selector #}
     <div>
-      <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Bounty Type</label>
+      <label class="block text-sm font-medium text-(--color-text-primary) mb-2">Bounty Type</label>
       <div class="grid grid-cols-2 gap-3">
         <label class="relative cursor-pointer">
           <input type="radio" name="request_type" value="firmware" x-model="requestType" class="peer sr-only" checked>
-          <div class="flex items-center gap-3 p-4 rounded-xl border-2 border-[var(--color-border)] peer-checked:border-[var(--color-accent)] bg-[var(--color-bg-secondary)] transition-colors">
+          <div class="flex items-center gap-3 p-4 rounded-xl border-2 border-(--color-border) peer-checked:border-(--color-accent) bg-(--color-bg-secondary) transition-colors">
             <i data-lucide="hard-drive-download" class="w-6 h-6 text-blue-400"></i>
             <div>
-              <div class="font-semibold text-sm text-[var(--color-text-primary)]">Firmware Request</div>
-              <div class="text-xs text-[var(--color-text-muted)]">Request a specific firmware build</div>
+              <div class="font-semibold text-sm text-(--color-text-primary)">Firmware Request</div>
+              <div class="text-xs text-(--color-text-muted)">Request a specific firmware build</div>
             </div>
           </div>
         </label>
         <label class="relative cursor-pointer">
           <input type="radio" name="request_type" value="support" x-model="requestType" class="peer sr-only">
-          <div class="flex items-center gap-3 p-4 rounded-xl border-2 border-[var(--color-border)] peer-checked:border-[var(--color-accent)] bg-[var(--color-bg-secondary)] transition-colors">
+          <div class="flex items-center gap-3 p-4 rounded-xl border-2 border-(--color-border) peer-checked:border-(--color-accent) bg-(--color-bg-secondary) transition-colors">
             <i data-lucide="message-circle-question" class="w-6 h-6 text-purple-400"></i>
             <div>
-              <div class="font-semibold text-sm text-[var(--color-text-primary)]">Support / Troubleshooting</div>
-              <div class="text-xs text-[var(--color-text-muted)]">Get help with flashing or unlocking</div>
+              <div class="font-semibold text-sm text-(--color-text-primary)">Support / Troubleshooting</div>
+              <div class="text-xs text-(--color-text-muted)">Get help with flashing or unlocking</div>
             </div>
           </div>
         </label>
-        <a href="{% url 'forum:index' %}" class="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-accent)] transition-colors">
-          <i data-lucide="message-circle" class="w-6 h-6 text-[var(--color-accent)]"></i>
+        <a href="{% url 'forum:index' %}" class="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-(--color-border) bg-(--color-bg-secondary) hover:border-(--color-accent) transition-colors">
+          <i data-lucide="message-circle" class="w-6 h-6 text-(--color-accent)"></i>
           <div>
-            <div class="font-semibold text-sm text-[var(--color-text-primary)]">Community Forum</div>
-            <div class="text-xs text-[var(--color-text-muted)]">Ask questions, get help from the community &rarr;</div>
+            <div class="font-semibold text-sm text-(--color-text-primary)">Community Forum</div>
+            <div class="text-xs text-(--color-text-muted)">Ask questions, get help from the community &rarr;</div>
           </div>
         </a>
       </div>
@@ -60,18 +60,18 @@
 
     {# Title #}
     <div>
-      <label for="id_title" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Title</label>
+      <label for="id_title" class="block text-sm font-medium text-(--color-text-primary) mb-1">Title</label>
       <input type="text" id="id_title" name="title" required maxlength="200"
              placeholder="e.g. Need Samsung A52 Android 14 firmware"
-             class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+             class="w-full px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent)">
     </div>
 
     {# Brand / Model #}
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label for="id_brand" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Brand (optional)</label>
+        <label for="id_brand" class="block text-sm font-medium text-(--color-text-primary) mb-1">Brand (optional)</label>
         <select id="id_brand" name="brand"
-                class="w-full px-3 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm">
+                class="w-full px-3 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm">
           <option value="">— Select brand —</option>
           {% for b in brands %}
           <option value="{{ b.id }}">{{ b.name }}</option>
@@ -79,51 +79,51 @@
         </select>
       </div>
       <div>
-        <label for="id_model" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Model (optional)</label>
+        <label for="id_model" class="block text-sm font-medium text-(--color-text-primary) mb-1">Model (optional)</label>
         <input type="text" id="id_model" name="device_model" placeholder="e.g. SM-A526B"
-               class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-sm">
+               class="w-full px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent) text-sm">
       </div>
     </div>
 
     {# Firmware Version (firmware requests only) #}
     <div x-show="requestType === 'firmware'" x-cloak>
-      <label for="id_fw" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Firmware Version Wanted</label>
+      <label for="id_fw" class="block text-sm font-medium text-(--color-text-primary) mb-1">Firmware Version Wanted</label>
       <input type="text" id="id_fw" name="fw_version_wanted"
              placeholder="e.g. A526BXXU4CVJ1 or Android 14"
-             class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+             class="w-full px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent)">
     </div>
 
     {# Description #}
     <div>
-      <label for="id_desc" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Description</label>
+      <label for="id_desc" class="block text-sm font-medium text-(--color-text-primary) mb-1">Description</label>
       <textarea id="id_desc" name="description" rows="5" required
                 placeholder="Describe what you need in detail..."
-                class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-y"></textarea>
+                class="w-full px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent) resize-y"></textarea>
     </div>
 
     {# What Tried (support requests only) #}
     <div x-show="requestType === 'support'" x-cloak>
-      <label for="id_tried" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">What Have You Already Tried?</label>
+      <label for="id_tried" class="block text-sm font-medium text-(--color-text-primary) mb-1">What Have You Already Tried?</label>
       <textarea id="id_tried" name="what_tried" rows="4"
                 placeholder="Describe the methods you've already attempted..."
-                class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-y"></textarea>
+                class="w-full px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent) resize-y"></textarea>
     </div>
 
     {# Reward Amount #}
     <div>
-      <label for="id_reward" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Reward Amount (credits)</label>
+      <label for="id_reward" class="block text-sm font-medium text-(--color-text-primary) mb-1">Reward Amount (credits)</label>
       <input type="number" id="id_reward" name="reward_amount" min="0" step="1" value="0"
-             class="w-full px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">Set to 0 for volunteer-only bounties.</p>
+             class="w-full px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent)">
+      <p class="text-xs text-(--color-text-muted) mt-1">Set to 0 for volunteer-only bounties.</p>
     </div>
 
     {# Submit #}
     <div class="flex items-center gap-4">
       <button type="submit"
-              class="px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition-colors">
+              class="px-6 py-3 rounded-lg bg-(--color-accent) text-(--color-accent-text) font-semibold hover:bg-(--color-accent-hover) transition-colors">
         Create Bounty
       </button>
-      <a href="{% url 'bounty:bounty_list' %}" class="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">Cancel</a>
+      <a href="{% url 'bounty:bounty_list' %}" class="text-sm text-(--color-text-muted) hover:text-(--color-text-primary)">Cancel</a>
     </div>
   </form>
 </div>

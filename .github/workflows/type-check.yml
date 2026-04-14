@@ -1,0 +1,120 @@
+name: Type Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  pyright:
+    name: Strict Type Checking (Pyright)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install type stubs
+        run: |
+          pip install \
+            django-stubs \
+            djangorestframework-stubs \
+            types-requests \
+            types-redis \
+            types-Pillow \
+            types-python-dateutil \
+            types-PyYAML
+
+      - name: Install Pyright
+        run: pip install pyright
+
+      - name: Run Pyright on apps/
+        id: pyright
+        run: |
+          set +e
+          pyright apps/ --outputjson > pyright-output.json 2>&1
+          EXIT_CODE=$?
+          set -e
+
+          if [ -f pyright-output.json ]; then
+            ERRORS=$(python -c "
+          import json, sys
+          try:
+              data = json.load(open('pyright-output.json'))
+              diags = data.get('generalDiagnostics', [])
+              errors = [d for d in diags if d.get('severity') == 'error']
+              warnings = [d for d in diags if d.get('severity') == 'warning']
+              print(f'{len(errors)}')
+          except Exception:
+              print('0')
+          ")
+            echo "error_count=$ERRORS" >> "$GITHUB_OUTPUT"
+          else
+            echo "error_count=unknown" >> "$GITHUB_OUTPUT"
+          fi
+
+          exit $EXIT_CODE
+
+      - name: Report errors
+        if: failure()
+        run: |
+          echo "## Pyright Type Check Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f pyright-output.json ]; then
+            python -c "
+          import json
+          data = json.load(open('pyright-output.json'))
+          diags = data.get('generalDiagnostics', [])
+          errors = [d for d in diags if d.get('severity') == 'error']
+
+          print(f'**{len(errors)} type errors found.**')
+          print()
+          print('| File | Line | Message |')
+          print('|------|------|---------|')
+          for e in errors[:50]:
+              f = e.get('file', 'unknown')
+              r = e.get('range', {}).get('start', {})
+              line = r.get('line', 0) + 1
+              msg = e.get('message', '').replace('|', '\\|')[:120]
+              print(f'| \`{f}\` | {line} | {msg} |')
+
+          if len(errors) > 50:
+              print(f'')
+              print(f'*... and {len(errors) - 50} more errors (showing first 50)*')
+          " >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Pyright output not available in JSON format." >> "$GITHUB_STEP_SUMMARY"
+            echo "Run \`pyright apps/\` locally for details." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Report success
+        if: success()
+        run: |
+          echo "## ✅ Pyright Type Check Passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "All files in \`apps/\` pass strict type checking." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Pyright output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyright-report
+          path: pyright-output.json
+          retention-days: 14
+          if-no-files-found: ignore

@@ -205,8 +205,8 @@ steps:
 ### 6.1 Overview
 
 **8 Orchestrator Agents** — coordinate high-level workflows.
-**31 Specialist Agents** — execute specific technical tasks.
-**Total: 39 agents** in `.github/agents/`.
+**36+ Specialist Agents** — execute specific technical tasks.
+**Total: 44+ agents** in `.github/agents/`.
 
 ### 6.2 Orchestrator Agents (8)
 
@@ -282,6 +282,8 @@ steps:
 ## 7. Skill Architecture
 
 ### 7.1 Skills Inventory (15)
+
+> Core inventory shown below. The active repository now maintains an expanded catalog (27+ skills) for deeper domain coverage.
 
 | Skill | Folder | Triggers |
 | --- | --- | --- |
@@ -364,14 +366,14 @@ Blog, devices, firmware catalog.
 - `templates/firmwares/` — Firmware list, detail, download gate
 - HTMX search and filtering
 
-### Phase 4: User Dashboard (In Progress)
+### Phase 4: User Dashboard ✅
 
 Authenticated user area.
 
-- `templates/user/` — Dashboard, profile, settings, notifications, wallet
+- `templates/users/` — Dashboard, profile, settings, notifications, wallet
 - Download history, referrals, gamification badges
 
-### Phase 5: Commerce (Planned)
+### Phase 5: Commerce ✅
 
 Shop, marketplace, bounty.
 
@@ -387,7 +389,7 @@ Custom admin dashboard (not Django admin).
 - 8 view modules in `apps/admin/`
 - KPI dashboard, user/content management, security monitoring
 
-### Phase 7: Polish (Ongoing)
+### Phase 7: Polish ✅ (Continuous)
 
 SEO, i18n, emails, performance.
 
@@ -395,6 +397,16 @@ SEO, i18n, emails, performance.
 - i18n translation setup
 - Email templates
 - Performance optimization
+
+### Phase 8: Governance Hardening ✅
+
+Global strict governance enforcement completed across docs, rules, instructions, agents, and workflow checks.
+
+- No-extra-file default policy (in-place extension first)
+- Mandatory reusable component policy
+- Static asset minimization + structured split-only-when-required policy
+- Backend/frontend/static/database synchronization guardrails
+- No-regression closure requirements in quality-gate workflows
 
 ---
 
@@ -482,3 +494,30 @@ Outperforms Easy Firmware Store Ultimate (Jaudi Softs) through:
 | P2P marketplace | User-to-user firmware/resource trading |
 | Subscription wallet | Credits, referral rewards, ad-unlock gates |
 | Download quota tiers | Free (ad-gated) → Registered → Subscriber → Premium |
+
+---
+
+## 12. 12-Month Roadmap Closure (Completed)
+
+This program is now treated as a completed 12-month execution baseline, with continuous hardening ongoing under governance controls.
+
+| Month | Focus | Status | Delivered Outcome |
+| --- | --- | --- | --- |
+| 1 | Frontend foundation | ✅ | Base/layout/component architecture established with Django-served rendering |
+| 2 | Theme and static architecture | ✅ | Tailwind/SCSS/Alpine/HTMX integration with multi-CDN fallback and theme tokens |
+| 3 | Core pages and auth UX | ✅ | Public pages, auth flow, and hardened error surfaces |
+| 4 | Content and catalog surfaces | ✅ | Blog/device/firmware rendering patterns with HTMX fragment strategy |
+| 5 | User dashboard and profile | ✅ | Dashboard/profile/settings surfaces with richer feature wiring |
+| 6 | Commerce surfaces | ✅ | Shop/marketplace/bounty templates and app wiring |
+| 7 | Custom admin suite | ✅ | Admin dashboard modules, KPI/review workflows, reusable admin components |
+| 8 | SEO/distribution/ads consolidation | ✅ | In-place canonical module evolution and anti-duplication enforcement |
+| 9 | Security and policy hardening | ✅ | Consent, CSRF/CSP discipline, app-boundary governance, no-versioned-files policy |
+| 10 | Quality and automation | ✅ | Quality gate standardization, diagnostics closure workflow, stricter validation |
+| 11 | Governance system maturity | ✅ | Expanded rules/instructions/agents/skills with enforceable workflow checks |
+| 12 | Enterprise closure and no-regression controls | ✅ | Backend/frontend/static/database synchronization and no-regression completion guardrails |
+
+### Completion Definition
+
+- Core roadmap phases are complete and reflected in active architecture/docs.
+- Remaining work is continuous optimization, not baseline roadmap debt.
+- Any future expansion must preserve in-place evolution, static minimization, component reuse, and no-regression closure requirements.

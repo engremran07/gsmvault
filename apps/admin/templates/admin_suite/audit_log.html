@@ -6,8 +6,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Audit Log</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Model changes and admin actions</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Audit Log</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Model changes and admin actions</p>
   </div>
 </div>
 {% endblock %}
@@ -20,32 +20,32 @@
     <div class="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center mb-3">
       <i data-lucide="scroll-text" class="w-5 h-5 text-blue-400"></i>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.total_logs }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Total Entries</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)">{{ stats.total_logs }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Total Entries</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-3">
       <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.creates }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Creates</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)">{{ stats.creates }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Creates</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center mb-3">
       <i data-lucide="pencil-line" class="w-5 h-5 text-amber-400"></i>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.updates }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Updates</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)">{{ stats.updates }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Updates</p>
   </div>
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center mb-3">
       <i data-lucide="trash-2" class="w-5 h-5 text-red-400"></i>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]">{{ stats.deletes }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Deletes</p>
+    <div class="text-2xl font-bold text-(--color-text-primary)">{{ stats.deletes }}</div>
+    <p class="text-xs text-(--color-text-muted) mt-1">Deletes</p>
   </div>
 </div>
 
@@ -60,31 +60,31 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-5 py-3 text-left font-medium">
             <a href="?sort=time&dir={% if sort == 'time' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
+               class="hover:text-(--color-accent) transition-colors inline-flex items-center gap-1">
               Time
               {% if sort == 'time' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3"></i>{% endif %}
             </a>
           </th>
           <th class="px-5 py-3 text-left font-medium">
             <a href="?sort=user&dir={% if sort == 'user' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
+               class="hover:text-(--color-accent) transition-colors inline-flex items-center gap-1">
               User
               {% if sort == 'user' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3"></i>{% endif %}
             </a>
           </th>
           <th class="px-5 py-3 text-left font-medium">
             <a href="?sort=action&dir={% if sort == 'action' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
+               class="hover:text-(--color-accent) transition-colors inline-flex items-center gap-1">
               Action
               {% if sort == 'action' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3"></i>{% endif %}
             </a>
           </th>
           <th class="px-5 py-3 text-left font-medium">
             <a href="?sort=model&dir={% if sort == 'model' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-               class="hover:text-[var(--color-accent)] transition-colors inline-flex items-center gap-1">
+               class="hover:text-(--color-accent) transition-colors inline-flex items-center gap-1">
               Model
               {% if sort == 'model' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3"></i>{% endif %}
             </a>
@@ -93,11 +93,11 @@
           <th class="px-5 py-3 text-center font-medium">Detail</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for log in page_obj %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
-          <td class="px-5 py-3 text-[var(--color-text-muted)] whitespace-nowrap">{{ log.timestamp|date:"M d, H:i:s" }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-secondary)]">{{ log.user.email|default:"system" }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
+          <td class="px-5 py-3 text-(--color-text-muted) whitespace-nowrap">{{ log.timestamp|date:"M d, H:i:s" }}</td>
+          <td class="px-5 py-3 text-(--color-text-secondary)">{{ log.user.email|default:"system" }}</td>
           <td class="px-5 py-3">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
               {% if log.action == 'create' %}bg-emerald-500/15 text-emerald-400
@@ -107,34 +107,34 @@
               {{ log.action }}
             </span>
           </td>
-          <td class="px-5 py-3 text-[var(--color-text-primary)] font-medium">{{ log.model_name }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-secondary)] truncate max-w-[200px]">{{ log.object_repr|default:"—" }}</td>
+          <td class="px-5 py-3 text-(--color-text-primary) font-medium">{{ log.model_name }}</td>
+          <td class="px-5 py-3 text-(--color-text-secondary) truncate max-w-[200px]">{{ log.object_repr|default:"—" }}</td>
           <td class="px-5 py-3 text-center">
             <button @click="expanded = expanded === {{ log.pk }} ? null : {{ log.pk }}"
-                    class="text-xs px-2 py-1 rounded bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-accent)]/20 text-[var(--color-text-secondary)] transition-colors">
+                    class="text-xs px-2 py-1 rounded bg-(--color-bg-tertiary) hover:bg-accent/20 text-(--color-text-secondary) transition-colors">
               <i data-lucide="chevron-down" class="w-3 h-3 inline-block transition-transform"
                  :class="expanded === {{ log.pk }} ? 'rotate-180' : ''"></i>
             </button>
           </td>
         </tr>
         <tr x-show="expanded === {{ log.pk }}" x-collapse x-cloak>
-          <td colspan="6" class="px-5 py-4 bg-[var(--color-bg-tertiary)]">
+          <td colspan="6" class="px-5 py-4 bg-(--color-bg-tertiary)">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               {% if log.before %}
               <div>
-                <p class="font-semibold text-[var(--color-text-muted)] mb-1 uppercase tracking-wider">Before</p>
-                <pre class="p-3 rounded-lg bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] overflow-x-auto max-h-40">{{ log.before }}</pre>
+                <p class="font-semibold text-(--color-text-muted) mb-1 uppercase tracking-wider">Before</p>
+                <pre class="p-3 rounded-lg bg-(--color-bg-primary) text-(--color-text-secondary) overflow-x-auto max-h-40">{{ log.before }}</pre>
               </div>
               {% endif %}
               {% if log.after %}
               <div>
-                <p class="font-semibold text-[var(--color-text-muted)] mb-1 uppercase tracking-wider">After</p>
-                <pre class="p-3 rounded-lg bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] overflow-x-auto max-h-40">{{ log.after }}</pre>
+                <p class="font-semibold text-(--color-text-muted) mb-1 uppercase tracking-wider">After</p>
+                <pre class="p-3 rounded-lg bg-(--color-bg-primary) text-(--color-text-secondary) overflow-x-auto max-h-40">{{ log.after }}</pre>
               </div>
               {% endif %}
             </div>
             {% if log.ip %}
-            <p class="mt-2 text-xs text-[var(--color-text-muted)]">
+            <p class="mt-2 text-xs text-(--color-text-muted)">
               IP: {{ log.ip }} &middot; UA: {{ log.user_agent|truncatechars:80|default:"—" }}
             </p>
             {% endif %}
@@ -142,7 +142,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="px-5 py-12 text-center text-[var(--color-text-muted)]">
+          <td colspan="6" class="px-5 py-12 text-center text-(--color-text-muted)">
             <i data-lucide="scroll-text" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
             <p>No audit log entries found{% if q %} matching "{{ q }}"{% endif %}</p>
           </td>
@@ -154,16 +154,16 @@
 
   {# ═══ Pagination ═══ #}
   {% if page_obj.has_other_pages %}
-  <div class="px-5 py-3 border-t border-[var(--color-border)] flex items-center justify-between text-xs text-[var(--color-text-muted)]">
+  <div class="px-5 py-3 border-t border-(--color-border) flex items-center justify-between text-xs text-(--color-text-muted)">
     <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} &middot; {{ page_obj.paginator.count }} total</span>
     <div class="flex items-center gap-2">
       {% if page_obj.has_previous %}
       <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}"
-         class="px-3 py-1 rounded bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-accent)]/20 transition-colors">&laquo; Prev</a>
+         class="px-3 py-1 rounded bg-(--color-bg-tertiary) hover:bg-accent/20 transition-colors">&laquo; Prev</a>
       {% endif %}
       {% if page_obj.has_next %}
       <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}"
-         class="px-3 py-1 rounded bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-accent)]/20 transition-colors">Next &raquo;</a>
+         class="px-3 py-1 rounded bg-(--color-bg-tertiary) hover:bg-accent/20 transition-colors">Next &raquo;</a>
       {% endif %}
     </div>
   </div>

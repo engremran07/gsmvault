@@ -10,6 +10,7 @@ from .models import (
     ContentDistribution,
     ContentVariant,
     DistributionSettings,
+    GeneratedVideo,
     ShareJob,
     ShareLog,
     SharePlan,
@@ -21,7 +22,7 @@ from .models import (
 
 
 @admin.register(SocialAccount)
-class SocialAccountAdmin(admin.ModelAdmin[SocialAccount]):
+class SocialAccountAdmin(admin.ModelAdmin[SocialAccount]):  # type: ignore[type-arg]
     list_display = ("channel", "account_name", "is_active", "last_tested_at")
     list_filter = ("channel", "is_active")
     search_fields = ("account_name",)
@@ -57,28 +58,28 @@ class SocialAccountAdmin(admin.ModelAdmin[SocialAccount]):
 
 
 @admin.register(ShareTemplate)
-class ShareTemplateAdmin(admin.ModelAdmin[ShareTemplate]):
+class ShareTemplateAdmin(admin.ModelAdmin[ShareTemplate]):  # type: ignore[type-arg]
     list_display = ("channel", "name", "is_default")
     list_filter = ("channel", "is_default")
     search_fields = ("name",)
 
 
 @admin.register(ContentVariant)
-class ContentVariantAdmin(admin.ModelAdmin[ContentVariant]):
+class ContentVariantAdmin(admin.ModelAdmin[ContentVariant]):  # type: ignore[type-arg]
     list_display = ("post", "channel", "variant_type", "generated_at")
     list_filter = ("channel", "variant_type")
     search_fields = ("post__title",)
 
 
 @admin.register(SharePlan)
-class SharePlanAdmin(admin.ModelAdmin[SharePlan]):
+class SharePlanAdmin(admin.ModelAdmin[SharePlan]):  # type: ignore[type-arg]
     list_display = ("post", "status", "schedule_at", "created_at")
     list_filter = ("status",)
     search_fields = ("post__title",)
 
 
 @admin.register(ShareJob)
-class ShareJobAdmin(admin.ModelAdmin[ShareJob]):
+class ShareJobAdmin(admin.ModelAdmin[ShareJob]):  # type: ignore[type-arg]
     list_display = ("post", "channel", "status", "schedule_at", "attempt_count")
     list_filter = ("channel", "status")
     search_fields = ("post__title", "external_post_id")
@@ -115,20 +116,20 @@ class ShareJobAdmin(admin.ModelAdmin[ShareJob]):
 
 
 @admin.register(ShareLog)
-class ShareLogAdmin(admin.ModelAdmin[ShareLog]):
+class ShareLogAdmin(admin.ModelAdmin[ShareLog]):  # type: ignore[type-arg]
     list_display = ("job", "level", "created_at")
     list_filter = ("level",)
     search_fields = ("message",)
 
 
 @admin.register(WebSubSubscription)
-class WebSubSubscriptionAdmin(admin.ModelAdmin[WebSubSubscription]):
+class WebSubSubscriptionAdmin(admin.ModelAdmin[WebSubSubscription]):  # type: ignore[type-arg]
     list_display = ("topic_url", "hub_url", "active", "last_pinged_at")
     list_filter = ("active",)
 
 
 @admin.register(SyndicationPartner)
-class SyndicationPartnerAdmin(admin.ModelAdmin[SyndicationPartner]):
+class SyndicationPartnerAdmin(admin.ModelAdmin[SyndicationPartner]):  # type: ignore[type-arg]
     list_display = ("name", "format", "enabled")
     list_filter = ("enabled", "format")
     search_fields = ("name",)
@@ -248,7 +249,7 @@ class DistributionSettingsAdmin(SingletonModelAdmin):
 
 
 @admin.register(ContentDistribution)
-class ContentDistributionAdmin(admin.ModelAdmin[ContentDistribution]):
+class ContentDistributionAdmin(admin.ModelAdmin[ContentDistribution]):  # type: ignore[type-arg]
     """
     Tracks individual content distribution jobs across platforms.
     View status, retry failed distributions, and monitor platform delivery.
@@ -327,17 +328,15 @@ class ContentDistributionAdmin(admin.ModelAdmin[ContentDistribution]):
 
     @admin.action(description="Retry failed distributions")
     def retry_failed(self, request, queryset):
-        from apps.distribution.tasks import (
-            distribute_content,  # type: ignore[attr-defined]
+        count = queryset.filter(status="failed").update(status="pending")
+        self.message_user(
+            request, f"Reset {count} distribution(s) to pending for retry"
         )
 
-        count = 0
-        for dist in queryset.filter(status="failed"):
-            dist.status = "pending"
-            dist.save()
-            try:
-                distribute_content.delay(dist.id)
-                count += 1
-            except Exception:  # noqa: S110
-                pass
-        self.message_user(request, f"Queued {count} distribution(s) for retry")
+
+@admin.register(GeneratedVideo)
+class GeneratedVideoAdmin(admin.ModelAdmin[GeneratedVideo]):  # type: ignore[type-arg]
+    list_display = ["post", "platform", "status", "orientation", "created_at"]
+    list_filter = ["platform", "status", "orientation"]
+    search_fields = ["post__title"]
+    readonly_fields = ["created_at", "updated_at"]

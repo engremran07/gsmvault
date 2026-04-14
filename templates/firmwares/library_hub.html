@@ -36,13 +36,13 @@
 
   {# ━━━ Hero Header ━━━ #}
   <div class="text-center space-y-4 py-6">
-    <h1 class="text-3xl lg:text-4xl font-bold text-[var(--color-text-primary)]">
-      <i data-lucide="database" class="w-8 h-8 inline mr-2 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl lg:text-4xl font-bold text-(--color-text-primary)">
+      <i data-lucide="database" class="w-8 h-8 inline mr-2 text-(--color-accent)"></i>
       Firmware Library
     </h1>
-    <p class="text-[var(--color-text-secondary)] text-lg max-w-2xl mx-auto">
-      Download firmware for <strong class="text-[var(--color-text-primary)]">{{ total_brands }}+</strong> brands and
-      <strong class="text-[var(--color-text-primary)]">{{ total_models }}+</strong> device models.
+    <p class="text-(--color-text-secondary) text-lg max-w-2xl mx-auto">
+      Download firmware for <strong class="text-(--color-text-primary)">{{ total_brands }}+</strong> brands and
+      <strong class="text-(--color-text-primary)">{{ total_models }}+</strong> device models.
       Official, engineering, and custom ROM — free and fast.
     </p>
   </div>
@@ -58,7 +58,7 @@
   {# ━━━ Universal Search ━━━ #}
   <div class="max-w-2xl mx-auto" x-data="{ query: '{{ search_query|escapejs }}', focused: false }" x-cloak>
     <div class="relative">
-      <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+      <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-(--color-text-muted)"></i>
       <input type="text"
              name="q"
              x-model="query"
@@ -69,15 +69,15 @@
              hx-trigger="keyup changed delay:300ms"
              hx-target="#universal-search-results"
              hx-swap="innerHTML"
-             class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-input)] text-[var(--color-text-primary)] text-base placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition shadow-sm">
+             class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-(--color-border) bg-(--color-input) text-(--color-text-primary) text-base placeholder:text-(--color-text-muted) focus:outline-none focus:ring-2 focus:ring-(--color-accent) focus:border-(--color-accent) transition shadow-sm">
       {# Search results dropdown #}
       <div id="universal-search-results"
            x-show="focused && query.length >= 2"
            x-cloak
-           class="absolute z-50 left-0 right-0 top-full mt-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl shadow-2xl max-h-96 overflow-y-auto">
+           class="absolute z-50 left-0 right-0 top-full mt-1 bg-(--color-bg-secondary) border border-(--color-border) rounded-xl shadow-2xl max-h-96 overflow-y-auto">
       </div>
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] text-center mt-2">
+    <p class="text-xs text-(--color-text-muted) text-center mt-2">
       Try: Samsung Galaxy S24, Pixel 9, Redmi Note 15, spinel, SM-S926B, Snapdragon...
     </p>
   </div>
@@ -89,11 +89,11 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
       {% for brand in featured_brands %}
       <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
-         class="group bg-[var(--color-bg-secondary)] rounded-xl border-2 border-[var(--color-accent)]/20 p-5 text-center hover:border-[var(--color-accent)] transition-all flex flex-col items-center gap-3 no-underline">
+         class="group bg-(--color-bg-secondary) rounded-xl border-2 border-accent/20 p-5 text-center hover:border-(--color-accent) transition-all flex flex-col items-center gap-3 no-underline">
         {% brand_logo_svg brand.name size=52 logo_url=brand.logo_url %}
         <div>
-          <h3 class="font-bold text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{{ brand.name }}</h3>
-          <p class="text-xs text-[var(--color-text-muted)] mt-0.5">{{ brand.model_count }} model{{ brand.model_count|pluralize }}</p>
+          <h3 class="font-bold text-sm text-(--color-text-primary) group-hover:text-(--color-accent) transition-colors">{{ brand.name }}</h3>
+          <p class="text-xs text-(--color-text-muted) mt-0.5">{{ brand.model_count }} model{{ brand.model_count|pluralize }}</p>
         </div>
       </a>
       {% endfor %}
@@ -110,7 +110,7 @@
     {# Brand filter bar #}
     <div class="flex items-center gap-3">
       <div class="flex-1 relative">
-        <i data-lucide="filter" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+        <i data-lucide="filter" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--color-text-muted)"></i>
         <input type="text"
                name="q"
                value="{{ search_query }}"
@@ -119,9 +119,9 @@
                hx-trigger="keyup changed delay:300ms"
                hx-target="#brand-grid"
                hx-swap="innerHTML"
-               class="w-full pl-9 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
+               class="w-full pl-9 pr-4 py-2 rounded-lg border border-(--color-border) bg-(--color-input) text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition">
       </div>
-      <span class="text-xs text-[var(--color-text-muted)] whitespace-nowrap">{{ brands|length }} brand{{ brands|length|pluralize }}</span>
+      <span class="text-xs text-(--color-text-muted) whitespace-nowrap">{{ brands|length }} brand{{ brands|length|pluralize }}</span>
     </div>
 
     {# Brand grid #}

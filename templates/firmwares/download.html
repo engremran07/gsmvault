@@ -6,27 +6,27 @@
 {% block page_content %}
 <div class="max-w-2xl mx-auto text-center space-y-8 py-8">
   <div>
-    <i data-lucide="download-cloud" class="w-16 h-16 text-[var(--color-accent)] mx-auto mb-4"></i>
+    <i data-lucide="download-cloud" class="w-16 h-16 text-(--color-accent) mx-auto mb-4"></i>
     <h1 class="text-2xl font-bold">Download Firmware</h1>
-    <p class="text-[var(--color-text-secondary)] mt-2">{{ firmware.original_file_name }}</p>
+    <p class="text-(--color-text-secondary) mt-2">{{ firmware.original_file_name }}</p>
   </div>
 
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
       <div>
-        <span class="text-[var(--color-text-muted)]">Brand</span>
+        <span class="text-(--color-text-muted)">Brand</span>
         <p class="font-medium">{{ firmware.brand.name }}</p>
       </div>
       <div>
-        <span class="text-[var(--color-text-muted)]">Model</span>
+        <span class="text-(--color-text-muted)">Model</span>
         <p class="font-medium">{{ firmware.model.name }}</p>
       </div>
       <div>
-        <span class="text-[var(--color-text-muted)]">Type</span>
+        <span class="text-(--color-text-muted)">Type</span>
         <p class="font-medium">{{ firmware_type_display }}</p>
       </div>
       <div>
-        <span class="text-[var(--color-text-muted)]">Size</span>
+        <span class="text-(--color-text-muted)">Size</span>
         <p class="font-medium">{{ file_size_display }}</p>
       </div>
     </div>
@@ -69,20 +69,20 @@
                   stroke-dasharray="251.2" :stroke-dashoffset="251.2 * (1 - countdown / {{ countdown_seconds }})"
                   stroke-linecap="round" class="transition-all duration-1000 ease-linear"></circle>
         </svg>
-        <span class="text-3xl font-bold text-[var(--color-accent)]" x-text="countdown"></span>
+        <span class="text-3xl font-bold text-(--color-accent)" x-text="countdown"></span>
       </div>
-      <p class="text-[var(--color-text-secondary)]">Your download will be ready shortly...</p>
+      <p class="text-(--color-text-secondary)">Your download will be ready shortly...</p>
       {% include "components/_loading.html" %}
     </div>
 
     {# Phase 2: Ad gate (if enabled) #}
     <div x-show="countdownDone && adGateEnabled && !adGateDone" x-cloak x-transition class="space-y-4">
-      <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+      <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
         <h3 class="text-lg font-semibold mb-2">
-          <i data-lucide="tv" class="w-5 h-5 inline mr-1 text-[var(--color-accent)]"></i>
+          <i data-lucide="tv" class="w-5 h-5 inline mr-1 text-(--color-accent)"></i>
           Support Us
         </h3>
-        <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+        <p class="text-sm text-(--color-text-secondary) mb-4">
           Please wait while we prepare your download. This helps keep our service free.
         </p>
 
@@ -111,12 +111,12 @@
 
         <template x-if="adGateActive && !adGateDone">
           <div class="space-y-3">
-            <div class="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2.5">
-              <div class="bg-[var(--color-accent)] h-2.5 rounded-full transition-all duration-1000 ease-linear"
+            <div class="w-full bg-(--color-bg-tertiary) rounded-full h-2.5">
+              <div class="bg-(--color-accent) h-2.5 rounded-full transition-all duration-1000 ease-linear"
                    :style="'width: ' + (100 - (adGateTimer / adGateSeconds * 100)) + '%'"></div>
             </div>
-            <p class="text-sm text-[var(--color-text-muted)]">
-              Please wait <span class="font-bold text-[var(--color-accent)]" x-text="adGateTimer"></span> seconds...
+            <p class="text-sm text-(--color-text-muted)">
+              Please wait <span class="font-bold text-(--color-accent)" x-text="adGateTimer"></span> seconds...
             </p>
           </div>
         </template>
@@ -129,12 +129,12 @@
         <i data-lucide="check-circle" class="w-10 h-10 text-emerald-500 mx-auto mb-3"></i>
         <p class="text-emerald-400 font-medium mb-4">Your download is ready!</p>
         <a :href="'{% url 'firmwares:firmware_download_start' firmware_type=firmware_type firmware_id=firmware.id %}?token=' + encodeURIComponent(token) + '&sig=' + encodeURIComponent(sig)"
-           class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-8 py-3 text-[var(--color-accent-text)] font-medium text-lg hover:bg-[var(--color-accent-hover)] transition shadow-lg shadow-[var(--color-accent)]/20">
+           class="inline-flex items-center gap-2 rounded-lg bg-(--color-accent) px-8 py-3 text-(--color-accent-text) font-medium text-lg hover:bg-(--color-accent-hover) transition shadow-lg shadow-(--color-accent)/20">
           <i data-lucide="download" class="w-5 h-5"></i>
           Download Now
         </a>
       </div>
-      <p class="text-xs text-[var(--color-text-muted)]">
+      <p class="text-xs text-(--color-text-muted)">
         This download link expires in {{ download_config.token_expiry_minutes|default:"30" }} minutes. By downloading, you agree to our terms of service.
       </p>
     </div>
@@ -144,7 +144,7 @@
 
   <div class="text-sm">
     <a href="{% url 'firmwares:firmware_detail' firmware_type=firmware_type firmware_id=firmware.id %}"
-       class="text-[var(--color-accent)] hover:underline">&larr; Back to firmware details</a>
+       class="text-(--color-accent) hover:underline">&larr; Back to firmware details</a>
   </div>
 </div>
 {% endblock %}

@@ -443,9 +443,21 @@ All views use the `_render_admin()` helper from `views_shared.py` — never call
 
 ### AI Agent System
 
-- **39 agents** in `.github/agents/` — 8 orchestrators + 31 specialists
-- **15 skills** in `.github/skills/` — reusable knowledge packages
+- **44+ agents** in `.github/agents/` — orchestrators + specialists
+- **27+ skills** in `.github/skills/` — reusable knowledge packages
+- **58 rules**, **36 hooks**, **50 commands** in `.claude/` — automated governance
 - Agents follow the quality gate, code style, and conventions in AGENTS.md
+
+### Governance & Compliance
+
+| Document | Purpose |
+| --- | --- |
+| [GOVERNANCE.md](GOVERNANCE.md) | Full governance system documentation |
+| [BREAKAGE_CHAINS.md](BREAKAGE_CHAINS.md) | Coupling chain analysis |
+| [AUDIT_CHECKLIST.md](AUDIT_CHECKLIST.md) | Post-implementation verification |
+| [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) | Pre-deploy checks |
+| [SECURITY_POLICY.md](SECURITY_POLICY.md) | Security reporting procedures |
+| [REGRESSION_REGISTRY.md](REGRESSION_REGISTRY.md) | Known regression patterns |
 
 ---
 

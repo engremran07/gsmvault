@@ -6,8 +6,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Security</h1>
-    <p class="text-sm text-[var(--color-text-muted)] mt-1">Devices, crawlers, risk analysis &amp; WAF configuration</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Security</h1>
+    <p class="text-sm text-(--color-text-muted) mt-1">Devices, crawlers, risk analysis &amp; WAF configuration</p>
   </div>
   <div class="flex items-center gap-2">
     <a href="{% url 'admin_suite:security_events' %}" class="btn btn-secondary btn-press text-xs">
@@ -22,8 +22,8 @@
 
 {% block page_content %}
 {% if message %}
-<div class="glass rounded-xl p-4 mb-6 border-l-4 border-[var(--color-accent)]">
-  <p class="text-sm text-[var(--color-text-secondary)]">{{ message }}</p>
+<div class="glass rounded-xl p-4 mb-6 border-l-4 border-(--color-accent)">
+  <p class="text-sm text-(--color-text-secondary)">{{ message }}</p>
 </div>
 {% endif %}
 
@@ -36,9 +36,9 @@
         <i data-lucide="shield-alert" class="w-5 h-5 text-red-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.total_events|default:'0' }})" x-text="display.toLocaleString()">{{ stats.total_events|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Security Events</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Security Events</p>
   </div>
 
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
@@ -48,9 +48,9 @@
         <i data-lucide="ban" class="w-5 h-5 text-amber-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.blocked_ips|default:'0' }})" x-text="display.toLocaleString()">{{ stats.blocked_ips|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Blocked IPs</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Blocked IPs</p>
   </div>
 
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
@@ -60,9 +60,9 @@
         <i data-lucide="gauge" class="w-5 h-5 text-cyan-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.rate_limit_rules|default:'0' }})" x-text="display.toLocaleString()">{{ stats.rate_limit_rules|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Rate Rules</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Rate Rules</p>
   </div>
 
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
@@ -72,9 +72,9 @@
         <i data-lucide="bot" class="w-5 h-5 text-violet-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.crawler_rules|default:'0' }})" x-text="display.toLocaleString()">{{ stats.crawler_rules|default:"0" }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Crawler Rules</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Crawler Rules</p>
   </div>
 </div>
 
@@ -87,7 +87,7 @@
         <i data-lucide="smartphone" class="w-4 h-4 text-blue-400"></i>
       </div>
       <div>
-        <p class="text-xs text-[var(--color-text-muted)]">Device Guard</p>
+        <p class="text-xs text-(--color-text-muted)">Device Guard</p>
         <span class="inline-flex items-center gap-1 text-xs font-semibold
           {% if registry_flags.device_identity_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
           <span class="w-1.5 h-1.5 rounded-full {% if registry_flags.device_identity_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
@@ -102,7 +102,7 @@
         <i data-lucide="bot" class="w-4 h-4 text-amber-400"></i>
       </div>
       <div>
-        <p class="text-xs text-[var(--color-text-muted)]">Crawler Guard</p>
+        <p class="text-xs text-(--color-text-muted)">Crawler Guard</p>
         <span class="inline-flex items-center gap-1 text-xs font-semibold
           {% if registry_flags.crawler_guard_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
           <span class="w-1.5 h-1.5 rounded-full {% if registry_flags.crawler_guard_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
@@ -117,7 +117,7 @@
         <i data-lucide="activity" class="w-4 h-4 text-violet-400"></i>
       </div>
       <div>
-        <p class="text-xs text-[var(--color-text-muted)]">AI Behavior</p>
+        <p class="text-xs text-(--color-text-muted)">AI Behavior</p>
         <span class="inline-flex items-center gap-1 text-xs font-semibold
           {% if registry_flags.ai_behavior_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
           <span class="w-1.5 h-1.5 rounded-full {% if registry_flags.ai_behavior_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
@@ -132,8 +132,8 @@
         <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
       </div>
       <div>
-        <p class="text-xs text-[var(--color-text-muted)]">Login Policy</p>
-        <span class="text-xs font-semibold text-[var(--color-accent)]">{{ security_config.login_risk_policy|default:"standard" }}</span>
+        <p class="text-xs text-(--color-text-muted)">Login Policy</p>
+        <span class="text-xs font-semibold text-(--color-accent)">{{ security_config.login_risk_policy|default:"standard" }}</span>
       </div>
     </div>
   </div>
@@ -144,22 +144,22 @@
      x-intersect.once="$el.classList.add('animate-in-visible')">
   <div class="flex items-center gap-1 p-1 glass rounded-xl w-fit mb-6">
     <button @click="tab = 'devices'"
-      :class="tab === 'devices' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'"
+      :class="tab === 'devices' ? 'bg-(--color-accent) text-(--color-accent-text) shadow-sm' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'"
       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200">
       <i data-lucide="smartphone" class="w-4 h-4"></i> Devices
     </button>
     <button @click="tab = 'crawlers'"
-      :class="tab === 'crawlers' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'"
+      :class="tab === 'crawlers' ? 'bg-(--color-accent) text-(--color-accent-text) shadow-sm' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'"
       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200">
       <i data-lucide="bot" class="w-4 h-4"></i> Crawlers
     </button>
     <button @click="tab = 'risk'"
-      :class="tab === 'risk' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'"
+      :class="tab === 'risk' ? 'bg-(--color-accent) text-(--color-accent-text) shadow-sm' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'"
       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200">
       <i data-lucide="activity" class="w-4 h-4"></i> Risk
     </button>
     <button @click="tab = 'config'"
-      :class="tab === 'config' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow-sm' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'"
+      :class="tab === 'config' ? 'bg-(--color-accent) text-(--color-accent-text) shadow-sm' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'"
       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200">
       <i data-lucide="settings" class="w-4 h-4"></i> Config
     </button>
@@ -172,23 +172,23 @@
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-[var(--color-border)]/40">
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Device</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Event</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden md:table-cell">IP</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Trust</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden lg:table-cell">Time</th>
+            <tr class="border-b border-(--color-border)/40">
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Device</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Event</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden md:table-cell">IP</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Trust</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden lg:table-cell">Time</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--color-border)]/20">
+          <tbody class="divide-y divide-(--color-border)/20">
             {% for event in device_events %}
-            <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
               <td class="py-3 px-4">
                 <div class="flex items-center gap-2">
                   <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center">
                     <i data-lucide="smartphone" class="w-3.5 h-3.5 text-blue-400"></i>
                   </div>
-                  <span class="text-xs font-mono text-[var(--color-text-primary)]">{{ event.device__fingerprint|default:"-"|truncatechars:14 }}</span>
+                  <span class="text-xs font-mono text-(--color-text-primary)">{{ event.device__fingerprint|default:"-"|truncatechars:14 }}</span>
                 </div>
               </td>
               <td class="py-3 px-4">
@@ -196,19 +196,19 @@
                   {{ event.event_type }}
                 </span>
               </td>
-              <td class="py-3 px-4 hidden md:table-cell font-mono text-xs text-[var(--color-text-muted)]">{{ event.ip_address }}</td>
+              <td class="py-3 px-4 hidden md:table-cell font-mono text-xs text-(--color-text-muted)">{{ event.ip_address }}</td>
               <td class="py-3 px-4">
                 {% if event.trust_score is not None %}
                 <div class="flex items-center gap-2">
-                  <div class="w-14 h-1.5 bg-[var(--color-bg-primary)] rounded-full overflow-hidden">
+                  <div class="w-14 h-1.5 bg-(--color-bg-primary) rounded-full overflow-hidden">
                     <div class="h-full rounded-full {% if event.trust_score >= 70 %}bg-emerald-400{% elif event.trust_score >= 40 %}bg-amber-400{% else %}bg-red-400{% endif %}"
                       style="width: {{ event.trust_score }}%"></div>
                   </div>
                   <span class="text-[10px] font-bold tabular-nums {% if event.trust_score >= 70 %}text-emerald-400{% elif event.trust_score >= 40 %}text-amber-400{% else %}text-red-400{% endif %}">{{ event.trust_score }}</span>
                 </div>
-                {% else %}<span class="text-[var(--color-text-muted)]/40">—</span>{% endif %}
+                {% else %}<span class="text-(--color-text-muted)/40">—</span>{% endif %}
               </td>
-              <td class="py-3 px-4 hidden lg:table-cell text-xs text-[var(--color-text-muted)]">{{ event.created_at|timesince }} ago</td>
+              <td class="py-3 px-4 hidden lg:table-cell text-xs text-(--color-text-muted)">{{ event.created_at|timesince }} ago</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -217,9 +217,9 @@
     </div>
     {% else %}
     <div class="glass rounded-xl py-16 text-center">
-      <i data-lucide="smartphone" class="w-10 h-10 text-[var(--color-text-muted)] mx-auto mb-3"></i>
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-1">No device events</h3>
-      <p class="text-xs text-[var(--color-text-muted)]">Events will appear here when devices are detected.</p>
+      <i data-lucide="smartphone" class="w-10 h-10 text-(--color-text-muted) mx-auto mb-3"></i>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-1">No device events</h3>
+      <p class="text-xs text-(--color-text-muted)">Events will appear here when devices are detected.</p>
     </div>
     {% endif %}
   </div>
@@ -231,26 +231,26 @@
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-[var(--color-border)]/40">
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">User Agent</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden md:table-cell">Path</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Action</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden lg:table-cell">IP</th>
-              <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Time</th>
+            <tr class="border-b border-(--color-border)/40">
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">User Agent</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden md:table-cell">Path</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Action</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden lg:table-cell">IP</th>
+              <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Time</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--color-border)]/20">
+          <tbody class="divide-y divide-(--color-border)/20">
             {% for event in crawler_events %}
-            <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+            <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
               <td class="py-3 px-4">
                 <div class="flex items-center gap-2">
                   <div class="w-7 h-7 rounded-lg bg-violet-500/10 flex items-center justify-center">
                     <i data-lucide="bot" class="w-3.5 h-3.5 text-violet-400"></i>
                   </div>
-                  <span class="text-xs text-[var(--color-text-primary)] truncate max-w-[160px]" title="{{ event.user_agent }}">{{ event.user_agent|truncatechars:30 }}</span>
+                  <span class="text-xs text-(--color-text-primary) truncate max-w-[160px]" title="{{ event.user_agent }}">{{ event.user_agent|truncatechars:30 }}</span>
                 </div>
               </td>
-              <td class="py-3 px-4 hidden md:table-cell font-mono text-xs text-[var(--color-text-muted)]">{{ event.path|truncatechars:20 }}</td>
+              <td class="py-3 px-4 hidden md:table-cell font-mono text-xs text-(--color-text-muted)">{{ event.path|truncatechars:20 }}</td>
               <td class="py-3 px-4">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium
                   {% if event.action_taken == 'allow' %}bg-emerald-500/10 text-emerald-400
@@ -261,8 +261,8 @@
                   {{ event.action_taken }}
                 </span>
               </td>
-              <td class="py-3 px-4 hidden lg:table-cell font-mono text-xs text-[var(--color-text-muted)]">{{ event.ip_address }}</td>
-              <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ event.created_at|timesince }} ago</td>
+              <td class="py-3 px-4 hidden lg:table-cell font-mono text-xs text-(--color-text-muted)">{{ event.ip_address }}</td>
+              <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ event.created_at|timesince }} ago</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -271,9 +271,9 @@
     </div>
     {% else %}
     <div class="glass rounded-xl py-16 text-center">
-      <i data-lucide="bot" class="w-10 h-10 text-[var(--color-text-muted)] mx-auto mb-3"></i>
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-1">No crawler events</h3>
-      <p class="text-xs text-[var(--color-text-muted)]">Bot activity will appear here when detected.</p>
+      <i data-lucide="bot" class="w-10 h-10 text-(--color-text-muted) mx-auto mb-3"></i>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-1">No crawler events</h3>
+      <p class="text-xs text-(--color-text-muted)">Bot activity will appear here when detected.</p>
     </div>
     {% endif %}
   </div>
@@ -303,7 +303,7 @@
             </div>
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ insight.insight_type }}</span>
+                <span class="text-sm font-semibold text-(--color-text-primary)">{{ insight.insight_type }}</span>
                 <span class="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold uppercase
                   {% if insight.risk_level == 'critical' %}bg-red-500/10 text-red-400
                   {% elif insight.risk_level == 'high' %}bg-orange-500/10 text-orange-400
@@ -312,10 +312,10 @@
                   {{ insight.risk_level }}
                 </span>
               </div>
-              <p class="text-xs text-[var(--color-text-muted)] leading-relaxed">{{ insight.details|truncatechars:120 }}</p>
+              <p class="text-xs text-(--color-text-muted) leading-relaxed">{{ insight.details|truncatechars:120 }}</p>
             </div>
           </div>
-          <span class="text-[10px] text-[var(--color-text-muted)] whitespace-nowrap shrink-0">{{ insight.created_at|timesince }} ago</span>
+          <span class="text-[10px] text-(--color-text-muted) whitespace-nowrap shrink-0">{{ insight.created_at|timesince }} ago</span>
         </div>
       </div>
       {% endfor %}
@@ -323,8 +323,8 @@
     {% else %}
     <div class="glass rounded-xl py-16 text-center">
       <i data-lucide="shield-check" class="w-10 h-10 text-emerald-400/60 mx-auto mb-3"></i>
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-1">All clear</h3>
-      <p class="text-xs text-[var(--color-text-muted)]">No risk insights detected.</p>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-1">All clear</h3>
+      <p class="text-xs text-(--color-text-muted)">No risk insights detected.</p>
     </div>
     {% endif %}
   </div>
@@ -336,16 +336,16 @@
       <form method="post" class="glass rounded-xl p-6">
         {% csrf_token %}
         <input type="hidden" name="action" value="update_security_config">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
-          <i data-lucide="shield" class="w-4 h-4 text-[var(--color-accent)]"></i> Security Configuration
+        <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+          <i data-lucide="shield" class="w-4 h-4 text-(--color-accent)"></i> Security Configuration
         </h3>
         <div class="space-y-4">
           <label class="flex items-center justify-between gap-4">
-            <span class="text-sm text-[var(--color-text-secondary)]">Device Guard</span>
+            <span class="text-sm text-(--color-text-secondary)">Device Guard</span>
             <div x-data="{ on: {{ security_config.device_guard_enabled|yesno:'true,false' }} }" class="relative">
               <input type="hidden" name="device_guard_enabled" :value="on ? '1' : ''">
               <button type="button" @click="on = !on"
-                :class="on ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bg-tertiary)]'"
+                :class="on ? 'bg-(--color-accent)' : 'bg-(--color-bg-tertiary)'"
                 class="w-10 h-6 rounded-full transition-colors relative">
                 <span :class="on ? 'translate-x-4' : 'translate-x-0.5'"
                   class="block w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
@@ -353,11 +353,11 @@
             </div>
           </label>
           <label class="flex items-center justify-between gap-4">
-            <span class="text-sm text-[var(--color-text-secondary)]">Crawler Guard</span>
+            <span class="text-sm text-(--color-text-secondary)">Crawler Guard</span>
             <div x-data="{ on: {{ security_config.crawler_guard_enabled|yesno:'true,false' }} }" class="relative">
               <input type="hidden" name="crawler_guard_enabled" :value="on ? '1' : ''">
               <button type="button" @click="on = !on"
-                :class="on ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bg-tertiary)]'"
+                :class="on ? 'bg-(--color-accent)' : 'bg-(--color-bg-tertiary)'"
                 class="w-10 h-6 rounded-full transition-colors relative">
                 <span :class="on ? 'translate-x-4' : 'translate-x-0.5'"
                   class="block w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
@@ -365,11 +365,11 @@
             </div>
           </label>
           <label class="flex items-center justify-between gap-4">
-            <span class="text-sm text-[var(--color-text-secondary)]">Risk Analysis</span>
+            <span class="text-sm text-(--color-text-secondary)">Risk Analysis</span>
             <div x-data="{ on: {{ security_config.risk_analysis_enabled|yesno:'true,false' }} }" class="relative">
               <input type="hidden" name="risk_analysis_enabled" :value="on ? '1' : ''">
               <button type="button" @click="on = !on"
-                :class="on ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bg-tertiary)]'"
+                :class="on ? 'bg-(--color-accent)' : 'bg-(--color-bg-tertiary)'"
                 class="w-10 h-6 rounded-full transition-colors relative">
                 <span :class="on ? 'translate-x-4' : 'translate-x-0.5'"
                   class="block w-5 h-5 rounded-full bg-white shadow transition-transform"></span>
@@ -377,9 +377,9 @@
             </div>
           </label>
           <div>
-            <label for="id_login_risk_policy" class="block text-sm text-[var(--color-text-secondary)] mb-1">Login Risk Policy</label>
+            <label for="id_login_risk_policy" class="block text-sm text-(--color-text-secondary) mb-1">Login Risk Policy</label>
             <select name="login_risk_policy" id="id_login_risk_policy"
-              class="w-full rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] px-3 py-2">
+              class="w-full rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) px-3 py-2">
               {% for val, label in login_risk_policy_choices %}
               <option value="{{ val }}" {% if security_config.login_risk_policy == val %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
@@ -395,24 +395,24 @@
       <form method="post" class="glass rounded-xl p-6">
         {% csrf_token %}
         <input type="hidden" name="action" value="update_device_config">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
-          <i data-lucide="smartphone" class="w-4 h-4 text-[var(--color-accent)]"></i> Device Configuration
+        <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+          <i data-lucide="smartphone" class="w-4 h-4 text-(--color-accent)"></i> Device Configuration
         </h3>
         <div class="space-y-4">
           <div>
-            <label for="id_trust_threshold" class="block text-sm text-[var(--color-text-secondary)] mb-1">Trust Threshold</label>
+            <label for="id_trust_threshold" class="block text-sm text-(--color-text-secondary) mb-1">Trust Threshold</label>
             <input type="number" name="trust_threshold" id="id_trust_threshold" autocomplete="off" value="{{ device_config.trust_threshold|default:'50' }}" min="0" max="100"
-              class="w-full rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] px-3 py-2">
+              class="w-full rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) px-3 py-2">
           </div>
           <div>
-            <label for="id_max_devices_per_user" class="block text-sm text-[var(--color-text-secondary)] mb-1">Max Devices per User</label>
+            <label for="id_max_devices_per_user" class="block text-sm text-(--color-text-secondary) mb-1">Max Devices per User</label>
             <input type="number" name="max_devices_per_user" id="id_max_devices_per_user" autocomplete="off" value="{{ device_config.max_devices_per_user|default:'5' }}" min="1" max="100"
-              class="w-full rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] px-3 py-2">
+              class="w-full rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) px-3 py-2">
           </div>
           <div>
-            <label for="id_event_window" class="block text-sm text-[var(--color-text-secondary)] mb-1">Window</label>
+            <label for="id_event_window" class="block text-sm text-(--color-text-secondary) mb-1">Window</label>
             <select name="event_window" id="id_event_window"
-              class="w-full rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] px-3 py-2">
+              class="w-full rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) px-3 py-2">
               {% for val, label in device_window_choices %}
               <option value="{{ val }}" {% if device_config.event_window == val %}selected{% endif %}>{{ label }}</option>
               {% endfor %}

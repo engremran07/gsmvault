@@ -1,0 +1,204 @@
+name: CD — Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: "Skip test suite (emergency hotfix only)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"
+  DJANGO_SETTINGS_MODULE: app.settings_production
+  DB_ENGINE: django.db.backends.postgresql
+  DB_NAME: test_gsmvault
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  DB_HOST: localhost
+  DB_PORT: "5432"
+
+jobs:
+  validate:
+    name: Validate & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ruff check
+        run: python -m ruff check .
+
+      - name: Ruff format check
+        run: python -m ruff format --check .
+
+      - name: Django deployment check
+        run: python manage.py check --deploy --settings=app.settings_production
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_ALLOWED_HOSTS: ${{ vars.PRODUCTION_HOST }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+      - name: Check for known vulnerabilities
+        run: pip audit
+
+  build:
+    name: Build & Test
+    needs: validate
+    if: ${{ !inputs.skip_tests }}
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_gsmvault
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=app.settings_dev
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_dev
+
+      - name: Run full test suite
+        run: python -m pytest --tb=short -q
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_dev
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput --settings=app.settings_production
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_ALLOWED_HOSTS: ${{ vars.PRODUCTION_HOST }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [validate, build]
+    if: always() && needs.validate.result == 'success' && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput --settings=app.settings_production
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_ALLOWED_HOSTS: ${{ vars.PRODUCTION_HOST }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRODUCTION_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ vars.PRODUCTION_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Backup database
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.PRODUCTION_USER }}@${{ vars.PRODUCTION_HOST }} \
+            "cd ${{ vars.PRODUCTION_DEPLOY_PATH }} && \
+             source .venv/bin/activate && \
+             python manage.py dumpdata --natural-foreign --natural-primary \
+               --exclude=contenttypes --exclude=auth.permission \
+               --output=/tmp/db_backup_$(date +%Y%m%d_%H%M%S).json.gz \
+               --settings=app.settings_production 2>/dev/null || \
+             pg_dump \$DATABASE_URL | gzip > /tmp/db_backup_$(date +%Y%m%d_%H%M%S).sql.gz"
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.venv' \
+            --exclude='media/' \
+            --exclude='storage_credentials/' \
+            --exclude='.env' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='logs/' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            ./ ${{ secrets.PRODUCTION_USER }}@${{ vars.PRODUCTION_HOST }}:${{ vars.PRODUCTION_DEPLOY_PATH }}/
+
+      - name: Run migrations
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.PRODUCTION_USER }}@${{ vars.PRODUCTION_HOST }} \
+            "cd ${{ vars.PRODUCTION_DEPLOY_PATH }} && \
+             source .venv/bin/activate && \
+             python manage.py migrate --settings=app.settings_production --noinput"
+
+      - name: Restart production services
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.PRODUCTION_USER }}@${{ vars.PRODUCTION_HOST }} \
+            "sudo systemctl restart gunicorn && \
+             sudo systemctl restart celery && \
+             sudo systemctl restart celerybeat"
+
+      - name: Smoke test
+        run: |
+          sleep 15
+          HTTP_CODE=$(curl --fail --silent --show-error \
+            "${{ vars.PRODUCTION_URL }}/api/v1/health/" \
+            -o /dev/null -w "%{http_code}")
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "::error::Smoke test failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+          echo "Production smoke test passed (HTTP $HTTP_CODE)"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

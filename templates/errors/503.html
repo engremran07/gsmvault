@@ -1,0 +1,19 @@
+{# templates/errors/503.html — Service Unavailable / Maintenance #}
+{% extends "layouts/minimal.html" %}
+
+{% block title %}503 — Under Maintenance{% endblock %}
+
+{% block error_content %}
+<div class="text-6xl font-bold text-(--color-warning) mb-4">503</div>
+<h1 class="text-2xl font-semibold mb-2">Under Maintenance</h1>
+<p class="text-(--color-text-secondary) mb-6">
+  {% if message %}{{ message }}{% else %}We're performing scheduled maintenance. Please check back shortly.{% endif %}
+</p>
+<div class="flex items-center justify-center gap-2 text-sm text-(--color-text-muted) mb-6">
+  <i data-lucide="clock" class="w-4 h-4"></i>
+  <span>We'll be back as soon as possible</span>
+</div>
+<a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) hover:bg-(--color-accent-hover) transition-colors">
+  <i data-lucide="refresh-cw" class="w-4 h-4"></i> Try Again
+</a>
+{% endblock %}

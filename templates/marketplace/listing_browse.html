@@ -8,14 +8,14 @@
 {% block page_header %}
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
-      <i data-lucide="store" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl font-bold text-(--color-text-primary) flex items-center gap-3">
+      <i data-lucide="store" class="w-8 h-8 text-(--color-accent)"></i>
       Marketplace
     </h1>
-    <p class="text-[var(--color-text-secondary)] mt-1">Buy and sell firmware from trusted community sellers</p>
+    <p class="text-(--color-text-secondary) mt-1">Buy and sell firmware from trusted community sellers</p>
   </div>
   <a href="{% url 'marketplace_public:become_seller' %}"
-     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition-colors">
+     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) font-semibold hover:bg-(--color-accent-hover) transition-colors">
     <i data-lucide="plus" class="w-4 h-4"></i> Become a Seller
   </a>
 </div>
@@ -26,24 +26,24 @@
 <div class="flex flex-col sm:flex-row gap-3 mb-6">
   <form method="get" action="{% url 'marketplace_public:listing_browse' %}" class="flex-1 flex gap-2">
     <div class="relative flex-1">
-      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]"></i>
+      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--color-text-muted)"></i>
       <input type="text" name="q" value="{{ search_query }}" placeholder="Search listings..."
-             class="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] text-sm">
+             class="w-full pl-10 pr-4 py-2 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent) text-sm">
     </div>
     <select name="sort" onchange="this.form.submit()"
-            class="px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm">
+            class="px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm">
       <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Newest</option>
       <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low → High</option>
       <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High → Low</option>
       <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Most Popular</option>
     </select>
-    <label class="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] cursor-pointer">
+    <label class="inline-flex items-center gap-1.5 text-sm text-(--color-text-secondary) cursor-pointer">
       <input type="checkbox" name="featured" value="1" {% if featured_only %}checked{% endif %} onchange="this.form.submit()"
-             class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+             class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
       Featured
     </label>
     <button type="submit"
-            class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-medium hover:bg-[var(--color-accent-hover)] transition-colors">
+            class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-sm font-medium hover:bg-(--color-accent-hover) transition-colors">
       Search
     </button>
   </form>

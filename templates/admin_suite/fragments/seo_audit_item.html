@@ -1,10 +1,10 @@
 {# HTMX Fragment — Single item inline SEO audit detail #}
 {% if result %}
 <td colspan="5" class="p-0">
-  <div class="mx-4 my-3 p-4 rounded-xl bg-[var(--color-bg-secondary)]/60 border border-[var(--color-border)]/20 animate-in animate-in-visible">
+  <div class="mx-4 my-3 p-4 rounded-xl bg-(--color-bg-secondary)/60 border border-(--color-border)/20 animate-in animate-in-visible">
     <div class="flex items-center justify-between mb-3">
-      <h4 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
-        <i data-lucide="scan-line" class="w-4 h-4 text-[var(--color-accent)]"></i>
+      <h4 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
+        <i data-lucide="scan-line" class="w-4 h-4 text-(--color-accent)"></i>
         SEO Audit: {{ result.item_title }}
       </h4>
       <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold
@@ -34,7 +34,7 @@
             {{ issue.message }}
           </p>
           {% if issue.field %}
-          <span class="text-[10px] text-[var(--color-text-muted)] mt-0.5 block">Field: <code class="bg-[var(--color-bg-tertiary)] px-1 py-0.5 rounded">{{ issue.field }}</code></span>
+          <span class="text-[10px] text-(--color-text-muted) mt-0.5 block">Field: <code class="bg-(--color-bg-tertiary) px-1 py-0.5 rounded">{{ issue.field }}</code></span>
           {% endif %}
         </div>
         <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase
@@ -55,7 +55,7 @@
   </div>
 </td>
 {% else %}
-<td colspan="5" class="p-4 text-center text-sm text-[var(--color-text-muted)]">
+<td colspan="5" class="p-4 text-center text-sm text-(--color-text-muted)">
   <i data-lucide="alert-circle" class="w-4 h-4 inline mr-1 text-amber-400"></i>Could not load audit details.
 </td>
 {% endif %}

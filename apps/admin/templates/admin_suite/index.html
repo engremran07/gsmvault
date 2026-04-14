@@ -8,10 +8,10 @@
 {# Welcome Hero #}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">
+    <h1 class="text-2xl sm:text-3xl font-bold text-(--color-text-primary) tracking-tight">
       Welcome back{% if request.user.email %}, <span class="text-gradient">{{ request.user.email|truncatechars:20 }}</span>{% endif %}
     </h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Here's your platform analytics at a glance.</p>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Here's your platform analytics at a glance.</p>
   </div>
   <div class="flex items-center gap-2">
     <a href="{% url 'admin_suite:pending_approval' %}" class="btn btn-primary btn-press">
@@ -37,11 +37,11 @@
         +{{ kpi.new_users_7d }} this week
       </span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.total_users }})" x-text="display.toLocaleString()">
       {{ kpi.total_users }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Total Users</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Total Users</p>
   </div>
 
   {# Posts KPI #}
@@ -55,11 +55,11 @@
         {{ kpi.published_posts }} live
       </span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.total_posts }})" x-text="display.toLocaleString()">
       {{ kpi.total_posts }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Blog Posts</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Blog Posts</p>
   </div>
 
   {# Firmwares KPI #}
@@ -73,11 +73,11 @@
         {{ kpi.total_brands }} brands
       </span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.total_firmwares }})" x-text="display.toLocaleString()">
       {{ kpi.total_firmwares }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Active Firmwares</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Active Firmwares</p>
   </div>
 
   {# Security KPI #}
@@ -95,11 +95,11 @@
       <span class="badge badge-success text-[10px]">All clear</span>
       {% endif %}
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.security_events_24h }})" x-text="display.toLocaleString()">
       {{ kpi.security_events_24h }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Security Events (24h)</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Security Events (24h)</p>
   </div>
 </div>
 
@@ -114,11 +114,11 @@
       </div>
       <span class="badge badge-accent text-[10px]">{{ kpi.forum_replies }} replies</span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.forum_topics }})" x-text="display.toLocaleString()">
       {{ kpi.forum_topics }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Forum Topics</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Forum Topics</p>
   </div>
 
   {# Flashing Tools KPI #}
@@ -130,11 +130,11 @@
       </div>
       <span class="badge badge-warning text-[10px]">{{ kpi.flashing_guides }} guides</span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.flashing_tools }})" x-text="display.toLocaleString()">
       {{ kpi.flashing_tools }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Flashing Tools</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Flashing Tools</p>
   </div>
 
   {# Video Generation KPI #}
@@ -146,11 +146,11 @@
       </div>
       <span class="badge badge-info text-[10px]">{{ kpi.guide_templates }} templates</span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.generated_videos }})" x-text="display.toLocaleString()">
       {{ kpi.generated_videos }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Generated Videos</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Generated Videos</p>
   </div>
 
   {# Device Catalog KPI #}
@@ -162,11 +162,11 @@
       </div>
       <span class="badge badge-success text-[10px]">{{ kpi.total_variants }} variants</span>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ kpi.total_models }})" x-text="display.toLocaleString()">
       {{ kpi.total_models }}
     </div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Device Models</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Device Models</p>
   </div>
 </div>
 
@@ -177,8 +177,8 @@
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">User Registrations</h3>
-        <p class="text-xs text-[var(--color-text-muted)]">Last 7 days</p>
+        <h3 class="text-sm font-semibold text-(--color-text-primary)">User Registrations</h3>
+        <p class="text-xs text-(--color-text-muted)">Last 7 days</p>
       </div>
       <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
         <i data-lucide="trending-up" class="w-4 h-4 text-blue-400"></i>
@@ -201,8 +201,8 @@
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Content Status</h3>
-        <p class="text-xs text-[var(--color-text-muted)]">Post distribution</p>
+        <h3 class="text-sm font-semibold text-(--color-text-primary)">Content Status</h3>
+        <p class="text-xs text-(--color-text-muted)">Post distribution</p>
       </div>
       <div class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
         <i data-lucide="pie-chart" class="w-4 h-4 text-violet-400"></i>
@@ -229,8 +229,8 @@
   <div class="glass rounded-xl p-6 animate-in" style="--stagger: 6"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Recent Activity</h3>
-      <a href="{% url 'admin_suite:security' %}" class="text-xs text-[var(--color-accent)] hover:underline">View all</a>
+      <h3 class="text-sm font-semibold text-(--color-text-primary)">Recent Activity</h3>
+      <a href="{% url 'admin_suite:security' %}" class="text-xs text-(--color-accent) hover:underline">View all</a>
     </div>
     <div class="space-y-3">
       {% for item in recent_activity %}
@@ -247,14 +247,14 @@
             {% else %}text-blue-400{% endif %}"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ item.text }}</p>
-          <p class="text-[10px] text-[var(--color-text-muted)]">{{ item.time }}</p>
+          <p class="text-xs text-(--color-text-secondary) truncate">{{ item.text }}</p>
+          <p class="text-[10px] text-(--color-text-muted)">{{ item.time }}</p>
         </div>
       </div>
       {% empty %}
       <div class="text-center py-6">
-        <i data-lucide="inbox" class="w-8 h-8 text-[var(--color-text-muted)] mx-auto mb-2"></i>
-        <p class="text-xs text-[var(--color-text-muted)]">No recent activity</p>
+        <i data-lucide="inbox" class="w-8 h-8 text-(--color-text-muted) mx-auto mb-2"></i>
+        <p class="text-xs text-(--color-text-muted)">No recent activity</p>
       </div>
       {% endfor %}
     </div>
@@ -265,8 +265,8 @@
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Security Events</h3>
-        <p class="text-xs text-[var(--color-text-muted)]">Last 7 days</p>
+        <h3 class="text-sm font-semibold text-(--color-text-primary)">Security Events</h3>
+        <p class="text-xs text-(--color-text-muted)">Last 7 days</p>
       </div>
       <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
         <i data-lucide="shield" class="w-4 h-4 text-red-400"></i>
@@ -287,94 +287,94 @@
   {# Quick Stats Sidebar #}
   <div class="glass rounded-xl p-6 animate-in" style="--stagger: 8"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Platform Overview</h3>
+    <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">Platform Overview</h3>
     <div class="space-y-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="download" class="w-4 h-4 text-blue-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Total Downloads</span>
+          <span class="text-xs text-(--color-text-secondary)">Total Downloads</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]"
+        <span class="text-sm font-semibold text-(--color-text-primary)"
               x-data="animatedCounter({{ kpi.total_downloads }})" x-text="display.toLocaleString()">
           {{ kpi.total_downloads }}
         </span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Active Users</span>
+          <span class="text-xs text-(--color-text-secondary)">Active Users</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]"
+        <span class="text-sm font-semibold text-(--color-text-primary)"
               x-data="animatedCounter({{ kpi.active_users }})" x-text="display.toLocaleString()">
           {{ kpi.active_users }}
         </span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="message-circle" class="w-4 h-4 text-amber-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Pending Comments</span>
+          <span class="text-xs text-(--color-text-secondary)">Pending Comments</span>
         </div>
-        <span class="text-sm font-semibold {% if kpi.pending_comments > 0 %}text-[var(--color-warning)]{% else %}text-[var(--color-text-primary)]{% endif %}">
+        <span class="text-sm font-semibold {% if kpi.pending_comments > 0 %}text-(--color-warning){% else %}text-(--color-text-primary){% endif %}">
           {{ kpi.pending_comments }}
         </span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="megaphone" class="w-4 h-4 text-pink-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Active Campaigns</span>
+          <span class="text-xs text-(--color-text-secondary)">Active Campaigns</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.active_campaigns }}</span>
+        <span class="text-sm font-semibold text-(--color-text-primary)">{{ kpi.active_campaigns }}</span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="layout" class="w-4 h-4 text-violet-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Published Pages</span>
+          <span class="text-xs text-(--color-text-secondary)">Published Pages</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.total_pages }}</span>
+        <span class="text-sm font-semibold text-(--color-text-primary)">{{ kpi.total_pages }}</span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Storage Providers</span>
+          <span class="text-xs text-(--color-text-secondary)">Storage Providers</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.storage_providers }}</span>
+        <span class="text-sm font-semibold text-(--color-text-primary)">{{ kpi.storage_providers }}</span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="message-square" class="w-4 h-4 text-purple-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Forum Topics</span>
+          <span class="text-xs text-(--color-text-secondary)">Forum Topics</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.forum_topics }}</span>
+        <span class="text-sm font-semibold text-(--color-text-primary)">{{ kpi.forum_topics }}</span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="wrench" class="w-4 h-4 text-orange-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Flashing Tools</span>
+          <span class="text-xs text-(--color-text-secondary)">Flashing Tools</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.flashing_tools }}</span>
+        <span class="text-sm font-semibold text-(--color-text-primary)">{{ kpi.flashing_tools }}</span>
       </div>
-      <div class="h-px bg-[var(--color-border)]/40"></div>
+      <div class="h-px bg-(--color-border)/40"></div>
 
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="video" class="w-4 h-4 text-pink-400"></i>
-          <span class="text-xs text-[var(--color-text-secondary)]">Generated Videos</span>
+          <span class="text-xs text-(--color-text-secondary)">Generated Videos</span>
         </div>
-        <span class="text-sm font-semibold text-[var(--color-text-primary)]">{{ kpi.generated_videos }}</span>
+        <span class="text-sm font-semibold text-(--color-text-primary)">{{ kpi.generated_videos }}</span>
       </div>
     </div>
   </div>
@@ -385,30 +385,30 @@
   {# Recent Blog Posts #}
   <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 9"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+    <div class="px-5 py-3 border-b border-(--color-border) flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
         <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i> Recent Posts
       </h3>
-      <span class="text-[10px] text-[var(--color-text-muted)]">{{ kpi.total_posts }} total</span>
+      <span class="text-[10px] text-(--color-text-muted)">{{ kpi.total_posts }} total</span>
     </div>
-    <div class="divide-y divide-[var(--color-border)]/40">
+    <div class="divide-y divide-(--color-border)/40">
       {% for post in widget_posts %}
-      <div class="px-5 py-2.5 hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
-        <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ post.title }}</p>
+      <div class="px-5 py-2.5 hover:bg-(--color-bg-secondary)/50 transition-colors">
+        <p class="text-xs text-(--color-text-secondary) truncate">{{ post.title }}</p>
         <div class="flex items-center justify-between mt-0.5">
-          <span class="text-[10px] text-[var(--color-text-muted)] capitalize">{{ post.subtitle }}</span>
-          {% if post.date %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ post.date }}</span>{% endif %}
+          <span class="text-[10px] text-(--color-text-muted) capitalize">{{ post.subtitle }}</span>
+          {% if post.date %}<span class="text-[10px] text-(--color-text-muted)">{{ post.date }}</span>{% endif %}
         </div>
       </div>
       {% empty %}
       <div class="px-5 py-6 text-center">
-        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
-        <p class="text-[10px] text-[var(--color-text-muted)]">No posts yet</p>
+        <i data-lucide="inbox" class="w-6 h-6 text-(--color-text-muted) mx-auto mb-1"></i>
+        <p class="text-[10px] text-(--color-text-muted)">No posts yet</p>
       </div>
       {% endfor %}
     </div>
     <a href="{% url 'admin_suite:blog' %}"
-       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+       class="block px-5 py-2.5 text-center text-xs font-medium text-(--color-accent) hover:bg-accent/5 border-t border-(--color-border)/40 transition-colors">
       See all posts →
     </a>
   </div>
@@ -416,26 +416,26 @@
   {# Blog Categories #}
   <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 10"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+    <div class="px-5 py-3 border-b border-(--color-border) flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
         <i data-lucide="tags" class="w-4 h-4 text-violet-400"></i> Blog Categories
       </h3>
     </div>
-    <div class="divide-y divide-[var(--color-border)]/40">
+    <div class="divide-y divide-(--color-border)/40">
       {% for cat in widget_categories %}
-      <div class="px-5 py-2.5 flex items-center justify-between hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
-        <span class="text-xs text-[var(--color-text-secondary)] truncate">{{ cat.title }}</span>
-        <span class="text-[10px] text-[var(--color-text-muted)] shrink-0 ml-2">{{ cat.subtitle }}</span>
+      <div class="px-5 py-2.5 flex items-center justify-between hover:bg-(--color-bg-secondary)/50 transition-colors">
+        <span class="text-xs text-(--color-text-secondary) truncate">{{ cat.title }}</span>
+        <span class="text-[10px] text-(--color-text-muted) shrink-0 ml-2">{{ cat.subtitle }}</span>
       </div>
       {% empty %}
       <div class="px-5 py-6 text-center">
-        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
-        <p class="text-[10px] text-[var(--color-text-muted)]">No categories yet</p>
+        <i data-lucide="inbox" class="w-6 h-6 text-(--color-text-muted) mx-auto mb-1"></i>
+        <p class="text-[10px] text-(--color-text-muted)">No categories yet</p>
       </div>
       {% endfor %}
     </div>
     <a href="{% url 'admin_suite:blog' %}"
-       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+       class="block px-5 py-2.5 text-center text-xs font-medium text-(--color-accent) hover:bg-accent/5 border-t border-(--color-border)/40 transition-colors">
       See all categories →
     </a>
   </div>
@@ -443,27 +443,27 @@
   {# Device Brands #}
   <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 11"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+    <div class="px-5 py-3 border-b border-(--color-border) flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
         <i data-lucide="hard-drive" class="w-4 h-4 text-amber-400"></i> Device Brands
       </h3>
-      <span class="text-[10px] text-[var(--color-text-muted)]">{{ kpi.total_brands }} total</span>
+      <span class="text-[10px] text-(--color-text-muted)">{{ kpi.total_brands }} total</span>
     </div>
-    <div class="divide-y divide-[var(--color-border)]/40">
+    <div class="divide-y divide-(--color-border)/40">
       {% for brand in widget_brands %}
-      <div class="px-5 py-2.5 flex items-center justify-between hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
-        <span class="text-xs text-[var(--color-text-secondary)] truncate">{{ brand.title }}</span>
-        <span class="text-[10px] text-[var(--color-text-muted)] shrink-0 ml-2">{{ brand.subtitle }}</span>
+      <div class="px-5 py-2.5 flex items-center justify-between hover:bg-(--color-bg-secondary)/50 transition-colors">
+        <span class="text-xs text-(--color-text-secondary) truncate">{{ brand.title }}</span>
+        <span class="text-[10px] text-(--color-text-muted) shrink-0 ml-2">{{ brand.subtitle }}</span>
       </div>
       {% empty %}
       <div class="px-5 py-6 text-center">
-        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
-        <p class="text-[10px] text-[var(--color-text-muted)]">No brands yet</p>
+        <i data-lucide="inbox" class="w-6 h-6 text-(--color-text-muted) mx-auto mb-1"></i>
+        <p class="text-[10px] text-(--color-text-muted)">No brands yet</p>
       </div>
       {% endfor %}
     </div>
     <a href="{% url 'admin_suite:firmwares' %}"
-       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+       class="block px-5 py-2.5 text-center text-xs font-medium text-(--color-accent) hover:bg-accent/5 border-t border-(--color-border)/40 transition-colors">
       See all brands →
     </a>
   </div>
@@ -471,29 +471,29 @@
   {# Scraper Runs #}
   <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 12"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+    <div class="px-5 py-3 border-b border-(--color-border) flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
         <i data-lucide="radar" class="w-4 h-4 text-cyan-400"></i> Scraper Runs
       </h3>
     </div>
-    <div class="divide-y divide-[var(--color-border)]/40">
+    <div class="divide-y divide-(--color-border)/40">
       {% for run in widget_scraper_runs %}
-      <div class="px-5 py-2.5 hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
-        <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ run.title }}</p>
+      <div class="px-5 py-2.5 hover:bg-(--color-bg-secondary)/50 transition-colors">
+        <p class="text-xs text-(--color-text-secondary) truncate">{{ run.title }}</p>
         <div class="flex items-center justify-between mt-0.5">
-          <span class="text-[10px] text-[var(--color-text-muted)]">{{ run.subtitle }}</span>
-          {% if run.date %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ run.date }}</span>{% endif %}
+          <span class="text-[10px] text-(--color-text-muted)">{{ run.subtitle }}</span>
+          {% if run.date %}<span class="text-[10px] text-(--color-text-muted)">{{ run.date }}</span>{% endif %}
         </div>
       </div>
       {% empty %}
       <div class="px-5 py-6 text-center">
-        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
-        <p class="text-[10px] text-[var(--color-text-muted)]">No scraper runs yet</p>
+        <i data-lucide="inbox" class="w-6 h-6 text-(--color-text-muted) mx-auto mb-1"></i>
+        <p class="text-[10px] text-(--color-text-muted)">No scraper runs yet</p>
       </div>
       {% endfor %}
     </div>
     <a href="{% url 'admin_suite:scraper' %}"
-       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+       class="block px-5 py-2.5 text-center text-xs font-medium text-(--color-accent) hover:bg-accent/5 border-t border-(--color-border)/40 transition-colors">
       See all runs →
     </a>
   </div>
@@ -501,30 +501,30 @@
   {# Forum Topics #}
   <div class="glass rounded-xl overflow-hidden animate-in" style="--stagger: 13"
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-    <div class="px-5 py-3 border-b border-[var(--color-border)] flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
+    <div class="px-5 py-3 border-b border-(--color-border) flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
         <i data-lucide="message-square" class="w-4 h-4 text-purple-400"></i> Forum Topics
       </h3>
-      <span class="text-[10px] text-[var(--color-text-muted)]">{{ kpi.forum_topics }} total</span>
+      <span class="text-[10px] text-(--color-text-muted)">{{ kpi.forum_topics }} total</span>
     </div>
-    <div class="divide-y divide-[var(--color-border)]/40">
+    <div class="divide-y divide-(--color-border)/40">
       {% for topic in widget_forum %}
-      <div class="px-5 py-2.5 hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
-        <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ topic.title }}</p>
+      <div class="px-5 py-2.5 hover:bg-(--color-bg-secondary)/50 transition-colors">
+        <p class="text-xs text-(--color-text-secondary) truncate">{{ topic.title }}</p>
         <div class="flex items-center justify-between mt-0.5">
-          <span class="text-[10px] text-[var(--color-text-muted)]">{{ topic.subtitle }}</span>
-          {% if topic.date %}<span class="text-[10px] text-[var(--color-text-muted)]">{{ topic.date }}</span>{% endif %}
+          <span class="text-[10px] text-(--color-text-muted)">{{ topic.subtitle }}</span>
+          {% if topic.date %}<span class="text-[10px] text-(--color-text-muted)">{{ topic.date }}</span>{% endif %}
         </div>
       </div>
       {% empty %}
       <div class="px-5 py-6 text-center">
-        <i data-lucide="inbox" class="w-6 h-6 text-[var(--color-text-muted)] mx-auto mb-1"></i>
-        <p class="text-[10px] text-[var(--color-text-muted)]">No forum topics yet</p>
+        <i data-lucide="inbox" class="w-6 h-6 text-(--color-text-muted) mx-auto mb-1"></i>
+        <p class="text-[10px] text-(--color-text-muted)">No forum topics yet</p>
       </div>
       {% endfor %}
     </div>
     <a href="{% url 'admin_suite:forum' %}"
-       class="block px-5 py-2.5 text-center text-xs font-medium text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 border-t border-[var(--color-border)]/40 transition-colors">
+       class="block px-5 py-2.5 text-center text-xs font-medium text-(--color-accent) hover:bg-accent/5 border-t border-(--color-border)/40 transition-colors">
       See all topics →
     </a>
   </div>
@@ -534,7 +534,7 @@
 <div class="mb-6 animate-in" style="--stagger: 13"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
   <div class="flex items-center gap-2 mb-4">
-    <h2 class="text-sm font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">Security Systems</h2>
+    <h2 class="text-sm font-semibold text-(--color-text-primary) uppercase tracking-wider">Security Systems</h2>
     <div class="flex-1 h-px bg-gradient-to-r from-[var(--color-border)]/60 to-transparent"></div>
   </div>
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -544,7 +544,7 @@
           <i data-lucide="smartphone" class="w-4 h-4 text-blue-400"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Device Guard</p>
+          <p class="text-xs text-(--color-text-muted) mb-0.5">Device Guard</p>
           <span class="inline-flex items-center gap-1 text-xs font-semibold
             {% if security_status.devices_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
             <span class="w-1.5 h-1.5 rounded-full {% if security_status.devices_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
@@ -560,7 +560,7 @@
           <i data-lucide="bot" class="w-4 h-4 text-amber-400"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Bot Protection</p>
+          <p class="text-xs text-(--color-text-muted) mb-0.5">Bot Protection</p>
           <span class="inline-flex items-center gap-1 text-xs font-semibold
             {% if security_status.bots_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
             <span class="w-1.5 h-1.5 rounded-full {% if security_status.bots_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
@@ -576,7 +576,7 @@
           <i data-lucide="activity" class="w-4 h-4 text-violet-400"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Risk Analysis</p>
+          <p class="text-xs text-(--color-text-muted) mb-0.5">Risk Analysis</p>
           <span class="inline-flex items-center gap-1 text-xs font-semibold
             {% if security_status.risk_enabled %}text-emerald-400{% else %}text-red-400{% endif %}">
             <span class="w-1.5 h-1.5 rounded-full {% if security_status.risk_enabled %}bg-emerald-400{% else %}bg-red-400{% endif %} animate-pulse"></span>
@@ -592,8 +592,8 @@
           <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-xs text-[var(--color-text-muted)] mb-0.5">Login Policy</p>
-          <span class="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)]">
+          <p class="text-xs text-(--color-text-muted) mb-0.5">Login Policy</p>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold text-(--color-accent)">
             {{ security_status.login_policy }}
           </span>
         </div>
@@ -606,7 +606,7 @@
 <div class="animate-in" style="--stagger: 14"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
   <div class="flex items-center gap-2 mb-4">
-    <h2 class="text-sm font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">Quick Access</h2>
+    <h2 class="text-sm font-semibold text-(--color-text-primary) uppercase tracking-wider">Quick Access</h2>
     <div class="flex-1 h-px bg-gradient-to-r from-[var(--color-border)]/60 to-transparent"></div>
   </div>
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 stagger-children">
@@ -614,73 +614,73 @@
       <div class="w-10 h-10 rounded-xl bg-blue-500/15 group-hover:bg-blue-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="shield" class="w-5 h-5 text-blue-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Security</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Security</span>
     </a>
     <a href="{% url 'admin_suite:users' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-violet-500/15 group-hover:bg-violet-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="users" class="w-5 h-5 text-violet-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Users</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Users</span>
     </a>
     <a href="{% url 'admin_suite:blog' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-emerald-500/15 group-hover:bg-emerald-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="file-text" class="w-5 h-5 text-emerald-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Blog</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Blog</span>
     </a>
     <a href="{% url 'admin_suite:firmwares' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-amber-500/15 group-hover:bg-amber-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="hard-drive" class="w-5 h-5 text-amber-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Firmwares</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Firmwares</span>
     </a>
     <a href="{% url 'admin_suite:storage' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-cyan-500/15 group-hover:bg-cyan-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="database" class="w-5 h-5 text-cyan-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Storage</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Storage</span>
     </a>
     <a href="{% url 'admin_suite:settings' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-rose-500/15 group-hover:bg-rose-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="settings" class="w-5 h-5 text-rose-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Settings</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Settings</span>
     </a>
     <a href="{% url 'admin_suite:pages' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-indigo-500/15 group-hover:bg-indigo-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="layout" class="w-5 h-5 text-indigo-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Pages</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Pages</span>
     </a>
     <a href="{% url 'admin_suite:content' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-teal-500/15 group-hover:bg-teal-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="newspaper" class="w-5 h-5 text-teal-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Content</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Content</span>
     </a>
     <a href="{% url 'admin_suite:comments' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-amber-500/15 group-hover:bg-amber-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="message-square" class="w-5 h-5 text-amber-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Comments</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Comments</span>
     </a>
     <a href="{% url 'admin_suite:marketing' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-pink-500/15 group-hover:bg-pink-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="megaphone" class="w-5 h-5 text-pink-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Marketing</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Marketing</span>
     </a>
     <a href="{% url 'admin_suite:ads' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-emerald-500/15 group-hover:bg-emerald-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="badge-dollar-sign" class="w-5 h-5 text-emerald-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Ads</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Ads</span>
     </a>
     <a href="{% url 'admin_suite:distribution' %}" class="group glass rounded-xl p-4 hover-lift flex flex-col items-center gap-2 text-center">
       <div class="w-10 h-10 rounded-xl bg-sky-500/15 group-hover:bg-sky-500/25 flex items-center justify-center transition-colors">
         <i data-lucide="share-2" class="w-5 h-5 text-sky-400"></i>
       </div>
-      <span class="text-xs font-medium text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">Distribution</span>
+      <span class="text-xs font-medium text-(--color-text-secondary) group-hover:text-(--color-text-primary) transition-colors">Distribution</span>
     </a>
   </div>
 </div>

@@ -1,0 +1,40 @@
+{# templates/tags/admin_keyword_review.html — Keyword suggestion review #}
+{% extends "layouts/default.html" %}
+{% load humanize %}
+
+{% block title %}Keyword Review{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+  {% include "components/_section_header.html" with title="Keyword Suggestions" subtitle="Review AI-generated keyword suggestions and apply them as tags" icon="sparkles" %}
+
+  {% if suggestions %}
+  <div class="rounded-lg border border-(--color-border) bg-(--color-surface) divide-y divide-(--color-border)">
+    {% for s in suggestions %}
+    <div class="p-4 flex items-center justify-between gap-4 hover:bg-(--color-surface-hover) transition-colors">
+      <div class="flex-1 min-w-0">
+        <span class="font-medium text-(--color-text-primary)">{{ s.keyword }}</span>
+        {% if s.provider %}
+        <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-(--color-accent)">{{ s.provider.name }}</span>
+        {% endif %}
+        {% if s.score %}
+        <span class="ml-2 text-xs text-(--color-text-muted)">Score: {{ s.score|floatformat:2 }}</span>
+        {% endif %}
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <form method="post" action="{% url 'tags:apply_keyword' %}">
+          {% csrf_token %}
+          <input type="hidden" name="id" value="{{ s.pk }}">
+          <button type="submit" class="px-3 py-1.5 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors" title="Apply as Tag">
+            <i data-lucide="check" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  {% include "components/_empty_state.html" with icon="sparkles" title="No Suggestions" description="No keyword suggestions available for review." %}
+  {% endif %}
+</div>
+{% endblock %}

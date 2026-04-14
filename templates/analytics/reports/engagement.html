@@ -5,7 +5,7 @@
 {% block page_header %}
 <div class="flex items-center justify-between">
   <h1 class="text-2xl font-bold">Engagement Report</h1>
-  <a href="{% url 'analytics:dashboard' %}" class="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm hover:bg-[var(--color-bg-secondary)] transition">
+  <a href="{% url 'analytics:dashboard' %}" class="rounded-lg border border-(--color-border) px-4 py-2 text-sm hover:bg-(--color-bg-secondary) transition">
     Back to Dashboard
   </a>
 </div>
@@ -13,16 +13,16 @@
 
 {% block page_content %}
 <div class="space-y-8">
-  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <section class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">User Engagement Metrics</h2>
-    <div class="h-64 flex items-center justify-center text-[var(--color-text-muted)]">
+    <div class="h-64 flex items-center justify-center text-(--color-text-muted)">
       {% include "components/_empty_state.html" with icon="heart" title="Coming soon" description="Engagement metrics including comments, shares, and time on page will be tracked here." %}
     </div>
   </section>
 
-  <section class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <section class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">Most Engaging Content</h2>
-    <div class="h-48 flex items-center justify-center text-[var(--color-text-muted)]">
+    <div class="h-48 flex items-center justify-center text-(--color-text-muted)">
       {% include "components/_empty_state.html" with icon="star" title="No data yet" description="Top-performing content by engagement score will appear here." %}
     </div>
   </section>

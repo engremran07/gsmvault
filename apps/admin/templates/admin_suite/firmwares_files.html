@@ -7,11 +7,11 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Firmware Files</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ total_count|default:"0" }} files across all types</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Firmware Files</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">{{ total_count|default:"0" }} files across all types</p>
   </div>
   <div class="flex items-center gap-2">
-    <a href="{% url 'admin_suite:firmwares' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all">
+    <a href="{% url 'admin_suite:firmwares' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all">
       <i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Firmwares
     </a>
   </div>
@@ -37,7 +37,7 @@
 <div class="flex items-center justify-between mb-4">
   <div></div>
   <button @click="showAddForm = !showAddForm"
-    class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all">
+    class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all">
     <i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Firmware File
   </button>
 </div>
@@ -51,8 +51,8 @@
 
 {# ═══ Add Firmware Form ═══ #}
 <div x-show="showAddForm" x-cloak x-transition class="glass rounded-xl p-5 mb-6">
-  <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
-    <i data-lucide="file-plus" class="w-4 h-4 inline mr-1 text-[var(--color-accent)]"></i>Add Firmware File
+  <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">
+    <i data-lucide="file-plus" class="w-4 h-4 inline mr-1 text-(--color-accent)"></i>Add Firmware File
   </h3>
   <form method="post">
     {% csrf_token %}
@@ -61,18 +61,18 @@
     {# Row 1: Type, Brand, Model #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label for="id_firmware_type" class="block text-xs text-[var(--color-text-muted)] mb-1">Firmware Type <span class="text-red-400">*</span></label>
+        <label for="id_firmware_type" class="block text-xs text-(--color-text-muted) mb-1">Firmware Type <span class="text-red-400">*</span></label>
         <select name="firmware_type" id="id_firmware_type" x-model="selectedType" required
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
           {% for key, label in firmware_types %}
           <option value="{{ key }}">{{ label }}</option>
           {% endfor %}
         </select>
       </div>
       <div>
-        <label for="id_file_brand_id" class="block text-xs text-[var(--color-text-muted)] mb-1">Brand <span class="text-red-400">*</span></label>
+        <label for="id_file_brand_id" class="block text-xs text-(--color-text-muted) mb-1">Brand <span class="text-red-400">*</span></label>
         <select name="brand_id" id="id_file_brand_id" x-model="selectedBrand" required
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
           <option value="">Select brand…</option>
           {% for b in brands %}
           <option value="{{ b.id }}">{{ b.name }}</option>
@@ -80,9 +80,9 @@
         </select>
       </div>
       <div>
-        <label for="id_model_id" class="block text-xs text-[var(--color-text-muted)] mb-1">Model <span class="text-red-400">*</span></label>
+        <label for="id_model_id" class="block text-xs text-(--color-text-muted) mb-1">Model <span class="text-red-400">*</span></label>
         <select name="model_id" id="id_model_id" required
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
           <option value="">Select model…</option>
           <template x-for="m in filteredModels" :key="m.id">
             <option :value="m.id" x-text="m.name"></option>
@@ -90,84 +90,84 @@
         </select>
       </div>
       <div x-show="showSubtype" x-cloak>
-        <label for="id_subtype" class="block text-xs text-[var(--color-text-muted)] mb-1">Subtype</label>
+        <label for="id_subtype" class="block text-xs text-(--color-text-muted) mb-1">Subtype</label>
         <input type="text" name="subtype" id="id_subtype" autocomplete="off" maxlength="128" placeholder="e.g. TWRP, Root, Custom"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
     </div>
 
     {# Row 2: File info #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
       <div>
-        <label for="id_original_file_name" class="block text-xs text-[var(--color-text-muted)] mb-1">Filename <span class="text-red-400">*</span></label>
+        <label for="id_original_file_name" class="block text-xs text-(--color-text-muted) mb-1">Filename <span class="text-red-400">*</span></label>
         <input type="text" name="original_file_name" id="id_original_file_name" autocomplete="off" required maxlength="255" placeholder="e.g. SM-S911B_OXM_14_firmware.zip"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_stored_file_path" class="block text-xs text-[var(--color-text-muted)] mb-1">Download Link or File Path <span class="text-red-400">*</span></label>
+        <label for="id_stored_file_path" class="block text-xs text-(--color-text-muted) mb-1">Download Link or File Path <span class="text-red-400">*</span></label>
         <input type="text" name="stored_file_path" id="id_stored_file_path" autocomplete="off" required maxlength="500" placeholder="e.g. https://mega.nz/file/abc123 or firmwares/official/samsung/file.zip"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
-        <p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Paste an external download link (Google Drive, Mega, MediaFire, etc.) or a local storage path</p>
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
+        <p class="mt-1 text-[10px] text-(--color-text-muted)">Paste an external download link (Google Drive, Mega, MediaFire, etc.) or a local storage path</p>
       </div>
       <div>
-        <label for="id_file_size" class="block text-xs text-[var(--color-text-muted)] mb-1">File Size <span class="text-[10px] text-[var(--color-text-muted)]">(bytes)</span></label>
+        <label for="id_file_size" class="block text-xs text-(--color-text-muted) mb-1">File Size <span class="text-[10px] text-(--color-text-muted)">(bytes)</span></label>
         <input type="number" name="file_size" id="id_file_size" autocomplete="off" min="0" placeholder="e.g. 3221225472"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
     </div>
 
     {# Row 3: Version details #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label for="id_android_version" class="block text-xs text-[var(--color-text-muted)] mb-1">Android Version</label>
+        <label for="id_android_version" class="block text-xs text-(--color-text-muted) mb-1">Android Version</label>
         <input type="text" name="android_version" id="id_android_version" autocomplete="off" maxlength="32" placeholder="e.g. 14.0"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_build_number" class="block text-xs text-[var(--color-text-muted)] mb-1">Build Number</label>
+        <label for="id_build_number" class="block text-xs text-(--color-text-muted) mb-1">Build Number</label>
         <input type="text" name="build_number" id="id_build_number" autocomplete="off" maxlength="128" placeholder="e.g. UP1A.231005.007"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_security_patch" class="block text-xs text-[var(--color-text-muted)] mb-1">Security Patch</label>
+        <label for="id_security_patch" class="block text-xs text-(--color-text-muted) mb-1">Security Patch</label>
         <input type="date" name="security_patch" id="id_security_patch"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_build_date" class="block text-xs text-[var(--color-text-muted)] mb-1">Build Date</label>
+        <label for="id_build_date" class="block text-xs text-(--color-text-muted) mb-1">Build Date</label>
         <input type="date" name="build_date" id="id_build_date"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
       </div>
     </div>
 
     {# Row 4: Extra fields #}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
       <div>
-        <label for="id_fw_chipset" class="block text-xs text-[var(--color-text-muted)] mb-1">Chipset</label>
+        <label for="id_fw_chipset" class="block text-xs text-(--color-text-muted) mb-1">Chipset</label>
         <input type="text" name="chipset" id="id_fw_chipset" autocomplete="off" maxlength="128" placeholder="e.g. Snapdragon 8 Gen 3"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div>
-        <label for="id_file_hash" class="block text-xs text-[var(--color-text-muted)] mb-1">File Hash <span class="text-[10px] text-[var(--color-text-muted)]">(SHA256)</span></label>
+        <label for="id_file_hash" class="block text-xs text-(--color-text-muted) mb-1">File Hash <span class="text-[10px] text-(--color-text-muted)">(SHA256)</span></label>
         <input type="text" name="file_hash" id="id_file_hash" autocomplete="off" maxlength="256" placeholder="Optional SHA256 hash"
-          class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
       </div>
       <div class="flex items-end">
-        <label class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] cursor-pointer">
-          <input type="checkbox" name="is_active" checked class="rounded border-[var(--color-border)]/30 bg-[var(--color-bg-tertiary)]">
+        <label class="flex items-center gap-2 text-xs text-(--color-text-secondary) cursor-pointer">
+          <input type="checkbox" name="is_active" checked class="rounded border-(--color-border)/30 bg-(--color-bg-tertiary)">
           Active (available for download)
         </label>
       </div>
     </div>
 
     {# Actions #}
-    <div class="flex items-center gap-3 pt-2 border-t border-[var(--color-border)]/20">
+    <div class="flex items-center gap-3 pt-2 border-t border-(--color-border)/20">
       <button type="submit"
-        class="px-5 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all">
+        class="px-5 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all">
         <i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>Add Firmware File
       </button>
       <button type="button" @click="showAddForm = false"
-        class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] btn-press transition-all">
+        class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-muted) hover:text-(--color-text-primary) btn-press transition-all">
         Cancel
       </button>
     </div>
@@ -177,19 +177,19 @@
 {# ═══ Search + Type Filter ═══ #}
 <div class="glass rounded-xl p-3 mb-6 flex flex-wrap items-center gap-3 animate-in" style="--stagger:1"
   x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <i data-lucide="search" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
+  <i data-lucide="search" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
   <form method="get" class="flex-1 flex items-center gap-3">
     <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search firmware files…" aria-label="Search firmware files"
-      class="flex-1 bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none">
+      class="flex-1 bg-transparent text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none">
     <select name="type" aria-label="Filter by firmware type"
-      class="px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-xs text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+      class="px-3 py-1.5 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-xs text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
       <option value="" {% if not type_filter %}selected{% endif %}>All Types</option>
       {% for key, label in firmware_types %}
       <option value="{{ key }}" {% if type_filter == key %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
     <button type="submit"
-      class="px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+      class="px-3 py-1.5 rounded-lg bg-(--color-bg-tertiary) text-xs text-(--color-text-secondary) hover:text-(--color-accent) transition-colors">
       Filter
     </button>
   </form>
@@ -201,24 +201,24 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)]/20">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Filename</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Type</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Brand / Model</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Android</th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Size</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Added</th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        <tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Filename</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Type</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Brand / Model</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Android</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Size</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Added</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]/10">
+      <tbody class="divide-y divide-(--color-border)/10">
         {% for f in files %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
           <td class="py-3 px-4">
             <div class="flex items-center gap-2">
-              <i data-lucide="file" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
-              <span class="text-[var(--color-text-primary)] truncate max-w-[200px]" title="{{ f.original_file_name }}">{{ f.original_file_name }}</span>
+              <i data-lucide="file" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
+              <span class="text-(--color-text-primary) truncate max-w-[200px]" title="{{ f.original_file_name }}">{{ f.original_file_name }}</span>
             </div>
           </td>
           <td class="py-3 px-4">
@@ -231,11 +231,11 @@
               {{ f.type_label }}
             </span>
           </td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">
             {{ f.brand_name }} / {{ f.model_name }}
           </td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ f.android_version }}</td>
-          <td class="py-3 px-4 text-right font-mono text-xs text-[var(--color-text-muted)]">
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ f.android_version }}</td>
+          <td class="py-3 px-4 text-right font-mono text-xs text-(--color-text-muted)">
             {% if f.file_size %}{{ f.file_size|filesizeformat }}{% else %}-{% endif %}
           </td>
           <td class="py-3 px-4 text-center">
@@ -248,7 +248,7 @@
             <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 ml-1">✓</span>
             {% endif %}
           </td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ f.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ f.created_at|timesince }} ago</td>
           <td class="py-3 px-4 text-right">
             <form method="post" class="inline">
               {% csrf_token %}
@@ -273,11 +273,11 @@
         {% empty %}
         <tr>
           <td colspan="8" class="py-12 text-center">
-            <div class="flex flex-col items-center gap-2 text-[var(--color-text-muted)]">
+            <div class="flex flex-col items-center gap-2 text-(--color-text-muted)">
               <i data-lucide="file-x" class="w-8 h-8 opacity-40"></i>
               <p class="text-sm">No firmware files found</p>
               <button @click="showAddForm = true"
-                class="mt-2 px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all">
+                class="mt-2 px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all">
                 <i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add First Firmware
               </button>
             </div>
@@ -289,18 +289,18 @@
   </div>
 
   {% if page_obj and page_obj.has_other_pages %}
-  <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-    <span class="text-xs text-[var(--color-text-muted)]">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+    <span class="text-xs text-(--color-text-muted)">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
     <div class="flex items-center gap-1">
       {% if page_obj.has_previous %}
       <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}"
-        class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+        class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
       </a>
       {% endif %}
       {% if page_obj.has_next %}
       <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}"
-        class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+        class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
       </a>
       {% endif %}

@@ -1,11 +1,11 @@
 {# templates/components/_search_bar.html — Search with HTMX live results #}
 <div class="relative w-full max-w-xl" x-data="{ focused: false }">
   <div class="relative">
-    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-secondary)]"></i>
+    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-(--color-text-secondary)"></i>
     <input type="search"
            name="q"
            placeholder="Search firmware, devices, brands..."
-           class="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition"
+           class="w-full pl-10 pr-4 py-3 rounded-lg border border-(--color-border) bg-(--color-bg-primary) text-(--color-text-primary) placeholder:text-(--color-text-secondary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) focus:border-transparent transition"
            hx-get="{{ search_url|default:'/firmwares/search/' }}"
            hx-trigger="keyup changed delay:300ms"
            hx-target="#search-results"
@@ -17,5 +17,5 @@
   <div id="search-spinner" class="htmx-indicator absolute right-3 top-1/2 -translate-y-1/2">
     {% include "components/_loading.html" %}
   </div>
-  <div id="search-results" x-show="focused" x-cloak class="absolute top-full left-0 right-0 mt-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto"></div>
+  <div id="search-results" x-show="focused" x-cloak class="absolute top-full left-0 right-0 mt-1 bg-(--color-bg-secondary) border border-(--color-border) rounded-lg shadow-xl z-50 max-h-80 overflow-y-auto"></div>
 </div>

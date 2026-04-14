@@ -2,7 +2,7 @@
 <button hx-post="{% url 'forum:toggle_like' reply_pk=reply.pk %}"
         hx-target="#like-btn-{{ reply.pk }}"
         hx-swap="innerHTML"
-        class="flex items-center gap-1 {% if user_liked %}text-red-400{% else %}text-[var(--color-text-secondary)] hover:text-red-400{% endif %} transition-colors">
+        class="flex items-center gap-1 {% if user_liked %}text-red-400{% else %}text-(--color-text-secondary) hover:text-red-400{% endif %} transition-colors">
   <i data-lucide="heart" class="w-4 h-4 {% if user_liked %}fill-current{% endif %}"></i>
   <span>{{ reply.likes_count }}</span>
 </button>

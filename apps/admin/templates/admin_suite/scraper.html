@@ -6,16 +6,16 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Scraper Hub</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Multi-source device spec sync, OEM firmware sources, approval queue</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Scraper Hub</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Multi-source device spec sync, OEM firmware sources, approval queue</p>
   </div>
 </div>
 {% endblock %}
 
 {% block page_content %}
 {% if message %}
-<div class="glass rounded-xl p-4 mb-6 border-l-4 border-[var(--color-accent)]">
-  <p class="text-sm text-[var(--color-text-secondary)]">{{ message }}</p>
+<div class="glass rounded-xl p-4 mb-6 border-l-4 border-(--color-accent)">
+  <p class="text-sm text-(--color-text-secondary)">{{ message }}</p>
 </div>
 {% endif %}
 
@@ -36,13 +36,13 @@
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-cyan-500/20"
      x-data="{ running: {{ scraper_is_running|yesno:'true,false' }} }"
      x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+  <div class="px-5 py-4 border-b border-(--color-border) flex items-center justify-between">
     <div>
-      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <h2 class="text-base font-semibold text-(--color-text-primary)">
         <i data-lucide="radar" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
         Device Scraper
       </h2>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">
+      <p class="text-xs text-(--color-text-muted) mt-1">
         Scrape device specs from 20+ sources with proxy rotation.
       </p>
     </div>
@@ -65,7 +65,7 @@
           <i data-lucide="activity" class="w-3.5 h-3.5 inline-block mr-1"></i>
           Live Progress
         </span>
-        <span class="text-[var(--color-text-muted)]">Refreshing automatically…</span>
+        <span class="text-(--color-text-muted)">Refreshing automatically…</span>
       </div>
     </div>
     {% endif %}
@@ -79,9 +79,9 @@
     {# Settings row — hidden while running #}
     <div x-show="!running" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mb-4">
       <div>
-        <label for="id_strategy" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">Strategy</label>
+        <label for="id_strategy" class="block text-xs font-medium text-(--color-text-muted) mb-1.5">Strategy</label>
         <select name="strategy" id="id_strategy"
-                class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           <option value="brand_walk" selected>Brand Walk (full catalogue)</option>
           <option value="search_targeted">Search Targeted (filters)</option>
           <option value="rumor_mill">Rumor Mill (upcoming)</option>
@@ -89,24 +89,24 @@
         </select>
       </div>
       <div>
-        <label for="id_sample_size" class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">Sample Size (per brand)</label>
+        <label for="id_sample_size" class="block text-xs font-medium text-(--color-text-muted) mb-1.5">Sample Size (per brand)</label>
         <input type="number" name="sample_size" id="id_sample_size" autocomplete="off" min="1" max="500" placeholder="All devices"
-               class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+               class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
       </div>
       <div class="space-y-2">
         <div class="flex items-center gap-2">
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" name="exclude_scraped" checked class="sr-only peer">
-            <div class="w-9 h-5 bg-[var(--color-bg-tertiary)] peer-focus:ring-2 peer-focus:ring-[var(--color-accent)]/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+            <div class="w-9 h-5 bg-(--color-bg-tertiary) peer-focus:ring-2 peer-focus:ring-[var(--color-accent)]/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
           </label>
-          <span class="text-xs text-[var(--color-text-secondary)]">Skip already scraped</span>
+          <span class="text-xs text-(--color-text-secondary)">Skip already scraped</span>
         </div>
         <div class="flex items-center gap-2">
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" name="exclude_discontinued" class="sr-only peer">
-            <div class="w-9 h-5 bg-[var(--color-bg-tertiary)] peer-focus:ring-2 peer-focus:ring-[var(--color-accent)]/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            <div class="w-9 h-5 bg-(--color-bg-tertiary) peer-focus:ring-2 peer-focus:ring-[var(--color-accent)]/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
           </label>
-          <span class="text-xs text-[var(--color-text-secondary)]">Exclude discontinued</span>
+          <span class="text-xs text-(--color-text-secondary)">Exclude discontinued</span>
         </div>
       </div>
       <div>{# spacer — button below #}</div>
@@ -138,13 +138,13 @@
 {# Probe All Methods Panel #}
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-purple-500/20"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+  <div class="px-5 py-4 border-b border-(--color-border) flex items-center justify-between">
     <div>
-      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <h2 class="text-base font-semibold text-(--color-text-primary)">
         <i data-lucide="scan-search" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
         Method Discovery
       </h2>
-      <p class="text-xs text-[var(--color-text-muted)] mt-0.5">
+      <p class="text-xs text-(--color-text-muted) mt-0.5">
         Test ALL scraping methods to discover which ones work, are banned, or error out.
       </p>
     </div>
@@ -164,7 +164,7 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-5 py-3 text-left font-medium">Method</th>
           <th class="px-5 py-3 text-center font-medium">Status</th>
           <th class="px-5 py-3 text-center font-medium">HTTP</th>
@@ -174,10 +174,10 @@
           <th class="px-5 py-3 text-left font-medium">Error</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for probe in probe_results %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
-          <td class="px-5 py-3 font-mono text-xs text-[var(--color-text-primary)] font-medium">{{ probe.name }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
+          <td class="px-5 py-3 font-mono text-xs text-(--color-text-primary) font-medium">{{ probe.name }}</td>
           <td class="px-5 py-3 text-center">
             {% if probe.success %}
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-400">
@@ -196,20 +196,20 @@
           <td class="px-5 py-3 text-center font-mono text-xs
             {% if probe.status_code >= 200 and probe.status_code < 300 %}text-emerald-400
             {% elif probe.status_code >= 400 %}text-red-400
-            {% else %}text-[var(--color-text-muted)]{% endif %}">
+            {% else %}text-(--color-text-muted){% endif %}">
             {{ probe.status_code|default:"—" }}
           </td>
           <td class="px-5 py-3 text-center">
             {% if probe.is_banned %}
             <span class="text-red-400 text-xs">Yes</span>
             {% else %}
-            <span class="text-[var(--color-text-muted)] text-xs">No</span>
+            <span class="text-(--color-text-muted) text-xs">No</span>
             {% endif %}
           </td>
-          <td class="px-5 py-3 text-right text-xs text-[var(--color-text-secondary)]">
+          <td class="px-5 py-3 text-right text-xs text-(--color-text-secondary)">
             {% if probe.html_length %}{{ probe.html_length|filesizeformat }}{% else %}—{% endif %}
           </td>
-          <td class="px-5 py-3 text-right text-xs text-[var(--color-text-secondary)]">
+          <td class="px-5 py-3 text-right text-xs text-(--color-text-secondary)">
             {{ probe.elapsed_ms }}ms
           </td>
           <td class="px-5 py-3 text-xs text-red-400 max-w-[250px] truncate">{{ probe.error|default:"—" }}</td>
@@ -219,7 +219,7 @@
     </table>
   </div>
   {% else %}
-  <div class="px-5 py-8 text-center text-sm text-[var(--color-text-muted)]">
+  <div class="px-5 py-8 text-center text-sm text-(--color-text-muted)">
     <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
     <p>No probe results yet. Click "Probe All Methods" to test which scraping methods work.</p>
   </div>
@@ -230,8 +230,8 @@
 {% if gsmarena_sync_runs %}
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)]">
-    <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+  <div class="px-5 py-4 border-b border-(--color-border)">
+    <h2 class="text-base font-semibold text-(--color-text-primary)">
       <i data-lucide="refresh-cw" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
       Sync Runs
     </h2>
@@ -239,7 +239,7 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-5 py-3 text-left font-medium">Run</th>
           <th class="px-5 py-3 text-left font-medium">Status</th>
           <th class="px-5 py-3 text-left font-medium">Method</th>
@@ -250,10 +250,10 @@
           <th class="px-5 py-3 text-left font-medium">Completed</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for run in gsmarena_sync_runs %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
-          <td class="px-5 py-3 font-mono text-xs text-[var(--color-text-muted)]">#{{ run.id }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
+          <td class="px-5 py-3 font-mono text-xs text-(--color-text-muted)">#{{ run.id }}</td>
           <td class="px-5 py-3">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
               {% if run.status == 'success' %}bg-emerald-500/15 text-emerald-400
@@ -264,12 +264,12 @@
               {{ run.status }}
             </span>
           </td>
-          <td class="px-5 py-3 text-xs text-[var(--color-text-muted)] font-mono">{{ run.method_used|default:"—" }}</td>
-          <td class="px-5 py-3 text-right text-[var(--color-text-secondary)]">{{ run.devices_checked|default:"0" }}</td>
+          <td class="px-5 py-3 text-xs text-(--color-text-muted) font-mono">{{ run.method_used|default:"—" }}</td>
+          <td class="px-5 py-3 text-right text-(--color-text-secondary)">{{ run.devices_checked|default:"0" }}</td>
           <td class="px-5 py-3 text-right text-emerald-400">{{ run.devices_created|default:"0" }}</td>
           <td class="px-5 py-3 text-right text-blue-400">{{ run.devices_updated|default:"0" }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ run.started_at|date:"M d, H:i"|default:"—" }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ run.completed_at|date:"M d, H:i"|default:"—" }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted)">{{ run.started_at|date:"M d, H:i"|default:"—" }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted)">{{ run.completed_at|date:"M d, H:i"|default:"—" }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -281,13 +281,13 @@
 {# ═══ Schedule Config ═══ #}
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-blue-500/20"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+  <div class="px-5 py-4 border-b border-(--color-border) flex items-center justify-between">
     <div>
-      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <h2 class="text-base font-semibold text-(--color-text-primary)">
         <i data-lucide="calendar-clock" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
         Scraping Schedule
       </h2>
-      <p class="text-xs text-[var(--color-text-muted)] mt-0.5">Auto-run scrapers at regular intervals. GSMArena and multi-source run independently.</p>
+      <p class="text-xs text-(--color-text-muted) mt-0.5">Auto-run scrapers at regular intervals. GSMArena and multi-source run independently.</p>
     </div>
   </div>
   <form method="post" class="px-5 py-4">
@@ -296,12 +296,12 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
       {# GSMArena schedule #}
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
+        <label class="block text-xs font-medium text-(--color-text-muted) mb-1.5">
           <i data-lucide="smartphone" class="w-3 h-3 inline-block mr-0.5"></i>
           GSMArena (primary specs)
         </label>
         <select name="schedule_hours"
-                class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           <option value="0" {% if schedule_hours == 0 %}selected{% endif %}>Disabled</option>
           <option value="1" {% if schedule_hours == 1 %}selected{% endif %}>1 hour</option>
           <option value="2" {% if schedule_hours == 2 %}selected{% endif %}>2 hours</option>
@@ -326,12 +326,12 @@
       </div>
       {# Multi-source schedule #}
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1.5">
+        <label class="block text-xs font-medium text-(--color-text-muted) mb-1.5">
           <i data-lucide="radar" class="w-3 h-3 inline-block mr-0.5"></i>
           Multi-Source Swarm (all 20+ sources)
         </label>
         <select name="ms_schedule_hours"
-                class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500/40">
+                class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500/40">
           <option value="0" {% if ms_schedule_hours == 0 %}selected{% endif %}>Disabled</option>
           <option value="2" {% if ms_schedule_hours == 2 %}selected{% endif %}>2 hours</option>
           <option value="4" {% if ms_schedule_hours == 4 %}selected{% endif %}>4 hours</option>
@@ -374,7 +374,7 @@
        editForm: { brand: '', model_name: '', marketed_as: '', model_codes: '', chipset: '', os_version: '', os_upgradeable_to: '' }
      }"
      x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+  <div class="px-5 py-4 border-b border-(--color-border) flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <h2 class="text-base font-semibold text-amber-400">
       <i data-lucide="alert-circle" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
       Pending Devices ({{ gsmarena_stats.pending_devices }})
@@ -383,14 +383,14 @@
       {# Brand Filter #}
       <form method="get" class="inline-flex items-center gap-2">
         <select name="device_brand" onchange="this.form.submit()"
-                class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           <option value="">All Brands</option>
           {% for b in pending_brands %}
           <option value="{{ b }}" {% if device_brand_filter == b %}selected{% endif %}>{{ b }}</option>
           {% endfor %}
         </select>
         {% if device_brand_filter %}
-        <a href="?device_brand=" class="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors" title="Clear filter">
+        <a href="?device_brand=" class="text-xs text-(--color-text-muted) hover:text-(--color-accent) transition-colors" title="Clear filter">
           <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
         </a>
         {% endif %}
@@ -420,7 +420,7 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-4 py-3 text-left font-medium w-10">
             <input type="checkbox" class="rounded"
                    @change="toggleAll = $event.target.checked;
@@ -436,25 +436,25 @@
           <th class="px-4 py-3 text-center font-medium">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for dev in pending_devices %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
           <td class="px-4 py-3">
             <input type="checkbox" class="rounded" value="{{ dev.id }}"
                    @change="$event.target.checked ? selectedDevices.push({{ dev.id }}) : selectedDevices = selectedDevices.filter(id => id !== {{ dev.id }})">
           </td>
-          <td class="px-4 py-3 font-medium text-[var(--color-text-primary)]">{{ dev.brand }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-secondary)]">
+          <td class="px-4 py-3 font-medium text-(--color-text-primary)">{{ dev.brand }}</td>
+          <td class="px-4 py-3 text-(--color-text-secondary)">
             {{ dev.model_name }}
             {% if dev.marketed_as and dev.marketed_as != dev.model_name %}
-            <span class="block text-xs text-[var(--color-text-muted)]">{{ dev.marketed_as|truncatechars:50 }}</span>
+            <span class="block text-xs text-(--color-text-muted)">{{ dev.marketed_as|truncatechars:50 }}</span>
             {% endif %}
           </td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)] text-xs font-mono max-w-[150px] truncate">{{ dev.model_codes|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-secondary)] text-xs max-w-[120px] truncate">{{ dev.chipset|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-secondary)] text-xs">{{ dev.os_version|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)] text-xs">{{ dev.os_upgradeable_to|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)] text-xs">{{ dev.last_synced_at|date:"M d, H:i"|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted) text-xs font-mono max-w-[150px] truncate">{{ dev.model_codes|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-secondary) text-xs max-w-[120px] truncate">{{ dev.chipset|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-secondary) text-xs">{{ dev.os_version|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted) text-xs">{{ dev.os_upgradeable_to|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted) text-xs">{{ dev.last_synced_at|date:"M d, H:i"|default:"—" }}</td>
           <td class="px-4 py-3 text-center">
             <div class="flex items-center justify-center gap-1">
               {# Edit button — opens modal #}
@@ -500,29 +500,29 @@
 
   {# ═══ Pagination ═══ #}
   {% if pending_devices_page.has_other_pages %}
-  <div class="px-5 py-3 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-2">
-    <span class="text-xs text-[var(--color-text-muted)]">
+  <div class="px-5 py-3 border-t border-(--color-border) flex flex-wrap items-center justify-between gap-2">
+    <span class="text-xs text-(--color-text-muted)">
       Page {{ pending_devices_page.number }} of {{ pending_devices_page.paginator.num_pages }}
       ({{ pending_devices_page.paginator.count }} total)
     </span>
     <div class="flex items-center gap-1">
       {% if pending_devices_page.has_previous %}
       <a href="?page={{ pending_devices_page.previous_page_number }}{% if device_brand_filter %}&device_brand={{ device_brand_filter }}{% endif %}"
-         class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+         class="px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <i data-lucide="chevron-left" class="w-3.5 h-3.5 inline-block"></i> Prev
       </a>
       {% endif %}
       {% for num in pending_devices_page.paginator.page_range %}
         {% if pending_devices_page.number == num %}
-        <span class="px-2.5 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-medium">{{ num }}</span>
+        <span class="px-2.5 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-medium">{{ num }}</span>
         {% elif num > pending_devices_page.number|add:"-3" and num < pending_devices_page.number|add:"4" %}
         <a href="?page={{ num }}{% if device_brand_filter %}&device_brand={{ device_brand_filter }}{% endif %}"
-           class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">{{ num }}</a>
+           class="px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">{{ num }}</a>
         {% endif %}
       {% endfor %}
       {% if pending_devices_page.has_next %}
       <a href="?page={{ pending_devices_page.next_page_number }}{% if device_brand_filter %}&device_brand={{ device_brand_filter }}{% endif %}"
-         class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+         class="px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         Next <i data-lucide="chevron-right" class="w-3.5 h-3.5 inline-block"></i>
       </a>
       {% endif %}
@@ -534,14 +534,14 @@
   <template x-if="editDevice !== null">
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" x-cloak
          @keydown.escape.window="editDevice = null" @click.self="editDevice = null">
-      <div class="glass rounded-2xl w-full max-w-lg border border-[var(--color-border)] shadow-2xl"
+      <div class="glass rounded-2xl w-full max-w-lg border border-(--color-border) shadow-2xl"
            @click.stop>
-        <div class="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
-          <h3 class="text-base font-semibold text-[var(--color-text-primary)]">
+        <div class="px-5 py-4 border-b border-(--color-border) flex items-center justify-between">
+          <h3 class="text-base font-semibold text-(--color-text-primary)">
             <i data-lucide="pencil" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
             Review & Edit Device
           </h3>
-          <button @click="editDevice = null" class="p-1 rounded-lg hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]">
+          <button @click="editDevice = null" class="p-1 rounded-lg hover:bg-(--color-bg-tertiary) text-(--color-text-muted)">
             <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
@@ -551,46 +551,46 @@
           <input type="hidden" name="device_id" :value="editDevice">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Brand</label>
+              <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Brand</label>
               <input type="text" name="edit_brand" x-model="editForm.brand"
-                     class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                     class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
             </div>
             <div>
-              <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Model Name</label>
+              <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Model Name</label>
               <input type="text" name="edit_model_name" x-model="editForm.model_name"
-                     class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                     class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Marketed As</label>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Marketed As</label>
             <input type="text" name="edit_marketed_as" x-model="editForm.marketed_as"
-                   class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                   class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Model Codes (comma-separated)</label>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Model Codes (comma-separated)</label>
             <input type="text" name="edit_model_codes" x-model="editForm.model_codes"
-                   class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                   class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Chipset</label>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Chipset</label>
             <input type="text" name="edit_chipset" x-model="editForm.chipset"
-                   class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                   class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">OS Version</label>
+              <label class="block text-xs font-medium text-(--color-text-muted) mb-1">OS Version</label>
               <input type="text" name="edit_os_version" x-model="editForm.os_version"
-                     class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                     class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
             </div>
             <div>
-              <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Upgradeable To</label>
+              <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Upgradeable To</label>
               <input type="text" name="edit_os_upgradeable_to" x-model="editForm.os_upgradeable_to"
-                     class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                     class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-2">
             <button type="button" @click="editDevice = null"
-                    class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] text-sm hover:bg-[var(--color-bg-secondary)] transition-colors">
+                    class="px-4 py-2 rounded-lg bg-(--color-bg-tertiary) text-(--color-text-secondary) text-sm hover:bg-(--color-bg-secondary) transition-colors">
               Cancel
             </button>
             <button type="submit"
@@ -607,11 +607,11 @@
 {% endif %}
 
 {# ═══ All Scraped Devices — Browse Full Catalogue ═══ #}
-<div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-[var(--color-border)]"
+<div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-(--color-border)"
      x-data="{ showAllDevices: {% if all_devices %}true{% else %}false{% endif %} }"
      x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-    <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+  <div class="px-5 py-4 border-b border-(--color-border) flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <h2 class="text-base font-semibold text-(--color-text-primary)">
       <i data-lucide="database" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
       All Scraped Devices ({{ gsmarena_stats.total_devices }})
     </h2>
@@ -619,7 +619,7 @@
       {# Status Filter #}
       <form method="get" class="inline-flex items-center gap-2">
         <select name="device_status" onchange="this.form.submit()"
-                class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           <option value="">All Statuses</option>
           <option value="pending" {% if device_status_filter == "pending" %}selected{% endif %}>Pending</option>
           <option value="approved" {% if device_status_filter == "approved" %}selected{% endif %}>Approved</option>
@@ -627,7 +627,7 @@
         </select>
         {# Brand Filter #}
         <select name="all_device_brand" onchange="this.form.submit()"
-                class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40">
+                class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-(--color-accent)/40">
           <option value="">All Brands</option>
           {% for b in all_devices_brands %}
           <option value="{{ b }}" {% if all_device_brand_filter == b %}selected{% endif %}>{{ b }}</option>
@@ -635,13 +635,13 @@
         </select>
         {% if device_status_filter or all_device_brand_filter %}
         <a href="?device_status=&all_device_brand="
-           class="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors" title="Clear filters">
+           class="text-xs text-(--color-text-muted) hover:text-(--color-accent) transition-colors" title="Clear filters">
           <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
         </a>
         {% endif %}
       </form>
       <button @click="showAllDevices = !showAllDevices"
-              class="text-xs px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+              class="text-xs px-3 py-1.5 rounded-lg bg-(--color-bg-tertiary) text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
         <span x-text="showAllDevices ? 'Collapse' : 'Expand'"></span>
       </button>
     </div>
@@ -651,7 +651,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+          <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
             <th class="px-4 py-3 text-left font-medium">Brand</th>
             <th class="px-4 py-3 text-left font-medium">Model</th>
             <th class="px-4 py-3 text-left font-medium">Model Codes</th>
@@ -661,19 +661,19 @@
             <th class="px-4 py-3 text-left font-medium">Synced</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[var(--color-border)]">
+        <tbody class="divide-y divide-(--color-border)">
           {% for dev in all_devices %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
-            <td class="px-4 py-3 font-medium text-[var(--color-text-primary)]">{{ dev.brand }}</td>
-            <td class="px-4 py-3 text-[var(--color-text-secondary)]">
+          <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
+            <td class="px-4 py-3 font-medium text-(--color-text-primary)">{{ dev.brand }}</td>
+            <td class="px-4 py-3 text-(--color-text-secondary)">
               {{ dev.model_name }}
               {% if dev.marketed_as and dev.marketed_as != dev.model_name %}
-              <span class="block text-xs text-[var(--color-text-muted)]">{{ dev.marketed_as|truncatechars:50 }}</span>
+              <span class="block text-xs text-(--color-text-muted)">{{ dev.marketed_as|truncatechars:50 }}</span>
               {% endif %}
             </td>
-            <td class="px-4 py-3 text-[var(--color-text-muted)] text-xs font-mono max-w-[150px] truncate">{{ dev.model_codes|default:"—" }}</td>
-            <td class="px-4 py-3 text-[var(--color-text-secondary)] text-xs max-w-[120px] truncate">{{ dev.chipset|default:"—" }}</td>
-            <td class="px-4 py-3 text-[var(--color-text-secondary)] text-xs">{{ dev.os_version|default:"—" }}</td>
+            <td class="px-4 py-3 text-(--color-text-muted) text-xs font-mono max-w-[150px] truncate">{{ dev.model_codes|default:"—" }}</td>
+            <td class="px-4 py-3 text-(--color-text-secondary) text-xs max-w-[120px] truncate">{{ dev.chipset|default:"—" }}</td>
+            <td class="px-4 py-3 text-(--color-text-secondary) text-xs">{{ dev.os_version|default:"—" }}</td>
             <td class="px-4 py-3 text-xs">
               {% if dev.review_status == "approved" %}
               <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">Approved</span>
@@ -685,7 +685,7 @@
               <span class="px-2 py-0.5 rounded-full bg-gray-500/15 text-gray-400 font-medium">{{ dev.review_status }}</span>
               {% endif %}
             </td>
-            <td class="px-4 py-3 text-[var(--color-text-muted)] text-xs">{{ dev.last_synced_at|date:"M d, H:i"|default:"—" }}</td>
+            <td class="px-4 py-3 text-(--color-text-muted) text-xs">{{ dev.last_synced_at|date:"M d, H:i"|default:"—" }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -693,29 +693,29 @@
     </div>
     {# Pagination #}
     {% if all_devices_page.has_other_pages %}
-    <div class="px-5 py-3 border-t border-[var(--color-border)] flex flex-wrap items-center justify-between gap-2">
-      <span class="text-xs text-[var(--color-text-muted)]">
+    <div class="px-5 py-3 border-t border-(--color-border) flex flex-wrap items-center justify-between gap-2">
+      <span class="text-xs text-(--color-text-muted)">
         Page {{ all_devices_page.number }} of {{ all_devices_page.paginator.num_pages }}
         ({{ all_devices_page.paginator.count }} total)
       </span>
       <div class="flex items-center gap-1">
         {% if all_devices_page.has_previous %}
         <a href="?allpage={{ all_devices_page.previous_page_number }}{% if device_status_filter %}&device_status={{ device_status_filter }}{% endif %}{% if all_device_brand_filter %}&all_device_brand={{ all_device_brand_filter }}{% endif %}"
-           class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+           class="px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
           <i data-lucide="chevron-left" class="w-3.5 h-3.5 inline-block"></i> Prev
         </a>
         {% endif %}
         {% for num in all_devices_page.paginator.page_range %}
           {% if all_devices_page.number == num %}
-          <span class="px-2.5 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-medium">{{ num }}</span>
+          <span class="px-2.5 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-medium">{{ num }}</span>
           {% elif num > all_devices_page.number|add:"-3" and num < all_devices_page.number|add:"4" %}
           <a href="?allpage={{ num }}{% if device_status_filter %}&device_status={{ device_status_filter }}{% endif %}{% if all_device_brand_filter %}&all_device_brand={{ all_device_brand_filter }}{% endif %}"
-             class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">{{ num }}</a>
+             class="px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">{{ num }}</a>
           {% endif %}
         {% endfor %}
         {% if all_devices_page.has_next %}
         <a href="?allpage={{ all_devices_page.next_page_number }}{% if device_status_filter %}&device_status={{ device_status_filter }}{% endif %}{% if all_device_brand_filter %}&all_device_brand={{ all_device_brand_filter }}{% endif %}"
-           class="px-2.5 py-1.5 rounded-lg border border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+           class="px-2.5 py-1.5 rounded-lg border border-(--color-border) text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
           Next <i data-lucide="chevron-right" class="w-3.5 h-3.5 inline-block"></i>
         </a>
         {% endif %}
@@ -723,7 +723,7 @@
     </div>
     {% endif %}
     {% else %}
-    <div class="px-5 py-8 text-center text-[var(--color-text-muted)]">
+    <div class="px-5 py-8 text-center text-(--color-text-muted)">
       <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
       <p class="text-sm">No scraped devices found. Run the scraper to populate device data.</p>
     </div>
@@ -731,7 +731,7 @@
   </div>
 </div>
 
-<div class="!my-6 border-t border-[var(--color-border)]/30"></div>
+<div class="!my-6 border-t border-(--color-border)/30"></div>
 
 {# ═══════════════════════════════════════════════════════════════════════ #}
 {# ═══ Multi-Source Discovery & Proxy Pool ═══ #}
@@ -739,19 +739,19 @@
 
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-violet-500/20"
      x-data="{ showMultiSource: false }" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+  <div class="px-5 py-4 border-b border-(--color-border) flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
     <div>
-      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <h2 class="text-base font-semibold text-(--color-text-primary)">
         <i data-lucide="radar" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
         Multi-Source Swarm Discovery
       </h2>
-      <p class="text-xs text-[var(--color-text-muted)] mt-0.5">
+      <p class="text-xs text-(--color-text-muted) mt-0.5">
         Scrape brands &amp; models from ALL registered English sources concurrently.
         Each site gets its own rate limiter. Cross-referenced data is higher confidence.
       </p>
     </div>
     <button @click="showMultiSource = !showMultiSource"
-            class="text-xs px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+            class="text-xs px-3 py-1.5 rounded-lg bg-(--color-bg-tertiary) text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
       <span x-text="showMultiSource ? 'Hide' : 'Configure & Run'"></span>
     </button>
   </div>
@@ -763,22 +763,22 @@
         <input type="hidden" name="action" value="run_multi_source">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Workers (threads)</label>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Workers (threads)</label>
             <input type="number" name="ms_workers" value="4" min="1" max="8"
-                   class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-colors">
-            <p class="text-[10px] text-[var(--color-text-muted)] mt-0.5">Parallel threads — 1 per source</p>
+                   class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-colors">
+            <p class="text-[10px] text-(--color-text-muted) mt-0.5">Parallel threads — 1 per source</p>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Per-site delay (sec)</label>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Per-site delay (sec)</label>
             <input type="number" name="ms_delay" value="5" min="2" max="30" step="0.5"
-                   class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-colors">
-            <p class="text-[10px] text-[var(--color-text-muted)] mt-0.5">Seconds between requests to same site</p>
+                   class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-colors">
+            <p class="text-[10px] text-(--color-text-muted) mt-0.5">Seconds between requests to same site</p>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Brand limit per source</label>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Brand limit per source</label>
             <input type="number" name="ms_brand_limit" value="30" min="5" max="100"
-                   class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-colors">
-            <p class="text-[10px] text-[var(--color-text-muted)] mt-0.5">Max brands to crawl per source</p>
+                   class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-colors">
+            <p class="text-[10px] text-(--color-text-muted) mt-0.5">Max brands to crawl per source</p>
           </div>
         </div>
         <div class="flex items-center gap-3 pt-2">
@@ -788,16 +788,16 @@
             <i data-lucide="radar" class="w-3.5 h-3.5"></i>
             Launch Swarm Discovery
           </button>
-          <span class="text-xs text-[var(--color-text-muted)]">
+          <span class="text-xs text-(--color-text-muted)">
             Targets all English sources — proxies auto-harvested before launch
           </span>
         </div>
       </form>
 
       {# Proxy pool section #}
-      <div class="mt-4 pt-4 border-t border-[var(--color-border)]/50">
+      <div class="mt-4 pt-4 border-t border-(--color-border)/50">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-medium text-[var(--color-text-primary)]">
+          <h3 class="text-sm font-medium text-(--color-text-primary)">
             <i data-lucide="shield" class="w-3.5 h-3.5 inline-block mr-1 opacity-60"></i>
             Proxy Pool
           </h3>
@@ -805,14 +805,14 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="harvest_proxies">
             <button type="submit"
-                    class="text-xs px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]
-                           hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)] transition-colors">
+                    class="text-xs px-3 py-1.5 rounded-lg bg-(--color-bg-tertiary) text-(--color-text-secondary)
+                           hover:bg-(--color-bg-secondary) border border-(--color-border) transition-colors">
               <i data-lucide="refresh-cw" class="w-3 h-3 inline-block mr-0.5"></i>
               Harvest Now
             </button>
           </form>
         </div>
-        <p class="text-xs text-[var(--color-text-muted)]">
+        <p class="text-xs text-(--color-text-muted)">
           Free proxies are auto-harvested from public lists before each scrape.
           Proxies rotate per-request and bad ones are auto-evicted.
           Use "Harvest Now" to test proxy availability.
@@ -822,7 +822,7 @@
   </div>
 </div>
 
-<div class="!my-6 border-t border-[var(--color-border)]/30"></div>
+<div class="!my-6 border-t border-(--color-border)/30"></div>
 
 {# ═══════════════════════════════════════════════════════════════════════ #}
 {# ═══ Source Registry — Global + Regional Sites ═══ #}
@@ -831,20 +831,20 @@
 {% if source_registry_sources %}
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-purple-500/20"
      x-data="{ showAll: false }" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+  <div class="px-5 py-4 border-b border-(--color-border) flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
     <div>
-      <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+      <h2 class="text-base font-semibold text-(--color-text-primary)">
         <i data-lucide="globe" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
         Source Registry
       </h2>
-      <p class="text-xs text-[var(--color-text-muted)] mt-0.5">
+      <p class="text-xs text-(--color-text-muted) mt-0.5">
         {{ source_registry_summary.total }} sources
         ({{ source_registry_summary.global_count }} global, {{ source_registry_summary.regional_count }} regional)
         — {{ source_registry_summary.needs_translation }} need translation
       </p>
     </div>
     <button @click="showAll = !showAll"
-            class="text-xs px-3 py-1.5 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors">
+            class="text-xs px-3 py-1.5 rounded-lg bg-(--color-bg-tertiary) text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors">
       <span x-text="showAll ? 'Collapse' : 'Show All Sources'"></span>
     </button>
   </div>
@@ -852,7 +852,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+          <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
             <th class="px-5 py-3 text-left font-medium">Source</th>
             <th class="px-5 py-3 text-left font-medium">Scope</th>
             <th class="px-5 py-3 text-left font-medium">Language</th>
@@ -862,13 +862,13 @@
             <th class="px-5 py-3 text-left font-medium">Notes</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[var(--color-border)]">
+        <tbody class="divide-y divide-(--color-border)">
           {% for src in source_registry_sources %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
+          <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
             <td class="px-5 py-3">
               <a href="{{ src.base_url }}" target="_blank" rel="noopener noreferrer"
-                 class="font-medium text-[var(--color-accent)] hover:underline">{{ src.name }}</a>
-              <span class="text-[10px] text-[var(--color-text-muted)] ml-1 font-mono">{{ src.country }}</span>
+                 class="font-medium text-(--color-accent) hover:underline">{{ src.name }}</a>
+              <span class="text-[10px] text-(--color-text-muted) ml-1 font-mono">{{ src.country }}</span>
             </td>
             <td class="px-5 py-3">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
@@ -877,7 +877,7 @@
                 {{ src.scope }}
               </span>
             </td>
-            <td class="px-5 py-3 text-[var(--color-text-secondary)] text-xs font-mono uppercase">{{ src.language }}</td>
+            <td class="px-5 py-3 text-(--color-text-secondary) text-xs font-mono uppercase">{{ src.language }}</td>
             <td class="px-5 py-3 text-center">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                 {% if src.quality_tier == 1 %}bg-emerald-500/15 text-emerald-400
@@ -904,13 +904,13 @@
                 <i data-lucide="languages" class="w-3 h-3 mr-0.5"></i> Needs Translation
               </span>
               {% else %}
-              <span class="text-xs text-[var(--color-text-muted)]">Not tested</span>
+              <span class="text-xs text-(--color-text-muted)">Not tested</span>
               {% endif %}
             </td>
-            <td class="px-5 py-3 text-center text-xs text-[var(--color-text-secondary)] font-mono">
+            <td class="px-5 py-3 text-center text-xs text-(--color-text-secondary) font-mono">
               {% if src.health.total_devices %}{{ src.health.total_devices }}{% else %}—{% endif %}
             </td>
-            <td class="px-5 py-3 text-[var(--color-text-muted)] text-xs max-w-[250px] truncate">{{ src.notes }}</td>
+            <td class="px-5 py-3 text-(--color-text-muted) text-xs max-w-[250px] truncate">{{ src.notes }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -920,7 +920,7 @@
 </div>
 {% endif %}
 
-<div class="!my-6 border-t border-[var(--color-border)]/30"></div>
+<div class="!my-6 border-t border-(--color-border)/30"></div>
 
 {# ═══════════════════════════════════════════════════════════════════════ #}
 {# ═══ OEM Firmware Scraper ═══ #}
@@ -940,7 +940,7 @@
 {% if pending_jobs %}
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in border border-amber-500/30"
      x-data="{ selectedJobs: [], toggleAll: false }" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between">
+  <div class="px-5 py-4 border-b border-(--color-border) flex items-center justify-between">
     <h2 class="text-base font-semibold text-amber-400">
       <i data-lucide="alert-circle" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
       Pending Approval ({{ stats.pending_review }})
@@ -970,7 +970,7 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-5 py-3 text-left font-medium w-10">
             <input type="checkbox" class="rounded"
                    @change="toggleAll = $event.target.checked;
@@ -983,19 +983,19 @@
           <th class="px-5 py-3 text-center font-medium">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for job in pending_jobs %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
           <td class="px-5 py-3">
             <input type="checkbox" class="rounded" value="{{ job.id }}"
                    @change="$event.target.checked ? selectedJobs.push({{ job.id }}) : selectedJobs = selectedJobs.filter(id => id !== {{ job.id }})">
           </td>
-          <td class="px-5 py-3 font-mono text-xs text-[var(--color-text-muted)]">#{{ job.id }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-secondary)]">{{ job.run__config__source__name|default:"—" }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)] truncate max-w-[300px]">
+          <td class="px-5 py-3 font-mono text-xs text-(--color-text-muted)">#{{ job.id }}</td>
+          <td class="px-5 py-3 text-(--color-text-secondary)">{{ job.run__config__source__name|default:"—" }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted) truncate max-w-[300px]">
             <code class="text-xs">{{ job.raw_data|truncatechars:120 }}</code>
           </td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ job.created_at|date:"M d, H:i" }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted)">{{ job.created_at|date:"M d, H:i" }}</td>
           <td class="px-5 py-3 text-center">
             <div class="flex items-center justify-center gap-1">
               <form method="post" class="inline">
@@ -1029,8 +1029,8 @@
 {# ═══ OEM Sources Table ═══ #}
 <div class="glass rounded-xl overflow-hidden mb-6 animate-in"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)]">
-    <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+  <div class="px-5 py-4 border-b border-(--color-border)">
+    <h2 class="text-base font-semibold text-(--color-text-primary)">
       <i data-lucide="satellite-dish" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
       OEM Sources
     </h2>
@@ -1038,7 +1038,7 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-5 py-3 text-left font-medium">Name</th>
           <th class="px-5 py-3 text-left font-medium">Brand</th>
           <th class="px-5 py-3 text-left font-medium">Auth</th>
@@ -1047,11 +1047,11 @@
           <th class="px-5 py-3 text-center font-medium">Action</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for src in sources %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
-          <td class="px-5 py-3 font-medium text-[var(--color-text-primary)]">{{ src.name }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-secondary)]">{{ src.brand__name|default:"—" }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
+          <td class="px-5 py-3 font-medium text-(--color-text-primary)">{{ src.name }}</td>
+          <td class="px-5 py-3 text-(--color-text-secondary)">{{ src.brand__name|default:"—" }}</td>
           <td class="px-5 py-3">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
               {% if src.auth_type == 'none' %}bg-gray-500/15 text-gray-400
@@ -1060,7 +1060,7 @@
               {{ src.auth_type }}
             </span>
           </td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)] truncate max-w-[200px]">{{ src.base_url }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted) truncate max-w-[200px]">{{ src.base_url }}</td>
           <td class="px-5 py-3 text-center">
             {% if src.is_active %}
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -1073,7 +1073,7 @@
               {% csrf_token %}
               <input type="hidden" name="action" value="toggle">
               <input type="hidden" name="source_id" value="{{ src.id }}">
-              <button type="submit" class="text-xs px-2 py-1 rounded bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-accent)]/20 text-[var(--color-text-secondary)] transition-colors">
+              <button type="submit" class="text-xs px-2 py-1 rounded bg-(--color-bg-tertiary) hover:bg-accent/20 text-(--color-text-secondary) transition-colors">
                 {% if src.is_active %}Disable{% else %}Enable{% endif %}
               </button>
             </form>
@@ -1081,7 +1081,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="px-5 py-12 text-center text-[var(--color-text-muted)]">
+          <td colspan="6" class="px-5 py-12 text-center text-(--color-text-muted)">
             <i data-lucide="satellite-dish" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
             <p>No OEM sources configured</p>
           </td>
@@ -1095,8 +1095,8 @@
 {# ═══ Recent Scraper Runs ═══ #}
 <div class="glass rounded-xl overflow-hidden animate-in"
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="px-5 py-4 border-b border-[var(--color-border)]">
-    <h2 class="text-base font-semibold text-[var(--color-text-primary)]">
+  <div class="px-5 py-4 border-b border-(--color-border)">
+    <h2 class="text-base font-semibold text-(--color-text-primary)">
       <i data-lucide="history" class="w-4 h-4 inline-block mr-1 opacity-60"></i>
       Recent Runs
     </h2>
@@ -1104,7 +1104,7 @@
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)] text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border) text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-5 py-3 text-left font-medium">Source</th>
           <th class="px-5 py-3 text-left font-medium">Status</th>
           <th class="px-5 py-3 text-right font-medium">Found</th>
@@ -1113,10 +1113,10 @@
           <th class="px-5 py-3 text-left font-medium">Finished</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for run in recent_runs %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)] transition-colors">
-          <td class="px-5 py-3 font-medium text-[var(--color-text-primary)]">{{ run.config__source__name|default:"—" }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary) transition-colors">
+          <td class="px-5 py-3 font-medium text-(--color-text-primary)">{{ run.config__source__name|default:"—" }}</td>
           <td class="px-5 py-3">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
               {% if run.status == 'success' %}bg-emerald-500/15 text-emerald-400
@@ -1127,14 +1127,14 @@
               {{ run.status }}
             </span>
           </td>
-          <td class="px-5 py-3 text-right text-[var(--color-text-secondary)]">{{ run.items_found|default:"0" }}</td>
-          <td class="px-5 py-3 text-right text-[var(--color-text-secondary)]">{{ run.items_ingested|default:"0" }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ run.started_at|date:"M d, H:i"|default:"—" }}</td>
-          <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ run.finished_at|date:"M d, H:i"|default:"—" }}</td>
+          <td class="px-5 py-3 text-right text-(--color-text-secondary)">{{ run.items_found|default:"0" }}</td>
+          <td class="px-5 py-3 text-right text-(--color-text-secondary)">{{ run.items_ingested|default:"0" }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted)">{{ run.started_at|date:"M d, H:i"|default:"—" }}</td>
+          <td class="px-5 py-3 text-(--color-text-muted)">{{ run.finished_at|date:"M d, H:i"|default:"—" }}</td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="px-5 py-12 text-center text-[var(--color-text-muted)]">
+          <td colspan="6" class="px-5 py-12 text-center text-(--color-text-muted)">
             <i data-lucide="play" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
             <p>No scraper runs recorded</p>
           </td>

@@ -9,7 +9,7 @@
 <div class="mb-6">
   <h1 class="text-3xl font-bold">{{ brand.name }} {{ model.name }}</h1>
   {% include "components/_breadcrumb.html" with label="Models" %}
-  <p class="text-[var(--color-text-secondary)] mt-2">{{ total_firmwares }} firmwares available</p>
+  <p class="text-(--color-text-secondary) mt-2">{{ total_firmwares }} firmwares available</p>
 </div>
 {% endblock %}
 
@@ -17,9 +17,9 @@
 {# Variants #}
 {% if variants %}
 <div class="flex flex-wrap gap-2 mb-6">
-  <span class="text-sm font-medium text-[var(--color-text-secondary)]">Variants:</span>
+  <span class="text-sm font-medium text-(--color-text-secondary)">Variants:</span>
   {% for variant in variants %}
-  <span class="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs">{{ variant.name }}</span>
+  <span class="rounded-full border border-(--color-border) px-3 py-1 text-xs">{{ variant.name }}</span>
   {% endfor %}
 </div>
 {% endif %}
@@ -28,16 +28,16 @@
 {% if firmware_types %}
 <div class="flex flex-wrap gap-2 mb-6">
   {% for ft in firmware_types %}
-  <span class="rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] px-3 py-1 text-xs font-medium">{{ ft|title }}</span>
+  <span class="rounded-full bg-accent/10 text-(--color-accent) px-3 py-1 text-xs font-medium">{{ ft|title }}</span>
   {% endfor %}
 </div>
 {% endif %}
 
 {# Firmware Table #}
 {% if firmwares %}
-<div class="overflow-x-auto rounded-lg border border-[var(--color-border)]">
+<div class="overflow-x-auto rounded-lg border border-(--color-border)">
   <table class="w-full text-sm">
-    <thead class="bg-[var(--color-bg-secondary)]">
+    <thead class="bg-(--color-bg-secondary)">
       <tr>
         <th class="text-left px-4 py-3 font-medium">File</th>
         <th class="text-left px-4 py-3 font-medium">Type</th>
@@ -47,27 +47,27 @@
         <th class="text-right px-4 py-3 font-medium">Action</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-[var(--color-border)]">
+    <tbody class="divide-y divide-(--color-border)">
       {% for fw in firmwares %}
-      <tr class="hover:bg-[var(--color-bg-secondary)]/50 transition">
+      <tr class="hover:bg-(--color-bg-secondary)/50 transition">
         <td class="px-4 py-3">
           <a href="{% url 'firmwares:firmware_detail' firmware_type=fw.firmware_type firmware_id=fw.id %}"
-             class="font-medium hover:text-[var(--color-accent)]">
+             class="font-medium hover:text-(--color-accent)">
             {{ fw.original_file_name|truncatewords:6 }}
           </a>
           {% if fw.variant %}
-          <span class="text-xs text-[var(--color-text-muted)] block">{{ fw.variant.name }}</span>
+          <span class="text-xs text-(--color-text-muted) block">{{ fw.variant.name }}</span>
           {% endif %}
         </td>
         <td class="px-4 py-3">
           {% include "components/_badge.html" with text=fw.firmware_type_display variant="accent" %}
         </td>
-        <td class="px-4 py-3 text-[var(--color-text-secondary)] hidden md:table-cell">{{ fw.chipset|default:"—" }}</td>
-        <td class="px-4 py-3 text-[var(--color-text-secondary)] hidden sm:table-cell">{{ fw.file_size_display|default:"—" }}</td>
-        <td class="px-4 py-3 text-[var(--color-text-secondary)] hidden lg:table-cell">{{ fw.created_at|date:"M d, Y" }}</td>
+        <td class="px-4 py-3 text-(--color-text-secondary) hidden md:table-cell">{{ fw.chipset|default:"—" }}</td>
+        <td class="px-4 py-3 text-(--color-text-secondary) hidden sm:table-cell">{{ fw.file_size_display|default:"—" }}</td>
+        <td class="px-4 py-3 text-(--color-text-secondary) hidden lg:table-cell">{{ fw.created_at|date:"M d, Y" }}</td>
         <td class="px-4 py-3 text-right">
           <a href="{% url 'firmwares:firmware_download' firmware_type=fw.firmware_type firmware_id=fw.id %}"
-             class="inline-flex items-center gap-1 rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-xs text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition">
+             class="inline-flex items-center gap-1 rounded-lg bg-(--color-accent) px-3 py-1.5 text-xs text-(--color-accent-text) hover:bg-(--color-accent-hover) transition">
             <i data-lucide="download" class="w-3 h-3"></i> Download
           </a>
         </td>

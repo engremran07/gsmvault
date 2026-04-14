@@ -178,7 +178,7 @@ class CloudStorageProvider(Timestamped):
         try:
             data = cipher.decrypt(bytes(self._credentials_encrypted))
             return json.loads(data.decode())
-        except Exception:
+        except (ValueError, TypeError):  # decryption or JSON parse failure
             return {}
 
     def set_access_token(self, token: str):
@@ -196,7 +196,7 @@ class CloudStorageProvider(Timestamped):
         cipher = self._get_cipher()
         try:
             return cipher.decrypt(bytes(self._access_token_encrypted)).decode()
-        except Exception:
+        except (ValueError, TypeError):  # decryption failure
             return ""
 
     def set_refresh_token(self, token: str):
@@ -214,7 +214,7 @@ class CloudStorageProvider(Timestamped):
         cipher = self._get_cipher()
         try:
             return cipher.decrypt(bytes(self._refresh_token_encrypted)).decode()
-        except Exception:
+        except (ValueError, TypeError):  # decryption failure
             return ""
 
     def available_space_gb(self):
@@ -532,7 +532,7 @@ class FirmwareStorageLocation(Timestamped):
                 return False
 
         if self.storage_type == "shared_drive" and self.shared_drive:
-            if not self.shared_drive.is_active:
+            if not self.shared_drive.is_active:  # type: ignore[union-attr]
                 return False
 
         return self.consecutive_failures < 5
@@ -548,7 +548,11 @@ class UserDownloadSession(Timestamped):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="storage_download_sessions",
+    )
 
     # Link to firmware storage
     storage_location = models.ForeignKey(
@@ -620,7 +624,7 @@ class UserDownloadSession(Timestamped):
         return self.expires_at - timezone.now()
 
     def __str__(self):  # noqa: DJ012
-        return f"{self.user.username} → {self.storage_location.file_name if self.storage_location else 'N/A'} ({self.status})"
+        return f"{self.user.username} → {self.storage_location.file_name if self.storage_location else 'N/A'} ({self.status})"  # type: ignore[union-attr]
 
 
 class ServiceAccountQuotaLog(models.Model):
@@ -628,7 +632,11 @@ class ServiceAccountQuotaLog(models.Model):
     Daily quota usage analytics per service account
     """
 
-    service_account = models.ForeignKey(ServiceAccount, on_delete=models.CASCADE)
+    service_account = models.ForeignKey(
+        ServiceAccount,
+        on_delete=models.CASCADE,
+        related_name="quota_logs",
+    )
     date = models.DateField()
     total_bytes_transferred = models.BigIntegerField(default=0)
     total_operations = models.IntegerField(default=0)

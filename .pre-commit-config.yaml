@@ -1,82 +1,53 @@
 repos:
-  # Python code formatting with black
-  - repo: https://github.com/psf/black
-    rev: 23.12.1
+  # -------------------------------------------------------------------------
+  # Ruff: lint + format (replaces black, isort, flake8 — DO NOT add those back)
+  # Project uses ruff exclusively. Python 3.12+, line-length 88.
+  # -------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
     hooks:
-      - id: black
-        language_version: python3.10
-        args: ["--line-length=88"]
+      - id: ruff
+        name: ruff lint (--fix)
+        args: ["--fix", "--exit-non-zero-on-fix"]
+        exclude: "migrations/"
+      - id: ruff-format
+        name: ruff format
+        exclude: "migrations/"
 
-  # Import sorting with isort
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: ["--profile", "black", "--line-length=88"]
-
-  # Linting with flake8
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        args: [
-          "--max-line-length=88",
-          "--extend-ignore=E203,E266,E501,W503",
-          "--count",
-          "--statistics",
-        ]
-        additional_dependencies:
-          - flake8-docstrings
-          - flake8-annotations
-          - flake8-bugbear
-
-  # Type checking with mypy
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
-    hooks:
-      - id: mypy
-        args: ["--ignore-missing-imports", "--pretty"]
-        additional_dependencies:
-          - types-all
-          - django-stubs
-
-  # General file checks
+  # -------------------------------------------------------------------------
+  # General file hygiene
+  # -------------------------------------------------------------------------
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
+        exclude: "migrations/"
       - id: end-of-file-fixer
+        exclude: "migrations/"
       - id: check-yaml
-      - id: check-added-large-files
-        args: ["--maxkb=1000"]
+        args: ["--unsafe"]
       - id: check-json
       - id: check-merge-conflict
       - id: detect-private-key
       - id: mixed-line-ending
+        args: ["--fix=lf"]
       - id: debug-statements
+      - id: check-added-large-files
+        args: ["--maxkb=2048"]
+      - id: check-case-conflict
+      - id: check-toml
 
-  # Security checks with bandit
+  # -------------------------------------------------------------------------
+  # Security: bandit static analysis (OWASP Top 10 patterns)
+  # -------------------------------------------------------------------------
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
+    rev: 1.8.3
     hooks:
       - id: bandit
-        args: ["-c", ".bandit"]
-        exclude: tests/
-
-  # YAML formatting
-  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.11.0
-    hooks:
-      - id: pretty-format-yaml
-        args: ["--autofix", "--indent", "2"]
-
-  # Docstring checks
-  - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        args: ["--convention=google"]
-        exclude: "migrations/|tests/"
+        name: bandit security scan
+        args: ["-c", "pyproject.toml", "--recursive", "-ll"]
+        exclude: "(tests/|conftest\\.py|scripts/|migrations/)"
+        additional_dependencies: ["bandit[toml]"]
 
 # Configuration
 default_language_version:

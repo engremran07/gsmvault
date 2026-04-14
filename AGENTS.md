@@ -548,6 +548,12 @@ pyright apps/
 - Storage credentials in `storage_credentials/` (gitignored)
 - All dissolved apps fully removed — **never reference dissolved app names in imports**
 - For cross-app communication: use `apps.core.events.EventBus` or Django signals — never direct imports between apps
+- Backend and frontend must be shipped in sync for each feature: domain model/service/API changes must include matching template/component/UX wiring in the same delivery window, and frontend behavior changes must be backed by canonical backend contracts
+- For `apps/seo`, `apps/distribution`, and `apps/ads`, upgrades are in-place only: extend existing modules/data flows and update existing templates/components, never introduce parallel "v2/new/refactor" implementations
+- New files are restricted by default: extend canonical files first; create new files only when architecture boundaries or proven split/performance needs require it
+- Reusable components are mandatory when available in `templates/components/`; inline duplication of reusable UI patterns is forbidden
+- Static assets must remain minimal and structured; split large CSS/JS files only when performance or maintainability requires it, otherwise no new static file creation
+- No-regression completion gate: backend/frontend/static/database changes are only complete after quality checks pass and behavioral consistency is verified
 
 ## Database
 
@@ -723,3 +729,25 @@ These are real issues encountered during development. Every agent MUST be aware 
 15. **[DB] Always `select_for_update()` on wallet transactions** — prevents race conditions on credit balance changes.
 16. **[Frontend] Consent form views NEVER return JSON** — `accept_all`, `reject_all`, `accept` always return `HttpResponseRedirect` to `HTTP_REFERER`. Cookie is set on the redirect response. `fetch()` callers follow the redirect automatically and their `.then()` handler fires regardless. This eliminates the entire class of "raw JSON on blank screen" bugs. See `apps/consent/views.py` `_consent_done()` for the canonical pattern. For JSON consent API, use `consent/api/status/` and `consent/api/update/` (separate DRF endpoints).
 17. **[Docs] Every new feature/app MUST be documented** in `README.md`, `AGENTS.md`, and `.github/copilot-instructions.md` before the task is considered complete.
+18. **[Static] New static files are not the default solution** — extend existing static modules first; split only when measurable file-size/lag complexity warrants it.
+19. **[Enterprise] Preserve operational guardrails** — keep performance budgets, observability, rollback readiness, and backward-compatible rollout patterns in scope for significant changes.
+
+---
+
+## Governance System
+
+The platform uses a comprehensive AI governance system for automated code quality enforcement.
+
+| Component | Location | Count |
+| --- | --- | --- |
+| Rules | `.claude/rules/` | 58 |
+| Hooks | `.claude/hooks/` | 36 |
+| Commands | `.claude/commands/` | 50 |
+| Agents | `.github/agents/` | 44+ |
+| Skills | `.github/skills/` | 27+ |
+
+See [`GOVERNANCE.md`](GOVERNANCE.md) for full documentation.
+See [`BREAKAGE_CHAINS.md`](BREAKAGE_CHAINS.md) for coupling chain analysis.
+See [`AUDIT_CHECKLIST.md`](AUDIT_CHECKLIST.md) for post-implementation verification.
+See [`DEPLOYMENT_CHECKLIST.md`](DEPLOYMENT_CHECKLIST.md) for pre-deploy checks.
+See [`SECURITY_POLICY.md`](SECURITY_POLICY.md) for security reporting procedures.

@@ -4,8 +4,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Subscriptions</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Subscriptions</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p>
   </div>
 </div>
 {% endblock %}
@@ -15,18 +15,18 @@
 {% include "components/_admin_search.html" with placeholder="Search by user email or username..." value=search %}
 
 <div class="flex gap-2 mb-6 flex-wrap">
-  <a href="?q={{ search }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if not status_filter %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">All</a>
+  <a href="?q={{ search }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if not status_filter %}bg-accent/10 text-(--color-accent) border border-accent/30{% else %}text-(--color-text-muted) hover:bg-(--color-bg-secondary) border border-(--color-border)/30{% endif %}">All</a>
   {% for val, label in status_choices %}
-  <a href="?q={{ search }}&status={{ val }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == val %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">{{ label }}</a>
+  <a href="?q={{ search }}&status={{ val }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == val %}bg-accent/10 text-(--color-accent) border border-accent/30{% else %}text-(--color-text-muted) hover:bg-(--color-bg-secondary) border border-(--color-border)/30{% endif %}">{{ label }}</a>
   {% endfor %}
 </div>
 
-<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] overflow-hidden">
+<div class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) overflow-hidden">
   {% if subscriptions %}
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)]/50 text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border)/50 text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-6 py-3 text-left">User</th>
           <th class="px-6 py-3 text-left">Plan</th>
           <th class="px-6 py-3 text-left">Status</th>
@@ -34,11 +34,11 @@
           <th class="px-6 py-3 text-left">Expires</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]/20">
+      <tbody class="divide-y divide-(--color-border)/20">
         {% for sub in subscriptions %}
-        <tr class="hover:bg-[var(--color-bg-primary)]/50 transition">
-          <td class="px-6 py-3 text-[var(--color-text-primary)]">{{ sub.user.email|default:sub.user.username }}</td>
-          <td class="px-6 py-3 text-[var(--color-text-secondary)]">{{ sub.plan.name }}</td>
+        <tr class="hover:bg-(--color-bg-primary)/50 transition">
+          <td class="px-6 py-3 text-(--color-text-primary)">{{ sub.user.email|default:sub.user.username }}</td>
+          <td class="px-6 py-3 text-(--color-text-secondary)">{{ sub.plan.name }}</td>
           <td class="px-6 py-3">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold
               {% if sub.status == 'active' %}bg-emerald-500/15 text-emerald-400
@@ -49,8 +49,8 @@
               {{ sub.get_status_display }}
             </span>
           </td>
-          <td class="px-6 py-3 text-[var(--color-text-muted)]">{{ sub.started_at|date:"M d, Y" }}</td>
-          <td class="px-6 py-3 text-[var(--color-text-muted)]">{{ sub.expires_at|date:"M d, Y"|default:"—" }}</td>
+          <td class="px-6 py-3 text-(--color-text-muted)">{{ sub.started_at|date:"M d, Y" }}</td>
+          <td class="px-6 py-3 text-(--color-text-muted)">{{ sub.expires_at|date:"M d, Y"|default:"—" }}</td>
         </tr>
         {% endfor %}
       </tbody>

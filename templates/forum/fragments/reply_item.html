@@ -1,24 +1,24 @@
 {# templates/forum/fragments/reply_item.html — Single reply card #}
-<div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5"
+<div class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5"
      id="reply-{{ reply.pk }}"
      data-reply-num="{{ forloop.counter|default:'0' }}">
   <div class="flex items-start gap-4">
     {# Avatar placeholder #}
-    <div class="w-10 h-10 rounded-full bg-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
-      <span class="text-[var(--color-accent)] font-bold text-sm">{{ reply.user.username|first|upper }}</span>
+    <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+      <span class="text-(--color-accent) font-bold text-sm">{{ reply.user.username|first|upper }}</span>
     </div>
 
     <div class="flex-1 min-w-0">
       {# Header #}
       <div class="flex items-center gap-2 mb-2">
         <a href="{% url 'forum:user_topics' pk=reply.user.pk %}"
-           class="font-medium text-[var(--color-accent)] hover:underline">{{ reply.user.username }}</a>
-        <span class="text-xs text-[var(--color-text-secondary)]">{{ reply.created_at|timesince }} ago</span>
+           class="font-medium text-(--color-accent) hover:underline">{{ reply.user.username }}</a>
+        <span class="text-xs text-(--color-text-secondary)">{{ reply.created_at|timesince }} ago</span>
         {% if reply.is_modified %}
         <a href="{% url 'forum:reply_history' pk=reply.pk %}"
            hx-get="{% url 'forum:reply_history' pk=reply.pk %}"
            hx-target="#history-{{ reply.pk }}"
-           class="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">
+           class="text-xs text-(--color-text-secondary) hover:text-(--color-accent)">
           edited {{ reply.modified_count }}x
         </a>
         {% endif %}
@@ -33,7 +33,7 @@
 
       {# Content #}
       {% if reply.action == 0 %}
-      <div class="prose prose-invert max-w-none text-[var(--color-text-primary)] text-sm leading-relaxed">
+      <div class="prose prose-invert max-w-none text-(--color-text-primary) text-sm leading-relaxed">
         {{ reply.content_html|safe }}
       </div>
       {% endif %}
@@ -49,7 +49,7 @@
           {% include "forum/fragments/like_button.html" with user_liked=reply.user_liked|default:False %}
         </div>
         {% else %}
-        <span class="flex items-center gap-1 text-[var(--color-text-secondary)]">
+        <span class="flex items-center gap-1 text-(--color-text-secondary)">
           <i data-lucide="heart" class="w-4 h-4"></i> {{ reply.likes_count }}
         </span>
         {% endif %}
@@ -59,7 +59,7 @@
         <a hx-get="{% url 'forum:reply_edit' pk=reply.pk %}"
            hx-target="#reply-{{ reply.pk }}"
            hx-swap="innerHTML"
-           class="flex items-center gap-1 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] cursor-pointer">
+           class="flex items-center gap-1 text-(--color-text-secondary) hover:text-(--color-accent) cursor-pointer">
           <i data-lucide="pencil" class="w-4 h-4"></i> Edit
         </a>
         {% endif %}
@@ -73,7 +73,7 @@
           <input type="hidden" name="reason" value="spam">
           <button @click.prevent="if(confirming) $el.closest('form').requestSubmit(); else confirming = true; setTimeout(() => confirming = false, 3000)"
                   type="submit"
-                  class="flex items-center gap-1 text-[var(--color-text-secondary)] hover:text-red-400 cursor-pointer">
+                  class="flex items-center gap-1 text-(--color-text-secondary) hover:text-red-400 cursor-pointer">
             <i data-lucide="flag" class="w-4 h-4"></i>
             <span x-text="confirming ? 'Confirm?' : 'Flag'"></span>
           </button>
@@ -83,7 +83,7 @@
         {# Staff: remove #}
         {% if user.is_staff and reply.action == 0 %}
         <form method="post" action="{% url 'forum:reply_remove' pk=reply.pk %}">{% csrf_token %}
-          <button class="flex items-center gap-1 text-[var(--color-text-secondary)] hover:text-red-400">
+          <button class="flex items-center gap-1 text-(--color-text-secondary) hover:text-red-400">
             <i data-lucide="trash-2" class="w-4 h-4"></i> Remove
           </button>
         </form>
@@ -94,7 +94,7 @@
         {% if topic.user == user or user.is_staff %}
         {% if not best_answer or best_answer.reply_id != reply.pk %}
         <form method="post" action="{% url 'forum:mark_solution' reply_pk=reply.pk %}">{% csrf_token %}
-          <button class="flex items-center gap-1 text-[var(--color-text-secondary)] hover:text-green-400">
+          <button class="flex items-center gap-1 text-(--color-text-secondary) hover:text-green-400">
             <i data-lucide="check-circle-2" class="w-4 h-4"></i> Solution
           </button>
         </form>

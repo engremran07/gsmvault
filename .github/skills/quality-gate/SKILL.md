@@ -128,6 +128,18 @@ When reading or editing any template or view, verify these rules:
 - [ ] No inline `onclick`/`onsubmit` handlers — use Alpine.js `@click`/`@submit` instead
 - [ ] All conditional Alpine.js elements have `x-cloak` to prevent FOUC
 
+### Backend/Frontend Synchronization
+
+- [ ] Backend contract changes (models/services/views/api/urls) that affect UX have matching template/component updates
+- [ ] Frontend behavior changes map to canonical backend contracts (no duplicated client-only business logic)
+- [ ] For `apps/seo`, `apps/distribution`, and `apps/ads`, enhancements are in-place and do not create parallel "v2/new/refactor" modules
+
+### Static Asset Governance
+
+- [ ] New static files are avoided unless there is a proven split/performance need
+- [ ] Existing static modules are extended before introducing additional files
+- [ ] CSS/JS assets remain within performance budgets; oversized files are split into cohesive modules
+
 ## Model Registration Checks
 
 When reading any app's `models.py`, `admin.py`, or `apps.py`, verify:
@@ -303,3 +315,5 @@ Run this checklist after any template, CSS, or JavaScript change. These are the 
 6. When reading any file, apply **Audit-on-Read** checks and fix or flag issues
 7. When touching templates, apply **Template Validation** checks
 8. When touching models/admin, apply **Model Registration Checks**
+9. Block completion when backend/frontend synchronization checks fail
+10. Block completion when static-asset minimization and regression checks fail

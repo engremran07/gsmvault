@@ -43,6 +43,18 @@ Call `get_errors()` — must return "No errors found."
 & .\.venv\Scripts\python.exe -m pytest --cov=apps --cov-report=term-missing
 ```
 
+### 6. Backend/Frontend Sync Check
+
+- Confirm every backend contract change (models/services/views/api/urls) has matching template/component/UX wiring where user-facing behavior is affected.
+- Confirm every frontend behavior change is backed by canonical backend contracts (no frontend-only forks of business logic).
+- In `apps/seo`, `apps/distribution`, and `apps/ads`, reject any parallel "v2/new/refactor" implementations and require in-place extension.
+
+### 7. Static Governance + Regression Check
+
+- Block unnecessary new static files; require extension of canonical static modules first.
+- Enforce practical asset size budgets and split oversized CSS/JS into coherent modules.
+- Confirm no behavioral regressions across backend contracts, UI wiring, and persisted data assumptions.
+
 ## Common Fix Patterns
 
 | Issue | Fix Pattern |
@@ -66,3 +78,5 @@ Call `get_errors()` — must return "No errors found."
 3. `# noqa: F401` only for deliberate re-exports in `__init__.py`
 4. Run ALL checks, not just one
 5. Zero tolerance — if any check fails, fix before proceeding
+6. Block completion when backend/frontend contract sync is incomplete
+7. Block completion when static governance or regression checks fail

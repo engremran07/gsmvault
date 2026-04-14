@@ -17,7 +17,7 @@ from __future__ import annotations
 import logging
 import re
 from datetime import timedelta
-from typing import Any
+from typing import Any, cast
 
 from allauth.account.forms import LoginForm, SignupForm
 from allauth.account.views import LoginView, SignupView
@@ -59,6 +59,70 @@ def profile(request: HttpRequest) -> HttpResponse:
     """
     Display the authenticated user's profile.
     """
+    # Gamification data
+    gamification_data: dict[str, Any] = {}
+    uid = cast(int, request.user.pk)  # @login_required guarantees authenticated user
+    try:
+        from apps.gamification.services import get_current_level, get_total_xp
+
+        total_xp = get_total_xp(uid)
+        current_level = get_current_level(uid)
+        gamification_data["total_xp"] = total_xp
+        gamification_data["level"] = current_level
+    except Exception:  # noqa: S110
+        pass
+    try:
+        from apps.gamification.models import Badge, Streak, UserBadge
+
+        user_badges = (
+            UserBadge.objects.filter(user=request.user)
+            .select_related("badge")
+            .order_by("-earned_at")[:10]
+        )
+        gamification_data["badges"] = user_badges
+        gamification_data["badge_count"] = user_badges.count()
+        gamification_data["total_badges"] = Badge.objects.filter(is_active=True).count()
+        streak = Streak.objects.filter(user=request.user).first()
+        gamification_data["streak"] = streak
+    except Exception:  # noqa: S110
+        pass
+
+    # Referral stats
+    referral_stats: dict[str, int] = {"clicks": 0, "conversions": 0}
+    user_referral_code = ""
+    try:
+        from apps.referral.models import ReferralCode
+
+        rc = ReferralCode.objects.filter(user=request.user, is_active=True).first()
+        if rc:
+            user_referral_code = rc.code
+            referral_stats = {"clicks": rc.clicks, "conversions": rc.conversions}
+    except Exception:  # noqa: S110
+        pass
+
+    # Bounty stats
+    bounty_stats: dict[str, int] = {"created": 0, "fulfilled": 0}
+    try:
+        from apps.bounty.models import BountyRequest, BountySubmission
+
+        bounty_stats["created"] = BountyRequest.objects.filter(
+            user=request.user
+        ).count()
+        bounty_stats["fulfilled"] = BountySubmission.objects.filter(
+            user=request.user, status="accepted"
+        ).count()
+    except Exception:  # noqa: S110
+        pass
+
+    # Reputation
+    reputation_obj = None
+    try:
+        from apps.user_profile.models import Reputation
+
+        reputation_obj = Reputation.objects.filter(user=request.user).first()
+    except Exception:  # noqa: S110
+        pass
+
     context: dict[str, Any] = {
         "user": request.user,
         "notifications": Notification.objects.filter(recipient=request.user).order_by(
@@ -67,6 +131,11 @@ def profile(request: HttpRequest) -> HttpResponse:
         "announcements": Announcement.objects.filter(is_active=True).order_by(
             "-created_at"
         )[:5],
+        "gamification": gamification_data,
+        "referral_code": user_referral_code,
+        "referral_stats": referral_stats,
+        "bounty_stats": bounty_stats,
+        "reputation": reputation_obj,
     }
     return render(request, "users/profile.html", context)
 
@@ -1109,6 +1178,62 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
         except Exception:  # noqa: S110
             pass
 
+    # Gamification data for dashboard
+    gamification_data: dict[str, Any] = {}
+    dash_uid = cast(
+        int, request.user.pk
+    )  # @login_required guarantees authenticated user
+    try:
+        from apps.gamification.services import get_current_level, get_total_xp
+
+        total_xp = get_total_xp(dash_uid)
+        current_level = get_current_level(dash_uid)
+        gamification_data["total_xp"] = total_xp
+        gamification_data["level"] = current_level
+    except Exception:  # noqa: S110
+        pass
+    try:
+        from apps.gamification.models import Streak, UserBadge
+
+        recent_badges = (
+            UserBadge.objects.filter(user=request.user)
+            .select_related("badge")
+            .order_by("-earned_at")[:5]
+        )
+        gamification_data["recent_badges"] = recent_badges
+        gamification_data["badge_count"] = UserBadge.objects.filter(
+            user=request.user
+        ).count()
+        streak = Streak.objects.filter(user=request.user).first()
+        gamification_data["streak"] = streak
+    except Exception:  # noqa: S110
+        pass
+
+    # Bounty stats for dashboard
+    bounty_stats: dict[str, int] = {"created": 0, "fulfilled": 0}
+    try:
+        from apps.bounty.models import BountyRequest, BountySubmission
+
+        bounty_stats["created"] = BountyRequest.objects.filter(
+            user=request.user
+        ).count()
+        bounty_stats["fulfilled"] = BountySubmission.objects.filter(
+            user=request.user, status="accepted"
+        ).count()
+    except Exception:  # noqa: S110
+        pass
+
+    # Download stats
+    download_count = 0
+    try:
+        from apps.firmwares.models import DownloadSession
+
+        download_count = DownloadSession.objects.filter(
+            user=request.user, status="completed"
+        ).count()
+    except Exception:  # noqa: S110
+        pass
+
     context = {
         "site_settings": s,
         "announcements": announcements,
@@ -1126,6 +1251,9 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
         "can_watch_ad": bool(s.get("recaptcha_enabled", False)),
         "can_pay": bool(s.get("enable_payments", True)),
         "current_device": current_device,
+        "gamification": gamification_data,
+        "bounty_stats": bounty_stats,
+        "download_count": download_count,
         "stats": {
             "posts_count": posts_count,
             "comments_count": comments_count,
@@ -1304,6 +1432,44 @@ def profile_view(request: HttpRequest) -> HttpResponse:
     except Exception:  # noqa: S110
         pass
 
+    # Gamification data
+    gamification_data: dict[str, Any] = {
+        "total_xp": 0,
+        "level": None,
+        "badges": [],
+        "badge_count": 0,
+        "total_badges": 0,
+        "streak": 0,
+    }
+    try:
+        from apps.gamification.models import Badge, UserBadge
+        from apps.gamification.services import get_current_level, get_total_xp
+
+        gamification_data["total_xp"] = get_total_xp(user.pk)
+        gamification_data["level"] = get_current_level(user.pk)
+        user_badges = (
+            UserBadge.objects.filter(user=user)
+            .select_related("badge")
+            .order_by("-earned_at")[:6]
+        )
+        gamification_data["badges"] = list(user_badges)
+        gamification_data["badge_count"] = UserBadge.objects.filter(user=user).count()
+        gamification_data["total_badges"] = Badge.objects.filter(is_active=True).count()
+    except Exception:  # noqa: S110
+        pass
+
+    # Bounty stats
+    bounty_stats: dict[str, int] = {"created": 0, "fulfilled": 0}
+    try:
+        from apps.bounty.models import BountyRequest, BountySubmission
+
+        bounty_stats["created"] = BountyRequest.objects.filter(user=user).count()
+        bounty_stats["fulfilled"] = BountySubmission.objects.filter(
+            user=user, status="accepted"
+        ).count()
+    except Exception:  # noqa: S110
+        pass
+
     return render(
         request,
         "users/profile.html",
@@ -1325,6 +1491,8 @@ def profile_view(request: HttpRequest) -> HttpResponse:
             "download_sessions": download_sessions,
             "download_stats": download_stats,
             "active_subscription": active_subscription,
+            "gamification": gamification_data,
+            "bounty_stats": bounty_stats,
             "site_settings": s,
         },
     )

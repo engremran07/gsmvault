@@ -1,0 +1,91 @@
+{# templates/tags/manage.html — Staff tag management #}
+{% extends "layouts/default.html" %}
+
+{% block title %}Manage Tags{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+  {% include "components/_section_header.html" with title="Tag Management" subtitle="Curate, merge, and organize tags" icon="tags" %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    {# Top Tags by Usage #}
+    <section>
+      <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+        <i data-lucide="trending-up" class="w-5 h-5 text-(--color-accent)"></i>
+        Top Tags ({{ top_tags|length }})
+      </h2>
+      {% if top_tags %}
+      <div class="rounded-lg border border-(--color-border) bg-(--color-surface) divide-y divide-(--color-border)">
+        {% for tag in top_tags %}
+        <div class="p-3 flex items-center justify-between hover:bg-(--color-surface-hover) transition-colors">
+          <div class="flex items-center gap-2">
+            <a href="{% url 'tags:tag_detail' tag.slug %}" class="font-medium text-(--color-accent) hover:underline">{{ tag.name }}</a>
+            {% if tag.is_curated %}
+            <span class="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">Curated</span>
+            {% endif %}
+          </div>
+          <span class="text-sm text-(--color-text-muted)">{{ tag.usage_count }} uses</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      {% include "components/_empty_state.html" with icon="tag" title="No Tags" description="No active tags found." %}
+      {% endif %}
+    </section>
+
+    {# Curated Tags #}
+    <section>
+      <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+        <i data-lucide="bookmark" class="w-5 h-5 text-(--color-accent)"></i>
+        Curated Tags ({{ curated_tags|length }})
+      </h2>
+      {% if curated_tags %}
+      <div class="rounded-lg border border-(--color-border) bg-(--color-surface) divide-y divide-(--color-border)">
+        {% for tag in curated_tags %}
+        <div class="p-3 flex items-center justify-between hover:bg-(--color-surface-hover) transition-colors">
+          <a href="{% url 'tags:tag_detail' tag.slug %}" class="font-medium text-(--color-accent) hover:underline">{{ tag.name }}</a>
+          <span class="text-sm text-(--color-text-muted)">{{ tag.usage_count }} uses</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      {% include "components/_empty_state.html" with icon="bookmark" title="No Curated Tags" description="No curated tags yet." %}
+      {% endif %}
+    </section>
+  </div>
+
+  {# Merge Tool #}
+  <section class="mt-8">
+    <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+      <i data-lucide="git-merge" class="w-5 h-5 text-(--color-warning)"></i>
+      Merge Tags
+    </h2>
+    <div class="rounded-lg border border-(--color-border) bg-(--color-surface) p-6">
+      <form method="post" action="{% url 'tags:merge_tags' %}"
+            x-data="{ source: '', target: '' }"
+            class="flex flex-col sm:flex-row items-end gap-4">
+        {% csrf_token %}
+        <div class="flex-1 w-full">
+          <label class="block text-sm font-medium text-(--color-text-secondary) mb-1">Source Tag (will be removed)</label>
+          <input type="text" name="source" x-model="source" required
+                 class="w-full px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-(--color-text-primary) focus:ring-2 focus:ring-(--color-accent) focus:border-transparent"
+                 placeholder="e.g. samsung-galaxy">
+        </div>
+        <div class="flex items-center text-(--color-text-muted)">
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </div>
+        <div class="flex-1 w-full">
+          <label class="block text-sm font-medium text-(--color-text-secondary) mb-1">Target Tag (will keep)</label>
+          <input type="text" name="target" x-model="target" required
+                 class="w-full px-3 py-2 rounded-lg border border-(--color-border) bg-(--color-bg) text-(--color-text-primary) focus:ring-2 focus:ring-(--color-accent) focus:border-transparent"
+                 placeholder="e.g. samsung">
+        </div>
+        <button type="submit" :disabled="!source || !target || source === target"
+                class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) hover:bg-(--color-accent-hover) transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+          <i data-lucide="git-merge" class="w-4 h-4 inline-block mr-1"></i> Merge
+        </button>
+      </form>
+    </div>
+  </section>
+</div>
+{% endblock %}

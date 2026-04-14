@@ -1,18 +1,18 @@
 {# templates/forum/fragments/similar_topics.html — Sidebar widget for related topics #}
 {% if similar_topics %}
-<div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-4">
-  <h4 class="font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2 text-sm">
-    <i data-lucide="link" class="w-4 h-4 text-[var(--color-accent)]"></i>
+<div class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-4">
+  <h4 class="font-semibold text-(--color-text-primary) mb-3 flex items-center gap-2 text-sm">
+    <i data-lucide="link" class="w-4 h-4 text-(--color-accent)"></i>
     Similar Topics
   </h4>
   <ul class="space-y-2">
     {% for st in similar_topics %}
     <li>
       <a href="{% url 'forum:topic_detail' pk=st.pk slug=st.slug %}"
-         class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] line-clamp-2">
+         class="text-sm text-(--color-text-secondary) hover:text-(--color-accent) line-clamp-2">
         {{ st.title }}
       </a>
-      <span class="text-xs text-[var(--color-text-secondary)]">{{ st.reply_count }} replies</span>
+      <span class="text-xs text-(--color-text-secondary)">{{ st.reply_count }} replies</span>
     </li>
     {% endfor %}
   </ul>

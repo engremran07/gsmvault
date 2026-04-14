@@ -3,13 +3,13 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight flex items-center gap-2">
-      <i data-lucide="shield-check" class="w-6 h-6 text-[var(--color-accent)]"></i>SEO Audit: {{ type_label }}
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight flex items-center gap-2">
+      <i data-lucide="shield-check" class="w-6 h-6 text-(--color-accent)"></i>SEO Audit: {{ type_label }}
     </h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+    <p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p>
   </div>
   <div class="flex gap-2">
-    <a href="{% url 'admin_suite:seo_audit' %}" class="px-4 py-2 rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] text-xs font-semibold hover:bg-[var(--color-bg-secondary)] transition-all btn-press">
+    <a href="{% url 'admin_suite:seo_audit' %}" class="px-4 py-2 rounded-lg bg-(--color-bg-tertiary) text-(--color-text-secondary) text-xs font-semibold hover:bg-(--color-bg-secondary) transition-all btn-press">
       <i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Back to Dashboard
     </a>
   </div>
@@ -21,10 +21,10 @@
 {% include "components/_admin_search.html" with placeholder="Search by title or slug..." q=q sort=sort dir=dir %}
 
 {# ── Summary bar ──────────────────────────────────────────────── #}
-<div class="flex items-center gap-4 mb-4 text-xs text-[var(--color-text-muted)]">
+<div class="flex items-center gap-4 mb-4 text-xs text-(--color-text-muted)">
   <span>{{ total_results }} items audited</span>
-  <span class="text-[var(--color-border)]">|</span>
-  <span>Sorted by <strong class="text-[var(--color-text-primary)]">{{ sort }}</strong> {{ dir }}</span>
+  <span class="text-(--color-border)">|</span>
+  <span>Sorted by <strong class="text-(--color-text-primary)">{{ sort }}</strong> {{ dir }}</span>
 </div>
 
 {# ── Results Table ────────────────────────────────────────────── #}

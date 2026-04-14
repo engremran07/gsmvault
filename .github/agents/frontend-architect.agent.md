@@ -50,6 +50,11 @@ templates/
 6. CSP nonce on all inline scripts: `nonce="{{ request.csp_nonce }}"`
 7. CSRF token on all forms and HTMX body tag
 8. Mobile-first responsive design
+9. Treat backend contracts as source of truth: frontend behavior and fields must map to existing models/services/APIs, not ad-hoc client-only assumptions
+10. For feature work in `apps/seo`, `apps/distribution`, and `apps/ads`, frontend template/component updates must be delivered together with backend in-place upgrades
+11. Reusable components are mandatory when available in `templates/components/`; avoid inline duplicates
+12. Static files must remain minimal and well-structured; new static files are allowed only for justified split/performance needs
+13. No-regression closure: UI work is incomplete until behavior, accessibility, and quality gate checks remain clean
 
 ## Reference
 

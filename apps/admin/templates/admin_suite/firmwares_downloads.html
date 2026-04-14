@@ -2,8 +2,8 @@
 {% block title %}Download Management — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Download Management</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">Token validation, ad-gate, hotlink protection & download config</p></div>
-  <a href="{% url 'admin_suite:firmwares' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Firmwares</a>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Download Management</h1><p class="mt-1 text-sm text-(--color-text-muted)">Token validation, ad-gate, hotlink protection & download config</p></div>
+  <a href="{% url 'admin_suite:firmwares' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Firmwares</a>
 </div>
 {% endblock %}
 {% block page_content %}
@@ -13,12 +13,12 @@
 
 {# ══════ Tab Navigation ══════ #}
 <div class="glass rounded-xl p-1 mb-6 flex gap-1 overflow-x-auto animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <button @click="activeTab = 'overview'" :class="activeTab === 'overview' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5 inline mr-1"></i>Overview</button>
-  <button @click="activeTab = 'config'" :class="activeTab === 'config' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="settings" class="w-3.5 h-3.5 inline mr-1"></i>Configuration</button>
-  <button @click="activeTab = 'tokens'" :class="activeTab === 'tokens' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="key" class="w-3.5 h-3.5 inline mr-1"></i>Tokens</button>
-  <button @click="activeTab = 'sessions'" :class="activeTab === 'sessions' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="download" class="w-3.5 h-3.5 inline mr-1"></i>Sessions</button>
-  <button @click="activeTab = 'hotlinks'" :class="activeTab === 'hotlinks' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="shield-ban" class="w-3.5 h-3.5 inline mr-1"></i>Hotlink Blocks</button>
-  <button @click="activeTab = 'adgate'" :class="activeTab === 'adgate' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="tv" class="w-3.5 h-3.5 inline mr-1"></i>Ad Gate Logs</button>
+  <button @click="activeTab = 'overview'" :class="activeTab === 'overview' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5 inline mr-1"></i>Overview</button>
+  <button @click="activeTab = 'config'" :class="activeTab === 'config' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="settings" class="w-3.5 h-3.5 inline mr-1"></i>Configuration</button>
+  <button @click="activeTab = 'tokens'" :class="activeTab === 'tokens' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="key" class="w-3.5 h-3.5 inline mr-1"></i>Tokens</button>
+  <button @click="activeTab = 'sessions'" :class="activeTab === 'sessions' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="download" class="w-3.5 h-3.5 inline mr-1"></i>Sessions</button>
+  <button @click="activeTab = 'hotlinks'" :class="activeTab === 'hotlinks' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="shield-ban" class="w-3.5 h-3.5 inline mr-1"></i>Hotlink Blocks</button>
+  <button @click="activeTab = 'adgate'" :class="activeTab === 'adgate' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all btn-press"><i data-lucide="tv" class="w-3.5 h-3.5 inline mr-1"></i>Ad Gate Logs</button>
 </div>
 
 {# ══════ Overview Tab ══════ #}
@@ -39,22 +39,22 @@
   {# Quick status cards #}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="glass rounded-xl p-5">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3"><i data-lucide="shield-check" class="w-4 h-4 inline mr-1 text-[var(--color-accent)]"></i>Protection Status</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-3"><i data-lucide="shield-check" class="w-4 h-4 inline mr-1 text-(--color-accent)"></i>Protection Status</h3>
       <div class="space-y-2 text-sm">
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Download Gate</span><span class="{% if config.gate_enabled %}text-emerald-400{% else %}text-red-400{% endif %} font-medium">{% if config.gate_enabled %}Enabled{% else %}Disabled{% endif %}</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Ad Gate</span><span class="{% if config.ad_gate_enabled %}text-emerald-400{% else %}text-amber-400{% endif %} font-medium">{% if config.ad_gate_enabled %}Active{% else %}Inactive{% endif %}</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Hotlink Protection</span><span class="{% if config.hotlink_protection %}text-emerald-400{% else %}text-red-400{% endif %} font-medium">{% if config.hotlink_protection %}On{% else %}Off{% endif %}</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Link Encryption</span><span class="{% if config.link_encryption %}text-emerald-400{% else %}text-red-400{% endif %} font-medium">{% if config.link_encryption %}On{% else %}Off{% endif %}</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Login Required</span><span class="{% if config.require_login %}text-amber-400{% else %}text-[var(--color-text-secondary)]{% endif %} font-medium">{% if config.require_login %}Yes{% else %}No{% endif %}</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Download Gate</span><span class="{% if config.gate_enabled %}text-emerald-400{% else %}text-red-400{% endif %} font-medium">{% if config.gate_enabled %}Enabled{% else %}Disabled{% endif %}</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Ad Gate</span><span class="{% if config.ad_gate_enabled %}text-emerald-400{% else %}text-amber-400{% endif %} font-medium">{% if config.ad_gate_enabled %}Active{% else %}Inactive{% endif %}</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Hotlink Protection</span><span class="{% if config.hotlink_protection %}text-emerald-400{% else %}text-red-400{% endif %} font-medium">{% if config.hotlink_protection %}On{% else %}Off{% endif %}</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Link Encryption</span><span class="{% if config.link_encryption %}text-emerald-400{% else %}text-red-400{% endif %} font-medium">{% if config.link_encryption %}On{% else %}Off{% endif %}</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Login Required</span><span class="{% if config.require_login %}text-amber-400{% else %}text-(--color-text-secondary){% endif %} font-medium">{% if config.require_login %}Yes{% else %}No{% endif %}</span></div>
       </div>
     </div>
     <div class="glass rounded-xl p-5">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3"><i data-lucide="clock" class="w-4 h-4 inline mr-1 text-[var(--color-accent)]"></i>Timing Configuration</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-3"><i data-lucide="clock" class="w-4 h-4 inline mr-1 text-(--color-accent)"></i>Timing Configuration</h3>
       <div class="space-y-2 text-sm">
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Countdown Delay</span><span class="text-[var(--color-text-primary)] font-medium">{{ config.countdown_seconds|default:"10" }}s</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Ad Gate Duration</span><span class="text-[var(--color-text-primary)] font-medium">{{ config.ad_gate_seconds|default:"30" }}s</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Token Expiry</span><span class="text-[var(--color-text-primary)] font-medium">{{ config.token_expiry_minutes|default:"30" }} min</span></div>
-        <div class="flex justify-between"><span class="text-[var(--color-text-muted)]">Daily Limit</span><span class="text-[var(--color-text-primary)] font-medium">{% if config.max_per_day %}{{ config.max_per_day }}{% else %}Unlimited{% endif %}</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Countdown Delay</span><span class="text-(--color-text-primary) font-medium">{{ config.countdown_seconds|default:"10" }}s</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Ad Gate Duration</span><span class="text-(--color-text-primary) font-medium">{{ config.ad_gate_seconds|default:"30" }}s</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Token Expiry</span><span class="text-(--color-text-primary) font-medium">{{ config.token_expiry_minutes|default:"30" }} min</span></div>
+        <div class="flex justify-between"><span class="text-(--color-text-muted)">Daily Limit</span><span class="text-(--color-text-primary) font-medium">{% if config.max_per_day %}{{ config.max_per_day }}{% else %}Unlimited{% endif %}</span></div>
       </div>
     </div>
   </div>
@@ -66,60 +66,60 @@
     {% csrf_token %}
     <input type="hidden" name="action" value="save_config">
 
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)]"><i data-lucide="settings" class="w-4 h-4 inline mr-1 text-[var(--color-accent)]"></i>Download Gate Settings</h3>
+    <h3 class="text-sm font-semibold text-(--color-text-primary)"><i data-lucide="settings" class="w-4 h-4 inline mr-1 text-(--color-accent)"></i>Download Gate Settings</h3>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       {# Toggle switches #}
       <div class="space-y-4">
-        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Enable Download Gate</span><p class="text-xs text-[var(--color-text-muted)]">Require countdown + token for all downloads</p></div>
-          <input type="checkbox" name="gate_enabled" {% if config.gate_enabled %}checked{% endif %} class="w-4 h-4 accent-[var(--color-accent)]">
+        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <div><span class="text-sm font-medium text-(--color-text-primary)">Enable Download Gate</span><p class="text-xs text-(--color-text-muted)">Require countdown + token for all downloads</p></div>
+          <input type="checkbox" name="gate_enabled" {% if config.gate_enabled %}checked{% endif %} class="w-4 h-4" style="accent-color: var(--color-accent);">
         </label>
-        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Enable Ad Gate</span><p class="text-xs text-[var(--color-text-muted)]">Require ad viewing before download</p></div>
-          <input type="checkbox" name="ad_gate_enabled" {% if config.ad_gate_enabled %}checked{% endif %} class="w-4 h-4 accent-[var(--color-accent)]">
+        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <div><span class="text-sm font-medium text-(--color-text-primary)">Enable Ad Gate</span><p class="text-xs text-(--color-text-muted)">Require ad viewing before download</p></div>
+          <input type="checkbox" name="ad_gate_enabled" {% if config.ad_gate_enabled %}checked{% endif %} class="w-4 h-4" style="accent-color: var(--color-accent);">
         </label>
-        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Require Login</span><p class="text-xs text-[var(--color-text-muted)]">Users must be logged in to download</p></div>
-          <input type="checkbox" name="require_login" {% if config.require_login %}checked{% endif %} class="w-4 h-4 accent-[var(--color-accent)]">
+        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <div><span class="text-sm font-medium text-(--color-text-primary)">Require Login</span><p class="text-xs text-(--color-text-muted)">Users must be logged in to download</p></div>
+          <input type="checkbox" name="require_login" {% if config.require_login %}checked{% endif %} class="w-4 h-4" style="accent-color: var(--color-accent);">
         </label>
-        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Hotlink Protection</span><p class="text-xs text-[var(--color-text-muted)]">Block direct linking from external sites</p></div>
-          <input type="checkbox" name="hotlink_protection" {% if config.hotlink_protection %}checked{% endif %} class="w-4 h-4 accent-[var(--color-accent)]">
+        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <div><span class="text-sm font-medium text-(--color-text-primary)">Hotlink Protection</span><p class="text-xs text-(--color-text-muted)">Block direct linking from external sites</p></div>
+          <input type="checkbox" name="hotlink_protection" {% if config.hotlink_protection %}checked{% endif %} class="w-4 h-4" style="accent-color: var(--color-accent);">
         </label>
-        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Link Encryption</span><p class="text-xs text-[var(--color-text-muted)]">Use signed tokens instead of direct URLs</p></div>
-          <input type="checkbox" name="link_encryption" {% if config.link_encryption %}checked{% endif %} class="w-4 h-4 accent-[var(--color-accent)]">
+        <label class="flex items-center justify-between gap-3 p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <div><span class="text-sm font-medium text-(--color-text-primary)">Link Encryption</span><p class="text-xs text-(--color-text-muted)">Use signed tokens instead of direct URLs</p></div>
+          <input type="checkbox" name="link_encryption" {% if config.link_encryption %}checked{% endif %} class="w-4 h-4" style="accent-color: var(--color-accent);">
         </label>
       </div>
 
       {# Numeric inputs #}
       <div class="space-y-4">
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Countdown Seconds</label>
-          <p class="text-xs text-[var(--color-text-muted)] mb-2">Timer before download link appears (0 = instant)</p>
-          <input type="number" name="countdown_seconds" value="{{ config.countdown_seconds|default:'10' }}" min="0" max="120" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <label class="block text-sm font-medium text-(--color-text-primary) mb-1">Countdown Seconds</label>
+          <p class="text-xs text-(--color-text-muted) mb-2">Timer before download link appears (0 = instant)</p>
+          <input type="number" name="countdown_seconds" value="{{ config.countdown_seconds|default:'10' }}" min="0" max="120" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
         </div>
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Ad Gate Seconds</label>
-          <p class="text-xs text-[var(--color-text-muted)] mb-2">Duration user must watch ad (5–300)</p>
-          <input type="number" name="ad_gate_seconds" value="{{ config.ad_gate_seconds|default:'30' }}" min="5" max="300" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <label class="block text-sm font-medium text-(--color-text-primary) mb-1">Ad Gate Seconds</label>
+          <p class="text-xs text-(--color-text-muted) mb-2">Duration user must watch ad (5–300)</p>
+          <input type="number" name="ad_gate_seconds" value="{{ config.ad_gate_seconds|default:'30' }}" min="5" max="300" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
         </div>
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Token Expiry (minutes)</label>
-          <p class="text-xs text-[var(--color-text-muted)] mb-2">Time before download token expires (1–1440)</p>
-          <input type="number" name="token_expiry_minutes" value="{{ config.token_expiry_minutes|default:'30' }}" min="1" max="1440" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <label class="block text-sm font-medium text-(--color-text-primary) mb-1">Token Expiry (minutes)</label>
+          <p class="text-xs text-(--color-text-muted) mb-2">Time before download token expires (1–1440)</p>
+          <input type="number" name="token_expiry_minutes" value="{{ config.token_expiry_minutes|default:'30' }}" min="1" max="1440" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
         </div>
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/20">
-          <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Max Downloads Per Day</label>
-          <p class="text-xs text-[var(--color-text-muted)] mb-2">Per user daily limit (0 = unlimited)</p>
-          <input type="number" name="max_per_day" value="{{ config.max_per_day|default:'0' }}" min="0" max="10000" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-primary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent)]">
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/20">
+          <label class="block text-sm font-medium text-(--color-text-primary) mb-1">Max Downloads Per Day</label>
+          <p class="text-xs text-(--color-text-muted) mb-2">Per user daily limit (0 = unlimited)</p>
+          <input type="number" name="max_per_day" value="{{ config.max_per_day|default:'0' }}" min="0" max="10000" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-primary) border border-(--color-border)/30 text-sm text-(--color-text-primary) focus:outline-none focus:border-(--color-accent)">
         </div>
       </div>
     </div>
 
     <div class="flex justify-end pt-2">
-      <button type="submit" class="px-6 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all"><i data-lucide="save" class="w-3.5 h-3.5 inline mr-1"></i>Save Configuration</button>
+      <button type="submit" class="px-6 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all"><i data-lucide="save" class="w-3.5 h-3.5 inline mr-1"></i>Save Configuration</button>
     </div>
   </form>
 </div>
@@ -128,8 +128,8 @@
 <div x-show="activeTab === 'tokens'" x-cloak x-transition>
   <div class="flex items-center justify-between mb-4">
     <div class="glass rounded-xl p-3 flex items-center gap-2 flex-1 mr-3">
-      <i data-lucide="search" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
-      <form method="get" class="flex-1"><input type="hidden" name="tab" value="tokens"><input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search tokens…" class="w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none"></form>
+      <i data-lucide="search" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
+      <form method="get" class="flex-1"><input type="hidden" name="tab" value="tokens"><input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search tokens…" class="w-full bg-transparent text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none"></form>
     </div>
     <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="action" value="expire_stale">
       <button type="submit" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-amber-400 hover:bg-amber-500/10 btn-press transition-all"><i data-lucide="clock" class="w-3.5 h-3.5 inline mr-1"></i>Expire Stale</button>
@@ -138,22 +138,22 @@
 
   <div class="glass rounded-xl overflow-hidden">
     <table class="w-full text-sm">
-      <thead><tr class="border-b border-[var(--color-border)]/20">
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Token</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">User</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Ad Gate</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Created</th>
-        <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+      <thead><tr class="border-b border-(--color-border)/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Token</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">User</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Ad Gate</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Created</th>
+        <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
       </tr></thead>
-      <tbody class="divide-y divide-[var(--color-border)]/10">
+      <tbody class="divide-y divide-(--color-border)/10">
         {% for t in tokens %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ t.token|truncatechars:20 }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ t.user.email|default:"Anonymous"|truncatechars:25 }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 font-mono text-xs text-(--color-text-primary)">{{ t.token|truncatechars:20 }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ t.user.email|default:"Anonymous"|truncatechars:25 }}</td>
           <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if t.status == 'active' %}bg-emerald-500/10 text-emerald-400{% elif t.status == 'used' %}bg-blue-500/10 text-blue-400{% elif t.status == 'expired' %}bg-amber-500/10 text-amber-400{% else %}bg-red-500/10 text-red-400{% endif %}">{{ t.get_status_display }}</span></td>
-          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if t.ad_gate_completed %}bg-emerald-500/10 text-emerald-400{% elif t.ad_gate_required %}bg-amber-500/10 text-amber-400{% else %}bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]{% endif %}">{% if t.ad_gate_completed %}Done{% elif t.ad_gate_required %}Pending{% else %}N/A{% endif %}</span></td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ t.created_at|timesince }} ago</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if t.ad_gate_completed %}bg-emerald-500/10 text-emerald-400{% elif t.ad_gate_required %}bg-amber-500/10 text-amber-400{% else %}bg-(--color-bg-tertiary) text-(--color-text-muted){% endif %}">{% if t.ad_gate_completed %}Done{% elif t.ad_gate_required %}Pending{% else %}N/A{% endif %}</span></td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ t.created_at|timesince }} ago</td>
           <td class="py-3 px-4 text-right">
             {% if t.status == 'active' %}
             <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="action" value="revoke_token"><input type="hidden" name="token_id" value="{{ t.pk }}">
@@ -163,16 +163,16 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">No download tokens found</td></tr>
+        <tr><td colspan="6" class="py-8 text-center text-(--color-text-muted)">No download tokens found</td></tr>
         {% endfor %}
       </tbody>
     </table>
     {% if tokens_page and tokens_page.has_other_pages %}
-    <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-      <span class="text-xs text-[var(--color-text-muted)]">Page {{ tokens_page.number }} of {{ tokens_page.paginator.num_pages }}</span>
+    <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+      <span class="text-xs text-(--color-text-muted)">Page {{ tokens_page.number }} of {{ tokens_page.paginator.num_pages }}</span>
       <div class="flex items-center gap-1">
-        {% if tokens_page.has_previous %}<a href="?tab=tokens&page={{ tokens_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-        {% if tokens_page.has_next %}<a href="?tab=tokens&page={{ tokens_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+        {% if tokens_page.has_previous %}<a href="?tab=tokens&page={{ tokens_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+        {% if tokens_page.has_next %}<a href="?tab=tokens&page={{ tokens_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
       </div>
     </div>
     {% endif %}
@@ -183,35 +183,35 @@
 <div x-show="activeTab === 'sessions'" x-cloak x-transition>
   <div class="glass rounded-xl overflow-hidden">
     <table class="w-full text-sm">
-      <thead><tr class="border-b border-[var(--color-border)]/20">
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">ID</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">User</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">IP</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Bytes</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Started</th>
+      <thead><tr class="border-b border-(--color-border)/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">ID</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">User</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">IP</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Bytes</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Started</th>
       </tr></thead>
-      <tbody class="divide-y divide-[var(--color-border)]/10">
+      <tbody class="divide-y divide-(--color-border)/10">
         {% for s in sessions %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 text-xs font-mono text-[var(--color-text-primary)]">#{{ s.pk }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ s.user.email|default:"Anonymous"|truncatechars:25 }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 text-xs font-mono text-(--color-text-primary)">#{{ s.pk }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ s.user.email|default:"Anonymous"|truncatechars:25 }}</td>
           <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if s.status == 'completed' %}bg-emerald-500/10 text-emerald-400{% elif s.status == 'started' %}bg-blue-500/10 text-blue-400{% elif s.status == 'failed' %}bg-red-500/10 text-red-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{{ s.get_status_display }}</span></td>
-          <td class="py-3 px-4 text-xs font-mono text-[var(--color-text-muted)]">{{ s.ip|default:"-" }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ s.bytes_delivered|filesizeformat }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ s.started_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs font-mono text-(--color-text-muted)">{{ s.ip|default:"-" }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ s.bytes_delivered|filesizeformat }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ s.started_at|timesince }} ago</td>
         </tr>
         {% empty %}
-        <tr><td colspan="6" class="py-8 text-center text-[var(--color-text-muted)]">No download sessions found</td></tr>
+        <tr><td colspan="6" class="py-8 text-center text-(--color-text-muted)">No download sessions found</td></tr>
         {% endfor %}
       </tbody>
     </table>
     {% if sessions_page and sessions_page.has_other_pages %}
-    <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-      <span class="text-xs text-[var(--color-text-muted)]">Page {{ sessions_page.number }} of {{ sessions_page.paginator.num_pages }}</span>
+    <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+      <span class="text-xs text-(--color-text-muted)">Page {{ sessions_page.number }} of {{ sessions_page.paginator.num_pages }}</span>
       <div class="flex items-center gap-1">
-        {% if sessions_page.has_previous %}<a href="?tab=sessions&page={{ sessions_page.previous_page_number }}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-        {% if sessions_page.has_next %}<a href="?tab=sessions&page={{ sessions_page.next_page_number }}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+        {% if sessions_page.has_previous %}<a href="?tab=sessions&page={{ sessions_page.previous_page_number }}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+        {% if sessions_page.has_next %}<a href="?tab=sessions&page={{ sessions_page.next_page_number }}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
       </div>
     </div>
     {% endif %}
@@ -223,47 +223,47 @@
   <div x-data="{ showAddBlock: false }">
     <div class="flex items-center justify-between mb-4">
       <div class="glass rounded-xl p-3 flex items-center gap-2 flex-1 mr-3">
-        <i data-lucide="search" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
-        <form method="get" class="flex-1"><input type="hidden" name="tab" value="hotlinks"><input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search domains…" class="w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none"></form>
+        <i data-lucide="search" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
+        <form method="get" class="flex-1"><input type="hidden" name="tab" value="hotlinks"><input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search domains…" class="w-full bg-transparent text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none"></form>
       </div>
-      <button type="button" @click="showAddBlock = !showAddBlock" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all"><i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Block</button>
+      <button type="button" @click="showAddBlock = !showAddBlock" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all"><i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Block</button>
     </div>
 
     <div x-show="showAddBlock" x-cloak x-transition class="glass rounded-xl p-5 mb-6">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Block Domain</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-3">Block Domain</h3>
       <form method="post" class="flex items-end gap-3 flex-wrap">
         {% csrf_token %}
         <input type="hidden" name="action" value="add_hotlink_block">
         <div class="flex-1 min-w-[200px]">
-          <label class="block text-xs text-[var(--color-text-muted)] mb-1">Domain</label>
-          <input type="text" name="domain" required maxlength="253" placeholder="e.g. example.com" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label class="block text-xs text-(--color-text-muted) mb-1">Domain</label>
+          <input type="text" name="domain" required maxlength="253" placeholder="e.g. example.com" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
         <div class="flex-1 min-w-[200px]">
-          <label class="block text-xs text-[var(--color-text-muted)] mb-1">Reason (optional)</label>
-          <input type="text" name="reason" maxlength="500" placeholder="Why block this domain?" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)]/30 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]">
+          <label class="block text-xs text-(--color-text-muted) mb-1">Reason (optional)</label>
+          <input type="text" name="reason" maxlength="500" placeholder="Why block this domain?" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border)/30 text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:border-(--color-accent)">
         </div>
-        <button type="submit" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold shadow btn-press transition-all"><i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>Block</button>
-        <button type="button" @click="showAddBlock = false" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] btn-press transition-all">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold shadow btn-press transition-all"><i data-lucide="check" class="w-3.5 h-3.5 inline mr-1"></i>Block</button>
+        <button type="button" @click="showAddBlock = false" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-muted) hover:text-(--color-text-primary) btn-press transition-all">Cancel</button>
       </form>
     </div>
   </div>
 
   <div class="glass rounded-xl overflow-hidden">
     <table class="w-full text-sm">
-      <thead><tr class="border-b border-[var(--color-border)]/20">
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Domain</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Reason</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-        <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Blocked</th>
-        <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+      <thead><tr class="border-b border-(--color-border)/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Domain</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Reason</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+        <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Blocked</th>
+        <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
       </tr></thead>
-      <tbody class="divide-y divide-[var(--color-border)]/10">
+      <tbody class="divide-y divide-(--color-border)/10">
         {% for h in hotlinks %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ h.domain }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ h.reason|default:"-"|truncatechars:50 }}</td>
-          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if h.is_active %}bg-red-500/10 text-red-400{% else %}bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]{% endif %}">{% if h.is_active %}Active{% else %}Inactive{% endif %}</span></td>
-          <td class="py-3 px-4 text-right text-xs font-bold text-[var(--color-text-primary)]">{{ h.blocked_count }}</td>
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 font-mono text-xs text-(--color-text-primary)">{{ h.domain }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ h.reason|default:"-"|truncatechars:50 }}</td>
+          <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if h.is_active %}bg-red-500/10 text-red-400{% else %}bg-(--color-bg-tertiary) text-(--color-text-muted){% endif %}">{% if h.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+          <td class="py-3 px-4 text-right text-xs font-bold text-(--color-text-primary)">{{ h.blocked_count }}</td>
           <td class="py-3 px-4 text-right">
             <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="action" value="delete_hotlink"><input type="hidden" name="block_id" value="{{ h.pk }}">
               <button type="submit" class="px-2 py-1 rounded text-[10px] font-semibold text-red-400 hover:bg-red-500/10 transition-colors">Remove</button>
@@ -271,7 +271,7 @@
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]">No hotlink blocks configured</td></tr>
+        <tr><td colspan="5" class="py-8 text-center text-(--color-text-muted)">No hotlink blocks configured</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -282,37 +282,37 @@
 <div x-show="activeTab === 'adgate'" x-cloak x-transition>
   <div class="glass rounded-xl overflow-hidden">
     <table class="w-full text-sm">
-      <thead><tr class="border-b border-[var(--color-border)]/20">
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Session</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Ad Type</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Network</th>
-        <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Watched</th>
-        <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Required</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Time</th>
+      <thead><tr class="border-b border-(--color-border)/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Session</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Ad Type</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Network</th>
+        <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Watched</th>
+        <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Required</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Time</th>
       </tr></thead>
-      <tbody class="divide-y divide-[var(--color-border)]/10">
+      <tbody class="divide-y divide-(--color-border)/10">
         {% for a in adgate_logs %}
-        <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-          <td class="py-3 px-4 text-xs font-mono text-[var(--color-text-primary)]">#{{ a.session_id }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ a.get_ad_type_display }}</td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-secondary)]">{{ a.ad_network|default:"-" }}</td>
-          <td class="py-3 px-4 text-right text-xs text-[var(--color-text-primary)]">{{ a.watched_seconds }}s</td>
-          <td class="py-3 px-4 text-right text-xs text-[var(--color-text-muted)]">{{ a.required_seconds }}s</td>
+        <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+          <td class="py-3 px-4 text-xs font-mono text-(--color-text-primary)">#{{ a.session_id }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ a.get_ad_type_display }}</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ a.ad_network|default:"-" }}</td>
+          <td class="py-3 px-4 text-right text-xs text-(--color-text-primary)">{{ a.watched_seconds }}s</td>
+          <td class="py-3 px-4 text-right text-xs text-(--color-text-muted)">{{ a.required_seconds }}s</td>
           <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if a.completed %}bg-emerald-500/10 text-emerald-400{% else %}bg-red-500/10 text-red-400{% endif %}">{% if a.completed %}Complete{% else %}Incomplete{% endif %}</span></td>
-          <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ a.created_at|timesince }} ago</td>
+          <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ a.created_at|timesince }} ago</td>
         </tr>
         {% empty %}
-        <tr><td colspan="7" class="py-8 text-center text-[var(--color-text-muted)]">No ad gate logs yet</td></tr>
+        <tr><td colspan="7" class="py-8 text-center text-(--color-text-muted)">No ad gate logs yet</td></tr>
         {% endfor %}
       </tbody>
     </table>
     {% if adgate_page and adgate_page.has_other_pages %}
-    <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-      <span class="text-xs text-[var(--color-text-muted)]">Page {{ adgate_page.number }} of {{ adgate_page.paginator.num_pages }}</span>
+    <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+      <span class="text-xs text-(--color-text-muted)">Page {{ adgate_page.number }} of {{ adgate_page.paginator.num_pages }}</span>
       <div class="flex items-center gap-1">
-        {% if adgate_page.has_previous %}<a href="?tab=adgate&page={{ adgate_page.previous_page_number }}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-        {% if adgate_page.has_next %}<a href="?tab=adgate&page={{ adgate_page.next_page_number }}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+        {% if adgate_page.has_previous %}<a href="?tab=adgate&page={{ adgate_page.previous_page_number }}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+        {% if adgate_page.has_next %}<a href="?tab=adgate&page={{ adgate_page.next_page_number }}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
       </div>
     </div>
     {% endif %}

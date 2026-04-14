@@ -28,11 +28,11 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
   {# Main Content #}
   <div class="lg:col-span-2 space-y-6">
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
       <div class="flex items-start justify-between mb-4">
         <div>
           <h1 class="text-2xl font-bold">{{ firmware.original_file_name }}</h1>
-          <p class="text-[var(--color-text-secondary)] mt-1">
+          <p class="text-(--color-text-secondary) mt-1">
             {{ firmware.brand.name }} {{ firmware.model.name }}
             {% if firmware.variant %} — {{ firmware.variant.name }}{% endif %}
           </p>
@@ -42,63 +42,63 @@
 
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
         <div>
-          <span class="text-xs text-[var(--color-text-muted)] block">File Size</span>
+          <span class="text-xs text-(--color-text-muted) block">File Size</span>
           <span class="font-medium">{{ file_size_display }}</span>
         </div>
         {% if firmware.chipset %}
         <div>
-          <span class="text-xs text-[var(--color-text-muted)] block">Chipset</span>
+          <span class="text-xs text-(--color-text-muted) block">Chipset</span>
           <span class="font-medium">{{ firmware.chipset }}</span>
         </div>
         {% endif %}
         {% if firmware.android_version %}
         <div>
-          <span class="text-xs text-[var(--color-text-muted)] block">Android</span>
+          <span class="text-xs text-(--color-text-muted) block">Android</span>
           <span class="font-medium">{{ firmware.android_version }}</span>
         </div>
         {% endif %}
         <div>
-          <span class="text-xs text-[var(--color-text-muted)] block">Downloads</span>
+          <span class="text-xs text-(--color-text-muted) block">Downloads</span>
           <span class="font-medium">{{ firmware.download_count|default:0 }}</span>
         </div>
         <div>
-          <span class="text-xs text-[var(--color-text-muted)] block">Views</span>
+          <span class="text-xs text-(--color-text-muted) block">Views</span>
           <span class="font-medium">{{ firmware.view_count|default:0 }}</span>
         </div>
         <div>
-          <span class="text-xs text-[var(--color-text-muted)] block">Uploaded</span>
+          <span class="text-xs text-(--color-text-muted) block">Uploaded</span>
           <span class="font-medium">{{ firmware.created_at|date:"M d, Y" }}</span>
         </div>
       </div>
 
       {% if firmware.description %}
-      <div class="mt-6 pt-6 border-t border-[var(--color-border)]">
+      <div class="mt-6 pt-6 border-t border-(--color-border)">
         <h2 class="font-semibold mb-2">Description</h2>
-        <p class="text-sm text-[var(--color-text-secondary)]">{{ firmware.description }}</p>
+        <p class="text-sm text-(--color-text-secondary)">{{ firmware.description }}</p>
       </div>
       {% endif %}
     </div>
 
     {# Download Button #}
     <a href="{% url 'firmwares:firmware_download' firmware_type=firmware_type firmware_id=firmware.id %}"
-       class="flex items-center justify-center gap-2 w-full rounded-lg bg-[var(--color-accent)] px-6 py-3 text-[var(--color-accent-text)] font-medium text-lg hover:bg-[var(--color-accent-hover)] transition">
+       class="flex items-center justify-center gap-2 w-full rounded-lg bg-(--color-accent) px-6 py-3 text-(--color-accent-text) font-medium text-lg hover:bg-(--color-accent-hover) transition">
       <i data-lucide="download" class="w-5 h-5"></i>
       Download Firmware
     </a>
 
     {% if firmware.md5_hash or firmware.sha256_hash %}
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-4">
       <h3 class="text-sm font-semibold mb-2">Checksums</h3>
       {% if firmware.md5_hash %}
       <div class="mb-2">
-        <span class="text-xs text-[var(--color-text-muted)]">MD5:</span>
-        <code class="text-xs break-all bg-[var(--color-bg-primary)] px-2 py-1 rounded ml-1">{{ firmware.md5_hash }}</code>
+        <span class="text-xs text-(--color-text-muted)">MD5:</span>
+        <code class="text-xs break-all bg-(--color-bg-primary) px-2 py-1 rounded ml-1">{{ firmware.md5_hash }}</code>
       </div>
       {% endif %}
       {% if firmware.sha256_hash %}
       <div>
-        <span class="text-xs text-[var(--color-text-muted)]">SHA-256:</span>
-        <code class="text-xs break-all bg-[var(--color-bg-primary)] px-2 py-1 rounded ml-1">{{ firmware.sha256_hash }}</code>
+        <span class="text-xs text-(--color-text-muted)">SHA-256:</span>
+        <code class="text-xs break-all bg-(--color-bg-primary) px-2 py-1 rounded ml-1">{{ firmware.sha256_hash }}</code>
       </div>
       {% endif %}
     </div>
@@ -108,14 +108,14 @@
   {# Sidebar - Related Firmwares #}
   <div class="lg:col-span-1">
     {% if related_firmwares %}
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-4">
       <h3 class="font-semibold mb-3">Related Firmwares</h3>
       <div class="space-y-3">
         {% for rf in related_firmwares %}
         <a href="{% url 'firmwares:firmware_detail' firmware_type=rf.firmware_type firmware_id=rf.id %}"
-           class="block text-sm hover:text-[var(--color-accent)]">
+           class="block text-sm hover:text-(--color-accent)">
           <p class="font-medium">{{ rf.original_file_name|truncatewords:5 }}</p>
-          <p class="text-xs text-[var(--color-text-muted)]">{{ rf.firmware_type_display }} &middot; {{ rf.created_at|date:"M d" }}</p>
+          <p class="text-xs text-(--color-text-muted)">{{ rf.firmware_type_display }} &middot; {{ rf.created_at|date:"M d" }}</p>
         </a>
         {% endfor %}
       </div>

@@ -84,6 +84,8 @@ class Tag(TimestampedModel, SoftDeleteModel):
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"
         indexes = [
             models.Index(fields=["normalized_name"], name="tag_normalized_idx"),
             models.Index(fields=["slug"], name="tag_slug_idx"),

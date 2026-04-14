@@ -210,6 +210,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "app.middleware.htmx_auth.HtmxAuthExpiryMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "apps.devices.middleware.DeviceEnforcementMiddleware",
     "apps.consent.middleware.ConsentMiddleware",

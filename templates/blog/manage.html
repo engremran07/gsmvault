@@ -6,7 +6,7 @@
 <div class="flex items-center justify-between">
   <h1 class="text-2xl font-bold">Manage Posts</h1>
   {% if allow_user_posts %}
-  <a href="{% url 'blog:post_create' %}" class="rounded-lg bg-[var(--color-accent)] px-5 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition">
+  <a href="{% url 'blog:post_create' %}" class="rounded-lg bg-(--color-accent) px-5 py-2.5 text-(--color-accent-text) font-medium hover:bg-(--color-accent-hover) transition">
     {% include "components/_icon.html" with name="plus" size="16" %}
     New Post
   </a>
@@ -26,9 +26,9 @@
   </h2>
 
   {% if drafts %}
-  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+  <div class="rounded-lg border border-(--color-border) overflow-hidden">
     <table class="w-full text-sm">
-      <thead class="bg-[var(--color-bg-secondary)]">
+      <thead class="bg-(--color-bg-secondary)">
         <tr>
           <th class="px-4 py-3 text-left font-medium">Title</th>
           <th class="px-4 py-3 text-left font-medium">Category</th>
@@ -36,18 +36,18 @@
           <th class="px-4 py-3 text-right font-medium">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for post in drafts %}
-        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+        <tr class="hover:bg-(--color-bg-secondary) transition">
           <td class="px-4 py-3">
-            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="font-medium text-[var(--color-accent)] hover:underline">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="font-medium text-(--color-accent) hover:underline">
               {{ post.title }}
             </a>
           </td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.category|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.updated_at|timesince }} ago</td>
+          <td class="px-4 py-3 text-(--color-text-muted)">{{ post.category|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted)">{{ post.updated_at|timesince }} ago</td>
           <td class="px-4 py-3 text-right">
-            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-[var(--color-accent)] hover:underline text-xs">Edit</a>
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-(--color-accent) hover:underline text-xs">Edit</a>
           </td>
         </tr>
         {% endfor %}
@@ -70,9 +70,9 @@
   </h2>
 
   {% if scheduled %}
-  <div class="rounded-lg border border-[var(--color-border)] overflow-hidden">
+  <div class="rounded-lg border border-(--color-border) overflow-hidden">
     <table class="w-full text-sm">
-      <thead class="bg-[var(--color-bg-secondary)]">
+      <thead class="bg-(--color-bg-secondary)">
         <tr>
           <th class="px-4 py-3 text-left font-medium">Title</th>
           <th class="px-4 py-3 text-left font-medium">Category</th>
@@ -80,18 +80,18 @@
           <th class="px-4 py-3 text-right font-medium">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]">
+      <tbody class="divide-y divide-(--color-border)">
         {% for post in scheduled %}
-        <tr class="hover:bg-[var(--color-bg-secondary)] transition">
+        <tr class="hover:bg-(--color-bg-secondary) transition">
           <td class="px-4 py-3">
-            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="font-medium text-[var(--color-accent)] hover:underline">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="font-medium text-(--color-accent) hover:underline">
               {{ post.title }}
             </a>
           </td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.category|default:"—" }}</td>
-          <td class="px-4 py-3 text-[var(--color-text-muted)]">{{ post.publish_date|date:"M d, Y H:i" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted)">{{ post.category|default:"—" }}</td>
+          <td class="px-4 py-3 text-(--color-text-muted)">{{ post.publish_date|date:"M d, Y H:i" }}</td>
           <td class="px-4 py-3 text-right">
-            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-[var(--color-accent)] hover:underline text-xs">Edit</a>
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="text-(--color-accent) hover:underline text-xs">Edit</a>
           </td>
         </tr>
         {% endfor %}

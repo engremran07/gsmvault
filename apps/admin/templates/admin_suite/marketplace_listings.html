@@ -4,8 +4,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Listings</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Listings</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p>
   </div>
 </div>
 {% endblock %}
@@ -15,18 +15,18 @@
 {% include "components/_admin_search.html" with placeholder="Search listings by title, seller, or description..." value=search %}
 
 <div class="flex gap-2 mb-6 flex-wrap">
-  <a href="?q={{ search }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if not status_filter %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">All</a>
-  <a href="?q={{ search }}&status=active" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == 'active' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">Active</a>
-  <a href="?q={{ search }}&status=inactive" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == 'inactive' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">Inactive</a>
-  <a href="?q={{ search }}&status=featured" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == 'featured' %}bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/30{% else %}text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)] border border-[var(--color-border)]/30{% endif %}">Featured</a>
+  <a href="?q={{ search }}" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if not status_filter %}bg-accent/10 text-(--color-accent) border border-accent/30{% else %}text-(--color-text-muted) hover:bg-(--color-bg-secondary) border border-(--color-border)/30{% endif %}">All</a>
+  <a href="?q={{ search }}&status=active" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == 'active' %}bg-accent/10 text-(--color-accent) border border-accent/30{% else %}text-(--color-text-muted) hover:bg-(--color-bg-secondary) border border-(--color-border)/30{% endif %}">Active</a>
+  <a href="?q={{ search }}&status=inactive" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == 'inactive' %}bg-accent/10 text-(--color-accent) border border-accent/30{% else %}text-(--color-text-muted) hover:bg-(--color-bg-secondary) border border-(--color-border)/30{% endif %}">Inactive</a>
+  <a href="?q={{ search }}&status=featured" class="px-3 py-1.5 rounded-lg text-xs font-medium transition {% if status_filter == 'featured' %}bg-accent/10 text-(--color-accent) border border-accent/30{% else %}text-(--color-text-muted) hover:bg-(--color-bg-secondary) border border-(--color-border)/30{% endif %}">Featured</a>
 </div>
 
-<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] overflow-hidden">
+<div class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) overflow-hidden">
   {% if listings %}
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
       <thead>
-        <tr class="border-b border-[var(--color-border)]/50 text-[var(--color-text-muted)] text-xs uppercase tracking-wider">
+        <tr class="border-b border-(--color-border)/50 text-(--color-text-muted) text-xs uppercase tracking-wider">
           <th class="px-6 py-3 text-left">Title</th>
           <th class="px-6 py-3 text-left">Seller</th>
           <th class="px-6 py-3 text-right">Price</th>
@@ -37,28 +37,28 @@
           <th class="px-6 py-3 text-left">Created</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[var(--color-border)]/20">
+      <tbody class="divide-y divide-(--color-border)/20">
         {% for listing in listings %}
-        <tr class="hover:bg-[var(--color-bg-primary)]/50 transition">
-          <td class="px-6 py-3 text-[var(--color-text-primary)] font-medium max-w-[240px] truncate">{{ listing.title }}</td>
-          <td class="px-6 py-3 text-[var(--color-text-secondary)]">{{ listing.seller.display_name|default:listing.seller.user.username }}</td>
-          <td class="px-6 py-3 text-right tabular-nums text-[var(--color-text-primary)]">
+        <tr class="hover:bg-(--color-bg-primary)/50 transition">
+          <td class="px-6 py-3 text-(--color-text-primary) font-medium max-w-[240px] truncate">{{ listing.title }}</td>
+          <td class="px-6 py-3 text-(--color-text-secondary)">{{ listing.seller.display_name|default:listing.seller.user.username }}</td>
+          <td class="px-6 py-3 text-right tabular-nums text-(--color-text-primary)">
             {% if listing.discount_price %}
-            <span class="line-through text-[var(--color-text-muted)]">${{ listing.price|floatformat:2 }}</span>
+            <span class="line-through text-(--color-text-muted)">${{ listing.price|floatformat:2 }}</span>
             <span class="ml-1">${{ listing.discount_price|floatformat:2 }}</span>
             {% else %}
             ${{ listing.price|floatformat:2 }}
             {% endif %}
           </td>
-          <td class="px-6 py-3 text-right tabular-nums text-[var(--color-text-primary)]">{{ listing.sale_count|intcomma }}</td>
-          <td class="px-6 py-3 text-right tabular-nums text-[var(--color-text-muted)]">{{ listing.view_count|intcomma }}</td>
+          <td class="px-6 py-3 text-right tabular-nums text-(--color-text-primary)">{{ listing.sale_count|intcomma }}</td>
+          <td class="px-6 py-3 text-right tabular-nums text-(--color-text-muted)">{{ listing.view_count|intcomma }}</td>
           <td class="px-6 py-3 text-center">
             {% if listing.featured %}
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400">
               <i data-lucide="star" class="w-3 h-3"></i> Yes
             </span>
             {% else %}
-            <span class="text-[var(--color-text-muted)]">—</span>
+            <span class="text-(--color-text-muted)">—</span>
             {% endif %}
           </td>
           <td class="px-6 py-3 text-center">
@@ -68,7 +68,7 @@
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/15 text-slate-400">Inactive</span>
             {% endif %}
           </td>
-          <td class="px-6 py-3 text-[var(--color-text-muted)]">{{ listing.created_at|date:"M d, Y" }}</td>
+          <td class="px-6 py-3 text-(--color-text-muted)">{{ listing.created_at|date:"M d, Y" }}</td>
         </tr>
         {% endfor %}
       </tbody>

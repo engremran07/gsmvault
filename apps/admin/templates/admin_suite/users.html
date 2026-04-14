@@ -7,8 +7,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Users</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Staff and user activity overview</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Users</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Staff and user activity overview</p>
   </div>
   <div class="flex items-center gap-2 flex-wrap">
     <a href="{% url 'admin_suite:staff_users' %}" class="btn btn-secondary btn-press text-xs">
@@ -27,8 +27,8 @@
 {% block page_content %}
 
 {% if message %}
-<div class="glass rounded-xl p-4 mb-6 border-l-4 border-[var(--color-accent)]">
-  <p class="text-sm text-[var(--color-text-secondary)]">{{ message }}</p>
+<div class="glass rounded-xl p-4 mb-6 border-l-4 border-(--color-accent)">
+  <p class="text-sm text-(--color-text-secondary)">{{ message }}</p>
 </div>
 {% endif %}
 
@@ -42,8 +42,8 @@
     <span x-text="showCreateForm ? 'Cancel' : 'Create User'"></span>
   </button>
   <div x-show="showCreateForm" x-cloak x-transition class="glass rounded-xl p-6 mt-3">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
-      <i data-lucide="user-plus" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>New User
+    <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">
+      <i data-lucide="user-plus" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>New User
     </h3>
     <form method="post" class="space-y-5">
       {% csrf_token %}
@@ -53,32 +53,32 @@
       {# ── Email & Password row ── #}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-xs text-[var(--color-text-muted)] mb-1">Email</label>
+          <label class="block text-xs text-(--color-text-muted) mb-1">Email</label>
           <input type="email" name="email" required placeholder="user@example.com"
-                 class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition">
+                 class="w-full px-3 py-2 rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:ring-2 focus:ring-(--color-accent)/40 focus:border-(--color-accent) transition">
         </div>
         <div>
-          <label class="block text-xs text-[var(--color-text-muted)] mb-1">Password (min 10 characters)</label>
+          <label class="block text-xs text-(--color-text-muted) mb-1">Password (min 10 characters)</label>
           <input type="password" name="password" required minlength="10"
-                 class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition">
+                 class="w-full px-3 py-2 rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) focus:ring-2 focus:ring-(--color-accent)/40 focus:border-(--color-accent) transition">
         </div>
       </div>
 
       {# ── Staff Profile Selector ── #}
       <div>
-        <label class="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+        <label class="block text-xs font-medium text-(--color-text-secondary) mb-2">
           <i data-lucide="shield" class="w-3.5 h-3.5 inline mr-1"></i>Staff Profile
         </label>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           {% for profile in staff_profiles %}
           <label @click="selectedProfile = '{{ profile.value }}'"
                  :class="selectedProfile === '{{ profile.value }}'
-                   ? 'border-[var(--color-accent)] ring-2 ring-[var(--color-accent)]/30 bg-[var(--color-accent)]/5'
-                   : 'border-[var(--color-border)] hover:border-[var(--color-text-muted)]'"
+                   ? 'border-(--color-accent) ring-2 ring-[var(--color-accent)]/30 bg-accent/5'
+                   : 'border-(--color-border) hover:border-(--color-text-muted)'"
                  class="relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200 block">
             {# Checkmark indicator #}
             <div x-show="selectedProfile === '{{ profile.value }}'" x-cloak
-                 class="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--color-accent)] flex items-center justify-center">
+                 class="absolute top-2 right-2 w-5 h-5 rounded-full bg-(--color-accent) flex items-center justify-center">
               <i data-lucide="check" class="w-3 h-3 text-white"></i>
             </div>
             {# Profile header #}
@@ -88,15 +88,15 @@
                 <i data-lucide="{{ profile.icon }}" class="w-4 h-4
                   {% if profile.color == 'gray' %}text-gray-400{% elif profile.color == 'red' %}text-red-400{% elif profile.color == 'blue' %}text-blue-400{% elif profile.color == 'green' %}text-green-400{% elif profile.color == 'amber' %}text-amber-400{% endif %}"></i>
               </div>
-              <span class="text-xs font-semibold text-[var(--color-text-primary)]">{{ profile.label }}</span>
+              <span class="text-xs font-semibold text-(--color-text-primary)">{{ profile.label }}</span>
             </div>
             {# Description #}
-            <p class="text-[10px] text-[var(--color-text-muted)] mb-2 leading-relaxed">{{ profile.description }}</p>
+            <p class="text-[10px] text-(--color-text-muted) mb-2 leading-relaxed">{{ profile.description }}</p>
             {# Permissions list #}
             {% if profile.permissions %}
             <ul class="space-y-1">
               {% for perm in profile.permissions %}
-              <li class="flex items-start gap-1.5 text-[10px] text-[var(--color-text-secondary)] leading-tight">
+              <li class="flex items-start gap-1.5 text-[10px] text-(--color-text-secondary) leading-tight">
                 <i data-lucide="check-circle" class="w-3 h-3 mt-0.5 shrink-0
                   {% if profile.color == 'red' %}text-red-400{% elif profile.color == 'blue' %}text-blue-400{% elif profile.color == 'green' %}text-green-400{% elif profile.color == 'amber' %}text-amber-400{% else %}text-gray-400{% endif %}"></i>
                 {{ perm }}
@@ -104,7 +104,7 @@
               {% endfor %}
             </ul>
             {% else %}
-            <p class="text-[10px] text-[var(--color-text-muted)] italic">No admin permissions</p>
+            <p class="text-[10px] text-(--color-text-muted) italic">No admin permissions</p>
             {% endif %}
           </label>
           {% endfor %}
@@ -116,8 +116,8 @@
         <button type="submit" class="btn btn-primary btn-press text-xs px-5 py-2">
           <i data-lucide="plus" class="w-3.5 h-3.5"></i> Create User
         </button>
-        <span x-show="selectedProfile" x-cloak class="text-[10px] text-[var(--color-text-muted)]">
-          Profile: <strong class="text-[var(--color-text-secondary)]" x-text="selectedProfile || 'Regular User'"></strong>
+        <span x-show="selectedProfile" x-cloak class="text-[10px] text-(--color-text-muted)">
+          Profile: <strong class="text-(--color-text-secondary)" x-text="selectedProfile || 'Regular User'"></strong>
           <template x-if="selectedProfile">
             <span class="text-amber-400 ml-1">(requires superuser)</span>
           </template>
@@ -136,9 +136,9 @@
         <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.total_users }})" x-text="display.toLocaleString()">{{ stats.total_users }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Total Users</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Total Users</p>
   </div>
 
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 1"
@@ -148,9 +148,9 @@
         <i data-lucide="shield-check" class="w-5 h-5 text-violet-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.staff_users }})" x-text="display.toLocaleString()">{{ stats.staff_users }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Staff Members</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Staff Members</p>
   </div>
 
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 2"
@@ -160,9 +160,9 @@
         <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.active_users }})" x-text="display.toLocaleString()">{{ stats.active_users }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Active Users</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Active Users</p>
   </div>
 
   <div class="glass rounded-xl p-5 hover-lift animate-in" style="--stagger: 3"
@@ -172,9 +172,9 @@
         <i data-lucide="link" class="w-5 h-5 text-pink-400"></i>
       </div>
     </div>
-    <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+    <div class="text-2xl font-bold text-(--color-text-primary)"
          x-data="animatedCounter({{ stats.social_users }})" x-text="display.toLocaleString()">{{ stats.social_users }}</div>
-    <p class="text-xs text-[var(--color-text-muted)] mt-1">Social Auth</p>
+    <p class="text-xs text-(--color-text-muted) mt-1">Social Auth</p>
   </div>
 </div>
 
@@ -185,8 +185,8 @@
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Registration Trend</h3>
-        <p class="text-xs text-[var(--color-text-muted)]">New sign-ups — last 7 days</p>
+        <h3 class="text-sm font-semibold text-(--color-text-primary)">Registration Trend</h3>
+        <p class="text-xs text-(--color-text-muted)">New sign-ups — last 7 days</p>
       </div>
       <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
         <i data-lucide="trending-up" class="w-4 h-4 text-blue-400"></i>
@@ -206,8 +206,8 @@
        x-data x-intersect.once="$el.classList.add('animate-in-visible')">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)]">Auth Providers</h3>
-        <p class="text-xs text-[var(--color-text-muted)]">Local vs Social</p>
+        <h3 class="text-sm font-semibold text-(--color-text-primary)">Auth Providers</h3>
+        <p class="text-xs text-(--color-text-muted)">Local vs Social</p>
       </div>
       <div class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
         <i data-lucide="pie-chart" class="w-4 h-4 text-violet-400"></i>
@@ -229,12 +229,12 @@
      x-data x-intersect.once="$el.classList.add('animate-in-visible')">
   <form method="get" class="flex flex-col sm:flex-row gap-3">
     <div class="flex-1 relative">
-      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--color-text-muted)"></i>
       <input type="text" name="q" value="{{ q }}" placeholder="Search by email or ID…"
-             class="w-full pl-10 pr-4 py-2 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition">
+             class="w-full pl-10 pr-4 py-2 rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:ring-2 focus:ring-(--color-accent)/40 focus:border-(--color-accent) transition">
     </div>
     <select name="provider"
-            class="rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] px-3 py-2">
+            class="rounded-lg bg-(--color-bg-secondary) border border-(--color-border) text-sm text-(--color-text-secondary) px-3 py-2">
       <option value="all" {% if provider_filter == 'all' %}selected{% endif %}>All Providers</option>
       <option value="local" {% if provider_filter == 'local' %}selected{% endif %}>Local Only</option>
       <option value="social" {% if provider_filter == 'social' %}selected{% endif %}>Social Auth</option>
@@ -276,11 +276,11 @@
       <template x-for="id in selectedIds" :key="id">
         <input type="hidden" name="selected" :value="id">
       </template>
-      <span class="text-xs text-[var(--color-text-muted)] shrink-0">
-        <span x-text="selectedIds.length" class="font-semibold text-[var(--color-accent)]"></span> selected:
+      <span class="text-xs text-(--color-text-muted) shrink-0">
+        <span x-text="selectedIds.length" class="font-semibold text-(--color-accent)"></span> selected:
       </span>
       <select name="bulk_action" x-model="bulkAction"
-              class="px-3 py-1.5 rounded-lg bg-[var(--color-bg-primary)]/60 border border-[var(--color-border)]/60 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)]/60 focus:outline-none">
+              class="px-3 py-1.5 rounded-lg bg-(--color-bg-primary)/60 border border-(--color-border)/60 text-sm text-(--color-text-primary) focus:border-accent/60 focus:outline-none">
         <option value="">Choose action…</option>
         <option value="activate">Activate</option>
         <option value="deactivate">Deactivate</option>
@@ -289,7 +289,7 @@
       </select>
       <button type="submit" :disabled="!bulkAction"
               class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              :class="bulkAction === 'delete' ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20'">
+              :class="bulkAction === 'delete' ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' : 'bg-accent/10 text-(--color-accent) border border-accent/20 hover:bg-accent/20'">
         Apply
       </button>
     </form>
@@ -300,41 +300,41 @@
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-[var(--color-border)]/40">
+          <tr class="border-b border-(--color-border)/40">
             <th class="py-3 px-4 w-10">
               <input type="checkbox"
                      @change="toggleAll($event.target.checked)"
                      :checked="selectedIds.length === allIds.length && allIds.length > 0"
                      :indeterminate="selectedIds.length > 0 && selectedIds.length < allIds.length"
-                     class="rounded border-[var(--color-border)]">
+                     class="rounded border-(--color-border)">
             </th>
-            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider"><a href="?sort=email&dir={% if sort == 'email' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">User {% if sort == 'email' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider"><a href="?sort=staff&dir={% if sort == 'staff' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Role {% if sort == 'staff' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Status</th>
-            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden md:table-cell"><a href="?sort=joined&dir={% if sort == 'joined' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Joined {% if sort == 'joined' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-            <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider hidden lg:table-cell"><a href="?sort=login&dir={% if sort == 'login' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Last Login {% if sort == 'login' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-            <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Actions</th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider"><a href="?sort=email&dir={% if sort == 'email' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">User {% if sort == 'email' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider"><a href="?sort=staff&dir={% if sort == 'staff' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Role {% if sort == 'staff' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Status</th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden md:table-cell"><a href="?sort=joined&dir={% if sort == 'joined' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Joined {% if sort == 'joined' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+            <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider hidden lg:table-cell"><a href="?sort=login&dir={% if sort == 'login' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Last Login {% if sort == 'login' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+            <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted) uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[var(--color-border)]/20">
+        <tbody class="divide-y divide-(--color-border)/20">
           {% for u in users_page %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors group"
-              :class="isSelected('{{ u.id }}') ? 'bg-[var(--color-accent)]/5' : ''">
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors group"
+              :class="isSelected('{{ u.id }}') ? 'bg-accent/5' : ''">
             <td class="py-3 px-4">
               <input type="checkbox"
                      :checked="isSelected('{{ u.id }}')"
                      @change="toggleUser('{{ u.id }}')"
-                     class="rounded border-[var(--color-border)]">
+                     class="rounded border-(--color-border)">
             </td>
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-[var(--color-accent)]/15 flex items-center justify-center text-xs font-bold text-[var(--color-accent)]">
+                <div class="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-xs font-bold text-(--color-accent)">
                   {{ u.email|first|upper }}
                 </div>
                 <div class="min-w-0">
-                  <p class="text-sm font-medium text-[var(--color-text-primary)] truncate max-w-[180px]">{{ u.email }}</p>
+                  <p class="text-sm font-medium text-(--color-text-primary) truncate max-w-[180px]">{{ u.email }}</p>
                   {% if u.providers %}
-                  <p class="text-[10px] text-[var(--color-text-muted)]">{{ u.providers|join:", " }}</p>
+                  <p class="text-[10px] text-(--color-text-muted)">{{ u.providers|join:", " }}</p>
                   {% endif %}
                 </div>
               </div>
@@ -345,7 +345,7 @@
                 <i data-lucide="shield" class="w-3 h-3"></i> Staff
               </span>
               {% else %}
-              <span class="text-xs text-[var(--color-text-muted)]">User</span>
+              <span class="text-xs text-(--color-text-muted)">User</span>
               {% endif %}
             </td>
             <td class="py-3 px-4">
@@ -359,18 +359,18 @@
               </span>
               {% endif %}
             </td>
-            <td class="py-3 px-4 hidden md:table-cell text-xs text-[var(--color-text-muted)]">{{ u.date_joined|date:"M d, Y" }}</td>
-            <td class="py-3 px-4 hidden lg:table-cell text-xs text-[var(--color-text-muted)]">{{ u.last_login|date:"M d, H:i"|default:"Never" }}</td>
+            <td class="py-3 px-4 hidden md:table-cell text-xs text-(--color-text-muted)">{{ u.date_joined|date:"M d, Y" }}</td>
+            <td class="py-3 px-4 hidden lg:table-cell text-xs text-(--color-text-muted)">{{ u.last_login|date:"M d, H:i"|default:"Never" }}</td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-2">
                 <button @click="toggleExpand('{{ u.id }}')"
-                        class="inline-flex items-center gap-1 text-xs text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+                        class="inline-flex items-center gap-1 text-xs text-(--color-accent) hover:text-(--color-accent-hover) transition-colors">
                   <span x-text="expanded === '{{ u.id }}' ? 'Close' : 'Actions'"></span>
                   <i data-lucide="chevron-down" class="w-3 h-3 transition-transform"
                      :class="expanded === '{{ u.id }}' ? 'rotate-180' : ''"></i>
                 </button>
                 <a href="{% url 'admin_suite:user_detail' u.id %}"
-                   class="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors"
+                   class="text-xs text-(--color-text-muted) hover:text-(--color-accent) transition-colors"
                    title="Full profile">
                   <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                 </a>
@@ -379,7 +379,7 @@
           </tr>
           {# Inline expandable actions row #}
           <tr x-show="expanded === '{{ u.id }}'" x-cloak>
-            <td colspan="7" class="px-4 py-3 bg-[var(--color-bg-tertiary)]/30 border-l-2 border-[var(--color-accent)]/40">
+            <td colspan="7" class="px-4 py-3 bg-(--color-bg-tertiary)/30 border-l-2 border-accent/40">
               <div class="flex flex-wrap items-center gap-2">
                 <form method="post" class="inline">
                   {% csrf_token %}
@@ -402,7 +402,7 @@
                   </button>
                 </form>
                 <a href="{% url 'admin_suite:user_detail' u.id %}"
-                   class="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 btn-press transition-all inline-flex items-center gap-1">
+                   class="px-3 py-1.5 rounded-lg text-xs font-medium bg-accent/10 text-(--color-accent) hover:bg-accent/20 btn-press transition-all inline-flex items-center gap-1">
                   <i data-lucide="eye" class="w-3 h-3"></i> Full Profile
                 </a>
               </div>
@@ -411,8 +411,8 @@
           {% empty %}
           <tr>
             <td colspan="7" class="py-12 text-center">
-              <i data-lucide="users" class="w-10 h-10 text-[var(--color-text-muted)] mx-auto mb-3"></i>
-              <p class="text-sm text-[var(--color-text-muted)]">No users found</p>
+              <i data-lucide="users" class="w-10 h-10 text-(--color-text-muted) mx-auto mb-3"></i>
+              <p class="text-sm text-(--color-text-muted)">No users found</p>
             </td>
           </tr>
           {% endfor %}
@@ -422,8 +422,8 @@
 
     {# Pagination #}
     {% if page_obj and page_obj.has_other_pages %}
-    <div class="flex items-center justify-between p-4 border-t border-[var(--color-border)]/40">
-      <span class="text-xs text-[var(--color-text-muted)]">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div class="flex items-center justify-between p-4 border-t border-(--color-border)/40">
+      <span class="text-xs text-(--color-text-muted)">{{ page_obj.paginator.count }} total &middot; Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
       <div class="flex gap-2">
         {% if page_obj.has_previous %}
         <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}{% if provider_filter and provider_filter != 'all' %}&provider={{ provider_filter }}{% endif %}"

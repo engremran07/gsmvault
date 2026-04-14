@@ -1,32 +1,32 @@
-{# templates/base/_footer.html — Footer #}<footer class="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border)] mt-auto">
+{# templates/base/_footer.html — Footer #}<footer class="bg-(--color-bg-secondary) border-t border-(--color-border) mt-auto">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
       {# Brand #}
       <div>
-        <h3 class="font-bold text-lg mb-3 text-[var(--color-text-primary)]">{{ settings.site_name }}</h3>
-        <p class="text-[var(--color-text-secondary)] text-sm">Enterprise firmware distribution platform. Download official, engineering, and modified firmware files.</p>
+        <h3 class="font-bold text-lg mb-3 text-(--color-text-primary)">{{ settings.site_name }}</h3>
+        <p class="text-(--color-text-secondary) text-sm">Enterprise firmware distribution platform. Download official, engineering, and modified firmware files.</p>
       </div>
       {# Links #}
       <div>
-        <h4 class="font-semibold mb-3 text-[var(--color-text-primary)]">Quick Links</h4>
+        <h4 class="font-semibold mb-3 text-(--color-text-primary)">Quick Links</h4>
         <ul class="space-y-1 text-sm">
-          <li><a href="{% url 'home' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Home</a></li>
-          <li><a href="{% url 'firmwares:library_hub' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Devices</a></li>
-          <li><a href="{% url 'blog:post_list' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Blog</a></li>
-          <li><a href="{% url 'pages:sitemap' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Sitemap</a></li>
+          <li><a href="{% url 'home' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">Home</a></li>
+          <li><a href="{% url 'firmwares:library_hub' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">Devices</a></li>
+          <li><a href="{% url 'blog:post_list' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">Blog</a></li>
+          <li><a href="{% url 'pages:sitemap' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">Sitemap</a></li>
         </ul>
       </div>
       {# Legal #}
       <div>
-        <h4 class="font-semibold mb-3 text-[var(--color-text-primary)]">Legal</h4>
+        <h4 class="font-semibold mb-3 text-(--color-text-primary)">Legal</h4>
         <ul class="space-y-1 text-sm">
-          <li><a href="{% url 'pages:page' slug='about' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">About</a></li>
-          <li><a href="{% url 'pages:page' slug='terms' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Terms</a></li>
-          <li><a href="{% url 'pages:page' slug='privacy' %}" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">Privacy</a></li>
+          <li><a href="{% url 'pages:page' slug='about' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">About</a></li>
+          <li><a href="{% url 'pages:page' slug='terms' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">Terms</a></li>
+          <li><a href="{% url 'pages:page' slug='privacy' %}" class="text-(--color-text-secondary) hover:text-(--color-accent)">Privacy</a></li>
         </ul>
       </div>
     </div>
-    <div class="border-t border-[var(--color-border)] mt-6 pt-6 text-center text-xs text-[var(--color-text-secondary)]">
+    <div class="border-t border-(--color-border) mt-6 pt-6 text-center text-xs text-(--color-text-secondary)">
       &copy; {% now "Y" %} {{ settings.site_name }}. All rights reserved.
     </div>
   </div>

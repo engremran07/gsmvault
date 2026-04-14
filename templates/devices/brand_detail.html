@@ -45,30 +45,30 @@
   {% include "components/_breadcrumb.html" with items=breadcrumb label=brand.name %}
 
   {# ━━━ Brand Header ━━━ #}
-  <div class="bg-[var(--color-bg-secondary)] rounded-2xl border border-[var(--color-border)] p-6 sm:p-8">
+  <div class="bg-(--color-bg-secondary) rounded-2xl border border-(--color-border) p-6 sm:p-8">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
       <div class="shrink-0">
         {% brand_logo_svg brand.name size=80 logo_url=brand.logo_url extra_class="shadow-lg" %}
       </div>
       <div class="flex-1 min-w-0">
-        <h1 class="text-2xl lg:text-3xl font-bold text-[var(--color-text-primary)]">{{ brand.name }}</h1>
+        <h1 class="text-2xl lg:text-3xl font-bold text-(--color-text-primary)">{{ brand.name }}</h1>
         {% if brand.description %}
-        <p class="text-[var(--color-text-secondary)] text-sm mt-2 max-w-2xl">{{ brand.description }}</p>
+        <p class="text-(--color-text-secondary) text-sm mt-2 max-w-2xl">{{ brand.description }}</p>
         {% endif %}
         <div class="flex flex-wrap items-center gap-4 mt-4">
-          <span class="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
-            <i data-lucide="smartphone" class="w-4 h-4 text-[var(--color-accent)]"></i>
-            <strong class="text-[var(--color-text-primary)]">{{ models|length }}</strong> model{{ models|length|pluralize }}
+          <span class="inline-flex items-center gap-1.5 text-sm text-(--color-text-muted)">
+            <i data-lucide="smartphone" class="w-4 h-4 text-(--color-accent)"></i>
+            <strong class="text-(--color-text-primary)">{{ models|length }}</strong> model{{ models|length|pluralize }}
           </span>
           {% if total_firmwares %}
-          <span class="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
+          <span class="inline-flex items-center gap-1.5 text-sm text-(--color-text-muted)">
             <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
-            <strong class="text-[var(--color-text-primary)]">{{ total_firmwares }}</strong> firmware{{ total_firmwares|pluralize }}
+            <strong class="text-(--color-text-primary)">{{ total_firmwares }}</strong> firmware{{ total_firmwares|pluralize }}
           </span>
           {% endif %}
           {% if brand.website_url %}
           <a href="{{ brand.website_url }}" target="_blank" rel="noopener noreferrer"
-             class="inline-flex items-center gap-1 text-xs text-[var(--color-accent)] hover:underline">
+             class="inline-flex items-center gap-1 text-xs text-(--color-accent) hover:underline">
             <i data-lucide="external-link" class="w-3 h-3"></i>Official site
           </a>
           {% endif %}
@@ -81,7 +81,7 @@
   <div class="flex flex-col sm:flex-row gap-3" x-data="{ showFilters: false }" x-cloak>
     {# Search #}
     <div class="flex-1 relative">
-      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"></i>
+      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-(--color-text-muted)"></i>
       <input type="text"
              name="q"
              value="{{ search_query }}"
@@ -92,7 +92,7 @@
              hx-target="#model-grid"
              hx-swap="innerHTML"
              hx-include="[name='sort'],[name='status']"
-             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
+             class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-input) text-sm text-(--color-text-primary) placeholder:text-(--color-text-muted) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition">
     </div>
 
     {# Sort dropdown #}
@@ -103,7 +103,7 @@
             hx-target="#model-grid"
             hx-swap="innerHTML"
             hx-include="[name='q'],[name='status']"
-            class="px-3 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+            class="px-3 py-2.5 rounded-lg border border-(--color-border) bg-(--color-input) text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent)">
       <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest first</option>
       <option value="oldest" {% if sort_by == "oldest" %}selected{% endif %}>Oldest first</option>
       <option value="name" {% if sort_by == "name" %}selected{% endif %}>A → Z</option>
@@ -117,7 +117,7 @@
             hx-target="#model-grid"
             hx-swap="innerHTML"
             hx-include="[name='q'],[name='sort']"
-            class="px-3 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-input)] text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+            class="px-3 py-2.5 rounded-lg border border-(--color-border) bg-(--color-input) text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent)">
       <option value="" {% if not filter_status %}selected{% endif %}>All statuses</option>
       <option value="available" {% if filter_status == "available" %}selected{% endif %}>Available</option>
       <option value="discontinued" {% if filter_status == "discontinued" %}selected{% endif %}>Discontinued</option>
@@ -133,7 +133,7 @@
   {# Back to catalog #}
   <div class="pt-2">
     <a href="{% url 'firmwares:library_hub' %}"
-       class="inline-flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline">
+       class="inline-flex items-center gap-2 text-sm text-(--color-accent) hover:underline">
       <i data-lucide="arrow-left" class="w-4 h-4"></i>
       Back to device catalog
     </a>

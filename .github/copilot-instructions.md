@@ -46,6 +46,11 @@ Enterprise-grade Django 5.2 firmware distribution platform. Django-served fronte
 - No raw SQL — Django ORM exclusively
 - Django reverse FK managers → `# type: ignore[attr-defined]`
 - For cross-app communication: use `apps.core.events.EventBus` or Django signals
+- Backend/frontend delivery is synchronized: backend domain changes and frontend template/component updates must land together
+- In `apps/seo`, `apps/distribution`, and `apps/ads`, evolve existing modules in place only; never create parallel "v2/new/refactor" implementations
+- New files are restricted by default: extend canonical files first; only create new files when architecture boundaries or proven split/performance needs require it
+- Reusable components are mandatory when available in `templates/components/`; avoid inline UI duplication
+- Static files stay minimal and structured; split oversized CSS/JS only when needed for performance/maintainability
 
 ## Critical Gotchas
 
@@ -62,6 +67,8 @@ Enterprise-grade Django 5.2 firmware distribution platform. Django-served fronte
 11. Consent form views NEVER return JSON — always `HttpResponseRedirect` to `HTTP_REFERER`. Cookie set on redirect. For JSON API, use `consent/api/status/` and `consent/api/update/` (separate DRF endpoints). See `apps/consent/views.py` `_consent_done()`.
 12. `requirements.txt` is the single source of truth — every `pip install` must update it, every entry must be used, check `Required-by:` before removing
 13. Every new feature/app MUST be documented in `README.md`, `AGENTS.md`, and this file before the task is considered complete
+14. Do not fork backend or frontend behavior into parallel files for the same feature; extend the canonical implementation in place and keep API/UI contracts aligned
+15. No-regression closure is mandatory — complete tasks only after quality gate checks pass and behavior remains consistent across backend/frontend/static/data layers
 
 ## Key References
 
@@ -71,4 +78,9 @@ Enterprise-grade Django 5.2 firmware distribution platform. Django-served fronte
 | [`MASTER_PLAN.md`](../MASTER_PLAN.md) | Strategy, agent/skill architecture, implementation phases |
 | [`CONTRIBUTING.md`](../CONTRIBUTING.md) | Developer workflow, commit format, PR process |
 | [`README.md`](../README.md) | Public project documentation |
+| [`GOVERNANCE.md`](../GOVERNANCE.md) | AI governance system (rules, hooks, commands) |
+| [`AUDIT_CHECKLIST.md`](../AUDIT_CHECKLIST.md) | Post-implementation verification checklist |
+| [`DEPLOYMENT_CHECKLIST.md`](../DEPLOYMENT_CHECKLIST.md) | Pre-deploy safety checks |
+| [`SECURITY_POLICY.md`](../SECURITY_POLICY.md) | Security reporting procedures |
+| [`BREAKAGE_CHAINS.md`](../BREAKAGE_CHAINS.md) | Coupling chain analysis |
 

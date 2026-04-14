@@ -2,38 +2,38 @@
 <div class="glass rounded-xl overflow-hidden">
   <table class="w-full text-sm">
     <thead>
-      <tr class="border-b border-[var(--color-border)]/20">
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)] w-10">
+      <tr class="border-b border-(--color-border)/20">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted) w-10">
           <a href="?sort=score&dir={% if sort == 'score' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-             class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors"
+             class="flex items-center gap-1 hover:text-(--color-accent) transition-colors"
              hx-get="?sort=score&dir={% if sort == 'score' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
              hx-target="#seo-audit-table" hx-swap="innerHTML" hx-push-url="false">
-            Score {% if sort == 'score' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+            Score {% if sort == 'score' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
           </a>
         </th>
-        <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">
+        <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">
           <a href="?sort=title&dir={% if sort == 'title' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-             class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors"
+             class="flex items-center gap-1 hover:text-(--color-accent) transition-colors"
              hx-get="?sort=title&dir={% if sort == 'title' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}"
              hx-target="#seo-audit-table" hx-swap="innerHTML" hx-push-url="false">
-            Title {% if sort == 'title' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+            Title {% if sort == 'title' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
           </a>
         </th>
-        <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">
+        <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">
           <a href="?sort=errors&dir={% if sort == 'errors' and dir == 'desc' %}asc{% else %}desc{% endif %}{% if q %}&q={{ q }}{% endif %}"
-             class="flex items-center gap-1 justify-center hover:text-[var(--color-accent)] transition-colors"
+             class="flex items-center gap-1 justify-center hover:text-(--color-accent) transition-colors"
              hx-get="?sort=errors&dir={% if sort == 'errors' and dir == 'desc' %}asc{% else %}desc{% endif %}{% if q %}&q={{ q }}{% endif %}"
              hx-target="#seo-audit-table" hx-swap="innerHTML" hx-push-url="false">
-            Errors {% if sort == 'errors' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+            Errors {% if sort == 'errors' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
           </a>
         </th>
-        <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Warnings</th>
-        <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Details</th>
+        <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Warnings</th>
+        <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Details</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-[var(--color-border)]/10">
+    <tbody class="divide-y divide-(--color-border)/10">
       {% for item in results %}
-      <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors group">
+      <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors group">
         <td class="py-3 px-4">
           <span class="inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold
             {% if item.score >= 80 %}bg-emerald-500/10 text-emerald-400
@@ -43,8 +43,8 @@
           </span>
         </td>
         <td class="py-3 px-4">
-          <div class="text-sm font-medium text-[var(--color-text-primary)] truncate max-w-[400px]">{{ item.item_title }}</div>
-          <div class="text-xs text-[var(--color-text-muted)]">{{ item.content_type }} #{{ item.item_id }}</div>
+          <div class="text-sm font-medium text-(--color-text-primary) truncate max-w-[400px]">{{ item.item_title }}</div>
+          <div class="text-xs text-(--color-text-muted)">{{ item.content_type }} #{{ item.item_id }}</div>
         </td>
         <td class="py-3 px-4 text-center">
           {% if item.error_count %}
@@ -57,16 +57,30 @@
           {% if item.warning_count %}
           <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">{{ item.warning_count }}</span>
           {% else %}
-          <span class="text-xs text-[var(--color-text-muted)]">—</span>
+          <span class="text-xs text-(--color-text-muted)">—</span>
           {% endif %}
         </td>
         <td class="py-3 px-4 text-right">
-          <button class="text-xs text-[var(--color-accent)] hover:underline btn-press opacity-0 group-hover:opacity-100 transition-opacity"
-                  hx-get="{% url 'admin_suite:seo_audit_item' content_type=item.content_type item_id=item.item_id %}"
-                  hx-target="#audit-detail-{{ item.content_type }}-{{ item.item_id }}"
-                  hx-swap="innerHTML">
-            <i data-lucide="scan-line" class="w-3.5 h-3.5 inline mr-0.5"></i>Inspect
-          </button>
+          <div class="inline-flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button class="text-xs text-(--color-accent) hover:underline btn-press"
+                    hx-get="{% url 'admin_suite:seo_audit_item' content_type=item.content_type item_id=item.item_id %}"
+                    hx-target="#audit-detail-{{ item.content_type }}-{{ item.item_id }}"
+                    hx-swap="innerHTML">
+              <i data-lucide="scan-line" class="w-3.5 h-3.5 inline mr-0.5"></i>Inspect
+            </button>
+            {% if item.item_url %}
+            <a href="{{ item.item_url }}" target="_blank" rel="noopener"
+               class="text-xs text-(--color-text-muted) hover:text-(--color-accent) transition-colors">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 inline mr-0.5"></i>View
+            </a>
+            {% endif %}
+            {% if item.edit_url %}
+            <a href="{{ item.edit_url }}"
+               class="text-xs text-amber-400 hover:underline btn-press">
+              <i data-lucide="pencil" class="w-3.5 h-3.5 inline mr-0.5"></i>Edit
+            </a>
+            {% endif %}
+          </div>
         </td>
       </tr>
       {# Expandable inline detail row #}
@@ -74,7 +88,7 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="5" class="py-12 text-center text-[var(--color-text-muted)]">
+        <td colspan="5" class="py-12 text-center text-(--color-text-muted)">
           <i data-lucide="check-circle-2" class="w-8 h-8 mx-auto mb-2 opacity-30"></i>
           <p class="text-sm">No items found{% if q %} matching "{{ q }}"{% endif %}.</p>
         </td>
@@ -85,12 +99,12 @@
 
   {# ── Pagination ──────────────────────────────────────────────── #}
   {% if results_page and results_page.has_other_pages %}
-  <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-    <span class="text-xs text-[var(--color-text-muted)]">{{ results_page.paginator.count }} total &middot; Page {{ results_page.number }} of {{ results_page.paginator.num_pages }}</span>
+  <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+    <span class="text-xs text-(--color-text-muted)">{{ results_page.paginator.count }} total &middot; Page {{ results_page.number }} of {{ results_page.paginator.num_pages }}</span>
     <div class="flex items-center gap-1">
       {% if results_page.has_previous %}
       <a href="?page={{ results_page.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
-         class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"
+         class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"
          hx-get="?page={{ results_page.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
          hx-target="#seo-audit-table" hx-swap="innerHTML">
         <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
@@ -98,7 +112,7 @@
       {% endif %}
       {% if results_page.has_next %}
       <a href="?page={{ results_page.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
-         class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"
+         class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"
          hx-get="?page={{ results_page.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}"
          hx-target="#seo-audit-table" hx-swap="innerHTML">
         <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>

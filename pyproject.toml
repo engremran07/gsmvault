@@ -132,9 +132,31 @@ skips = ["B101"]  # Skip assert_used check
 [tool.pylint.messages_control]
 disable = [
     "C0111",  # missing-docstring
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
     "R0903",  # too-few-public-methods
     "R0913",  # too-many-arguments
     "W0212",  # protected-access
+    "E1136",  # unsubscriptable-object — Django ModelAdmin[Model] generic pattern
+    "E1101",  # no-member — Django model .objects manager + FK attribute traversal
+    "W0613",  # unused-argument — Django admin permission method signatures
+    "W0718",  # broad-exception-caught — defensive admin handlers (narrowed where practical)
+    "W0719",  # broad-exception-raised — Django admin defensive code
+    "C0209",  # consider-using-f-string — project uses both styles
+    "W0107",  # unnecessary-pass — base classes with only docstrings
+    "W0105",  # pointless-string-statement — documentation strings between methods
+    "R0801",  # duplicate-code — admin files share patterns
+    "R0901",  # too-many-ancestors — Django model/admin inheritance chains
+    "R0902",  # too-many-instance-attributes — Django models with many fields
+    "R0914",  # too-many-locals — complex admin/view methods
+    "W0221",  # arguments-differ — Django method overrides
+    "W0223",  # abstract-method — partial implementations
+    "C0301",  # line-too-long — handled by ruff formatter
+    "W0611",  # unused-import — handled by ruff
+    "W0612",  # unused-variable — handled by ruff
+    "C0412",  # ungrouped-imports — handled by ruff isort
+    "C0411",  # wrong-import-order — handled by ruff isort
 ]
 
 [tool.pylint.format]

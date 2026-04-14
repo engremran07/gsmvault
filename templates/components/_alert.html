@@ -12,17 +12,17 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      class="flex items-start gap-3 p-4 rounded-lg border
-       {% if type == 'success' %}border-[var(--color-success)]/30 bg-[var(--color-success)]/10
-       {% elif type == 'error' %}border-[var(--color-error)]/30 bg-[var(--color-error)]/10
-       {% elif type == 'warning' %}border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10
-       {% else %}border-[var(--color-info)]/30 bg-[var(--color-info)]/10{% endif %}"
+       {% if type == 'success' %}border-(--color-success)/30 bg-(--color-success)/10
+       {% elif type == 'error' %}border-(--color-error)/30 bg-(--color-error)/10
+       {% elif type == 'warning' %}border-(--color-warning)/30 bg-(--color-warning)/10
+       {% else %}border-(--color-info)/30 bg-(--color-info)/10{% endif %}"
      role="alert">
   {# Icon #}
   <span class="shrink-0 mt-0.5
-    {% if type == 'success' %}text-[var(--color-success)]
-    {% elif type == 'error' %}text-[var(--color-error)]
-    {% elif type == 'warning' %}text-[var(--color-warning)]
-    {% else %}text-[var(--color-info)]{% endif %}">
+    {% if type == 'success' %}text-(--color-success)
+    {% elif type == 'error' %}text-(--color-error)
+    {% elif type == 'warning' %}text-(--color-warning)
+    {% else %}text-(--color-info){% endif %}">
     {% if icon %}
     <i data-lucide="{{ icon }}" class="w-5 h-5"></i>
     {% elif type == 'success' %}<i data-lucide="check-circle" class="w-5 h-5"></i>
@@ -32,10 +32,10 @@
   </span>
   {# Content #}
   <div class="flex-1 min-w-0
-    {% if type == 'success' %}text-[var(--color-success)]
-    {% elif type == 'error' %}text-[var(--color-error)]
-    {% elif type == 'warning' %}text-[var(--color-warning)]
-    {% else %}text-[var(--color-info)]{% endif %}">
+    {% if type == 'success' %}text-(--color-success)
+    {% elif type == 'error' %}text-(--color-error)
+    {% elif type == 'warning' %}text-(--color-warning)
+    {% else %}text-(--color-info){% endif %}">
     {% if title %}<p class="text-sm font-semibold">{{ title }}</p>{% endif %}
     <p class="text-sm {% if title %}mt-0.5 opacity-90{% endif %}">{{ message }}</p>
   </div>

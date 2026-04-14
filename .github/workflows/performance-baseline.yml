@@ -1,0 +1,208 @@
+name: Performance Baseline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 15 * *'  # Monthly on the 15th at midnight UTC
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: appdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/appdb
+      REDIS_URL: redis://localhost:6379/0
+      DJANGO_SETTINGS_MODULE: app.settings_dev
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=app.settings_dev
+
+      - name: Seed test data
+        run: |
+          python manage.py shell --settings=app.settings_dev -c "
+          from django.contrib.auth import get_user_model
+          User = get_user_model()
+          if not User.objects.filter(username='benchuser').exists():
+              User.objects.create_user('benchuser', 'bench@test.local', 'BenchPass123!')
+              print('Created benchmark user')
+          else:
+              print('Benchmark user exists')
+          "
+
+          # Try seeding forum data if command exists
+          python manage.py seed_forum --settings=app.settings_dev 2>/dev/null || echo "seed_forum not available, skipping"
+
+      - name: Run Django system check
+        run: python manage.py check --settings=app.settings_dev
+
+      - name: Measure view response times
+        run: |
+          python -c "
+          import django, os, time, json, statistics
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          django.setup()
+
+          from django.test import Client
+          from django.urls import reverse, URLResolver, URLPattern
+          from django.urls.resolvers import get_resolver
+
+          client = Client()
+          results = []
+
+          def collect_no_arg_urls(resolver, prefix=''):
+              urls = []
+              for pattern in resolver.url_patterns:
+                  if isinstance(pattern, URLResolver):
+                      ns = pattern.namespace or ''
+                      new_prefix = f'{prefix}{ns}:' if ns else prefix
+                      urls.extend(collect_no_arg_urls(pattern, new_prefix))
+                  elif isinstance(pattern, URLPattern) and pattern.name:
+                      try:
+                          url = reverse(f'{prefix}{pattern.name}')
+                          urls.append((f'{prefix}{pattern.name}', url))
+                      except Exception:
+                          pass
+              return urls
+
+          urls = collect_no_arg_urls(get_resolver())
+          print(f'Found {len(urls)} testable URLs (no-arg)')
+
+          for name, url in urls[:50]:
+              times = []
+              for _ in range(3):
+                  start = time.perf_counter()
+                  try:
+                      response = client.get(url, follow=True)
+                      elapsed = (time.perf_counter() - start) * 1000
+                      times.append(elapsed)
+                  except Exception as e:
+                      break
+
+              if times:
+                  avg = statistics.mean(times)
+                  median = statistics.median(times)
+                  status = response.status_code
+                  results.append({
+                      'name': name,
+                      'url': url,
+                      'status': status,
+                      'avg_ms': round(avg, 2),
+                      'median_ms': round(median, 2),
+                      'min_ms': round(min(times), 2),
+                      'max_ms': round(max(times), 2),
+                      'samples': len(times),
+                  })
+
+          # Sort by avg response time (slowest first)
+          results.sort(key=lambda x: x['avg_ms'], reverse=True)
+
+          # Save metrics
+          with open('performance-baseline.json', 'w') as f:
+              json.dump({
+                  'timestamp': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+                  'total_urls': len(urls),
+                  'tested_urls': len(results),
+                  'results': results,
+              }, f, indent=2)
+
+          # Print summary
+          print()
+          print(f'{'View':<45} {'Avg (ms)':>10} {'Med (ms)':>10} {'Status':>8}')
+          print('-' * 75)
+          for r in results[:20]:
+              flag = '⚠️' if r['avg_ms'] > 500 else '  '
+              print(f\"{flag}{r['name']:<43} {r['avg_ms']:>10.1f} {r['median_ms']:>10.1f} {r['status']:>8}\")
+
+          # Check for slow views
+          slow = [r for r in results if r['avg_ms'] > 1000]
+          if slow:
+              print(f'')
+              print(f'::warning::{len(slow)} view(s) exceed 1000ms average response time')
+              for s in slow:
+                  print(f\"  - {s['name']}: {s['avg_ms']:.0f}ms\")
+
+          print(f'')
+          if results:
+              overall_avg = statistics.mean(r['avg_ms'] for r in results)
+              print(f'Overall average: {overall_avg:.1f}ms across {len(results)} views')
+          "
+
+      - name: Save baseline metrics as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-baseline-${{ github.run_id }}
+          path: performance-baseline.json
+          retention-days: 90
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Performance Baseline" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Trigger**: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f performance-baseline.json ]; then
+            python -c "
+          import json
+          data = json.load(open('performance-baseline.json'))
+          results = data['results']
+          print(f'| Metric | Value |')
+          print(f'|--------|-------|')
+          print(f'| URLs tested | {data[\"tested_urls\"]} / {data[\"total_urls\"]} |')
+          if results:
+              import statistics
+              avgs = [r['avg_ms'] for r in results]
+              print(f'| Average response | {statistics.mean(avgs):.1f}ms |')
+              print(f'| Median response | {statistics.median(avgs):.1f}ms |')
+              print(f'| Slowest view | {results[0][\"name\"]} ({results[0][\"avg_ms\"]:.0f}ms) |')
+              slow = len([r for r in results if r['avg_ms'] > 1000])
+              print(f'| Views > 1s | {slow} |')
+          " >> "$GITHUB_STEP_SUMMARY"
+          fi

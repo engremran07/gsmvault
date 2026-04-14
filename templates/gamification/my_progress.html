@@ -7,19 +7,19 @@
 {% block page_header %}
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
-      <i data-lucide="trophy" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl font-bold text-(--color-text-primary) flex items-center gap-3">
+      <i data-lucide="trophy" class="w-8 h-8 text-(--color-accent)"></i>
       My Progress
     </h1>
-    <p class="text-[var(--color-text-secondary)] mt-1">Track your XP, level, badges, and streak</p>
+    <p class="text-(--color-text-secondary) mt-1">Track your XP, level, badges, and streak</p>
   </div>
   <div class="flex gap-3">
     <a href="{% url 'gamification_public:badge_showcase' %}"
-       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors">
       <i data-lucide="award" class="w-4 h-4"></i> All Badges
     </a>
     <a href="{% url 'gamification_public:leaderboard' %}"
-       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors">
       <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Leaderboard
     </a>
   </div>
@@ -28,38 +28,38 @@
 
 {% block page_content %}
 {# ── Level & XP Card ── #}
-<div class="rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 mb-8">
+<div class="rounded-xl border border-accent/30 bg-(--color-bg-secondary) p-6 mb-8">
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
     {# Current Level #}
     <div class="text-center sm:text-left">
-      <p class="text-sm text-[var(--color-text-muted)] mb-1">Current Level</p>
+      <p class="text-sm text-(--color-text-muted) mb-1">Current Level</p>
       {% if current_level %}
-      <p class="text-3xl font-bold text-[var(--color-accent)]">{{ current_level.number }}</p>
-      <p class="text-sm text-[var(--color-text-secondary)]">{{ current_level.name }}</p>
+      <p class="text-3xl font-bold text-(--color-accent)">{{ current_level.number }}</p>
+      <p class="text-sm text-(--color-text-secondary)">{{ current_level.name }}</p>
       {% else %}
-      <p class="text-3xl font-bold text-[var(--color-text-muted)]">0</p>
-      <p class="text-sm text-[var(--color-text-secondary)]">Newcomer</p>
+      <p class="text-3xl font-bold text-(--color-text-muted)">0</p>
+      <p class="text-sm text-(--color-text-secondary)">Newcomer</p>
       {% endif %}
     </div>
 
     {# Total XP #}
     <div class="text-center sm:text-left">
-      <p class="text-sm text-[var(--color-text-muted)] mb-1">Total XP</p>
-      <p class="text-3xl font-bold text-[var(--color-success)]">{{ total_xp|default:"0" }}</p>
+      <p class="text-sm text-(--color-text-muted) mb-1">Total XP</p>
+      <p class="text-3xl font-bold text-(--color-success)">{{ total_xp|default:"0" }}</p>
       {% if next_level %}
-      <p class="text-sm text-[var(--color-text-secondary)]">{{ next_level.min_xp }} XP to Level {{ next_level.number }}</p>
+      <p class="text-sm text-(--color-text-secondary)">{{ next_level.min_xp }} XP to Level {{ next_level.number }}</p>
       {% endif %}
     </div>
 
     {# Streak #}
     <div class="text-center sm:text-left">
-      <p class="text-sm text-[var(--color-text-muted)] mb-1">Current Streak</p>
+      <p class="text-sm text-(--color-text-muted) mb-1">Current Streak</p>
       {% if streak %}
-      <p class="text-3xl font-bold text-[var(--color-warning)]">{{ streak.count }} <span class="text-base">🔥</span></p>
-      <p class="text-sm text-[var(--color-text-secondary)]">Longest: {{ streak.longest_streak }} days</p>
+      <p class="text-3xl font-bold text-(--color-warning)">{{ streak.count }} <span class="text-base">🔥</span></p>
+      <p class="text-sm text-(--color-text-secondary)">Longest: {{ streak.longest_streak }} days</p>
       {% else %}
-      <p class="text-3xl font-bold text-[var(--color-text-muted)]">0</p>
-      <p class="text-sm text-[var(--color-text-secondary)]">Start your streak today!</p>
+      <p class="text-3xl font-bold text-(--color-text-muted)">0</p>
+      <p class="text-sm text-(--color-text-secondary)">Start your streak today!</p>
       {% endif %}
     </div>
   </div>
@@ -67,11 +67,11 @@
   {# XP Progress Bar to next level #}
   {% if next_level and current_level %}
   <div class="mt-6">
-    <div class="flex items-center justify-between text-xs text-[var(--color-text-muted)] mb-1">
+    <div class="flex items-center justify-between text-xs text-(--color-text-muted) mb-1">
       <span>Level {{ current_level.number }}</span>
       <span>Level {{ next_level.number }}</span>
     </div>
-    <div class="w-full h-3 rounded-full bg-[var(--color-bg-primary)] overflow-hidden">
+    <div class="w-full h-3 rounded-full bg-(--color-bg-primary) overflow-hidden">
       <div class="h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-success)] transition-all"
            style="width: {% widthratio total_xp next_level.min_xp 100 %}%"></div>
     </div>
@@ -85,17 +85,17 @@
 {% if user_badges %}
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mt-4 mb-8">
   {% for ub in user_badges %}
-  <div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 text-center hover:border-[var(--color-accent)]/50 transition-colors">
+  <div class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) p-4 text-center hover:border-accent/50 transition-colors">
     {% if ub.badge.image %}
     <img src="{{ ub.badge.image.url }}" alt="{{ ub.badge.name }}" class="w-12 h-12 mx-auto mb-2 rounded-lg">
     {% else %}
-    <div class="w-12 h-12 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-2">
-      <i data-lucide="award" class="w-6 h-6 text-[var(--color-accent)]"></i>
+    <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-2">
+      <i data-lucide="award" class="w-6 h-6 text-(--color-accent)"></i>
     </div>
     {% endif %}
-    <h4 class="text-sm font-semibold text-[var(--color-text-primary)] line-clamp-1">{{ ub.badge.name }}</h4>
-    <p class="text-xs text-[var(--color-text-muted)] mt-0.5">+{{ ub.badge.xp_value }} XP</p>
-    <p class="text-xs text-[var(--color-text-muted)]">{{ ub.earned_at|date:"M d" }}</p>
+    <h4 class="text-sm font-semibold text-(--color-text-primary) line-clamp-1">{{ ub.badge.name }}</h4>
+    <p class="text-xs text-(--color-text-muted) mt-0.5">+{{ ub.badge.xp_value }} XP</p>
+    <p class="text-xs text-(--color-text-muted)">{{ ub.earned_at|date:"M d" }}</p>
   </div>
   {% endfor %}
 </div>
@@ -109,25 +109,25 @@
 {% include "components/_section_header.html" with title="Recent XP Activity" %}
 
 {% if recent_xp %}
-<div class="mt-4 rounded-xl border border-[var(--color-border)] overflow-hidden">
-  <div class="divide-y divide-[var(--color-border)]/50">
+<div class="mt-4 rounded-xl border border-(--color-border) overflow-hidden">
+  <div class="divide-y divide-(--color-border)/50">
     {% for xp in recent_xp %}
-    <div class="flex items-center justify-between px-5 py-3 bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
+    <div class="flex items-center justify-between px-5 py-3 bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) transition-colors">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-full flex items-center justify-center
-          {% if xp.amount > 0 %}bg-[var(--color-success)]/10{% else %}bg-[var(--color-error)]/10{% endif %}">
+          {% if xp.amount > 0 %}bg-(--color-success)/10{% else %}bg-(--color-error)/10{% endif %}">
           {% if xp.amount > 0 %}
-          <i data-lucide="arrow-up" class="w-4 h-4 text-[var(--color-success)]"></i>
+          <i data-lucide="arrow-up" class="w-4 h-4 text-(--color-success)"></i>
           {% else %}
-          <i data-lucide="arrow-down" class="w-4 h-4 text-[var(--color-error)]"></i>
+          <i data-lucide="arrow-down" class="w-4 h-4 text-(--color-error)"></i>
           {% endif %}
         </div>
         <div>
-          <p class="text-sm text-[var(--color-text-primary)]">{{ xp.reason }}</p>
-          <p class="text-xs text-[var(--color-text-muted)]">{{ xp.created_at|timesince }} ago</p>
+          <p class="text-sm text-(--color-text-primary)">{{ xp.reason }}</p>
+          <p class="text-xs text-(--color-text-muted)">{{ xp.created_at|timesince }} ago</p>
         </div>
       </div>
-      <span class="text-sm font-bold {% if xp.amount > 0 %}text-[var(--color-success)]{% else %}text-[var(--color-error)]{% endif %}">
+      <span class="text-sm font-bold {% if xp.amount > 0 %}text-(--color-success){% else %}text-(--color-error){% endif %}">
         {% if xp.amount > 0 %}+{% endif %}{{ xp.amount }} XP
       </span>
     </div>

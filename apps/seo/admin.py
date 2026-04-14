@@ -3,11 +3,16 @@ from django.http import HttpRequest
 from solo.admin import SingletonModelAdmin  # type: ignore[import-untyped]
 
 from .models import (
+    BatchOperation,
+    InterlinkExclusion,
     LinkableEntity,
     LinkSuggestion,
     Metadata,
     Redirect,
     SchemaEntry,
+    SeoEntity,
+    SeoEntityEdge,
+    SeoKeywordHistory,
     SEOModel,
     SEOSettings,
     SitemapEntry,
@@ -91,3 +96,45 @@ class SEOSettingsAdmin(SingletonModelAdmin):
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False
+
+
+@admin.register(SeoKeywordHistory)
+class SeoKeywordHistoryAdmin(admin.ModelAdmin[SeoKeywordHistory]):
+    list_display = ("keyword", "target_url", "position", "intent", "created_at")
+    list_filter = ("intent",)
+    search_fields = ("keyword", "target_url")
+
+
+@admin.register(SeoEntity)
+class SeoEntityAdmin(admin.ModelAdmin[SeoEntity]):
+    list_display = ("name", "slug", "entity_type", "is_active", "updated_at")
+    list_filter = ("entity_type", "is_active")
+    search_fields = ("name", "slug")
+
+
+@admin.register(SeoEntityEdge)
+class SeoEntityEdgeAdmin(admin.ModelAdmin[SeoEntityEdge]):
+    list_display = ("source", "target", "relation_type", "weight", "created_at")
+    list_filter = ("relation_type",)
+    search_fields = ("source__name", "target__name")
+
+
+@admin.register(InterlinkExclusion)
+class InterlinkExclusionAdmin(admin.ModelAdmin[InterlinkExclusion]):
+    list_display = ("phrase", "source_pattern", "target_pattern", "is_active")
+    list_filter = ("is_active",)
+    search_fields = ("phrase", "source_pattern", "target_pattern")
+
+
+@admin.register(BatchOperation)
+class BatchOperationAdmin(admin.ModelAdmin[BatchOperation]):
+    list_display = (
+        "operation_type",
+        "status",
+        "initiated_by",
+        "started_at",
+        "completed_at",
+        "created_at",
+    )
+    list_filter = ("operation_type", "status")
+    search_fields = ("operation_type", "status")

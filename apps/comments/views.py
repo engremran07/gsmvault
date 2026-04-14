@@ -16,7 +16,7 @@ from django.http import (
     HttpResponseForbidden,
     JsonResponse,
 )
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
@@ -574,7 +574,7 @@ def moderation_queue(request: HttpRequest) -> HttpResponse:
         ],
         is_deleted=False,
     ).order_by("-created_at")[:50]
-    return render(  # type: ignore[name-defined]  # noqa: F821
+    return render(
         request,
         "comments/moderation_panel.html",
         {"pending_comments": pending, "recent_comments": recent},

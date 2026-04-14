@@ -19,6 +19,8 @@ from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
 
+from apps.core.utils.ip import get_client_ip as get_request_ip
+
 from .models import AdGateLog, DownloadSession, DownloadToken, HotlinkBlock
 
 logger = logging.getLogger(__name__)
@@ -55,14 +57,6 @@ def _get_download_config() -> dict[str, Any]:
         }
 
 
-def get_client_ip(request: HttpRequest) -> str:
-    """Extract real client IP from request headers."""
-    xff = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR", "127.0.0.1")
-
-
 def create_download_token(
     firmware: Any,
     request: HttpRequest,
@@ -77,7 +71,7 @@ def create_download_token(
         token=secrets.token_urlsafe(32),
         ad_gate_required=config["ad_gate_enabled"],
         ad_gate_completed=not config["ad_gate_enabled"],
-        ip=get_client_ip(request),
+        ip=get_request_ip(request) or None,
         status=DownloadToken.Status.ACTIVE,
         expires_at=timezone.now() + timedelta(minutes=config["token_expiry_minutes"]),
     )
@@ -189,7 +183,7 @@ def start_download_session(
     session = DownloadSession.objects.create(
         token=token,
         user=token.user,
-        ip=get_client_ip(request),
+        ip=get_request_ip(request) or None,
         user_agent=request.META.get("HTTP_USER_AGENT", "")[:255],
         status=DownloadSession.Status.STARTED,
     )

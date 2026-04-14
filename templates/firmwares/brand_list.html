@@ -7,7 +7,7 @@
 <div class="mb-6">
   <h1 class="text-3xl font-bold">Firmware Brands</h1>
   {% include "components/_breadcrumb.html" with label="Brands" %}
-  <p class="text-[var(--color-text-secondary)] mt-2">
+  <p class="text-(--color-text-secondary) mt-2">
     {{ brands|length }} brands &middot; {{ total_models }} models &middot; {{ total_firmwares }} firmwares
   </p>
 </div>
@@ -15,10 +15,10 @@
 
 {% block page_content %}
 {# Alphabet Quick Nav #}
-<div class="flex flex-wrap gap-1 mb-6 sticky top-16 z-10 bg-[var(--color-bg-primary)] py-2">
+<div class="flex flex-wrap gap-1 mb-6 sticky top-16 z-10 bg-(--color-bg-primary) py-2">
   {% for letter in alphabet %}
   <a href="#brand-{{ letter }}"
-     class="w-8 h-8 flex items-center justify-center rounded text-sm font-medium border border-[var(--color-border)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-text)] hover:border-[var(--color-accent)] transition">
+     class="w-8 h-8 flex items-center justify-center rounded text-sm font-medium border border-(--color-border) hover:bg-(--color-accent) hover:text-(--color-accent-text) hover:border-(--color-accent) transition">
     {{ letter }}
   </a>
   {% endfor %}
@@ -27,13 +27,13 @@
 {# Brands by Letter #}
 {% for letter, brand_group in grouped_brands %}
 <div id="brand-{{ letter }}" class="mb-8">
-  <h2 class="text-xl font-bold border-b border-[var(--color-border)] pb-2 mb-4">{{ letter }}</h2>
+  <h2 class="text-xl font-bold border-b border-(--color-border) pb-2 mb-4">{{ letter }}</h2>
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
     {% for brand in brand_group %}
     <a href="{% url 'firmwares:brand_detail' slug=brand.slug %}"
-       class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-3 hover:border-[var(--color-accent)] transition group">
-      <h3 class="font-medium text-sm group-hover:text-[var(--color-accent)]">{{ brand.name }}</h3>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">
+       class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-3 hover:border-(--color-accent) transition group">
+      <h3 class="font-medium text-sm group-hover:text-(--color-accent)">{{ brand.name }}</h3>
+      <p class="text-xs text-(--color-text-muted) mt-1">
         {{ brand.model_count }} models &middot; {{ brand.firmware_count }} FW
       </p>
     </a>

@@ -4,24 +4,24 @@
 
 {% block auth_header %}
 <div class="text-center">
-  <i data-lucide="mail-check" class="w-16 h-16 text-[var(--color-accent)] mx-auto mb-4"></i>
+  <i data-lucide="mail-check" class="w-16 h-16 text-(--color-accent) mx-auto mb-4"></i>
   <h1 class="text-2xl font-bold">Check Your Email</h1>
 </div>
 {% endblock %}
 
 {% block auth_content %}
 <div class="text-center space-y-4">
-  <p class="text-[var(--color-text-secondary)]">
+  <p class="text-(--color-text-secondary)">
     We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.
   </p>
-  <p class="text-sm text-[var(--color-text-muted)]">
+  <p class="text-sm text-(--color-text-muted)">
     Didn't receive the email? Check your spam folder or request a new one.
   </p>
   <div class="flex flex-col gap-3 mt-6">
-    <a href="{% url 'users:dashboard' %}" class="rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] transition text-center">
+    <a href="{% url 'users:dashboard' %}" class="rounded-lg bg-(--color-accent) px-4 py-2.5 text-(--color-accent-text) font-medium hover:bg-(--color-accent-hover) transition text-center">
       Go to Dashboard
     </a>
-    <a href="{% url 'users:account_login' %}" class="text-sm text-[var(--color-accent)] hover:underline">
+    <a href="{% url 'users:account_login' %}" class="text-sm text-(--color-accent) hover:underline">
       Back to Sign In
     </a>
   </div>

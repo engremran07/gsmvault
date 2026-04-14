@@ -4,8 +4,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Flashing Tools &amp; Guides</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Flashing Tools &amp; Guides</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p>
   </div>
 </div>
 {% endblock %}
@@ -31,10 +31,10 @@
 {# ── Tabs ── #}
 <div x-data="{ tab: new URLSearchParams(window.location.search).get('tab') || '{{ active_tab|default:"tools" }}' }" class="animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
 
-  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit">
-    <button @click="tab='tools'" :class="tab==='tools' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="wrench" class="w-3 h-3 inline mr-1"></i>Tools</button>
-    <button @click="tab='categories'" :class="tab==='categories' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="folder" class="w-3 h-3 inline mr-1"></i>Categories</button>
-    <button @click="tab='guides'" :class="tab==='guides' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="book-open" class="w-3 h-3 inline mr-1"></i>Guides</button>
+  <div class="flex gap-1 mb-6 bg-(--color-bg-tertiary)/40 rounded-xl p-1 w-fit">
+    <button @click="tab='tools'" :class="tab==='tools' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="wrench" class="w-3 h-3 inline mr-1"></i>Tools</button>
+    <button @click="tab='categories'" :class="tab==='categories' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="folder" class="w-3 h-3 inline mr-1"></i>Categories</button>
+    <button @click="tab='guides'" :class="tab==='guides' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press"><i data-lucide="book-open" class="w-3 h-3 inline mr-1"></i>Guides</button>
   </div>
 
   {# ══════════════════════════════════════════════════════════ #}
@@ -43,11 +43,11 @@
   <div x-show="tab==='tools'" x-cloak x-transition.opacity x-data="{ showToolForm: false, editTool: null }">
 
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
-        <i data-lucide="wrench" class="w-4 h-4 text-[var(--color-accent)]"></i>Flashing Tools Catalog
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
+        <i data-lucide="wrench" class="w-4 h-4 text-(--color-accent)"></i>Flashing Tools Catalog
         <span class="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ stats.total_tools }}</span>
       </h3>
-      <button @click="showToolForm = !showToolForm; editTool = null" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">
+      <button @click="showToolForm = !showToolForm; editTool = null" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">
         <i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Tool
       </button>
     </div>
@@ -56,8 +56,8 @@
 
     {# ── Add/Edit Tool Form ── #}
     <div x-show="showToolForm" x-cloak x-transition class="glass rounded-xl p-6 mb-6">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
-        <i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">
+        <i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>
         <span x-text="editTool ? 'Edit Tool #' + editTool.id : 'Add New Tool'">Add New Tool</span>
       </h3>
       <form method="post" class="space-y-4">{% csrf_token %}
@@ -65,16 +65,16 @@
         <input type="hidden" name="tool_id" :value="editTool?.id || ''">
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Name *</label>
-            <input type="text" name="name" :value="editTool?.name || ''" placeholder="SP Flash Tool" required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Name *</label>
+            <input type="text" name="name" :value="editTool?.name || ''" placeholder="SP Flash Tool" required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Slug *</label>
-            <input type="text" name="slug" :value="editTool?.slug || ''" placeholder="sp-flash-tool" required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Slug *</label>
+            <input type="text" name="slug" :value="editTool?.slug || ''" placeholder="sp-flash-tool" required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Category *</label>
-            <select name="category_id" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors" required>
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Category *</label>
+            <select name="category_id" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors" required>
               <option value="">Select…</option>
               {% for cat in categories %}
               <option value="{{ cat.id }}" :selected="editTool?.category_id == {{ cat.id }}">{{ cat.name }}</option>
@@ -82,65 +82,65 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Tool Type</label>
-            <select name="tool_type" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Tool Type</label>
+            <select name="tool_type" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               {% for val, label in tool_types %}
               <option value="{{ val }}" :selected="editTool?.tool_type === '{{ val }}'">{{ label }}</option>
               {% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Platform</label>
-            <select name="platform" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Platform</label>
+            <select name="platform" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               {% for val, label in platforms %}
               <option value="{{ val }}" :selected="editTool?.platform === '{{ val }}'">{{ label }}</option>
               {% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Risk Level</label>
-            <select name="risk_level" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Risk Level</label>
+            <select name="risk_level" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               {% for val, label in risk_levels %}
               <option value="{{ val }}" :selected="editTool?.risk_level === '{{ val }}'">{{ label }}</option>
               {% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Version</label>
-            <input type="text" name="version" :value="editTool?.version || ''" placeholder="v6.2.1" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Version</label>
+            <input type="text" name="version" :value="editTool?.version || ''" placeholder="v6.2.1" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Download URL</label>
-            <input type="url" name="download_url" :value="editTool?.download_url || ''" placeholder="https://..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Download URL</label>
+            <input type="url" name="download_url" :value="editTool?.download_url || ''" placeholder="https://..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Official URL</label>
-            <input type="url" name="official_url" :value="editTool?.official_url || ''" placeholder="https://..." class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Official URL</label>
+            <input type="url" name="official_url" :value="editTool?.official_url || ''" placeholder="https://..." class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Description</label>
-          <textarea name="description" rows="2" placeholder="Brief description of the tool…" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none" x-text="editTool?.description || ''"></textarea>
+          <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Description</label>
+          <textarea name="description" rows="2" placeholder="Brief description of the tool…" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors resize-none" x-text="editTool?.description || ''"></textarea>
         </div>
         <div>
-          <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Instructions (Markdown)</label>
-          <textarea name="instructions" rows="3" placeholder="Step-by-step usage instructions…" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none" x-text="editTool?.instructions || ''"></textarea>
+          <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Instructions (Markdown)</label>
+          <textarea name="instructions" rows="3" placeholder="Step-by-step usage instructions…" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors resize-none" x-text="editTool?.instructions || ''"></textarea>
         </div>
         <div class="flex items-center gap-6">
-          <label class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] cursor-pointer">
-            <input type="checkbox" name="is_free" :checked="editTool?.is_free" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+          <label class="flex items-center gap-2 text-xs text-(--color-text-secondary) cursor-pointer">
+            <input type="checkbox" name="is_free" :checked="editTool?.is_free" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
             <span>Free</span>
           </label>
-          <label class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] cursor-pointer">
-            <input type="checkbox" name="is_featured" :checked="editTool?.is_featured" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+          <label class="flex items-center gap-2 text-xs text-(--color-text-secondary) cursor-pointer">
+            <input type="checkbox" name="is_featured" :checked="editTool?.is_featured" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
             <span>Featured</span>
           </label>
         </div>
         <div class="flex items-center gap-3">
-          <button type="submit" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">
+          <button type="submit" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">
             <i data-lucide="save" class="w-3.5 h-3.5 inline mr-1"></i><span x-text="editTool ? 'Update Tool' : 'Save Tool'">Save Tool</span>
           </button>
-          <button type="button" @click="showToolForm = false; editTool = null" class="px-4 py-2 rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:bg-[var(--color-bg-tertiary)] transition-colors">Cancel</button>
+          <button type="button" @click="showToolForm = false; editTool = null" class="px-4 py-2 rounded-lg text-xs font-semibold text-(--color-text-muted) hover:bg-(--color-bg-tertiary) transition-colors">Cancel</button>
         </div>
       </form>
     </div>
@@ -150,61 +150,61 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead>
-            <tr class="border-b border-[var(--color-border)]">
+            <tr class="border-b border-(--color-border)">
               {% with current_sort=sort current_dir=dir %}
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                <a href="?tab=tools&q={{ q|urlencode }}&sort=name&dir={% if current_sort == 'name' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-[var(--color-text-primary)] transition-colors">
-                  Tool {% if current_sort == 'name' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">
+                <a href="?tab=tools&q={{ q|urlencode }}&sort=name&dir={% if current_sort == 'name' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-(--color-text-primary) transition-colors">
+                  Tool {% if current_sort == 'name' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
                 </a>
               </th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                <a href="?tab=tools&q={{ q|urlencode }}&sort=category&dir={% if current_sort == 'category' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-[var(--color-text-primary)] transition-colors">
-                  Category {% if current_sort == 'category' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">
+                <a href="?tab=tools&q={{ q|urlencode }}&sort=category&dir={% if current_sort == 'category' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-(--color-text-primary) transition-colors">
+                  Category {% if current_sort == 'category' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
                 </a>
               </th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                <a href="?tab=tools&q={{ q|urlencode }}&sort=type&dir={% if current_sort == 'type' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-[var(--color-text-primary)] transition-colors">
-                  Type {% if current_sort == 'type' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">
+                <a href="?tab=tools&q={{ q|urlencode }}&sort=type&dir={% if current_sort == 'type' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-(--color-text-primary) transition-colors">
+                  Type {% if current_sort == 'type' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
                 </a>
               </th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                <a href="?tab=tools&q={{ q|urlencode }}&sort=platform&dir={% if current_sort == 'platform' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-[var(--color-text-primary)] transition-colors">
-                  Platform {% if current_sort == 'platform' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">
+                <a href="?tab=tools&q={{ q|urlencode }}&sort=platform&dir={% if current_sort == 'platform' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-(--color-text-primary) transition-colors">
+                  Platform {% if current_sort == 'platform' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
                 </a>
               </th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-                <a href="?tab=tools&q={{ q|urlencode }}&sort=risk&dir={% if current_sort == 'risk' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-[var(--color-text-primary)] transition-colors">
-                  Risk {% if current_sort == 'risk' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">
+                <a href="?tab=tools&q={{ q|urlencode }}&sort=risk&dir={% if current_sort == 'risk' and current_dir == 'asc' %}desc{% else %}asc{% endif %}" class="inline-flex items-center gap-1 hover:text-(--color-text-primary) transition-colors">
+                  Risk {% if current_sort == 'risk' %}<i data-lucide="{% if current_dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}
                 </a>
               </th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Version</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Status</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] text-right">Actions</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Version</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Status</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted) text-right">Actions</th>
               {% endwith %}
             </tr>
           </thead>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Version</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Status</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] text-right">Actions</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Version</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Status</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted) text-right">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--color-border)]/50">
+          <tbody class="divide-y divide-(--color-border)/50">
             {% for tool in tools %}
-            <tr class="hover:bg-[var(--color-bg-tertiary)]/30 transition-colors group">
+            <tr class="hover:bg-(--color-bg-tertiary)/30 transition-colors group">
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
                   <div class="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
                     <i data-lucide="wrench" class="w-4 h-4 text-blue-400"></i>
                   </div>
                   <div>
-                    <span class="font-medium text-[var(--color-text-primary)]">{{ tool.name }}</span>
+                    <span class="font-medium text-(--color-text-primary)">{{ tool.name }}</span>
                     {% if tool.is_featured %}<span class="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/10 text-amber-400">Featured</span>{% endif %}
                     {% if tool.is_free %}<span class="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400">Free</span>{% endif %}
-                    <div class="text-[10px] text-[var(--color-text-muted)] mt-0.5 truncate max-w-[200px]">{{ tool.description|truncatewords:10 }}</div>
+                    <div class="text-[10px] text-(--color-text-muted) mt-0.5 truncate max-w-[200px]">{{ tool.description|truncatewords:10 }}</div>
                   </div>
                 </div>
               </td>
-              <td class="px-4 py-3 text-xs text-[var(--color-text-secondary)]">{{ tool.category.name }}</td>
+              <td class="px-4 py-3 text-xs text-(--color-text-secondary)">{{ tool.category.name }}</td>
               <td class="px-4 py-3">
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold
                   {% if tool.tool_type == 'oem' %}bg-blue-500/10 text-blue-400
@@ -215,7 +215,7 @@
                   {% endif %}">{{ tool.get_tool_type_display }}</span>
               </td>
               <td class="px-4 py-3">
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">{{ tool.get_platform_display }}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--color-bg-tertiary) text-(--color-text-secondary)">{{ tool.get_platform_display }}</span>
               </td>
               <td class="px-4 py-3">
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold
@@ -225,7 +225,7 @@
                   {% elif tool.risk_level == 'risky' %}bg-red-500/10 text-red-400
                   {% endif %}">{{ tool.get_risk_level_display }}</span>
               </td>
-              <td class="px-4 py-3 text-xs text-[var(--color-text-muted)]">{{ tool.version|default:"—" }}</td>
+              <td class="px-4 py-3 text-xs text-(--color-text-muted)">{{ tool.version|default:"—" }}</td>
               <td class="px-4 py-3">
                 {% if tool.is_active %}
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Active</span>
@@ -258,9 +258,9 @@
             </tr>
             {% empty %}
             <tr><td colspan="8" class="px-4 py-12 text-center">
-              <i data-lucide="wrench" class="w-8 h-8 mx-auto mb-3 text-[var(--color-text-muted)] opacity-40"></i>
-              <p class="text-sm text-[var(--color-text-muted)]">No flashing tools yet</p>
-              <p class="text-xs text-[var(--color-text-muted)] mt-1">Click "Add Tool" to create your first tool entry</p>
+              <i data-lucide="wrench" class="w-8 h-8 mx-auto mb-3 text-(--color-text-muted) opacity-40"></i>
+              <p class="text-sm text-(--color-text-muted)">No flashing tools yet</p>
+              <p class="text-xs text-(--color-text-muted) mt-1">Click "Add Tool" to create your first tool entry</p>
             </td></tr>
             {% endfor %}
           </tbody>
@@ -276,19 +276,19 @@
   <div x-show="tab==='categories'" x-cloak x-transition.opacity x-data="{ showCatForm: false, editCat: null }">
 
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
-        <i data-lucide="folder" class="w-4 h-4 text-[var(--color-accent)]"></i>Tool Categories
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
+        <i data-lucide="folder" class="w-4 h-4 text-(--color-accent)"></i>Tool Categories
         <span class="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-400">{{ categories|length }}</span>
       </h3>
-      <button @click="showCatForm = !showCatForm; editCat = null" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">
+      <button @click="showCatForm = !showCatForm; editCat = null" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">
         <i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Category
       </button>
     </div>
 
     {# ── Add/Edit Category Form ── #}
     <div x-show="showCatForm" x-cloak x-transition class="glass rounded-xl p-6 mb-6">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
-        <i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">
+        <i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>
         <span x-text="editCat ? 'Edit Category' : 'Add New Category'">Add New Category</span>
       </h3>
       <form method="post" class="space-y-4">{% csrf_token %}
@@ -296,31 +296,31 @@
         <input type="hidden" name="category_id" :value="editCat?.id || ''">
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Name *</label>
-            <input type="text" name="name" :value="editCat?.name || ''" placeholder="MediaTek Tools" required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Name *</label>
+            <input type="text" name="name" :value="editCat?.name || ''" placeholder="MediaTek Tools" required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Slug *</label>
-            <input type="text" name="slug" :value="editCat?.slug || ''" placeholder="mediatek-tools" required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Slug *</label>
+            <input type="text" name="slug" :value="editCat?.slug || ''" placeholder="mediatek-tools" required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Icon (Lucide)</label>
-            <input type="text" name="icon" :value="editCat?.icon || 'wrench'" placeholder="wrench" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Icon (Lucide)</label>
+            <input type="text" name="icon" :value="editCat?.icon || 'wrench'" placeholder="wrench" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Sort Order</label>
-            <input type="number" name="sort_order" :value="editCat?.sort_order ?? 0" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Sort Order</label>
+            <input type="number" name="sort_order" :value="editCat?.sort_order ?? 0" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Description</label>
-          <textarea name="description" rows="2" placeholder="Category description…" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none" x-text="editCat?.description || ''"></textarea>
+          <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Description</label>
+          <textarea name="description" rows="2" placeholder="Category description…" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors resize-none" x-text="editCat?.description || ''"></textarea>
         </div>
         <div class="flex items-center gap-3">
-          <button type="submit" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">
+          <button type="submit" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">
             <i data-lucide="save" class="w-3.5 h-3.5 inline mr-1"></i><span x-text="editCat ? 'Update Category' : 'Save Category'">Save Category</span>
           </button>
-          <button type="button" @click="showCatForm = false; editCat = null" class="px-4 py-2 rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:bg-[var(--color-bg-tertiary)] transition-colors">Cancel</button></button>
+          <button type="button" @click="showCatForm = false; editCat = null" class="px-4 py-2 rounded-lg text-xs font-semibold text-(--color-text-muted) hover:bg-(--color-bg-tertiary) transition-colors">Cancel</button></button>
         </div>
       </form>
     </div>
@@ -335,8 +335,8 @@
               <i data-lucide="{{ cat.icon|default:'folder' }}" class="w-5 h-5 text-violet-400"></i>
             </div>
             <div>
-              <h4 class="text-sm font-semibold text-[var(--color-text-primary)]">{{ cat.name }}</h4>
-              <span class="text-[10px] text-[var(--color-text-muted)]">{{ cat.tool_count }} tool{{ cat.tool_count|pluralize }}</span>
+              <h4 class="text-sm font-semibold text-(--color-text-primary)">{{ cat.name }}</h4>
+              <span class="text-[10px] text-(--color-text-muted)">{{ cat.tool_count }} tool{{ cat.tool_count|pluralize }}</span>
             </div>
           </div>
           <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -349,19 +349,19 @@
           </div>
         </div>
         {% if cat.description %}
-        <p class="text-xs text-[var(--color-text-muted)] line-clamp-2">{{ cat.description }}</p>
+        <p class="text-xs text-(--color-text-muted) line-clamp-2">{{ cat.description }}</p>
         {% endif %}
         <div class="mt-3 flex items-center gap-2">
-          <span class="text-[10px] text-[var(--color-text-muted)]">Sort: {{ cat.sort_order }}</span>
-          <span class="text-[10px] text-[var(--color-text-muted)]">&middot;</span>
-          <span class="text-[10px] text-[var(--color-text-muted)]">{{ cat.slug }}</span>
+          <span class="text-[10px] text-(--color-text-muted)">Sort: {{ cat.sort_order }}</span>
+          <span class="text-[10px] text-(--color-text-muted)">&middot;</span>
+          <span class="text-[10px] text-(--color-text-muted)">{{ cat.slug }}</span>
         </div>
       </div>
       {% empty %}
       <div class="sm:col-span-2 lg:col-span-3 glass rounded-xl p-8 text-center">
-        <i data-lucide="folder" class="w-8 h-8 mx-auto mb-3 text-[var(--color-text-muted)] opacity-40"></i>
-        <p class="text-sm text-[var(--color-text-muted)]">No categories yet</p>
-        <p class="text-xs text-[var(--color-text-muted)] mt-1">Create categories to organize your flashing tools</p>
+        <i data-lucide="folder" class="w-8 h-8 mx-auto mb-3 text-(--color-text-muted) opacity-40"></i>
+        <p class="text-sm text-(--color-text-muted)">No categories yet</p>
+        <p class="text-xs text-(--color-text-muted) mt-1">Create categories to organize your flashing tools</p>
       </div>
       {% endfor %}
     </div>
@@ -374,8 +374,8 @@
 
     {# ── Bulk Generation Bar ── #}
     <div class="glass rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
-      <div class="flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
-        <i data-lucide="sparkles" class="w-4 h-4 text-[var(--color-accent)]"></i>Auto-Generation
+      <div class="flex items-center gap-2 text-sm font-semibold text-(--color-text-primary)">
+        <i data-lucide="sparkles" class="w-4 h-4 text-(--color-accent)"></i>Auto-Generation
       </div>
       <div class="flex flex-wrap items-center gap-3">
         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">{{ stats.total_templates }} Templates</span>
@@ -384,15 +384,15 @@
       </div>
       <form method="post" class="ml-auto flex items-center gap-3">{% csrf_token %}
         <input type="hidden" name="action" value="bulk_generate">
-        <label class="flex items-center gap-1.5 text-[10px] text-[var(--color-text-secondary)]">
-          <input type="number" name="limit" value="20" min="1" max="100" class="w-16 px-2 py-1 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[10px] text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none">
+        <label class="flex items-center gap-1.5 text-[10px] text-(--color-text-secondary)">
+          <input type="number" name="limit" value="20" min="1" max="100" class="w-16 px-2 py-1 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-[10px] text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none">
           limit
         </label>
-        <label class="flex items-center gap-1.5 text-[10px] text-[var(--color-text-secondary)] cursor-pointer">
-          <input type="checkbox" name="use_ai" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+        <label class="flex items-center gap-1.5 text-[10px] text-(--color-text-secondary) cursor-pointer">
+          <input type="checkbox" name="use_ai" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
           AI Enrich
         </label>
-        <button type="submit" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all" onclick="return confirm('Run bulk generation for all auto-generate templates?')">
+        <button type="submit" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all" onclick="return confirm('Run bulk generation for all auto-generate templates?')">
           <i data-lucide="zap" class="w-3.5 h-3.5 inline mr-1"></i>Bulk Generate
         </button>
       </form>
@@ -400,69 +400,69 @@
 
     {# ── Guide Templates Section ── #}
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2">
-        <i data-lucide="file-text" class="w-4 h-4 text-[var(--color-accent)]"></i>Guide Templates
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
+        <i data-lucide="file-text" class="w-4 h-4 text-(--color-accent)"></i>Guide Templates
         <span class="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">{{ stats.total_templates }}</span>
       </h3>
-      <button @click="showTemplateForm = !showTemplateForm" class="px-3 py-1.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">
+      <button @click="showTemplateForm = !showTemplateForm" class="px-3 py-1.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">
         <i data-lucide="plus" class="w-3.5 h-3.5 inline mr-1"></i>Add Template
       </button>
     </div>
 
     {# ── Add Template Form ── #}
     <div x-show="showTemplateForm" x-cloak x-transition class="glass rounded-xl p-6 mb-6">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">
-        <i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>Add Guide Template
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">
+        <i data-lucide="plus-circle" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>Add Guide Template
       </h3>
       <form method="post" class="space-y-4">{% csrf_token %}
         <input type="hidden" name="action" value="save_template">
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Guide Type</label>
-            <select name="guide_type" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Guide Type</label>
+            <select name="guide_type" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               {% for val, label in guide_types %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Brand (optional)</label>
-            <select name="brand_id" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Brand (optional)</label>
+            <select name="brand_id" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
               <option value="">All brands</option>
               {% for brand in brands %}<option value="{{ brand.id }}">{{ brand.name }}</option>{% endfor %}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Chipset Filter</label>
-            <input type="text" name="chipset_filter" placeholder="MediaTek, Snapdragon…" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
+            <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Chipset Filter</label>
+            <input type="text" name="chipset_filter" placeholder="MediaTek, Snapdragon…" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Title Template</label>
-          <input type="text" name="title_template" placeholder="How to Flash {brand} {model} — {guide_type} Guide" required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors">
-          <p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Placeholders: <code class="text-[var(--color-accent)]">{brand}</code> <code class="text-[var(--color-accent)]">{model}</code> <code class="text-[var(--color-accent)]">{chipset}</code> <code class="text-[var(--color-accent)]">{tools}</code> <code class="text-[var(--color-accent)]">{steps}</code></p>
+          <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Title Template</label>
+          <input type="text" name="title_template" placeholder="How to Flash {brand} {model} — {guide_type} Guide" required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors">
+          <p class="mt-1 text-[10px] text-(--color-text-muted)">Placeholders: <code class="text-(--color-accent)">{brand}</code> <code class="text-(--color-accent)">{model}</code> <code class="text-(--color-accent)">{chipset}</code> <code class="text-(--color-accent)">{tools}</code> <code class="text-(--color-accent)">{steps}</code></p>
         </div>
         <div>
-          <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Summary Template</label>
-          <textarea name="summary_template" rows="2" placeholder="Learn how to flash {brand} {model} with step-by-step instructions…" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-none"></textarea>
+          <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Summary Template</label>
+          <textarea name="summary_template" rows="2" placeholder="Learn how to flash {brand} {model} with step-by-step instructions…" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors resize-none"></textarea>
         </div>
         <div>
-          <label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Body Template (Markdown)</label>
-          <textarea name="body_template" rows="8" placeholder="# {brand} {model} — {guide_type} Guide&#10;&#10;## Prerequisites&#10;&#10;{tools}&#10;&#10;## Steps&#10;&#10;{steps}&#10;&#10;## Important Notes&#10;&#10;..." required class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors resize-y font-mono text-xs"></textarea>
+          <label class="block text-xs font-medium text-(--color-text-muted) mb-1">Body Template (Markdown)</label>
+          <textarea name="body_template" rows="8" placeholder="# {brand} {model} — {guide_type} Guide&#10;&#10;## Prerequisites&#10;&#10;{tools}&#10;&#10;## Steps&#10;&#10;{steps}&#10;&#10;## Important Notes&#10;&#10;..." required class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors resize-y font-mono text-xs"></textarea>
         </div>
         <div class="flex items-center gap-6">
-          <label class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] cursor-pointer">
-            <input type="checkbox" name="auto_generate" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+          <label class="flex items-center gap-2 text-xs text-(--color-text-secondary) cursor-pointer">
+            <input type="checkbox" name="auto_generate" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
             <span>Auto-generate</span>
           </label>
-          <label class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)] cursor-pointer">
-            <input type="checkbox" name="auto_publish" class="rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
+          <label class="flex items-center gap-2 text-xs text-(--color-text-secondary) cursor-pointer">
+            <input type="checkbox" name="auto_publish" class="rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
             <span>Auto-publish</span>
           </label>
         </div>
         <div class="flex items-center gap-3">
-          <button type="submit" class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-xs font-semibold btn-press hover:shadow-lg transition-all">
+          <button type="submit" class="px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold btn-press hover:shadow-lg transition-all">
             <i data-lucide="save" class="w-3.5 h-3.5 inline mr-1"></i>Save Template
           </button>
-          <button type="button" @click="showTemplateForm = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-[var(--color-text-muted)] hover:bg-[var(--color-bg-tertiary)] transition-colors">Cancel</button>
+          <button type="button" @click="showTemplateForm = false" class="px-4 py-2 rounded-lg text-xs font-semibold text-(--color-text-muted) hover:bg-(--color-bg-tertiary) transition-colors">Cancel</button>
         </div>
       </form>
     </div>
@@ -472,27 +472,27 @@
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead>
-            <tr class="border-b border-[var(--color-border)]">
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Template</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Type</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Brand</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Chipset</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Flags</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] text-right">Generated</th>
-              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] text-right">Actions</th>
+            <tr class="border-b border-(--color-border)">
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Template</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Type</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Brand</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Chipset</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Flags</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted) text-right">Generated</th>
+              <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted) text-right">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[var(--color-border)]/50">
+          <tbody class="divide-y divide-(--color-border)/50">
             {% for tmpl in templates %}
-            <tr class="hover:bg-[var(--color-bg-tertiary)]/30 transition-colors group">
+            <tr class="hover:bg-(--color-bg-tertiary)/30 transition-colors group">
               <td class="px-4 py-3">
-                <div class="text-sm font-medium text-[var(--color-text-primary)] truncate max-w-[250px]">{{ tmpl.title_template }}</div>
+                <div class="text-sm font-medium text-(--color-text-primary) truncate max-w-[250px]">{{ tmpl.title_template }}</div>
               </td>
               <td class="px-4 py-3">
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400">{{ tmpl.get_guide_type_display }}</span>
               </td>
-              <td class="px-4 py-3 text-xs text-[var(--color-text-secondary)]">{{ tmpl.brand.name|default:"All" }}</td>
-              <td class="px-4 py-3 text-xs text-[var(--color-text-muted)]">{{ tmpl.chipset_filter|default:"Any" }}</td>
+              <td class="px-4 py-3 text-xs text-(--color-text-secondary)">{{ tmpl.brand.name|default:"All" }}</td>
+              <td class="px-4 py-3 text-xs text-(--color-text-muted)">{{ tmpl.chipset_filter|default:"Any" }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center gap-1">
                   {% if tmpl.auto_generate %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400">Auto</span>{% endif %}
@@ -500,7 +500,7 @@
                   {% if not tmpl.is_active %}<span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-zinc-500/10 text-zinc-400">Inactive</span>{% endif %}
                 </div>
               </td>
-              <td class="px-4 py-3 text-right text-xs text-[var(--color-text-muted)]">{{ tmpl.generated_count }}</td>
+              <td class="px-4 py-3 text-right text-xs text-(--color-text-muted)">{{ tmpl.generated_count }}</td>
               <td class="px-4 py-3 text-right">
                 <div class="flex items-center gap-1 justify-end">
                   <form method="post" class="inline">{% csrf_token %}
@@ -523,9 +523,9 @@
             </tr>
             {% empty %}
             <tr><td colspan="7" class="px-4 py-12 text-center">
-              <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-3 text-[var(--color-text-muted)] opacity-40"></i>
-              <p class="text-sm text-[var(--color-text-muted)]">No guide templates yet</p>
-              <p class="text-xs text-[var(--color-text-muted)] mt-1">Create templates to auto-generate flashing guides for your devices</p>
+              <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-3 text-(--color-text-muted) opacity-40"></i>
+              <p class="text-sm text-(--color-text-muted)">No guide templates yet</p>
+              <p class="text-xs text-(--color-text-muted) mt-1">Create templates to auto-generate flashing guides for your devices</p>
             </td></tr>
             {% endfor %}
           </tbody>
@@ -536,40 +536,40 @@
 
     {# ── Generated Guides History ── #}
     <div class="mt-8">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2 mb-4">
-        <i data-lucide="book-open" class="w-4 h-4 text-[var(--color-accent)]"></i>Generated Guides
+      <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2 mb-4">
+        <i data-lucide="book-open" class="w-4 h-4 text-(--color-accent)"></i>Generated Guides
         <span class="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/10 text-pink-400">{{ stats.total_generated }}</span>
       </h3>
       <div class="glass rounded-xl overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead>
-              <tr class="border-b border-[var(--color-border)]">
-                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Post Title</th>
-                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Brand</th>
-                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Model</th>
-                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Chipset</th>
-                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Template</th>
-                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Created</th>
+              <tr class="border-b border-(--color-border)">
+                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Post Title</th>
+                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Brand</th>
+                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Model</th>
+                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Chipset</th>
+                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Template</th>
+                <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-(--color-text-muted)">Created</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[var(--color-border)]/50">
+            <tbody class="divide-y divide-(--color-border)/50">
               {% for guide in generated_guides %}
-              <tr class="hover:bg-[var(--color-bg-tertiary)]/30 transition-colors">
+              <tr class="hover:bg-(--color-bg-tertiary)/30 transition-colors">
                 <td class="px-4 py-3">
-                  <span class="text-sm font-medium text-[var(--color-text-primary)] truncate max-w-[200px] block">{{ guide.post.title|default:"—" }}</span>
+                  <span class="text-sm font-medium text-(--color-text-primary) truncate max-w-[200px] block">{{ guide.post.title|default:"—" }}</span>
                 </td>
-                <td class="px-4 py-3 text-xs text-[var(--color-text-secondary)]">{{ guide.brand.name|default:"—" }}</td>
-                <td class="px-4 py-3 text-xs text-[var(--color-text-secondary)]">{{ guide.model.name|default:"—" }}</td>
-                <td class="px-4 py-3 text-xs text-[var(--color-text-muted)]">{{ guide.chipset|default:"—" }}</td>
-                <td class="px-4 py-3 text-xs text-[var(--color-text-muted)] truncate max-w-[150px]">{{ guide.template.title_template|truncatewords:5 }}</td>
-                <td class="px-4 py-3 text-xs text-[var(--color-text-muted)]">{{ guide.created_at|timesince }} ago</td>
+                <td class="px-4 py-3 text-xs text-(--color-text-secondary)">{{ guide.brand.name|default:"—" }}</td>
+                <td class="px-4 py-3 text-xs text-(--color-text-secondary)">{{ guide.model.name|default:"—" }}</td>
+                <td class="px-4 py-3 text-xs text-(--color-text-muted)">{{ guide.chipset|default:"—" }}</td>
+                <td class="px-4 py-3 text-xs text-(--color-text-muted) truncate max-w-[150px]">{{ guide.template.title_template|truncatewords:5 }}</td>
+                <td class="px-4 py-3 text-xs text-(--color-text-muted)">{{ guide.created_at|timesince }} ago</td>
               </tr>
               {% empty %}
               <tr><td colspan="6" class="px-4 py-12 text-center">
-                <i data-lucide="book-open" class="w-8 h-8 mx-auto mb-3 text-[var(--color-text-muted)] opacity-40"></i>
-                <p class="text-sm text-[var(--color-text-muted)]">No guides generated yet</p>
-                <p class="text-xs text-[var(--color-text-muted)] mt-1">Create a template and click "Generate" to produce flashing guide blog posts</p>
+                <i data-lucide="book-open" class="w-8 h-8 mx-auto mb-3 text-(--color-text-muted) opacity-40"></i>
+                <p class="text-sm text-(--color-text-muted)">No guides generated yet</p>
+                <p class="text-xs text-(--color-text-muted) mt-1">Create a template and click "Generate" to produce flashing guide blog posts</p>
               </td></tr>
               {% endfor %}
             </tbody>

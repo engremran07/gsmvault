@@ -7,40 +7,40 @@
 {% block page_header %}
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
-      <i data-lucide="share-2" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl font-bold text-(--color-text-primary) flex items-center gap-3">
+      <i data-lucide="share-2" class="w-8 h-8 text-(--color-accent)"></i>
       Referral Dashboard
     </h1>
-    <p class="text-[var(--color-text-secondary)] mt-1">Share your link, earn commissions on every signup</p>
+    <p class="text-(--color-text-secondary) mt-1">Share your link, earn commissions on every signup</p>
   </div>
 </div>
 {% endblock %}
 
 {% block page_content %}
 {# ── Referral Code Card ── #}
-<div class="rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 mb-8">
-  <h2 class="text-lg font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
-    <i data-lucide="link" class="w-5 h-5 text-[var(--color-accent)]"></i>
+<div class="rounded-xl border border-accent/30 bg-(--color-bg-secondary) p-6 mb-8">
+  <h2 class="text-lg font-semibold text-(--color-text-primary) mb-3 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 text-(--color-accent)"></i>
     Your Referral Link
   </h2>
   <div class="flex flex-col sm:flex-row gap-3"
        x-data="{ copied: false }">
     <input type="text" readonly
            value="{{ request.scheme }}://{{ request.get_host }}/ref/{{ referral_code.code }}/"
-           class="flex-1 px-4 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] text-sm text-[var(--color-text-primary)] font-mono select-all"
+           class="flex-1 px-4 py-2.5 rounded-lg border border-(--color-border) bg-(--color-bg-primary) text-sm text-(--color-text-primary) font-mono select-all"
            id="ref-link-input">
     <button type="button"
             @click="navigator.clipboard.writeText($refs.refLink?.value || document.getElementById('ref-link-input').value); copied = true; setTimeout(() => copied = false, 2000)"
-            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-medium text-sm hover:opacity-90 transition-opacity">
+            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) font-medium text-sm hover:opacity-90 transition-opacity">
       <i data-lucide="copy" class="w-4 h-4" x-show="!copied" x-cloak></i>
       <i data-lucide="check" class="w-4 h-4" x-show="copied" x-cloak></i>
       <span x-text="copied ? 'Copied!' : 'Copy Link'"></span>
     </button>
   </div>
-  <p class="text-xs text-[var(--color-text-muted)] mt-2">
-    Code: <span class="font-mono font-bold text-[var(--color-accent)]">{{ referral_code.code }}</span>
+  <p class="text-xs text-(--color-text-muted) mt-2">
+    Code: <span class="font-mono font-bold text-(--color-accent)">{{ referral_code.code }}</span>
     {% if referral_code.tier %}
-    — Tier: <span class="font-semibold text-[var(--color-success)]">{{ referral_code.tier.name }}</span>
+    — Tier: <span class="font-semibold text-(--color-success)">{{ referral_code.tier.name }}</span>
     ({{ referral_code.tier.commission_rate|floatformat:1 }}% commission)
     {% endif %}
   </p>
@@ -59,19 +59,19 @@
 {% include "components/_section_header.html" with title="Referral Tiers" %}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 mb-8">
   {% for tier in tiers %}
-  <div class="rounded-xl border {% if referral_code.tier_id == tier.pk %}border-[var(--color-accent)] ring-2 ring-[var(--color-accent)]/20{% else %}border-[var(--color-border)]{% endif %} bg-[var(--color-bg-secondary)] p-5 relative">
+  <div class="rounded-xl border {% if referral_code.tier_id == tier.pk %}border-(--color-accent) ring-2 ring-[var(--color-accent)]/20{% else %}border-(--color-border){% endif %} bg-(--color-bg-secondary) p-5 relative">
     {% if referral_code.tier_id == tier.pk %}
     <div class="absolute -top-2.5 left-4">
-      <span class="inline-flex items-center gap-1 text-xs font-medium rounded-full bg-[var(--color-accent)] text-[var(--color-accent-text)] px-2.5 py-0.5">
+      <span class="inline-flex items-center gap-1 text-xs font-medium rounded-full bg-(--color-accent) text-(--color-accent-text) px-2.5 py-0.5">
         Current
       </span>
     </div>
     {% endif %}
-    <h4 class="text-base font-bold text-[var(--color-text-primary)] mb-1">{{ tier.name }}</h4>
-    <p class="text-sm text-[var(--color-text-secondary)] mb-2">
+    <h4 class="text-base font-bold text-(--color-text-primary) mb-1">{{ tier.name }}</h4>
+    <p class="text-sm text-(--color-text-secondary) mb-2">
       {{ tier.commission_rate|floatformat:1 }}% commission
     </p>
-    <p class="text-xs text-[var(--color-text-muted)]">
+    <p class="text-xs text-(--color-text-muted)">
       Requires {{ tier.min_referrals }} successful referral{{ tier.min_referrals|pluralize }}
     </p>
   </div>
@@ -83,10 +83,10 @@
 {% include "components/_section_header.html" with title="Recent Commissions" %}
 
 {% if commissions %}
-<div class="mt-4 rounded-xl border border-[var(--color-border)] overflow-hidden">
+<div class="mt-4 rounded-xl border border-(--color-border) overflow-hidden">
   <table class="w-full text-sm">
     <thead>
-      <tr class="border-b border-[var(--color-border)] bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]">
+      <tr class="border-b border-(--color-border) bg-(--color-bg-tertiary) text-(--color-text-muted)">
         <th class="text-left px-5 py-3 font-medium">Date</th>
         <th class="text-left px-5 py-3 font-medium">Referred User</th>
         <th class="text-left px-5 py-3 font-medium">Type</th>
@@ -94,19 +94,19 @@
         <th class="text-right px-5 py-3 font-medium">Status</th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-[var(--color-border)]/50">
+    <tbody class="divide-y divide-(--color-border)/50">
       {% for c in commissions %}
-      <tr class="bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
-        <td class="px-5 py-3 text-[var(--color-text-secondary)]">{{ c.created_at|date:"M d, Y" }}</td>
-        <td class="px-5 py-3 text-[var(--color-text-primary)]">{{ c.referred_user.get_full_name|default:c.referred_user.username }}</td>
-        <td class="px-5 py-3 text-[var(--color-text-muted)]">{{ c.tx_type }}</td>
-        <td class="px-5 py-3 text-right font-medium text-[var(--color-success)]">${{ c.amount|floatformat:2 }}</td>
+      <tr class="bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) transition-colors">
+        <td class="px-5 py-3 text-(--color-text-secondary)">{{ c.created_at|date:"M d, Y" }}</td>
+        <td class="px-5 py-3 text-(--color-text-primary)">{{ c.referred_user.get_full_name|default:c.referred_user.username }}</td>
+        <td class="px-5 py-3 text-(--color-text-muted)">{{ c.tx_type }}</td>
+        <td class="px-5 py-3 text-right font-medium text-(--color-success)">${{ c.amount|floatformat:2 }}</td>
         <td class="px-5 py-3 text-right">
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-            {% if c.status == 'paid' %}bg-[var(--color-success)]/15 text-[var(--color-success)]
-            {% elif c.status == 'approved' %}bg-[var(--color-accent)]/15 text-[var(--color-accent)]
-            {% elif c.status == 'reversed' %}bg-[var(--color-error)]/15 text-[var(--color-error)]
-            {% else %}bg-[var(--color-warning)]/15 text-[var(--color-warning)]{% endif %}">
+            {% if c.status == 'paid' %}bg-(--color-success)/15 text-(--color-success)
+            {% elif c.status == 'approved' %}bg-accent/15 text-(--color-accent)
+            {% elif c.status == 'reversed' %}bg-(--color-error)/15 text-(--color-error)
+            {% else %}bg-(--color-warning)/15 text-(--color-warning){% endif %}">
             {{ c.get_status_display }}
           </span>
         </td>

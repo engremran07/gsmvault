@@ -35,6 +35,7 @@ class Category(models.Model):
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "Blog Category"
         verbose_name_plural = "Categories"
 
     def __str__(self) -> str:
@@ -158,6 +159,8 @@ class Post(models.Model):
 
     class Meta:
         ordering = ["-published_at", "-created_at"]
+        verbose_name = "Blog Post"
+        verbose_name_plural = "Blog Posts"
         indexes = [
             models.Index(
                 fields=["status", "publish_at"], name="blog_post_status_pub_idx"

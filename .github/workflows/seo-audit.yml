@@ -1,0 +1,199 @@
+name: SEO Audit
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'  # Weekly Sunday at 5am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-audit:
+    name: SEO Health Check
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: appdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgres://postgres:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/appdb
+      DJANGO_SETTINGS_MODULE: app.settings_dev
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=app.settings_dev
+
+      - name: Check meta titles and descriptions
+        run: |
+          python -c "
+          import django, os
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          django.setup()
+
+          from apps.seo.models import Metadata
+          total = Metadata.objects.count()
+          missing_title = Metadata.objects.filter(title='').count()
+          missing_desc = Metadata.objects.filter(description='').count()
+
+          print(f'Total metadata entries: {total}')
+          print(f'Missing titles: {missing_title}')
+          print(f'Missing descriptions: {missing_desc}')
+
+          if total > 0:
+              coverage = ((total - missing_title) / total) * 100
+              print(f'Title coverage: {coverage:.1f}%')
+              if missing_title > 0:
+                  print(f'::warning::Found {missing_title} pages without meta titles')
+              if missing_desc > 0:
+                  print(f'::warning::Found {missing_desc} pages without meta descriptions')
+          else:
+              print('No metadata entries found — new deployment or empty DB')
+          "
+
+      - name: Validate JSON-LD schemas
+        run: |
+          python -c "
+          import django, os, json
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          django.setup()
+
+          from apps.seo.models import SchemaEntry
+          entries = SchemaEntry.objects.all()
+          errors = 0
+          valid = 0
+
+          for entry in entries:
+              try:
+                  data = json.loads(entry.schema_data) if isinstance(entry.schema_data, str) else entry.schema_data
+                  if '@type' not in data and '@graph' not in data:
+                      print(f'::warning::Schema entry {entry.pk} missing @type: {entry}')
+                      errors += 1
+                  else:
+                      valid += 1
+              except (json.JSONDecodeError, TypeError) as e:
+                  print(f'::error::Invalid JSON-LD in schema entry {entry.pk}: {e}')
+                  errors += 1
+
+          print(f'Valid schemas: {valid}')
+          print(f'Invalid schemas: {errors}')
+          if errors > 0:
+              print(f'::warning::{errors} JSON-LD schema(s) have issues')
+          "
+
+      - name: Check sitemap completeness
+        run: |
+          python -c "
+          import django, os
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          django.setup()
+
+          from apps.seo.models import SitemapEntry
+          total = SitemapEntry.objects.count()
+          active = SitemapEntry.objects.filter(is_active=True).count() if hasattr(SitemapEntry, 'is_active') else total
+          print(f'Sitemap entries: {total} (active: {active})')
+
+          # Check for sitemap template files
+          import pathlib
+          templates = list(pathlib.Path('templates').glob('sitemap*.xml'))
+          print(f'Sitemap templates: {len(templates)}')
+          for t in templates:
+              print(f'  - {t}')
+          "
+
+      - name: Detect broken internal links
+        run: |
+          python -c "
+          import django, os
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          django.setup()
+
+          from django.test import Client
+          from django.urls import reverse, URLResolver, URLPattern
+          from django.urls.resolvers import get_resolver
+
+          client = Client()
+          resolver = get_resolver()
+          broken = []
+          checked = 0
+
+          def collect_url_names(resolver, prefix=''):
+              names = []
+              for pattern in resolver.url_patterns:
+                  if isinstance(pattern, URLResolver):
+                      ns = pattern.namespace or ''
+                      new_prefix = f'{prefix}{ns}:' if ns else prefix
+                      names.extend(collect_url_names(pattern, new_prefix))
+                  elif isinstance(pattern, URLPattern) and pattern.name:
+                      names.append(f'{prefix}{pattern.name}')
+              return names
+
+          url_names = collect_url_names(resolver)
+
+          # Test only no-arg URLs (safe subset)
+          for name in url_names[:100]:
+              try:
+                  url = reverse(name)
+                  response = client.get(url, follow=False)
+                  checked += 1
+                  if response.status_code >= 500:
+                      broken.append((name, url, response.status_code))
+                      print(f'::error::Broken: {name} ({url}) -> {response.status_code}')
+              except Exception:
+                  pass  # Skip URLs that require arguments
+
+          print(f'Checked {checked} URLs, {len(broken)} broken (5xx)')
+          if broken:
+              print(f'::warning::{len(broken)} internal URLs return server errors')
+          "
+
+      - name: Verify robots.txt exists
+        run: |
+          if [ -f "templates/robots.txt" ]; then
+            echo "✓ robots.txt template found"
+            cat templates/robots.txt
+          else
+            echo "::warning::templates/robots.txt not found"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## SEO Audit Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Trigger**: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checks performed:" >> "$GITHUB_STEP_SUMMARY"
+          echo "1. Meta titles & descriptions coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "2. JSON-LD schema validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "3. Sitemap completeness" >> "$GITHUB_STEP_SUMMARY"
+          echo "4. Broken internal link detection" >> "$GITHUB_STEP_SUMMARY"
+          echo "5. robots.txt presence" >> "$GITHUB_STEP_SUMMARY"

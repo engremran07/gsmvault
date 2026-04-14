@@ -5,7 +5,7 @@
 
 {% block auth_header %}
 <h1 class="text-2xl font-bold text-center">Sign In</h1>
-<p class="text-[var(--color-text-secondary)] text-center mt-2">Welcome back to {{ settings.site_name }}</p>
+<p class="text-(--color-text-secondary) text-center mt-2">Welcome back to {{ settings.site_name }}</p>
 {% endblock %}
 
 {% block auth_content %}
@@ -14,50 +14,50 @@
   {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
   {% if form.non_field_errors %}
-  <div class="rounded-lg bg-[var(--color-error)]/10 border border-[var(--color-error)]/30 p-3">
+  <div class="rounded-lg bg-(--color-error)/10 border border-(--color-error)/30 p-3">
     {% for error in form.non_field_errors %}
-    <p class="text-sm text-[var(--color-error)]">{{ error }}</p>
+    <p class="text-sm text-(--color-error)">{{ error }}</p>
     {% endfor %}
   </div>
   {% endif %}
 
   <div>
-    <label for="id_login" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Email or Username</label>
+    <label for="id_login" class="block text-sm font-medium text-(--color-text-primary) mb-1">Email or Username</label>
     <input type="text" name="login" id="id_login" required autofocus
-           class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+           class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
            placeholder="you@example.com"
            value="{{ form.login.value|default:'' }}">
     {% if form.login.errors %}
-    <p class="text-xs text-[var(--color-error)] mt-1">{{ form.login.errors.0 }}</p>
+    <p class="text-xs text-(--color-error) mt-1">{{ form.login.errors.0 }}</p>
     {% endif %}
   </div>
 
   <div>
-    <label for="id_password" class="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Password</label>
+    <label for="id_password" class="block text-sm font-medium text-(--color-text-primary) mb-1">Password</label>
     <input type="password" name="password" id="id_password" required
-           class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+           class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
            placeholder="••••••••">
     {% if form.password.errors %}
-    <p class="text-xs text-[var(--color-error)] mt-1">{{ form.password.errors.0 }}</p>
+    <p class="text-xs text-(--color-error) mt-1">{{ form.password.errors.0 }}</p>
     {% endif %}
   </div>
 
   <div class="flex items-center justify-between">
-    <label class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-      <input type="checkbox" name="remember" class="rounded border-[var(--color-border)] accent-[var(--color-accent)]">
+    <label class="flex items-center gap-2 text-sm text-(--color-text-secondary)">
+      <input type="checkbox" name="remember" class="rounded border-(--color-border) accent-[var(--color-accent)]">
       Remember me
     </label>
-    <a href="{% url 'account_reset_password' %}" class="text-sm text-[var(--color-accent)] hover:underline">Forgot password?</a>
+    <a href="{% url 'account_reset_password' %}" class="text-sm text-(--color-accent) hover:underline">Forgot password?</a>
   </div>
 
   <button type="submit"
-          class="w-full rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-[var(--color-accent-text)] font-medium hover:bg-[var(--color-accent-hover)] active:scale-[0.98] transition-all">
+          class="w-full rounded-lg bg-(--color-accent) px-4 py-2.5 text-(--color-accent-text) font-medium hover:bg-(--color-accent-hover) active:scale-[0.98] transition-all">
     Sign In
   </button>
 </form>
 
-<p class="text-center text-sm text-[var(--color-text-secondary)] mt-6">
+<p class="text-center text-sm text-(--color-text-secondary) mt-6">
   Don't have an account?
-  <a href="{% url 'users:account_signup' %}" class="text-[var(--color-accent)] hover:underline">Create one</a>
+  <a href="{% url 'users:account_signup' %}" class="text-(--color-accent) hover:underline">Create one</a>
 </p>
 {% endblock %}

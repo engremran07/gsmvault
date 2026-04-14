@@ -3,20 +3,20 @@
 
 {% for cat in categories %}
 <div class="mb-6">
-  <div class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] overflow-hidden">
+  <div class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) overflow-hidden">
     {# Category header #}
     <a href="{% url 'forum:category_detail' slug=cat.slug %}"
-       class="flex items-center gap-3 px-6 py-4 hover:bg-[var(--color-bg-tertiary)] transition-colors">
+       class="flex items-center gap-3 px-6 py-4 hover:bg-(--color-bg-tertiary) transition-colors">
       <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: {{ cat.color }}20;">
         <i data-lucide="{{ cat.icon|default:'message-circle' }}" class="w-5 h-5" style="color: {{ cat.color }};"></i>
       </div>
       <div class="flex-1 min-w-0">
-        <h2 class="text-lg font-semibold text-[var(--color-text-primary)]">{{ cat.title }}</h2>
+        <h2 class="text-lg font-semibold text-(--color-text-primary)">{{ cat.title }}</h2>
         {% if cat.description %}
-        <p class="text-sm text-[var(--color-text-secondary)] truncate">{{ cat.description }}</p>
+        <p class="text-sm text-(--color-text-secondary) truncate">{{ cat.description }}</p>
         {% endif %}
       </div>
-      <div class="hidden sm:flex items-center gap-6 text-sm text-[var(--color-text-secondary)]">
+      <div class="hidden sm:flex items-center gap-6 text-sm text-(--color-text-secondary)">
         <span title="Topics">{{ cat.topic_count }} topics</span>
         <span title="Replies">{{ cat.reply_count }} replies</span>
       </div>
@@ -25,17 +25,17 @@
     {# Subcategories #}
     {% for sub in cat.children.all %}
     <a href="{% url 'forum:category_detail' slug=sub.slug %}"
-       class="flex items-center gap-3 px-6 py-3 border-t border-[var(--color-border)] hover:bg-[var(--color-bg-tertiary)] transition-colors pl-12">
+       class="flex items-center gap-3 px-6 py-3 border-t border-(--color-border) hover:bg-(--color-bg-tertiary) transition-colors pl-12">
       <div class="w-7 h-7 rounded flex items-center justify-center" style="background: {{ sub.color }}20;">
         <i data-lucide="{{ sub.icon|default:'hash' }}" class="w-4 h-4" style="color: {{ sub.color }};"></i>
       </div>
       <div class="flex-1 min-w-0">
-        <span class="text-[var(--color-text-primary)] font-medium">{{ sub.title }}</span>
+        <span class="text-(--color-text-primary) font-medium">{{ sub.title }}</span>
         {% if sub.description %}
-        <span class="text-xs text-[var(--color-text-secondary)] ml-2">{{ sub.description }}</span>
+        <span class="text-xs text-(--color-text-secondary) ml-2">{{ sub.description }}</span>
         {% endif %}
       </div>
-      <div class="hidden sm:flex items-center gap-4 text-xs text-[var(--color-text-secondary)]">
+      <div class="hidden sm:flex items-center gap-4 text-xs text-(--color-text-secondary)">
         <span>{{ sub.topic_count }}</span>
         <span>{{ sub.reply_count }}</span>
       </div>

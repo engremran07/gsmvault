@@ -14,6 +14,8 @@ import os
 
 from django.core.asgi import get_asgi_application
 
+import app._platform_fix  # noqa: F401  # Python 3.13+ WMI fix
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
 
 application = get_asgi_application()

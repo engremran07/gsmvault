@@ -7,14 +7,14 @@
 <div class="space-y-6">
   <h1 class="text-2xl font-bold">My Profile</h1>
 
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <div class="flex items-center gap-4 mb-6">
-      <div class="w-16 h-16 rounded-full bg-[var(--color-accent)]/20 flex items-center justify-center text-[var(--color-accent)] text-2xl font-bold">
+      <div class="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center text-(--color-accent) text-2xl font-bold">
         {{ user.username|first|upper }}
       </div>
       <div>
         <h2 class="text-xl font-semibold">{{ user.full_name|default:user.username }}</h2>
-        <p class="text-sm text-[var(--color-text-secondary)]">{{ user.email }}</p>
+        <p class="text-sm text-(--color-text-secondary)">{{ user.email }}</p>
       </div>
     </div>
 
@@ -72,48 +72,48 @@
         },
         cancel() { this.username = this.original; this.editing = false; this.status = ''; }
       }">
-        <span class="text-sm text-[var(--color-text-secondary)]">Username</span>
+        <span class="text-sm text-(--color-text-secondary)">Username</span>
         <div x-show="!editing" class="flex items-center gap-2">
           <p class="font-medium" x-text="original"></p>
-          <button type="button" @click="editing = true" class="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition" title="Edit username">
+          <button type="button" @click="editing = true" class="text-(--color-accent) hover:text-(--color-accent-hover) transition" title="Edit username">
             <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
           </button>
         </div>
         <div x-show="editing" x-cloak class="mt-1 space-y-2">
           <div class="relative">
             <input type="text" x-model="username" @input="check()" @keydown.escape="cancel()" @keydown.enter.prevent="save()"
-                   class="w-full rounded-lg border bg-[var(--color-bg-primary)] px-3 py-2 pr-9 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
-                   :class="status === 'available' ? 'border-[var(--color-success)]' : (status === 'taken' || status === 'invalid' || status === 'limit') ? 'border-[var(--color-error)]' : 'border-[var(--color-border)]'">
+                   class="w-full rounded-lg border bg-(--color-bg-primary) px-3 py-2 pr-9 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
+                   :class="status === 'available' ? 'border-(--color-success)' : (status === 'taken' || status === 'invalid' || status === 'limit') ? 'border-(--color-error)' : 'border-(--color-border)'">
             <div class="absolute right-2.5 top-1/2 -translate-y-1/2">
-              <i data-lucide="loader-2" class="w-4 h-4 text-[var(--color-text-muted)] animate-spin" x-show="status === 'checking'" x-cloak></i>
-              <i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-success)]" x-show="status === 'available'" x-cloak></i>
-              <i data-lucide="x-circle" class="w-4 h-4 text-[var(--color-error)]" x-show="status === 'taken' || status === 'invalid' || status === 'limit'" x-cloak></i>
+              <i data-lucide="loader-2" class="w-4 h-4 text-(--color-text-muted) animate-spin" x-show="status === 'checking'" x-cloak></i>
+              <i data-lucide="check-circle" class="w-4 h-4 text-(--color-success)" x-show="status === 'available'" x-cloak></i>
+              <i data-lucide="x-circle" class="w-4 h-4 text-(--color-error)" x-show="status === 'taken' || status === 'invalid' || status === 'limit'" x-cloak></i>
             </div>
           </div>
           <p class="text-xs" x-cloak>
-            <span x-show="status === 'available'" class="text-[var(--color-success)]">Available — press Enter or Save to apply</span>
-            <span x-show="status === 'same'" class="text-[var(--color-text-muted)]">This is your current username</span>
-            <span x-show="status === 'taken'" class="text-[var(--color-error)]">This username is already taken</span>
-            <span x-show="status === 'invalid'" class="text-[var(--color-error)]">3–32 chars: letters, numbers, dots, hyphens, underscores</span>
-            <span x-show="status === 'limit'" class="text-[var(--color-error)]">Username change limit reached (2 per year)</span>
+            <span x-show="status === 'available'" class="text-(--color-success)">Available — press Enter or Save to apply</span>
+            <span x-show="status === 'same'" class="text-(--color-text-muted)">This is your current username</span>
+            <span x-show="status === 'taken'" class="text-(--color-error)">This username is already taken</span>
+            <span x-show="status === 'invalid'" class="text-(--color-error)">3–32 chars: letters, numbers, dots, hyphens, underscores</span>
+            <span x-show="status === 'limit'" class="text-(--color-error)">Username change limit reached (2 per year)</span>
           </p>
           <div class="flex gap-2">
             <button type="button" @click="save()" :disabled="status !== 'available' || saving"
-                    class="rounded-md bg-[var(--color-accent)] px-3 py-1.5 text-xs font-medium text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    class="rounded-md bg-(--color-accent) px-3 py-1.5 text-xs font-medium text-(--color-accent-text) hover:bg-(--color-accent-hover) transition disabled:opacity-40 disabled:cursor-not-allowed">
               <span x-show="!saving">Save</span>
               <span x-show="saving" x-cloak>Saving…</span>
             </button>
-            <button type="button" @click="cancel()" class="rounded-md border border-[var(--color-border)] px-3 py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)] transition">Cancel</button>
+            <button type="button" @click="cancel()" class="rounded-md border border-(--color-border) px-3 py-1.5 text-xs text-(--color-text-secondary) hover:bg-(--color-bg-tertiary) transition">Cancel</button>
           </div>
         </div>
       </div>
       <div>
-        <span class="text-sm text-[var(--color-text-secondary)]">Email</span>
+        <span class="text-sm text-(--color-text-secondary)">Email</span>
         <p class="font-medium">{{ user.email }}</p>
       </div>
       {% if country_name %}
       <div>
-        <span class="text-sm text-[var(--color-text-secondary)]">Country</span>
+        <span class="text-sm text-(--color-text-secondary)">Country</span>
         <p class="font-medium flex items-center gap-2">
           {% if user.country %}
           <img src="https://flagcdn.com/24x18/{{ user.country|lower }}.png" alt="{{ country_name }}" class="inline-block w-6 h-4 rounded-sm">
@@ -124,45 +124,139 @@
       {% endif %}
       {% if user.phone %}
       <div>
-        <span class="text-sm text-[var(--color-text-secondary)]">Phone</span>
+        <span class="text-sm text-(--color-text-secondary)">Phone</span>
         <p class="font-medium">{% if user.phone_country_code %}{{ user.phone_country_code }} {% endif %}{{ user.phone }}</p>
       </div>
       {% endif %}
       {% if profile_obj and profile_obj.location %}
       <div>
-        <span class="text-sm text-[var(--color-text-secondary)]">Location</span>
+        <span class="text-sm text-(--color-text-secondary)">Location</span>
         <p class="font-medium">{{ profile_obj.location }}</p>
       </div>
       {% endif %}
       <div>
-        <span class="text-sm text-[var(--color-text-secondary)]">Joined</span>
+        <span class="text-sm text-(--color-text-secondary)">Joined</span>
         <p class="font-medium">{{ user.date_joined|date:"M d, Y" }}</p>
       </div>
       <div>
-        <span class="text-sm text-[var(--color-text-secondary)]">Last Login</span>
+        <span class="text-sm text-(--color-text-secondary)">Last Login</span>
         <p class="font-medium">{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</p>
       </div>
     </div>
 
     {% if profile_obj and profile_obj.bio %}
-    <div class="mt-4 pt-4 border-t border-[var(--color-border)]">
-      <span class="text-sm text-[var(--color-text-secondary)]">Bio</span>
-      <p class="text-sm text-[var(--color-text-primary)] mt-1">{{ profile_obj.bio }}</p>
+    <div class="mt-4 pt-4 border-t border-(--color-border)">
+      <span class="text-sm text-(--color-text-secondary)">Bio</span>
+      <p class="text-sm text-(--color-text-primary) mt-1">{{ profile_obj.bio }}</p>
     </div>
     {% endif %}
     {% if profile_obj and profile_obj.website %}
     <div class="mt-3">
-      <span class="text-sm text-[var(--color-text-secondary)]">Website</span>
+      <span class="text-sm text-(--color-text-secondary)">Website</span>
       <p class="text-sm mt-1">
         <a href="{{ profile_obj.website }}" target="_blank" rel="noopener noreferrer"
-           class="text-[var(--color-accent)] hover:underline">{{ profile_obj.website }}</a>
+           class="text-(--color-accent) hover:underline">{{ profile_obj.website }}</a>
       </p>
     </div>
     {% endif %}
   </div>
 
+  {# Gamification — XP, Level, Badges, Streak #}
+  {% if gamification %}
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
+    <div class="flex items-center gap-2 mb-4">
+      <i data-lucide="trophy" class="w-5 h-5 text-(--color-accent)"></i>
+      <h2 class="text-lg font-semibold">Achievements</h2>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+      <div class="text-center p-3 rounded-lg bg-(--color-bg-primary)">
+        <div class="text-2xl font-bold text-(--color-accent) tabular-nums">{{ gamification.total_xp|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-secondary) mt-1">Total XP</div>
+      </div>
+      <div class="text-center p-3 rounded-lg bg-(--color-bg-primary)">
+        {% if gamification.level %}
+        <div class="text-2xl font-bold text-(--color-accent)">{{ gamification.level.name }}</div>
+        <div class="text-xs text-(--color-text-secondary) mt-1">Current Level</div>
+        {% else %}
+        <div class="text-2xl font-bold text-(--color-text-muted)">--</div>
+        <div class="text-xs text-(--color-text-secondary) mt-1">Level</div>
+        {% endif %}
+      </div>
+      <div class="text-center p-3 rounded-lg bg-(--color-bg-primary)">
+        <div class="text-2xl font-bold text-(--color-accent) tabular-nums">{{ gamification.badge_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-secondary) mt-1">Badges Earned</div>
+      </div>
+      <div class="text-center p-3 rounded-lg bg-(--color-bg-primary)">
+        <div class="flex items-center justify-center gap-1">
+          <i data-lucide="flame" class="w-5 h-5 text-(--color-warning)"></i>
+          <span class="text-2xl font-bold text-(--color-warning) tabular-nums">{{ gamification.streak|default:"0" }}</span>
+        </div>
+        <div class="text-xs text-(--color-text-secondary) mt-1">Day Streak</div>
+      </div>
+    </div>
+
+    {% if gamification.level and gamification.level.xp_required %}
+    <div class="mb-4">
+      <div class="flex items-center justify-between text-xs text-(--color-text-secondary) mb-1">
+        <span>Progress to next level</span>
+        <span class="tabular-nums">{{ gamification.total_xp }} / {{ gamification.level.xp_required }} XP</span>
+      </div>
+      <div class="w-full h-2 rounded-full bg-(--color-bg-primary) overflow-hidden">
+        <div class="h-full rounded-full bg-(--color-accent) transition-all"
+             style="width: {% widthratio gamification.total_xp gamification.level.xp_required 100 %}%"></div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if gamification.badges %}
+    <div class="border-t border-(--color-border) pt-4">
+      <h3 class="text-sm font-medium text-(--color-text-secondary) mb-3">Recent Badges</h3>
+      <div class="flex flex-wrap gap-2">
+        {% for ub in gamification.badges %}
+        <div class="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/5 px-3 py-1.5 text-sm"
+             title="{{ ub.badge.description }}">
+          {% if ub.badge.icon %}
+          <span>{{ ub.badge.icon }}</span>
+          {% else %}
+          <i data-lucide="award" class="w-4 h-4 text-(--color-accent)"></i>
+          {% endif %}
+          <span class="font-medium text-(--color-text-primary)">{{ ub.badge.name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% if gamification.badge_count > gamification.badges|length %}
+      <p class="text-xs text-(--color-text-muted) mt-2">
+        + {{ gamification.badge_count|add:"-6" }} more badges
+      </p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# Bounty Stats #}
+  {% if bounty_stats and bounty_stats.created or bounty_stats.fulfilled %}
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
+    <div class="flex items-center gap-2 mb-3">
+      <i data-lucide="target" class="w-5 h-5 text-(--color-accent)"></i>
+      <h2 class="text-lg font-semibold">Bounty Activity</h2>
+    </div>
+    <div class="flex gap-6">
+      <div class="text-center">
+        <div class="text-xl font-bold text-(--color-accent) tabular-nums">{{ bounty_stats.created }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Bounties Created</div>
+      </div>
+      <div class="text-center">
+        <div class="text-xl font-bold text-(--color-success) tabular-nums">{{ bounty_stats.fulfilled }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Bounties Fulfilled</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   {% comment %}Edit Profile — collapsible full editor with country/phone pickers{% endcomment %}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6"
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6"
        x-data="{
          open: false,
          selectedCountry: '{{ detected_country|default:"" }}',
@@ -174,17 +268,17 @@
        }">
     <button type="button" @click="open = !open" class="w-full flex items-center justify-between">
       <h2 class="text-lg font-semibold flex items-center gap-2">
-        <i data-lucide="user-pen" class="w-5 h-5 text-[var(--color-accent)]"></i>
+        <i data-lucide="user-pen" class="w-5 h-5 text-(--color-accent)"></i>
         Edit Profile
       </h2>
-      <i data-lucide="chevron-down" class="w-5 h-5 text-[var(--color-text-muted)] transition-transform" :class="open && 'rotate-180'"></i>
+      <i data-lucide="chevron-down" class="w-5 h-5 text-(--color-text-muted) transition-transform" :class="open && 'rotate-180'"></i>
     </button>
     <div x-show="open" x-cloak x-collapse class="mt-4">
       {% if detected_country %}
-      <div class="flex items-center gap-3 rounded-lg border border-[var(--color-info)]/30 bg-[var(--color-info)]/5 px-4 py-3 mb-4">
+      <div class="flex items-center gap-3 rounded-lg border border-(--color-info)/30 bg-(--color-info)/5 px-4 py-3 mb-4">
         <img :src="flagUrl('{{ detected_country }}')" alt="" class="w-6 h-4 rounded-sm object-cover shadow-sm" loading="lazy">
-        <p class="text-sm text-[var(--color-text-secondary)]">
-          <i data-lucide="map-pin" class="w-3.5 h-3.5 inline text-[var(--color-info)]"></i>
+        <p class="text-sm text-(--color-text-secondary)">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 inline text-(--color-info)"></i>
           Country auto-detected from your IP: <strong>{{ country_name }}</strong>. You can change it below.
         </p>
       </div>
@@ -196,7 +290,7 @@
           <label for="edit_full_name" class="block text-sm font-medium mb-1">Full Name</label>
           <input type="text" name="full_name" id="edit_full_name"
                  value="{{ user.full_name|default:'' }}"
-                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+                 class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                  placeholder="Your full name">
         </div>
 
@@ -207,12 +301,12 @@
         }" class="relative" @click.outside="open = false">
           <label class="block text-sm font-medium mb-1">Country</label>
           <button type="button" @click="open = !open"
-                  class="w-full flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-left text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
+                  class="w-full flex items-center gap-2 rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-left text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition">
             <template x-if="selectedCountry">
               <img :src="flagUrl(selectedCountry)" alt="" class="w-5 h-3.5 rounded-sm object-cover shadow-sm">
             </template>
-            <span class="flex-1 truncate" x-text="selectedCountryName || 'Select country'" :class="!selectedCountryName && 'text-[var(--color-text-muted)]'"></span>
-            <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
+            <span class="flex-1 truncate" x-text="selectedCountryName || 'Select country'" :class="!selectedCountryName && 'text-(--color-text-muted)'"></span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
           </button>
           <select name="country" class="sr-only" x-ref="countrySelect" tabindex="-1">
             <option value="">Select country</option>
@@ -221,21 +315,21 @@
             {% endfor %}
           </select>
           <div x-show="open" x-cloak x-transition
-               class="absolute z-50 mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] shadow-xl max-h-64 flex flex-col overflow-hidden">
-            <div class="p-2 border-b border-[var(--color-border)]/50">
+               class="absolute z-50 mt-1 w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) shadow-xl max-h-64 flex flex-col overflow-hidden">
+            <div class="p-2 border-b border-(--color-border)/50">
               <input type="text" x-model="search" placeholder="Search countries…" @keydown.escape="open = false"
-                     class="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]">
+                     class="w-full rounded-md border border-(--color-border) bg-(--color-bg-secondary) px-3 py-1.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-1 focus:ring-(--color-accent)">
             </div>
             <div class="overflow-y-auto flex-1">
               {% for code, name in countries %}
               <button type="button" data-code="{{ code }}" data-name="{{ name }}"
                       x-show="!search || '{{ name|escapejs }}'.toLowerCase().includes(search.toLowerCase()) || '{{ code }}'.toLowerCase().includes(search.toLowerCase())"
                       @click="selectedCountry = '{{ code }}'; selectedCountryName = '{{ name|escapejs }}'; $refs.countrySelect.value = '{{ code }}'; open = false; search = '';"
-                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-[var(--color-accent)]/10 transition"
-                      :class="selectedCountry === '{{ code }}' && 'bg-[var(--color-accent)]/5 text-[var(--color-accent)] font-medium'">
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-accent/10 transition"
+                      :class="selectedCountry === '{{ code }}' && 'bg-accent/5 text-(--color-accent) font-medium'">
                 <img src="https://flagcdn.com/24x18/{{ code|lower }}.png" alt="" class="w-5 h-3.5 rounded-sm object-cover shadow-sm" loading="lazy">
                 <span class="truncate">{{ name }}</span>
-                <span class="ml-auto text-xs text-[var(--color-text-muted)]">{{ code }}</span>
+                <span class="ml-auto text-xs text-(--color-text-muted)">{{ code }}</span>
               </button>
               {% endfor %}
             </div>
@@ -251,12 +345,12 @@
               phoneSearch: '',
             }" class="relative" @click.outside="phoneOpen = false">
               <button type="button" @click="phoneOpen = !phoneOpen"
-                      class="w-32 flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-2 py-2.5 text-left text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition">
+                      class="w-32 flex items-center gap-1.5 rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-2 py-2.5 text-left text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition">
                 <template x-if="selectedCountry">
                   <img :src="flagUrl(selectedCountry)" alt="" class="w-4 h-3 rounded-sm object-cover shadow-sm shrink-0">
                 </template>
                 <span class="flex-1 truncate tabular-nums" x-text="selectedPhoneCode || 'Code'"></span>
-                <i data-lucide="chevron-down" class="w-3 h-3 text-[var(--color-text-muted)] shrink-0"></i>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-(--color-text-muted) shrink-0"></i>
               </button>
               <select name="phone_country_code" class="sr-only" x-ref="phoneSelect" tabindex="-1">
                 <option value="">Code</option>
@@ -265,21 +359,21 @@
                 {% endfor %}
               </select>
               <div x-show="phoneOpen" x-cloak x-transition
-                   class="absolute z-50 mt-1 w-56 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] shadow-xl max-h-56 flex flex-col overflow-hidden">
-                <div class="p-2 border-b border-[var(--color-border)]/50">
+                   class="absolute z-50 mt-1 w-56 rounded-lg border border-(--color-border) bg-(--color-bg-primary) shadow-xl max-h-56 flex flex-col overflow-hidden">
+                <div class="p-2 border-b border-(--color-border)/50">
                   <input type="text" x-model="phoneSearch" placeholder="Search…" @keydown.escape="phoneOpen = false"
-                         class="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]">
+                         class="w-full rounded-md border border-(--color-border) bg-(--color-bg-secondary) px-3 py-1.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-1 focus:ring-(--color-accent)">
                 </div>
                 <div class="overflow-y-auto flex-1">
                   {% for code, dial in phone_codes %}
                   <button type="button"
                           x-show="!phoneSearch || '{{ code }}'.toLowerCase().includes(phoneSearch.toLowerCase()) || '{{ dial }}'.includes(phoneSearch)"
                           @click="selectedPhoneCode = '{{ dial }}'; selectedCountry = '{{ code }}'; $refs.phoneSelect.value = '{{ dial }}'; $refs.countrySelect.value = '{{ code }}'; selectedCountryName = ($refs.countrySelect.querySelector('option[value=&quot;{{ code }}&quot;]') || {}).textContent || ''; phoneOpen = false; phoneSearch = '';"
-                          class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-left hover:bg-[var(--color-accent)]/10 transition"
-                          :class="selectedPhoneCode === '{{ dial }}' && selectedCountry === '{{ code }}' && 'bg-[var(--color-accent)]/5 text-[var(--color-accent)] font-medium'">
+                          class="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-left hover:bg-accent/10 transition"
+                          :class="selectedPhoneCode === '{{ dial }}' && selectedCountry === '{{ code }}' && 'bg-accent/5 text-(--color-accent) font-medium'">
                     <img src="https://flagcdn.com/24x18/{{ code|lower }}.png" alt="" class="w-4 h-3 rounded-sm object-cover shadow-sm" loading="lazy">
                     <span class="truncate">{{ code }}</span>
-                    <span class="ml-auto text-xs tabular-nums text-[var(--color-text-muted)]">{{ dial }}</span>
+                    <span class="ml-auto text-xs tabular-nums text-(--color-text-muted)">{{ dial }}</span>
                   </button>
                   {% endfor %}
                 </div>
@@ -287,7 +381,7 @@
             </div>
             <input type="tel" name="phone"
                    value="{{ user.phone|default:'' }}"
-                   class="flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+                   class="flex-1 rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                    placeholder="Phone number">
           </div>
         </div>
@@ -296,30 +390,30 @@
           <label for="edit_location" class="block text-sm font-medium mb-1">City / Location</label>
           <input type="text" name="location" id="edit_location"
                  value="{% if profile_obj %}{{ profile_obj.location|default:'' }}{% endif %}"
-                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+                 class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                  placeholder="City, State">
         </div>
         <div>
           <label for="edit_bio" class="block text-sm font-medium mb-1">Bio</label>
           <textarea name="bio" id="edit_bio" rows="3" maxlength="1000"
-                    class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition resize-y"
+                    class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition resize-y"
                     placeholder="A short bio about yourself">{% if profile_obj %}{{ profile_obj.bio|default:'' }}{% endif %}</textarea>
-          <p class="text-xs text-[var(--color-text-muted)] mt-1">Max 1000 characters</p>
+          <p class="text-xs text-(--color-text-muted) mt-1">Max 1000 characters</p>
         </div>
         <div>
           <label for="edit_website" class="block text-sm font-medium mb-1">Website</label>
           <input type="url" name="website" id="edit_website"
                  value="{% if profile_obj %}{{ profile_obj.website|default:'' }}{% endif %}"
-                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+                 class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                  placeholder="https://example.com">
         </div>
         <div class="flex items-center gap-3 pt-2">
           <button type="submit"
-                  class="rounded-lg bg-[var(--color-accent)] px-6 py-2 text-sm font-medium text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition active:scale-[0.97]">
+                  class="rounded-lg bg-(--color-accent) px-6 py-2 text-sm font-medium text-(--color-accent-text) hover:bg-(--color-accent-hover) transition active:scale-[0.97]">
             Save Changes
           </button>
           <a href="{% url 'users:tell_us_about_you' %}"
-             class="text-sm text-[var(--color-accent)] hover:underline flex items-center gap-1">
+             class="text-sm text-(--color-accent) hover:underline flex items-center gap-1">
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
             Full profile editor
           </a>
@@ -329,7 +423,7 @@
   </div>
 
   {# Change Password #}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6"
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6"
        x-data="{
          open: false,
          currentPw: '',
@@ -367,10 +461,10 @@
        }">
     <button type="button" @click="open = !open" class="w-full flex items-center justify-between">
       <h2 class="text-lg font-semibold flex items-center gap-2">
-        <i data-lucide="key-round" class="w-5 h-5 text-[var(--color-warning)]"></i>
+        <i data-lucide="key-round" class="w-5 h-5 text-(--color-warning)"></i>
         Change Password
       </h2>
-      <i data-lucide="chevron-down" class="w-5 h-5 text-[var(--color-text-muted)] transition-transform" :class="open && 'rotate-180'"></i>
+      <i data-lucide="chevron-down" class="w-5 h-5 text-(--color-text-muted) transition-transform" :class="open && 'rotate-180'"></i>
     </button>
     <div x-show="open" x-cloak x-collapse class="mt-4">
       <form method="post" class="space-y-4 max-w-md">
@@ -379,21 +473,21 @@
         <div>
           <label for="current_password" class="block text-sm font-medium mb-1">Current Password</label>
           <input type="password" name="current_password" id="current_password" x-model="currentPw" autocomplete="current-password"
-                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+                 class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-3 py-2 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                  placeholder="Enter current password" required>
         </div>
         <div>
           <label for="new_password1" class="block text-sm font-medium mb-1">New Password</label>
           <input type="password" name="new_password1" id="new_password1" x-model="pw" autocomplete="new-password"
-                 class="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
+                 class="w-full rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-3 py-2 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
                  placeholder="Create new password" required>
           {# Strength bar #}
           <div x-show="pw" x-cloak class="mt-2">
             <div class="flex items-center justify-between mb-1">
               <span class="text-xs font-medium" :style="'color:' + strengthColor" x-text="strengthLabel"></span>
-              <span class="text-xs text-[var(--color-text-muted)]" x-text="passed + '/' + rules.length + ' rules'"></span>
+              <span class="text-xs text-(--color-text-muted)" x-text="passed + '/' + rules.length + ' rules'"></span>
             </div>
-            <div class="h-1.5 rounded-full bg-[var(--color-border)] overflow-hidden">
+            <div class="h-1.5 rounded-full bg-(--color-border) overflow-hidden">
               <div class="h-full rounded-full transition-all duration-300"
                    :style="'width:' + strength + '%; background:' + strengthColor"></div>
             </div>
@@ -402,9 +496,9 @@
           <div x-show="pw" x-cloak class="mt-2 space-y-1">
             <template x-for="rule in rules" :key="rule.key">
               <div class="flex items-center gap-1.5 text-xs">
-                <i data-lucide="check" class="w-3 h-3 text-[var(--color-success)]" x-show="rule.pass"></i>
-                <i data-lucide="x" class="w-3 h-3 text-[var(--color-text-muted)]" x-show="!rule.pass"></i>
-                <span :class="rule.pass ? 'text-[var(--color-success)]' : 'text-[var(--color-text-muted)]'" x-text="rule.label"></span>
+                <i data-lucide="check" class="w-3 h-3 text-(--color-success)" x-show="rule.pass"></i>
+                <i data-lucide="x" class="w-3 h-3 text-(--color-text-muted)" x-show="!rule.pass"></i>
+                <span :class="rule.pass ? 'text-(--color-success)' : 'text-(--color-text-muted)'" x-text="rule.label"></span>
               </div>
             </template>
           </div>
@@ -413,21 +507,21 @@
           <label for="new_password2" class="block text-sm font-medium mb-1">Confirm New Password</label>
           <div class="relative">
             <input type="password" name="new_password2" id="new_password2" x-model="pw2" autocomplete="new-password"
-                   class="w-full rounded-lg border bg-[var(--color-bg-primary)] px-3 py-2 pr-9 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] transition"
-                   :class="matchOk ? 'border-[var(--color-success)]' : matchBad ? 'border-[var(--color-error)]' : 'border-[var(--color-border)]'"
+                   class="w-full rounded-lg border bg-(--color-bg-primary) px-3 py-2 pr-9 text-sm text-(--color-text-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent) transition"
+                   :class="matchOk ? 'border-(--color-success)' : matchBad ? 'border-(--color-error)' : 'border-(--color-border)'"
                    placeholder="Confirm new password" required>
             <div class="absolute right-2.5 top-1/2 -translate-y-1/2">
-              <i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-success)]" x-show="matchOk" x-cloak></i>
-              <i data-lucide="x-circle" class="w-4 h-4 text-[var(--color-error)]" x-show="matchBad" x-cloak></i>
+              <i data-lucide="check-circle" class="w-4 h-4 text-(--color-success)" x-show="matchOk" x-cloak></i>
+              <i data-lucide="x-circle" class="w-4 h-4 text-(--color-error)" x-show="matchBad" x-cloak></i>
             </div>
           </div>
           <p class="text-xs mt-1" x-cloak>
-            <span x-show="matchOk" class="text-[var(--color-success)]">Passwords match</span>
-            <span x-show="matchBad" class="text-[var(--color-error)]">Passwords do not match</span>
+            <span x-show="matchOk" class="text-(--color-success)">Passwords match</span>
+            <span x-show="matchBad" class="text-(--color-error)">Passwords do not match</span>
           </p>
         </div>
         <button type="submit" :disabled="!canSubmit"
-                class="rounded-lg bg-[var(--color-accent)] px-6 py-2 text-sm font-medium text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition disabled:opacity-40 disabled:cursor-not-allowed">
+                class="rounded-lg bg-(--color-accent) px-6 py-2 text-sm font-medium text-(--color-accent-text) hover:bg-(--color-accent-hover) transition disabled:opacity-40 disabled:cursor-not-allowed">
           Update Password
         </button>
       </form>
@@ -435,42 +529,42 @@
   </div>
 
   {# Wallet & Credits #}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-      <i data-lucide="wallet" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      <i data-lucide="wallet" class="w-5 h-5 text-(--color-accent)"></i>
       Wallet
     </h2>
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-4">
-        <div class="text-xl font-bold text-[var(--color-accent)] tabular-nums">{{ wallet_balance }}</div>
-        <div class="text-sm text-[var(--color-text-secondary)]">Available Balance</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-4">
+        <div class="text-xl font-bold text-(--color-accent) tabular-nums">{{ wallet_balance }}</div>
+        <div class="text-sm text-(--color-text-secondary)">Available Balance</div>
       </div>
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-4">
-        <div class="text-xl font-bold text-[var(--color-warning)] tabular-nums">{{ wallet_locked }}</div>
-        <div class="text-sm text-[var(--color-text-secondary)]">Locked (Escrow)</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-4">
+        <div class="text-xl font-bold text-(--color-warning) tabular-nums">{{ wallet_locked }}</div>
+        <div class="text-sm text-(--color-text-secondary)">Locked (Escrow)</div>
       </div>
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-4">
-        <div class="text-xl font-bold text-[var(--color-text-primary)] tabular-nums">{{ credits }}</div>
-        <div class="text-sm text-[var(--color-text-secondary)]">Legacy Credits</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-4">
+        <div class="text-xl font-bold text-(--color-text-primary) tabular-nums">{{ credits }}</div>
+        <div class="text-sm text-(--color-text-secondary)">Legacy Credits</div>
       </div>
     </div>
   </div>
 
   {% comment %}Subscription & Firmware Downloads{% endcomment %}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6"
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6"
        x-data="{ showAll: false }">
     <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-      <i data-lucide="download" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      <i data-lucide="download" class="w-5 h-5 text-(--color-accent)"></i>
       Firmware Downloads
     </h2>
 
     {% comment %}Active subscription banner{% endcomment %}
     {% if active_subscription %}
-    <div class="flex items-center gap-3 rounded-lg border border-[var(--color-success)]/30 bg-[var(--color-success)]/5 px-4 py-3 mb-4">
-      <i data-lucide="crown" class="w-5 h-5 text-[var(--color-success)] shrink-0"></i>
+    <div class="flex items-center gap-3 rounded-lg border border-(--color-success)/30 bg-(--color-success)/5 px-4 py-3 mb-4">
+      <i data-lucide="crown" class="w-5 h-5 text-(--color-success) shrink-0"></i>
       <div>
-        <p class="text-sm font-medium text-[var(--color-success)]">{{ active_subscription.plan.name }} Subscription</p>
-        <p class="text-xs text-[var(--color-text-secondary)]">
+        <p class="text-sm font-medium text-(--color-success)">{{ active_subscription.plan.name }} Subscription</p>
+        <p class="text-xs text-(--color-text-secondary)">
           Status: {{ active_subscription.get_status_display }}
           {% if active_subscription.expires_at %} · Expires {{ active_subscription.expires_at|date:"M d, Y" }}{% endif %}
         </p>
@@ -480,21 +574,21 @@
 
     {% comment %}Download stats KPI row{% endcomment %}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 text-center">
-        <div class="text-lg font-bold text-[var(--color-accent)] tabular-nums">{{ download_stats.total }}</div>
-        <div class="text-xs text-[var(--color-text-secondary)]">Total Downloads</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-3 text-center">
+        <div class="text-lg font-bold text-(--color-accent) tabular-nums">{{ download_stats.total }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Total Downloads</div>
       </div>
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 text-center">
-        <div class="text-lg font-bold text-[var(--color-success)] tabular-nums">{{ download_stats.completed }}</div>
-        <div class="text-xs text-[var(--color-text-secondary)]">Completed</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-3 text-center">
+        <div class="text-lg font-bold text-(--color-success) tabular-nums">{{ download_stats.completed }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Completed</div>
       </div>
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 text-center">
-        <div class="text-lg font-bold text-[var(--color-info)] tabular-nums">{{ download_stats.free }}</div>
-        <div class="text-xs text-[var(--color-text-secondary)]">Free (Ad-gated)</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-3 text-center">
+        <div class="text-lg font-bold text-(--color-info) tabular-nums">{{ download_stats.free }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Free (Ad-gated)</div>
       </div>
-      <div class="rounded-lg border border-[var(--color-border)]/50 bg-[var(--color-bg-primary)] p-3 text-center">
-        <div class="text-lg font-bold text-[var(--color-warning)] tabular-nums">{{ download_stats.paid }}</div>
-        <div class="text-xs text-[var(--color-text-secondary)]">Paid / Subscription</div>
+      <div class="rounded-lg border border-(--color-border)/50 bg-(--color-bg-primary) p-3 text-center">
+        <div class="text-lg font-bold text-(--color-warning) tabular-nums">{{ download_stats.paid }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Paid / Subscription</div>
       </div>
     </div>
 
@@ -503,63 +597,63 @@
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-[var(--color-border)]">
-            <th class="text-left py-2 px-2 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">Firmware</th>
-            <th class="text-left py-2 px-2 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">Brand / Model</th>
-            <th class="text-left py-2 px-2 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">Type</th>
-            <th class="text-left py-2 px-2 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">Status</th>
-            <th class="text-left py-2 px-2 text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-wider">Date</th>
+          <tr class="border-b border-(--color-border)">
+            <th class="text-left py-2 px-2 text-xs font-medium text-(--color-text-muted) uppercase tracking-wider">Firmware</th>
+            <th class="text-left py-2 px-2 text-xs font-medium text-(--color-text-muted) uppercase tracking-wider">Brand / Model</th>
+            <th class="text-left py-2 px-2 text-xs font-medium text-(--color-text-muted) uppercase tracking-wider">Type</th>
+            <th class="text-left py-2 px-2 text-xs font-medium text-(--color-text-muted) uppercase tracking-wider">Status</th>
+            <th class="text-left py-2 px-2 text-xs font-medium text-(--color-text-muted) uppercase tracking-wider">Date</th>
           </tr>
         </thead>
         <tbody>
           {% for session in download_sessions %}
-          <tr class="border-b border-[var(--color-border)]/30 hover:bg-[var(--color-bg-tertiary)]/50 transition"
+          <tr class="border-b border-(--color-border)/30 hover:bg-(--color-bg-tertiary)/50 transition"
               x-show="showAll || {{ forloop.counter }} <= 5" {% if forloop.counter > 5 %}x-cloak{% endif %}>
             <td class="py-2.5 px-2">
-              <span class="font-medium text-[var(--color-text-primary)] truncate max-w-[200px] inline-block"
+              <span class="font-medium text-(--color-text-primary) truncate max-w-[200px] inline-block"
                     title="{{ session.token.firmware.original_file_name }}">
                 {{ session.token.firmware.original_file_name|truncatechars:35 }}
               </span>
             </td>
-            <td class="py-2.5 px-2 text-[var(--color-text-secondary)]">
+            <td class="py-2.5 px-2 text-(--color-text-secondary)">
               {% if session.token.firmware.brand %}{{ session.token.firmware.brand.name }}{% endif %}
               {% if session.token.firmware.model %}/ {{ session.token.firmware.model.name }}{% endif %}
             </td>
             <td class="py-2.5 px-2">
               {% if session.token.ad_gate_required and session.token.ad_gate_completed %}
-              <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[var(--color-info)]/10 text-[var(--color-info)]">
+              <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-(--color-info)/10 text-(--color-info)">
                 <i data-lucide="tv" class="w-3 h-3"></i> Free (Ad)
               </span>
               {% elif not session.token.ad_gate_required %}
-              <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[var(--color-warning)]/10 text-[var(--color-warning)]">
+              <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-(--color-warning)/10 text-(--color-warning)">
                 <i data-lucide="credit-card" class="w-3 h-3"></i> Paid
               </span>
               {% else %}
-              <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[var(--color-text-muted)]/10 text-[var(--color-text-muted)]">
+              <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-(--color-text-muted)/10 text-(--color-text-muted)">
                 <i data-lucide="download" class="w-3 h-3"></i> Download
               </span>
               {% endif %}
             </td>
             <td class="py-2.5 px-2">
               {% if session.status == "completed" %}
-              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-success)]">
+              <span class="inline-flex items-center gap-1 text-xs text-(--color-success)">
                 <i data-lucide="check-circle" class="w-3 h-3"></i> Completed
               </span>
               {% elif session.status == "started" %}
-              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-info)]">
+              <span class="inline-flex items-center gap-1 text-xs text-(--color-info)">
                 <i data-lucide="loader-2" class="w-3 h-3"></i> In Progress
               </span>
               {% elif session.status == "failed" %}
-              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-error)]">
+              <span class="inline-flex items-center gap-1 text-xs text-(--color-error)">
                 <i data-lucide="x-circle" class="w-3 h-3"></i> Failed
               </span>
               {% else %}
-              <span class="inline-flex items-center gap-1 text-xs text-[var(--color-text-muted)]">
+              <span class="inline-flex items-center gap-1 text-xs text-(--color-text-muted)">
                 <i data-lucide="ban" class="w-3 h-3"></i> {{ session.get_status_display }}
               </span>
               {% endif %}
             </td>
-            <td class="py-2.5 px-2 text-[var(--color-text-muted)] text-xs whitespace-nowrap">
+            <td class="py-2.5 px-2 text-(--color-text-muted) text-xs whitespace-nowrap">
               {{ session.started_at|date:"M d, Y H:i" }}
             </td>
           </tr>
@@ -570,7 +664,7 @@
     {% if download_sessions|length > 5 %}
     <div class="mt-3 text-center">
       <button type="button" @click="showAll = !showAll"
-              class="text-sm text-[var(--color-accent)] hover:underline flex items-center gap-1 mx-auto">
+              class="text-sm text-(--color-accent) hover:underline flex items-center gap-1 mx-auto">
         <span x-text="showAll ? 'Show less' : 'Show all {{ download_sessions|length }} downloads'"></span>
         <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" :class="showAll && 'rotate-180'"></i>
       </button>
@@ -578,31 +672,31 @@
     {% endif %}
     {% else %}
     <div class="text-center py-8">
-      <i data-lucide="download-cloud" class="w-10 h-10 text-[var(--color-text-muted)]/40 mx-auto mb-3"></i>
-      <p class="text-sm text-[var(--color-text-muted)]">No firmware downloads yet</p>
-      <p class="text-xs text-[var(--color-text-muted)]/70 mt-1">Your download history will appear here</p>
+      <i data-lucide="download-cloud" class="w-10 h-10 text-(--color-text-muted)/40 mx-auto mb-3"></i>
+      <p class="text-sm text-(--color-text-muted)">No firmware downloads yet</p>
+      <p class="text-xs text-(--color-text-muted)/70 mt-1">Your download history will appear here</p>
     </div>
     {% endif %}
   </div>
 
   {# Profile Completion Status & Unlocked Features #}
   {% if unlocked_features %}
-  <div class="rounded-lg border border-[var(--color-success)]/30 bg-[var(--color-success)]/5 p-6"
+  <div class="rounded-lg border border-(--color-success)/30 bg-(--color-success)/5 p-6"
        x-data="{ showFeatures: false }">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <span class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-success)]/15 text-[var(--color-success)]">
+        <span class="flex items-center justify-center w-10 h-10 rounded-full bg-(--color-success)/15 text-(--color-success)">
           <i data-lucide="check-circle" class="w-5 h-5"></i>
         </span>
         <div>
-          <h2 class="text-base font-semibold text-[var(--color-success)]">Profile Complete</h2>
-          <p class="text-sm text-[var(--color-text-secondary)]">
+          <h2 class="text-base font-semibold text-(--color-success)">Profile Complete</h2>
+          <p class="text-sm text-(--color-text-secondary)">
             You have access to all <strong>{{ unlocked_features|length }}</strong> platform features
           </p>
         </div>
       </div>
       <button type="button" @click="showFeatures = !showFeatures"
-              class="text-sm text-[var(--color-accent)] hover:underline flex items-center gap-1">
+              class="text-sm text-(--color-accent) hover:underline flex items-center gap-1">
         <span x-text="showFeatures ? 'Hide' : 'View all'"></span>
         <i data-lucide="chevron-down" class="w-4 h-4 transition-transform" :class="showFeatures && 'rotate-180'"></i>
       </button>
@@ -610,29 +704,29 @@
     <div x-show="showFeatures" x-cloak x-collapse class="mt-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {% for feature in unlocked_features %}
-        <a href="{{ feature.url }}" class="flex items-center gap-2 rounded-lg bg-[var(--color-bg-secondary)] px-3 py-2 transition hover:bg-[var(--color-success)]/10 hover:ring-1 hover:ring-[var(--color-success)]/30 group">
-          <i data-lucide="{{ feature.icon }}" class="w-4 h-4 text-[var(--color-success)] shrink-0"></i>
-          <span class="text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-success)] transition-colors">{{ feature.title }}</span>
-          <i data-lucide="arrow-right" class="w-3 h-3 text-[var(--color-text-muted)] shrink-0 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"></i>
+        <a href="{{ feature.url }}" class="flex items-center gap-2 rounded-lg bg-(--color-bg-secondary) px-3 py-2 transition hover:bg-(--color-success)/10 hover:ring-1 hover:ring-(--color-success)/30 group">
+          <i data-lucide="{{ feature.icon }}" class="w-4 h-4 text-(--color-success) shrink-0"></i>
+          <span class="text-sm text-(--color-text-primary) group-hover:text-(--color-success) transition-colors">{{ feature.title }}</span>
+          <i data-lucide="arrow-right" class="w-3 h-3 text-(--color-text-muted) shrink-0 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"></i>
         </a>
         {% endfor %}
       </div>
     </div>
   </div>
   {% elif not profile_completed %}
-  <div class="rounded-lg border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/5 p-6">
+  <div class="rounded-lg border border-(--color-warning)/30 bg-(--color-warning)/5 p-6">
     <div class="flex items-center gap-3">
-      <span class="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-warning)]/15 text-[var(--color-warning)]">
+      <span class="flex items-center justify-center w-10 h-10 rounded-full bg-(--color-warning)/15 text-(--color-warning)">
         <i data-lucide="lock" class="w-5 h-5"></i>
       </span>
       <div>
-        <h2 class="text-base font-semibold text-[var(--color-warning)]">Profile Incomplete</h2>
-        <p class="text-sm text-[var(--color-text-secondary)]">
+        <h2 class="text-base font-semibold text-(--color-warning)">Profile Incomplete</h2>
+        <p class="text-sm text-(--color-text-secondary)">
           Complete your profile to unlock all platform features.
         </p>
       </div>
       <a href="{% url 'users:tell_us_about_you' %}"
-         class="ml-auto rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition shrink-0">
+         class="ml-auto rounded-lg bg-(--color-accent) px-4 py-2 text-sm font-medium text-(--color-accent-text) hover:bg-(--color-accent-hover) transition shrink-0">
         Complete Now
       </a>
     </div>
@@ -641,43 +735,43 @@
 
   {% comment %}Referral Code — share & stats{% endcomment %}
   {% if user_referral_code %}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6"
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6"
        x-data="{ copied: false }">
     <div class="flex items-center gap-2 mb-3">
-      <i data-lucide="users" class="w-5 h-5 text-[var(--color-accent)]"></i>
+      <i data-lucide="users" class="w-5 h-5 text-(--color-accent)"></i>
       <h2 class="text-lg font-semibold">Referral Programme</h2>
     </div>
-    <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+    <p class="text-sm text-(--color-text-secondary) mb-4">
       Share your code. When friends sign up using it, you both earn rewards!
     </p>
 
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
-      <div class="flex-1 flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-2.5">
-        <i data-lucide="key" class="w-4 h-4 text-[var(--color-text-muted)] shrink-0"></i>
-        <code class="text-sm font-mono font-bold text-[var(--color-accent)] tracking-wider select-all">{{ user_referral_code }}</code>
+      <div class="flex-1 flex items-center gap-2 rounded-lg border border-(--color-border) bg-(--color-bg-primary) px-4 py-2.5">
+        <i data-lucide="key" class="w-4 h-4 text-(--color-text-muted) shrink-0"></i>
+        <code class="text-sm font-mono font-bold text-(--color-accent) tracking-wider select-all">{{ user_referral_code }}</code>
       </div>
       <button type="button"
               @click="navigator.clipboard.writeText('{{ user_referral_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
-              class="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--color-accent)] px-4 py-2.5 text-sm font-medium text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition-all active:scale-[0.97]">
+              class="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-lg bg-(--color-accent) px-4 py-2.5 text-sm font-medium text-(--color-accent-text) hover:bg-(--color-accent-hover) transition-all active:scale-[0.97]">
         <i x-show="!copied" data-lucide="copy" class="w-4 h-4"></i>
         <i x-show="copied" data-lucide="check" class="w-4 h-4" x-cloak></i>
         <span x-text="copied ? 'Copied!' : 'Copy Code'"></span>
       </button>
     </div>
 
-    <p class="text-xs text-[var(--color-text-muted)] mb-4">
+    <p class="text-xs text-(--color-text-muted) mb-4">
       Share link:
-      <code class="text-[var(--color-accent)] select-all">{{ request.scheme }}://{{ request.get_host }}/ref/{{ user_referral_code }}/</code>
+      <code class="text-(--color-accent) select-all">{{ request.scheme }}://{{ request.get_host }}/ref/{{ user_referral_code }}/</code>
     </p>
 
-    <div class="flex gap-4 pt-3 border-t border-[var(--color-border)]">
+    <div class="flex gap-4 pt-3 border-t border-(--color-border)">
       <div class="text-center">
-        <div class="text-xl font-bold text-[var(--color-accent)] tabular-nums">{{ referral_stats.clicks }}</div>
-        <div class="text-xs text-[var(--color-text-secondary)]">Total Clicks</div>
+        <div class="text-xl font-bold text-(--color-accent) tabular-nums">{{ referral_stats.clicks }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Total Clicks</div>
       </div>
       <div class="text-center">
-        <div class="text-xl font-bold text-[var(--color-success)] tabular-nums">{{ referral_stats.conversions }}</div>
-        <div class="text-xs text-[var(--color-text-secondary)]">Signups</div>
+        <div class="text-xl font-bold text-(--color-success) tabular-nums">{{ referral_stats.conversions }}</div>
+        <div class="text-xs text-(--color-text-secondary)">Signups</div>
       </div>
     </div>
   </div>
@@ -685,15 +779,15 @@
 
   {# Notifications #}
   {% if notifications %}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">Recent Notifications</h2>
     <div class="space-y-3">
       {% for notif in notifications %}
       <div class="flex items-start gap-3 {% if not notif.is_read %}font-medium{% endif %}">
-        <i data-lucide="bell" class="w-4 h-4 mt-0.5 text-[var(--color-text-secondary)]"></i>
+        <i data-lucide="bell" class="w-4 h-4 mt-0.5 text-(--color-text-secondary)"></i>
         <div>
           <p class="text-sm">{{ notif.message|truncatewords:25 }}</p>
-          <p class="text-xs text-[var(--color-text-muted)]">{{ notif.created_at|timesince }} ago</p>
+          <p class="text-xs text-(--color-text-muted)">{{ notif.created_at|timesince }} ago</p>
         </div>
       </div>
       {% endfor %}
@@ -703,12 +797,12 @@
 
   {# Announcements #}
   {% if announcements %}
-  <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6">
+  <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-6">
     <h2 class="text-lg font-semibold mb-4">Announcements</h2>
     {% for ann in announcements %}
-    <div class="border-b border-[var(--color-border)] pb-3 mb-3 last:border-0 last:mb-0 last:pb-0">
+    <div class="border-b border-(--color-border) pb-3 mb-3 last:border-0 last:mb-0 last:pb-0">
       <h3 class="font-medium">{{ ann.title }}</h3>
-      <p class="text-sm text-[var(--color-text-secondary)] mt-1">{{ ann.content|truncatewords:30 }}</p>
+      <p class="text-sm text-(--color-text-secondary) mt-1">{{ ann.content|truncatewords:30 }}</p>
     </div>
     {% endfor %}
   </div>

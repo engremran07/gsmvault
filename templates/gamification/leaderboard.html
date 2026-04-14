@@ -8,14 +8,14 @@
 {% block page_header %}
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
-      <i data-lucide="bar-chart-3" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl font-bold text-(--color-text-primary) flex items-center gap-3">
+      <i data-lucide="bar-chart-3" class="w-8 h-8 text-(--color-accent)"></i>
       Leaderboard
     </h1>
-    <p class="text-[var(--color-text-secondary)] mt-1">Top contributors ranked by XP</p>
+    <p class="text-(--color-text-secondary) mt-1">Top contributors ranked by XP</p>
   </div>
   <a href="{% url 'gamification_public:my_progress' %}"
-     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+     class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors">
     <i data-lucide="trophy" class="w-4 h-4"></i> My Progress
   </a>
 </div>
@@ -23,10 +23,10 @@
 
 {% block page_content %}
 {# ── Period Tabs ── #}
-<div class="flex gap-1 mb-6 border-b border-[var(--color-border)]">
+<div class="flex gap-1 mb-6 border-b border-(--color-border)">
   {% for value, label in period_choices %}
   <a href="{% url 'gamification_public:leaderboard' %}?period={{ value }}"
-     class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors {% if current_period == value %}border-[var(--color-accent)] text-[var(--color-accent)]{% else %}border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]{% endif %}">
+     class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors {% if current_period == value %}border-(--color-accent) text-(--color-accent){% else %}border-transparent text-(--color-text-muted) hover:text-(--color-text-primary){% endif %}">
     {{ label }}
   </a>
   {% endfor %}
@@ -34,10 +34,10 @@
 
 {# ── Leaderboard Table ── #}
 {% if entries %}
-<div class="rounded-xl border border-[var(--color-border)] overflow-hidden">
-  <div class="divide-y divide-[var(--color-border)]/50">
+<div class="rounded-xl border border-(--color-border) overflow-hidden">
+  <div class="divide-y divide-(--color-border)/50">
     {% for entry in entries %}
-    <div class="flex items-center gap-4 px-5 py-3 bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
+    <div class="flex items-center gap-4 px-5 py-3 bg-(--color-bg-secondary) hover:bg-(--color-bg-tertiary) transition-colors">
       {# Rank badge #}
       <div class="w-10 text-center shrink-0">
         {% if entry.rank == 1 %}
@@ -47,24 +47,24 @@
         {% elif entry.rank == 3 %}
         <span class="text-2xl">🥉</span>
         {% else %}
-        <span class="text-lg font-bold text-[var(--color-text-muted)]">#{{ entry.rank }}</span>
+        <span class="text-lg font-bold text-(--color-text-muted)">#{{ entry.rank }}</span>
         {% endif %}
       </div>
 
       {# User info #}
       <div class="flex items-center gap-3 flex-1 min-w-0">
-        <div class="w-8 h-8 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center shrink-0">
-          <i data-lucide="user" class="w-4 h-4 text-[var(--color-accent)]"></i>
+        <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+          <i data-lucide="user" class="w-4 h-4 text-(--color-accent)"></i>
         </div>
-        <span class="text-sm font-medium text-[var(--color-text-primary)] truncate">
+        <span class="text-sm font-medium text-(--color-text-primary) truncate">
           {{ entry.user.get_full_name|default:entry.user.username }}
         </span>
       </div>
 
       {# Score #}
       <div class="text-right shrink-0">
-        <span class="text-sm font-bold text-[var(--color-accent)]">{{ entry.score }}</span>
-        <span class="text-xs text-[var(--color-text-muted)]">XP</span>
+        <span class="text-sm font-bold text-(--color-accent)">{{ entry.score }}</span>
+        <span class="text-xs text-(--color-text-muted)">XP</span>
       </div>
     </div>
     {% endfor %}

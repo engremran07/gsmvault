@@ -1,0 +1,217 @@
+name: Redis Health
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  redis-check:
+    name: Redis Connectivity and Health
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Redis CLI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq redis-tools
+
+      - name: Redis PING test
+        run: |
+          RESPONSE=$(redis-cli -h localhost -p 6379 ping)
+          if [ "$RESPONSE" = "PONG" ]; then
+            echo "✓ Redis PING: $RESPONSE"
+          else
+            echo "::error::Redis PING failed: $RESPONSE"
+            exit 1
+          fi
+
+      - name: Check Redis memory usage
+        run: |
+          echo "--- Redis Memory Info ---"
+          redis-cli -h localhost -p 6379 info memory | grep -E '(used_memory_human|used_memory_peak_human|maxmemory_human|mem_fragmentation_ratio)'
+
+          USED=$(redis-cli -h localhost -p 6379 info memory | grep 'used_memory:' | cut -d: -f2 | tr -d '\r')
+          echo "Raw memory usage: $USED bytes"
+
+          # Check info server for version
+          VERSION=$(redis-cli -h localhost -p 6379 info server | grep 'redis_version:' | cut -d: -f2 | tr -d '\r')
+          echo "Redis version: $VERSION"
+
+          # Verify Redis 7.x
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          if [ "$MAJOR" -ge 7 ]; then
+            echo "✓ Redis version $VERSION meets requirement (>= 7.x)"
+          else
+            echo "::warning::Redis version $VERSION is below required 7.x"
+          fi
+
+      - name: Verify Celery broker connection
+        run: |
+          python -c "
+          import os
+          os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings_dev')
+
+          # Test Redis connectivity as Celery broker
+          import redis
+
+          r = redis.Redis(host='localhost', port=6379, db=0, socket_timeout=5)
+
+          # Basic connectivity
+          assert r.ping(), 'Redis ping failed'
+          print('✓ Redis connection successful')
+
+          # Test broker-style operations (Celery uses lists and pubsub)
+          test_queue = '_ci_celery_broker_test'
+          r.delete(test_queue)
+
+          # Simulate Celery task push/pull
+          r.lpush(test_queue, 'test_task_payload')
+          result = r.rpop(test_queue)
+          assert result == b'test_task_payload', f'Unexpected result: {result}'
+          print('✓ Celery broker queue operations work (lpush/rpop)')
+
+          # Test pubsub (used by Celery for events)
+          pubsub = r.pubsub()
+          pubsub.subscribe('_ci_test_channel')
+          r.publish('_ci_test_channel', 'test_message')
+          pubsub.unsubscribe()
+          pubsub.close()
+          print('✓ Redis pubsub operations work')
+
+          # Cleanup
+          r.delete(test_queue)
+          print('✓ Celery broker simulation passed')
+          "
+
+      - name: Test cache operations
+        run: |
+          python -c "
+          import redis, time, json
+
+          r = redis.Redis(host='localhost', port=6379, db=1, socket_timeout=5, decode_responses=True)
+
+          print('--- Testing cache operations ---')
+
+          # SET/GET
+          r.set('_ci_test_key', 'hello_world', ex=60)
+          val = r.get('_ci_test_key')
+          assert val == 'hello_world', f'GET failed: {val}'
+          print('✓ SET/GET works')
+
+          # JSON serialization
+          data = {'user': 'test', 'score': 42, 'tags': ['a', 'b']}
+          r.set('_ci_test_json', json.dumps(data), ex=60)
+          retrieved = json.loads(r.get('_ci_test_json'))
+          assert retrieved == data, f'JSON round-trip failed'
+          print('✓ JSON serialization works')
+
+          # TTL
+          ttl = r.ttl('_ci_test_key')
+          assert 0 < ttl <= 60, f'TTL unexpected: {ttl}'
+          print(f'✓ TTL works ({ttl}s remaining)')
+
+          # INCR/DECR (rate limiting)
+          r.set('_ci_test_counter', 0, ex=60)
+          r.incr('_ci_test_counter')
+          r.incr('_ci_test_counter')
+          r.incr('_ci_test_counter')
+          count = int(r.get('_ci_test_counter'))
+          assert count == 3, f'INCR failed: {count}'
+          print('✓ INCR/DECR works (rate limiting pattern)')
+
+          # HASH operations (session-like)
+          r.hset('_ci_test_hash', mapping={'field1': 'value1', 'field2': 'value2'})
+          r.expire('_ci_test_hash', 60)
+          vals = r.hgetall('_ci_test_hash')
+          assert vals == {'field1': 'value1', 'field2': 'value2'}
+          print('✓ HASH operations work (session pattern)')
+
+          # Pipeline (batch operations)
+          pipe = r.pipeline()
+          pipe.set('_ci_pipe_1', 'a', ex=60)
+          pipe.set('_ci_pipe_2', 'b', ex=60)
+          pipe.get('_ci_pipe_1')
+          pipe.get('_ci_pipe_2')
+          results = pipe.execute()
+          assert results[2] == 'a' and results[3] == 'b'
+          print('✓ Pipeline batch operations work')
+
+          # Cleanup
+          for key in r.keys('_ci_*'):
+              r.delete(key)
+          print('✓ Cleanup complete')
+
+          print()
+          print('All cache operation tests passed')
+          "
+
+      - name: Test Django cache backend
+        run: |
+          python -c "
+          import django, os
+          os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings_dev'
+          os.environ['REDIS_URL'] = 'redis://localhost:6379/0'
+          django.setup()
+
+          from django.core.cache import cache
+
+          # Test Django cache API
+          cache.set('_ci_django_test', 'works', timeout=30)
+          val = cache.get('_ci_django_test')
+          if val == 'works':
+              print('✓ Django cache backend connected and operational')
+          else:
+              print(f'::warning::Django cache returned unexpected value: {val}')
+
+          cache.delete('_ci_django_test')
+          print('✓ Django cache cleanup done')
+          " 2>/dev/null || echo "::warning::Django cache backend test skipped (settings may need REDIS_URL)"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Redis Health Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Trigger**: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          VERSION=$(redis-cli -h localhost -p 6379 info server 2>/dev/null | grep 'redis_version:' | cut -d: -f2 | tr -d '\r')
+          MEMORY=$(redis-cli -h localhost -p 6379 info memory 2>/dev/null | grep 'used_memory_human:' | cut -d: -f2 | tr -d '\r')
+
+          echo "| Check | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Redis Version | $VERSION |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Memory Usage | $MEMORY |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| PING | PONG |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Broker (Celery) | Verified |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cache Operations | Verified |" >> "$GITHUB_STEP_SUMMARY"

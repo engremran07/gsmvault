@@ -20,18 +20,18 @@
        x-transition:leave-start="opacity-100 translate-x-0"
        x-transition:leave-end="opacity-0 translate-x-full"
        class="pointer-events-auto rounded-lg shadow-lg border overflow-hidden
-         {% if message.tags == 'success' %}border-[var(--color-success)]/30 bg-[var(--color-bg-secondary)]
-         {% elif message.tags == 'error' %}border-[var(--color-error)]/30 bg-[var(--color-bg-secondary)]
-         {% elif message.tags == 'warning' %}border-[var(--color-warning)]/30 bg-[var(--color-bg-secondary)]
-         {% else %}border-[var(--color-info)]/30 bg-[var(--color-bg-secondary)]{% endif %}"
+         {% if message.tags == 'success' %}border-(--color-success)/30 bg-(--color-bg-secondary)
+         {% elif message.tags == 'error' %}border-(--color-error)/30 bg-(--color-bg-secondary)
+         {% elif message.tags == 'warning' %}border-(--color-warning)/30 bg-(--color-bg-secondary)
+         {% else %}border-(--color-info)/30 bg-(--color-bg-secondary){% endif %}"
        role="alert">
     <div class="flex items-start gap-3 px-4 py-3">
       {# Icon #}
       <span class="shrink-0 mt-0.5
-        {% if message.tags == 'success' %}text-[var(--color-success)]
-        {% elif message.tags == 'error' %}text-[var(--color-error)]
-        {% elif message.tags == 'warning' %}text-[var(--color-warning)]
-        {% else %}text-[var(--color-info)]{% endif %}">
+        {% if message.tags == 'success' %}text-(--color-success)
+        {% elif message.tags == 'error' %}text-(--color-error)
+        {% elif message.tags == 'warning' %}text-(--color-warning)
+        {% else %}text-(--color-info){% endif %}">
         {% if message.tags == 'success' %}<i data-lucide="check-circle" class="w-5 h-5"></i>
         {% elif message.tags == 'error' %}<i data-lucide="alert-circle" class="w-5 h-5"></i>
         {% elif message.tags == 'warning' %}<i data-lucide="alert-triangle" class="w-5 h-5"></i>
@@ -40,35 +40,35 @@
       {# Content #}
       <div class="flex-1 min-w-0">
         <p class="text-xs font-semibold uppercase tracking-wide
-          {% if message.tags == 'success' %}text-[var(--color-success)]
-          {% elif message.tags == 'error' %}text-[var(--color-error)]
-          {% elif message.tags == 'warning' %}text-[var(--color-warning)]
-          {% else %}text-[var(--color-info)]{% endif %}">
+          {% if message.tags == 'success' %}text-(--color-success)
+          {% elif message.tags == 'error' %}text-(--color-error)
+          {% elif message.tags == 'warning' %}text-(--color-warning)
+          {% else %}text-(--color-info){% endif %}">
           {% if message.tags == 'success' %}Success
           {% elif message.tags == 'error' %}Error
           {% elif message.tags == 'warning' %}Warning
           {% else %}Notice{% endif %}
         </p>
-        <p class="text-sm text-[var(--color-text-primary)] mt-0.5">{{ message }}</p>
+        <p class="text-sm text-(--color-text-primary) mt-0.5">{{ message }}</p>
       </div>
       {# Dismiss #}
       <button @click="show = false"
-              class="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+              class="shrink-0 text-(--color-text-muted) hover:text-(--color-text-primary) transition-colors"
               aria-label="Dismiss notification">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
     </div>
     {# Progress bar #}
     <div class="h-0.5
-      {% if message.tags == 'success' %}bg-[var(--color-success)]/20
-      {% elif message.tags == 'error' %}bg-[var(--color-error)]/20
-      {% elif message.tags == 'warning' %}bg-[var(--color-warning)]/20
-      {% else %}bg-[var(--color-info)]/20{% endif %}">
+      {% if message.tags == 'success' %}bg-(--color-success)/20
+      {% elif message.tags == 'error' %}bg-(--color-error)/20
+      {% elif message.tags == 'warning' %}bg-(--color-warning)/20
+      {% else %}bg-(--color-info)/20{% endif %}">
       <div class="h-full toast-progress
-        {% if message.tags == 'success' %}bg-[var(--color-success)]
-        {% elif message.tags == 'error' %}bg-[var(--color-error)]
-        {% elif message.tags == 'warning' %}bg-[var(--color-warning)]
-        {% else %}bg-[var(--color-info)]{% endif %}"
+        {% if message.tags == 'success' %}bg-(--color-success)
+        {% elif message.tags == 'error' %}bg-(--color-error)
+        {% elif message.tags == 'warning' %}bg-(--color-warning)
+        {% else %}bg-(--color-info){% endif %}"
         :style="'width:' + progress + '%'"></div>
     </div>
   </div>
@@ -84,22 +84,22 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-x-0"
          x-transition:leave-end="opacity-0 translate-x-full"
-         class="pointer-events-auto rounded-lg shadow-lg border overflow-hidden bg-[var(--color-bg-secondary)]"
+         class="pointer-events-auto rounded-lg shadow-lg border overflow-hidden bg-(--color-bg-secondary)"
          :class="{
-           'border-[var(--color-success)]/30': toast.type === 'success',
-           'border-[var(--color-error)]/30': toast.type === 'error',
-           'border-[var(--color-warning)]/30': toast.type === 'warning',
-           'border-[var(--color-info)]/30': toast.type === 'info'
+           'border-(--color-success)/30': toast.type === 'success',
+           'border-(--color-error)/30': toast.type === 'error',
+           'border-(--color-warning)/30': toast.type === 'warning',
+           'border-(--color-info)/30': toast.type === 'info'
          }"
          role="alert">
       <div class="flex items-start gap-3 px-4 py-3">
         {# Icon #}
         <span class="shrink-0 mt-0.5"
               :class="{
-                'text-[var(--color-success)]': toast.type === 'success',
-                'text-[var(--color-error)]': toast.type === 'error',
-                'text-[var(--color-warning)]': toast.type === 'warning',
-                'text-[var(--color-info)]': toast.type === 'info'
+                'text-(--color-success)': toast.type === 'success',
+                'text-(--color-error)': toast.type === 'error',
+                'text-(--color-warning)': toast.type === 'warning',
+                'text-(--color-info)': toast.type === 'info'
               }">
           <i :data-lucide="$store.notify.icon(toast.type)" class="w-5 h-5"></i>
         </span>
@@ -107,17 +107,17 @@
         <div class="flex-1 min-w-0">
           <p class="text-xs font-semibold uppercase tracking-wide"
              :class="{
-               'text-[var(--color-success)]': toast.type === 'success',
-               'text-[var(--color-error)]': toast.type === 'error',
-               'text-[var(--color-warning)]': toast.type === 'warning',
-               'text-[var(--color-info)]': toast.type === 'info'
+               'text-(--color-success)': toast.type === 'success',
+               'text-(--color-error)': toast.type === 'error',
+               'text-(--color-warning)': toast.type === 'warning',
+               'text-(--color-info)': toast.type === 'info'
              }"
              x-text="toast.title"></p>
-          <p class="text-sm text-[var(--color-text-primary)] mt-0.5" x-text="toast.message"></p>
+          <p class="text-sm text-(--color-text-primary) mt-0.5" x-text="toast.message"></p>
         </div>
         {# Dismiss #}
         <button @click="$store.notify.dismiss(toast.id)"
-                class="shrink-0 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+                class="shrink-0 text-(--color-text-muted) hover:text-(--color-text-primary) transition-colors"
                 aria-label="Dismiss notification">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
@@ -125,17 +125,17 @@
       {# Progress bar #}
       <div class="h-0.5"
            :class="{
-             'bg-[var(--color-success)]/20': toast.type === 'success',
-             'bg-[var(--color-error)]/20': toast.type === 'error',
-             'bg-[var(--color-warning)]/20': toast.type === 'warning',
-             'bg-[var(--color-info)]/20': toast.type === 'info'
+             'bg-(--color-success)/20': toast.type === 'success',
+             'bg-(--color-error)/20': toast.type === 'error',
+             'bg-(--color-warning)/20': toast.type === 'warning',
+             'bg-(--color-info)/20': toast.type === 'info'
            }">
         <div class="h-full toast-progress"
              :class="{
-               'bg-[var(--color-success)]': toast.type === 'success',
-               'bg-[var(--color-error)]': toast.type === 'error',
-               'bg-[var(--color-warning)]': toast.type === 'warning',
-               'bg-[var(--color-info)]': toast.type === 'info'
+               'bg-(--color-success)': toast.type === 'success',
+               'bg-(--color-error)': toast.type === 'error',
+               'bg-(--color-warning)': toast.type === 'warning',
+               'bg-(--color-info)': toast.type === 'info'
              }"
              :style="'width:' + toast.progress + '%'"></div>
       </div>

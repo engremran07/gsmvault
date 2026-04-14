@@ -1,15 +1,15 @@
 {# templates/forum/fragments/search_results.html — Search results (HTMX swappable) #}
 {% if query %}
-<p class="text-sm text-[var(--color-text-secondary)] mb-4">{{ results|length }} result{{ results|length|pluralize }} for "<strong class="text-[var(--color-text-primary)]">{{ query }}</strong>"</p>
+<p class="text-sm text-(--color-text-secondary) mb-4">{{ results|length }} result{{ results|length|pluralize }} for "<strong class="text-(--color-text-primary)">{{ query }}</strong>"</p>
 
 {% if results %}
 <div class="space-y-3">
   {% for topic in results %}
   <a href="{% url 'forum:topic_detail' pk=topic.pk slug=topic.slug %}"
-     class="block bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] transition-colors">
-    <div class="font-medium text-[var(--color-text-primary)]">{{ topic.title }}</div>
-    <div class="text-xs text-[var(--color-text-secondary)] mt-1">
-      in <span class="text-[var(--color-accent)]">{{ topic.category.title }}</span>
+     class="block bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) transition-colors">
+    <div class="font-medium text-(--color-text-primary)">{{ topic.title }}</div>
+    <div class="text-xs text-(--color-text-secondary) mt-1">
+      in <span class="text-(--color-accent)">{{ topic.category.title }}</span>
       · by {{ topic.user.username }}
       · {{ topic.reply_count }} replies · {{ topic.view_count }} views
       · {{ topic.created_at|timesince }} ago

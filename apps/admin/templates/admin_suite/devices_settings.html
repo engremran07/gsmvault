@@ -2,7 +2,7 @@
 {% block title %}Device Settings — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Device Settings</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Device Settings</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
 </div>
 {% endblock %}
 {% block page_content %}
@@ -10,23 +10,23 @@
 
 <div class="grid md:grid-cols-3 gap-6">
   <div class="md:col-span-2 glass rounded-xl p-6 animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="settings" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>Configuration</h3>
+    <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="settings" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>Configuration</h3>
     <form method="post" class="space-y-4">{% csrf_token %}
       {% if device_settings %}
       <div class="grid sm:grid-cols-2 gap-4">
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Trust Threshold</p><p class="text-sm font-medium text-[var(--color-text-primary)]">{{ device_settings.trust_threshold|default:"0.5" }}</p></div>
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Max Devices/User</p><p class="text-sm font-medium text-[var(--color-text-primary)]">{{ device_settings.max_devices_per_user|default:"5" }}</p></div>
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Fingerprint Enabled</p>{% if device_settings.fingerprint_enabled %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Yes</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">No</span>{% endif %}</div>
-        <div class="p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><p class="text-xs text-[var(--color-text-muted)] mb-1">Auto Block</p>{% if device_settings.auto_block_suspicious %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">Enabled</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">Disabled</span>{% endif %}</div>
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary)/50"><p class="text-xs text-(--color-text-muted) mb-1">Trust Threshold</p><p class="text-sm font-medium text-(--color-text-primary)">{{ device_settings.trust_threshold|default:"0.5" }}</p></div>
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary)/50"><p class="text-xs text-(--color-text-muted) mb-1">Max Devices/User</p><p class="text-sm font-medium text-(--color-text-primary)">{{ device_settings.max_devices_per_user|default:"5" }}</p></div>
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary)/50"><p class="text-xs text-(--color-text-muted) mb-1">Fingerprint Enabled</p>{% if device_settings.fingerprint_enabled %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Yes</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">No</span>{% endif %}</div>
+        <div class="p-3 rounded-lg bg-(--color-bg-tertiary)/50"><p class="text-xs text-(--color-text-muted) mb-1">Auto Block</p>{% if device_settings.auto_block_suspicious %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">Enabled</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">Disabled</span>{% endif %}</div>
       </div>
       {% endif %}
-      <div class="flex justify-end pt-2"><button type="submit" name="action" value="update_settings" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save</button></div>
+      <div class="flex justify-end pt-2"><button type="submit" name="action" value="update_settings" class="px-6 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save</button></div>
     </form>
   </div>
   <div class="glass rounded-xl p-6 animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
-    <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4">Policies</h3>
+    <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">Policies</h3>
     <div class="space-y-2">
-      {% for pol in policies %}<div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50"><span class="text-xs text-[var(--color-text-primary)]">{{ pol.name }}</span>{% if pol.is_active %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Active</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">Off</span>{% endif %}</div>{% empty %}<p class="text-xs text-[var(--color-text-muted)]">No policies defined</p>{% endfor %}
+      {% for pol in policies %}<div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50"><span class="text-xs text-(--color-text-primary)">{{ pol.name }}</span>{% if pol.is_active %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Active</span>{% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/10 text-zinc-400">Off</span>{% endif %}</div>{% empty %}<p class="text-xs text-(--color-text-muted)">No policies defined</p>{% endfor %}
     </div>
   </div>
 </div>

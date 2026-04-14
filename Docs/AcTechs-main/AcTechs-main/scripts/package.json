@@ -1,0 +1,24 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:firestore-rules",
+    "lint:firestore-rules": "node tests/firestore_rules_strict_lint.js",
+    "test:firestore-rules": "node --no-deprecation tests/firestore_rules_strict_runner.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "firebase": "^12.11.0",
+    "firebase-admin": "^13.7.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "firebase-tools": "^14.16.0"
+  }
+}

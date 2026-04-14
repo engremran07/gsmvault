@@ -2,48 +2,68 @@
 {% block title %}SEO Engine — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">SEO Engine</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">SEO Engine</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
 </div>
 {% endblock %}
 {% block page_content %}
 {% include "components/_admin_search.html" with placeholder="Search SEO..." q=q sort=sort dir=dir %}
 
 {# ── KPI Cards ────────────────────────────────────────────────── #}
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 stagger-children">
-  {% include "components/_admin_kpi_card.html" with icon="corner-down-right" color="blue" value=stats.redirects label="Redirects" stagger=0 %}
-  {% include "components/_admin_kpi_card.html" with icon="map" color="emerald" value=stats.sitemap_urls label="Sitemap URLs" stagger=1 %}
-  {% include "components/_admin_kpi_card.html" with icon="file-text" color="violet" value=stats.metadata label="Metadata" stagger=2 %}
-  {% include "components/_admin_kpi_card.html" with icon="code-2" color="cyan" value=stats.schemas label="Schemas" stagger=3 %}
-  {% include "components/_admin_kpi_card.html" with icon="link" color="amber" value=stats.entities label="Link Entities" stagger=4 %}
-  {% include "components/_admin_kpi_card.html" with icon="alert-triangle" color="red" value=stats.link_issues label="Broken Links" stagger=5 %}
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-8 stagger-children">
+  <button type="button" class="block text-left w-full cursor-pointer focus:outline-none" onclick="window.dispatchEvent(new CustomEvent('seo-tab', {detail:'redirects'}))">
+    {% include "components/_admin_kpi_card.html" with icon="corner-down-right" color="blue" value=stats.redirects label="Redirects" stagger=0 %}
+  </button>
+  <button type="button" class="block text-left w-full cursor-pointer focus:outline-none" onclick="window.dispatchEvent(new CustomEvent('seo-tab', {detail:'sitemap'}))">
+    {% include "components/_admin_kpi_card.html" with icon="map" color="emerald" value=stats.sitemap_urls label="Sitemap URLs" stagger=1 %}
+  </button>
+  <a href="{% url 'admin_suite:seo_audit' %}" class="block">
+    {% include "components/_admin_kpi_card.html" with icon="file-text" color="violet" value=stats.metadata label="Metadata" stagger=2 %}
+  </a>
+  <a href="{% url 'admin_suite:seo_audit' %}" class="block">
+    {% include "components/_admin_kpi_card.html" with icon="code-2" color="cyan" value=stats.schemas label="Schemas" stagger=3 %}
+  </a>
+  <button type="button" class="block text-left w-full cursor-pointer focus:outline-none" onclick="window.dispatchEvent(new CustomEvent('seo-tab', {detail:'interlinking'}))">
+    {% include "components/_admin_kpi_card.html" with icon="link" color="amber" value=stats.entities label="Link Entities" stagger=4 %}
+  </button>
+  <button type="button" class="block text-left w-full cursor-pointer focus:outline-none" onclick="window.dispatchEvent(new CustomEvent('seo-tab', {detail:'sitemap'}))">
+    {% include "components/_admin_kpi_card.html" with icon="alert-triangle" color="red" value=stats.link_issues label="Broken Links" stagger=5 %}
+  </button>
+  <button type="button" class="block text-left w-full cursor-pointer focus:outline-none" onclick="window.dispatchEvent(new CustomEvent('seo-tab', {detail:'interlinking'}))">
+    {% include "components/_admin_kpi_card.html" with icon="git-pull-request" color="orange" value=stats.pending_suggestions label="Pending Interlinks" stagger=6 %}
+  </button>
+  <button type="button" class="block text-left w-full cursor-pointer focus:outline-none" onclick="window.dispatchEvent(new CustomEvent('seo-tab', {detail:'interlinking'}))">
+    {% include "components/_admin_kpi_card.html" with icon="loader" color="indigo" value=stats.active_batches label="Active Jobs" stagger=7 %}
+  </button>
 </div>
 
 {% if message %}<div class="mb-4 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 animate-in animate-in-visible"><i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>{{ message }}</div>{% endif %}
 
 {# ── Tabs ─────────────────────────────────────────────────────── #}
-<div x-data="{ tab: 'redirects' }" class="animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
-  <div class="flex gap-1 mb-6 bg-[var(--color-bg-tertiary)]/40 rounded-xl p-1 w-fit flex-wrap">
-    <button @click="tab='redirects'" :class="tab==='redirects' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Redirects</button>
-    <button @click="tab='sitemap'" :class="tab==='sitemap' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Sitemap</button>
-    <button @click="tab='settings'" :class="tab==='settings' ? 'bg-[var(--color-accent)] text-[var(--color-accent-text)] shadow' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Settings</button>
+<div x-data="{ tab: 'redirects' }" x-on:seo-tab.window="tab = $event.detail" class="animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
+  <div class="flex gap-1 mb-6 bg-(--color-bg-tertiary)/40 rounded-xl p-1 w-fit flex-wrap">
+    <button @click="tab='redirects'" :class="tab==='redirects' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Redirects</button>
+    <button @click="tab='sitemap'" :class="tab==='sitemap' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Sitemap</button>
+    <button @click="tab='interlinking'" :class="tab==='interlinking' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Interlinking</button>
+    <button @click="tab='settings'" :class="tab==='settings' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Settings</button>
+    <button @click="tab='content'" :class="tab==='content' ? 'bg-(--color-accent) text-(--color-accent-text) shadow' : 'text-(--color-text-muted) hover:text-(--color-text-primary)'" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all btn-press">Content SEO</button>
   </div>
 
   {# ── Redirects Tab ──────────────────────────────────────────── #}
   <div x-show="tab==='redirects'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=source&dir={% if sort == 'source' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Source {% if sort == 'source' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]"><a href="?sort=target&dir={% if sort == 'target' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}" class="flex items-center gap-1 hover:text-[var(--color-accent)] transition-colors">Target {% if sort == 'target' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-[var(--color-accent)]"></i>{% endif %}</a></th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Type</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th>
-          <th class="text-right py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Actions</th>
+        <thead><tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)"><a href="?sort=source&dir={% if sort == 'source' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Source {% if sort == 'source' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)"><a href="?sort=target&dir={% if sort == 'target' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if q %}&q={{ q }}{% endif %}" class="flex items-center gap-1 hover:text-(--color-accent) transition-colors">Target {% if sort == 'target' %}<i data-lucide="{% if dir == 'asc' %}chevron-up{% else %}chevron-down{% endif %}" class="w-3 h-3 text-(--color-accent)"></i>{% endif %}</a></th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Type</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Active</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for r in redirects %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-            <td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)]">{{ r.source }}</td>
-            <td class="py-3 px-4 font-mono text-xs text-[var(--color-text-secondary)]">{{ r.target }}</td>
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-3 px-4 font-mono text-xs text-(--color-text-primary)">{{ r.source }}</td>
+            <td class="py-3 px-4 font-mono text-xs text-(--color-text-secondary)">{{ r.target }}</td>
             <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if r.is_permanent %}bg-blue-500/10 text-blue-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{% if r.is_permanent %}301{% else %}302{% endif %}</span></td>
             <td class="py-3 px-4 text-center">{% if r.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
             <td class="py-3 px-4 text-right flex gap-2 justify-end">
@@ -54,16 +74,16 @@
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="corner-down-right" class="w-8 h-8 mx-auto mb-2 opacity-30"></i><p>No redirects configured</p></td></tr>
+          <tr><td colspan="5" class="py-8 text-center text-(--color-text-muted)"><i data-lucide="corner-down-right" class="w-8 h-8 mx-auto mb-2 opacity-30"></i><p>No redirects configured</p></td></tr>
           {% endfor %}
         </tbody>
       </table>
       {% if redirect_page and redirect_page.has_other_pages %}
-      <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-        <span class="text-xs text-[var(--color-text-muted)]">{{ redirect_page.paginator.count }} total &middot; Page {{ redirect_page.number }} of {{ redirect_page.paginator.num_pages }}</span>
+      <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+        <span class="text-xs text-(--color-text-muted)">{{ redirect_page.paginator.count }} total &middot; Page {{ redirect_page.number }} of {{ redirect_page.paginator.num_pages }}</span>
         <div class="flex items-center gap-1">
-          {% if redirect_page.has_previous %}<a href="?page={{ redirect_page.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-          {% if redirect_page.has_next %}<a href="?page={{ redirect_page.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+          {% if redirect_page.has_previous %}<a href="?page={{ redirect_page.previous_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+          {% if redirect_page.has_next %}<a href="?page={{ redirect_page.next_page_number }}{% if sort %}&sort={{ sort }}&dir={{ dir }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
         </div>
       </div>
       {% endif %}
@@ -74,42 +94,154 @@
   <div x-show="tab==='sitemap'" x-cloak x-transition.opacity>
     <div class="glass rounded-xl overflow-hidden">
       <table class="w-full text-sm">
-        <thead><tr class="border-b border-[var(--color-border)]/20">
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">URL</th>
-          <th class="text-left py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Changefreq</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Priority</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Status</th>
-          <th class="text-center py-3 px-4 text-xs font-semibold text-[var(--color-text-muted)]">Active</th>
+        <thead><tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">URL</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Changefreq</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Priority</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Active</th>
         </tr></thead>
-        <tbody class="divide-y divide-[var(--color-border)]/10">
+        <tbody class="divide-y divide-(--color-border)/10">
           {% for s in sitemap_entries %}
-          <tr class="hover:bg-[var(--color-bg-tertiary)]/50 transition-colors">
-            <td class="py-3 px-4 font-mono text-xs text-[var(--color-text-primary)] truncate max-w-[400px]">{{ s.url }}</td>
-            <td class="py-3 px-4 text-xs text-[var(--color-text-muted)]">{{ s.changefreq|default:"-" }}</td>
-            <td class="py-3 px-4 text-center text-xs text-[var(--color-text-muted)]">{{ s.priority|default:"-" }}</td>
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-3 px-4 font-mono text-xs text-(--color-text-primary) truncate max-w-[400px]">{{ s.url }}</td>
+            <td class="py-3 px-4 text-xs text-(--color-text-muted)">{{ s.changefreq|default:"-" }}</td>
+            <td class="py-3 px-4 text-center text-xs text-(--color-text-muted)">{{ s.priority|default:"-" }}</td>
             <td class="py-3 px-4 text-center">
               {% if s.last_status %}
                 {% if s.last_status >= 400 %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400">{{ s.last_status }}</span>
                 {% elif s.last_status >= 300 %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">{{ s.last_status }}</span>
                 {% else %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">{{ s.last_status }}</span>{% endif %}
-              {% else %}<span class="text-xs text-[var(--color-text-muted)]">—</span>{% endif %}
+              {% else %}<span class="text-xs text-(--color-text-muted)">—</span>{% endif %}
             </td>
             <td class="py-3 px-4 text-center">{% if s.is_active %}<span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>{% else %}<span class="inline-block w-2 h-2 rounded-full bg-zinc-500"></span>{% endif %}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="5" class="py-8 text-center text-[var(--color-text-muted)]"><i data-lucide="map" class="w-8 h-8 mx-auto mb-2 opacity-30"></i><p>No sitemap entries</p></td></tr>
+          <tr><td colspan="5" class="py-8 text-center text-(--color-text-muted)"><i data-lucide="map" class="w-8 h-8 mx-auto mb-2 opacity-30"></i><p>No sitemap entries</p></td></tr>
           {% endfor %}
         </tbody>
       </table>
       {% if sitemap_page and sitemap_page.has_other_pages %}
-      <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--color-border)]/40">
-        <span class="text-xs text-[var(--color-text-muted)]">{{ sitemap_page.paginator.count }} total &middot; Page {{ sitemap_page.number }} of {{ sitemap_page.paginator.num_pages }}</span>
+      <div class="flex items-center justify-between px-4 py-3 border-t border-(--color-border)/40">
+        <span class="text-xs text-(--color-text-muted)">{{ sitemap_page.paginator.count }} total &middot; Page {{ sitemap_page.number }} of {{ sitemap_page.paginator.num_pages }}</span>
         <div class="flex items-center gap-1">
-          {% if sitemap_page.has_previous %}<a href="?page={{ sitemap_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
-          {% if sitemap_page.has_next %}<a href="?page={{ sitemap_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
+          {% if sitemap_page.has_previous %}<a href="?page={{ sitemap_page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></a>{% endif %}
+          {% if sitemap_page.has_next %}<a href="?page={{ sitemap_page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="px-2 py-1 rounded text-xs text-(--color-text-secondary) hover:bg-(--color-bg-secondary) transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></a>{% endif %}
         </div>
       </div>
       {% endif %}
+    </div>
+  </div>
+
+  {# ── Interlinking Settlement Tab ──────────────────────────── #}
+  <div x-show="tab==='interlinking'" x-cloak x-transition.opacity class="space-y-6">
+    <div class="glass rounded-xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-(--color-border)/20 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2">
+          <i data-lucide="network" class="w-4 h-4 text-(--color-accent)"></i>
+          Interlink Suggestion Settlement Queue
+        </h3>
+        <a href="{% url 'admin_suite:seo_audit' %}" class="text-xs text-(--color-accent) hover:underline">Open SEO Audit</a>
+      </div>
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-(--color-border)/20">
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Source</th>
+          <th class="text-left py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Target</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Score</th>
+          <th class="text-center py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Status</th>
+          <th class="text-right py-3 px-4 text-xs font-semibold text-(--color-text-muted)">Actions</th>
+        </tr></thead>
+        <tbody class="divide-y divide-(--color-border)/10">
+          {% for suggestion in suggestions_page %}
+          <tr class="hover:bg-(--color-bg-tertiary)/50 transition-colors">
+            <td class="py-3 px-4 text-xs text-(--color-text-primary)">{{ suggestion.source.title|default:suggestion.source.slug }}</td>
+            <td class="py-3 px-4 text-xs text-(--color-text-secondary)">{{ suggestion.target.title|default:suggestion.target.slug }}</td>
+            <td class="py-3 px-4 text-center text-xs font-semibold text-(--color-accent)">{{ suggestion.score|floatformat:2 }}</td>
+            <td class="py-3 px-4 text-center">
+              {% if suggestion.locked %}
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-500/20 text-zinc-300">Locked</span>
+              {% elif suggestion.is_applied %}
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400">Applied</span>
+              {% else %}
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400">Pending</span>
+              {% endif %}
+            </td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="suggestion_id" value="{{ suggestion.id }}">
+                  {% if suggestion.is_applied %}
+                  <button type="submit" name="action" value="unapply_suggestion" class="text-xs text-amber-300 hover:underline btn-press" {% if suggestion.locked %}disabled{% endif %}>Mark Pending</button>
+                  {% else %}
+                  <button type="submit" name="action" value="apply_suggestion" class="text-xs text-emerald-300 hover:underline btn-press" {% if suggestion.locked %}disabled{% endif %}>Apply</button>
+                  {% endif %}
+                </form>
+                <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="suggestion_id" value="{{ suggestion.id }}">
+                  {% if suggestion.locked %}
+                  <button type="submit" name="action" value="unlock_suggestion" class="text-xs text-cyan-300 hover:underline btn-press">Unlock</button>
+                  {% else %}
+                  <button type="submit" name="action" value="lock_suggestion" class="text-xs text-zinc-300 hover:underline btn-press">Lock</button>
+                  {% endif %}
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="py-8 text-center text-(--color-text-muted)"><i data-lucide="network" class="w-8 h-8 mx-auto mb-2 opacity-30"></i><p>No interlink suggestions available</p></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div class="glass rounded-xl p-5">
+        <h4 class="text-sm font-semibold text-(--color-text-primary) mb-3 flex items-center gap-2"><i data-lucide="list-checks" class="w-4 h-4 text-violet-400"></i>Recent SEO Batch Jobs</h4>
+        <div class="space-y-2 text-xs">
+          {% for op in batch_operations %}
+          <div class="rounded-lg bg-(--color-bg-tertiary)/30 px-3 py-2 flex items-center justify-between gap-3">
+            <div>
+              <p class="text-(--color-text-primary) font-medium">{{ op.operation_type|title }}</p>
+              <p class="text-(--color-text-muted)">{{ op.created_at }}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if op.status == 'completed' %}bg-emerald-500/10 text-emerald-400{% elif op.status == 'failed' %}bg-red-500/10 text-red-400{% elif op.status == 'running' %}bg-blue-500/10 text-blue-400{% else %}bg-amber-500/10 text-amber-400{% endif %}">{{ op.status|title }}</span>
+              {% if op.status == 'pending' or op.status == 'running' %}
+              <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="batch_id" value="{{ op.id }}"><button type="submit" name="action" value="cancel_batch" class="text-[10px] text-red-300 hover:underline">Cancel</button></form>
+              {% endif %}
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-(--color-text-muted)">No batch operations found.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="glass rounded-xl p-5">
+        <h4 class="text-sm font-semibold text-(--color-text-primary) mb-3 flex items-center gap-2"><i data-lucide="ban" class="w-4 h-4 text-amber-400"></i>Interlink Exclusions</h4>
+        <form method="post" class="space-y-2 mb-4">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_interlink_exclusion">
+          <input type="text" name="phrase" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-xs text-(--color-text-primary)" placeholder="Phrase (required)">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input type="text" name="source_pattern" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-xs text-(--color-text-primary)" placeholder="Source pattern">
+            <input type="text" name="target_pattern" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-xs text-(--color-text-primary)" placeholder="Target pattern">
+          </div>
+          <input type="text" name="reason" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-xs text-(--color-text-primary)" placeholder="Reason">
+          <button type="submit" class="px-3 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-xs font-semibold">Add Exclusion</button>
+        </form>
+        <div class="space-y-2 max-h-64 overflow-auto">
+          {% for exclusion in interlink_exclusions %}
+          <div class="rounded-lg bg-(--color-bg-tertiary)/30 px-3 py-2 flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="text-xs text-(--color-text-primary) font-medium truncate">{{ exclusion.phrase }}</p>
+              <p class="text-[10px] text-(--color-text-muted) truncate">{{ exclusion.source_pattern|default:'*' }} → {{ exclusion.target_pattern|default:'*' }}</p>
+            </div>
+            <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="exclusion_id" value="{{ exclusion.id }}"><button type="submit" name="action" value="remove_interlink_exclusion" class="text-[10px] text-red-300 hover:underline">Remove</button></form>
+          </div>
+          {% empty %}
+          <p class="text-xs text-(--color-text-muted)">No exclusions defined.</p>
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
 
@@ -118,42 +250,91 @@
     <form method="post">
       {% csrf_token %}
       <div class="glass rounded-xl p-6 space-y-6">
-        <h3 class="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-2"><i data-lucide="settings" class="w-4 h-4 text-[var(--color-accent)]"></i>SEO Automation</h3>
+        <h3 class="text-sm font-semibold text-(--color-text-primary) flex items-center gap-2"><i data-lucide="settings" class="w-4 h-4 text-(--color-accent)"></i>SEO Automation</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="auto_meta" value="1" {% if seo_settings.auto_meta %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Auto Meta</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">AI-generate meta titles and descriptions on publish</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="auto_meta" value="1" {% if seo_settings.auto_meta %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Auto Meta</span><p class="text-xs text-(--color-text-muted) mt-0.5">AI-generate meta titles and descriptions on publish</p></div>
           </label>
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="auto_tags" value="1" {% if seo_settings.auto_tags %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Auto Tags</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">AI-suggest tags on content creation</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="auto_tags" value="1" {% if seo_settings.auto_tags %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Auto Tags</span><p class="text-xs text-(--color-text-muted) mt-0.5">AI-suggest tags on content creation</p></div>
           </label>
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="auto_schema" value="1" {% if seo_settings.auto_schema %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Auto Schema</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">Auto-generate JSON-LD structured data</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="auto_schema" value="1" {% if seo_settings.auto_schema %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Auto Schema</span><p class="text-xs text-(--color-text-muted) mt-0.5">Auto-generate JSON-LD structured data</p></div>
           </label>
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="suggest_only" value="1" {% if seo_settings.suggest_only %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Suggest Only</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">Auto-generated content requires manual approval</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="suggest_only" value="1" {% if seo_settings.suggest_only %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Suggest Only</span><p class="text-xs text-(--color-text-muted) mt-0.5">Auto-generated content requires manual approval</p></div>
           </label>
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="tag_sitemap_enabled" value="1" {% if seo_settings.tag_sitemap_enabled %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Tag Sitemap</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">Include tag pages in XML sitemap</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="tag_sitemap_enabled" value="1" {% if seo_settings.tag_sitemap_enabled %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Tag Sitemap</span><p class="text-xs text-(--color-text-muted) mt-0.5">Include tag pages in XML sitemap</p></div>
           </label>
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="comment_nofollow" value="1" {% if seo_settings.comment_nofollow %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Comment Nofollow</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">Add rel=nofollow to user-generated comment links</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="comment_nofollow" value="1" {% if seo_settings.comment_nofollow %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Comment Nofollow</span><p class="text-xs text-(--color-text-muted) mt-0.5">Add rel=nofollow to user-generated comment links</p></div>
           </label>
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]/50 hover:bg-[var(--color-bg-secondary)] transition-colors cursor-pointer">
-            <input type="checkbox" name="comment_bump_lastmod" value="1" {% if seo_settings.comment_bump_lastmod %}checked{% endif %} class="mt-0.5 rounded border-[var(--color-border)] text-[var(--color-accent)] focus:ring-[var(--color-accent)]">
-            <div><span class="text-sm font-medium text-[var(--color-text-primary)]">Comment Bump Lastmod</span><p class="text-xs text-[var(--color-text-muted)] mt-0.5">Update sitemap lastmod when new comments arrive</p></div>
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-(--color-bg-secondary)/50 hover:bg-(--color-bg-secondary) transition-colors cursor-pointer">
+            <input type="checkbox" name="comment_bump_lastmod" value="1" {% if seo_settings.comment_bump_lastmod %}checked{% endif %} class="mt-0.5 rounded border-(--color-border) text-(--color-accent) focus:ring-(--color-accent)">
+            <div><span class="text-sm font-medium text-(--color-text-primary)">Comment Bump Lastmod</span><p class="text-xs text-(--color-text-muted) mt-0.5">Update sitemap lastmod when new comments arrive</p></div>
           </label>
         </div>
-        <div class="pt-4 border-t border-[var(--color-border)]/20">
-          <button type="submit" name="action" value="save_seo_settings" class="px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-1"></i>Save Settings</button>
+        <div class="pt-4 border-t border-(--color-border)/20">
+          <button type="submit" name="action" value="save_seo_settings" class="px-6 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-1"></i>Save Settings</button>
         </div>
       </div>
     </form>
+  </div>
+
+  {# ── Content SEO Tab ──────────────────────────────────────── #}
+  <div x-show="tab==='content'" x-cloak x-transition.opacity>
+    <div class="glass rounded-xl p-6">
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4">Content SEO Coverage</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <a href="{% url 'admin_suite:seo_audit_type' content_type='posts' %}"
+           class="glass rounded-xl p-4 hover:bg-(--color-bg-tertiary)/60 transition-colors group">
+          <div class="text-2xl font-bold text-(--color-accent)">{{ content_counts.posts }}</div>
+          <div class="text-xs text-(--color-text-muted) mt-1">Blog Posts</div>
+          <div class="text-xs text-emerald-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <i data-lucide="search" class="w-3 h-3 inline mr-0.5"></i>Audit &rarr;
+          </div>
+        </a>
+        <a href="{% url 'admin_suite:seo_audit_type' content_type='brands' %}"
+           class="glass rounded-xl p-4 hover:bg-(--color-bg-tertiary)/60 transition-colors group">
+          <div class="text-2xl font-bold text-(--color-accent)">{{ content_counts.brands }}</div>
+          <div class="text-xs text-(--color-text-muted) mt-1">Brands</div>
+          <div class="text-xs text-emerald-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <i data-lucide="search" class="w-3 h-3 inline mr-0.5"></i>Audit &rarr;
+          </div>
+        </a>
+        <a href="{% url 'admin_suite:seo_audit_type' content_type='models' %}"
+           class="glass rounded-xl p-4 hover:bg-(--color-bg-tertiary)/60 transition-colors group">
+          <div class="text-2xl font-bold text-(--color-accent)">{{ content_counts.models }}</div>
+          <div class="text-xs text-(--color-text-muted) mt-1">Device Models</div>
+          <div class="text-xs text-emerald-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <i data-lucide="search" class="w-3 h-3 inline mr-0.5"></i>Audit &rarr;
+          </div>
+        </a>
+        <a href="{% url 'admin_suite:seo_audit_type' content_type='firmwares' %}"
+           class="glass rounded-xl p-4 hover:bg-(--color-bg-tertiary)/60 transition-colors group">
+          <div class="text-2xl font-bold text-(--color-accent)">{{ content_counts.firmwares }}</div>
+          <div class="text-xs text-(--color-text-muted) mt-1">Firmware Files</div>
+          <div class="text-xs text-emerald-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <i data-lucide="search" class="w-3 h-3 inline mr-0.5"></i>Audit &rarr;
+          </div>
+        </a>
+        <a href="{% url 'admin_suite:seo_audit_type' content_type='topics' %}"
+           class="glass rounded-xl p-4 hover:bg-(--color-bg-tertiary)/60 transition-colors group">
+          <div class="text-2xl font-bold text-(--color-accent)">{{ content_counts.topics }}</div>
+          <div class="text-xs text-(--color-text-muted) mt-1">Forum Topics</div>
+          <div class="text-xs text-emerald-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <i data-lucide="search" class="w-3 h-3 inline mr-0.5"></i>Audit &rarr;
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

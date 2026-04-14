@@ -2,8 +2,8 @@
 {% block title %}Distribution Settings — Admin{% endblock %}
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-  <div><h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Distribution Settings</h1><p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p></div>
-  <a href="{% url 'admin_suite:distribution' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Distribution</a>
+  <div><h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Distribution Settings</h1><p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p></div>
+  <a href="{% url 'admin_suite:distribution' %}" class="px-4 py-2 rounded-lg glass text-xs font-semibold text-(--color-text-secondary) hover:text-(--color-text-primary) btn-press transition-all"><i data-lucide="arrow-left" class="w-3.5 h-3.5 inline mr-1"></i>Distribution</a>
 </div>
 {% endblock %}
 {% block page_content %}
@@ -16,58 +16,58 @@
 
     {# General Settings #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:0" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="settings" class="w-4 h-4 inline mr-2 text-[var(--color-accent)]"></i>General</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="settings" class="w-4 h-4 inline mr-2 text-(--color-accent)"></i>General</h3>
       <div class="space-y-4">
-        <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50">
-          <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Distribution Enabled</p><p class="text-xs text-[var(--color-text-muted)]">Master switch for all content distribution</p></div>
-          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="distribution_enabled" class="sr-only peer" {% if dist_settings.distribution_enabled %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-[var(--color-accent)] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50">
+          <div><p class="text-sm font-medium text-(--color-text-primary)">Distribution Enabled</p><p class="text-xs text-(--color-text-muted)">Master switch for all content distribution</p></div>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="distribution_enabled" class="sr-only peer" {% if dist_settings.distribution_enabled %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-(--color-accent) transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
         </div>
-        <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50">
-          <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Auto-Fanout on Publish</p><p class="text-xs text-[var(--color-text-muted)]">Automatically queue distribution when blog posts are published</p></div>
-          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="auto_fanout_on_publish" class="sr-only peer" {% if dist_settings.auto_fanout_on_publish %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-[var(--color-accent)] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50">
+          <div><p class="text-sm font-medium text-(--color-text-primary)">Auto-Fanout on Publish</p><p class="text-xs text-(--color-text-muted)">Automatically queue distribution when blog posts are published</p></div>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="auto_fanout_on_publish" class="sr-only peer" {% if dist_settings.auto_fanout_on_publish %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-(--color-accent) transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
         </div>
-        <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50">
-          <div><p class="text-sm font-medium text-[var(--color-text-primary)]">Firmware Auto-Distribution</p><p class="text-xs text-[var(--color-text-muted)]">Auto-distribute firmware blog posts when created/updated</p></div>
-          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="enable_firmware_auto_distribution" class="sr-only peer" {% if dist_settings.enable_firmware_auto_distribution %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-[var(--color-accent)] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50">
+          <div><p class="text-sm font-medium text-(--color-text-primary)">Firmware Auto-Distribution</p><p class="text-xs text-(--color-text-muted)">Auto-distribute firmware blog posts when created/updated</p></div>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="enable_firmware_auto_distribution" class="sr-only peer" {% if dist_settings.enable_firmware_auto_distribution %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-(--color-accent) transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
         </div>
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Default Channels <span class="text-[10px]">(comma-separated)</span></label><input type="text" name="default_channels" value="{{ dist_settings.default_channels|join:', ' }}" placeholder="twitter, facebook, linkedin" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Leave empty to use all active channels</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Default Channels <span class="text-[10px]">(comma-separated)</span></label><input type="text" name="default_channels" value="{{ dist_settings.default_channels|join:', ' }}" placeholder="twitter, facebook, linkedin" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">Leave empty to use all active channels</p></div>
       </div>
     </div>
 
     {# Platform & Distribution Limits #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:1" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="shield" class="w-4 h-4 inline mr-2 text-amber-400"></i>Platform &amp; Distribution Limits</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="shield" class="w-4 h-4 inline mr-2 text-amber-400"></i>Platform &amp; Distribution Limits</h3>
       <div class="grid sm:grid-cols-2 gap-4">
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Max Platforms per Content</label><input type="number" name="max_platforms_per_content" value="{{ dist_settings.max_platforms_per_content }}" min="1" max="20" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">⚠️ Recommended: 5 or less to avoid spam detection</p></div>
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Distribution Frequency (hours)</label><input type="number" name="distribution_frequency_hours" value="{{ dist_settings.distribution_frequency_hours }}" min="1" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Min hours between auto-distributions. Recommended: 4-24</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Max Platforms per Content</label><input type="number" name="max_platforms_per_content" value="{{ dist_settings.max_platforms_per_content }}" min="1" max="20" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">⚠️ Recommended: 5 or less to avoid spam detection</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Distribution Frequency (hours)</label><input type="number" name="distribution_frequency_hours" value="{{ dist_settings.distribution_frequency_hours }}" min="1" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">Min hours between auto-distributions. Recommended: 4-24</p></div>
       </div>
     </div>
 
     {# SEO Limits #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:2" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="search" class="w-4 h-4 inline mr-2 text-emerald-400"></i>SEO Limits</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="search" class="w-4 h-4 inline mr-2 text-emerald-400"></i>SEO Limits</h3>
       <div class="grid sm:grid-cols-3 gap-4">
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Max SEO Title Length</label><input type="number" name="max_seo_title_length" value="{{ dist_settings.max_seo_title_length }}" min="30" max="120" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Google displays ~60 chars</p></div>
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Max SEO Description Length</label><input type="number" name="max_seo_description_length" value="{{ dist_settings.max_seo_description_length }}" min="50" max="300" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Google displays ~160 chars</p></div>
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Max SEO Tags</label><input type="number" name="max_seo_tags" value="{{ dist_settings.max_seo_tags }}" min="1" max="30" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">⚠️ Too many = keyword stuffing. Recommended: 5-10</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Max SEO Title Length</label><input type="number" name="max_seo_title_length" value="{{ dist_settings.max_seo_title_length }}" min="30" max="120" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">Google displays ~60 chars</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Max SEO Description Length</label><input type="number" name="max_seo_description_length" value="{{ dist_settings.max_seo_description_length }}" min="50" max="300" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">Google displays ~160 chars</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Max SEO Tags</label><input type="number" name="max_seo_tags" value="{{ dist_settings.max_seo_tags }}" min="1" max="30" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">⚠️ Too many = keyword stuffing. Recommended: 5-10</p></div>
       </div>
     </div>
 
     {# Auto-Tagging Limits #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:3" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="tag" class="w-4 h-4 inline mr-2 text-violet-400"></i>Auto-Tagging</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="tag" class="w-4 h-4 inline mr-2 text-violet-400"></i>Auto-Tagging</h3>
       <div class="grid sm:grid-cols-2 gap-4">
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Max Auto Tags</label><input type="number" name="max_auto_tags" value="{{ dist_settings.max_auto_tags }}" min="1" max="50" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">⚠️ Over-tagging reduces content quality. Recommended: 10-15</p></div>
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Auto-Tag Frequency (days)</label><input type="number" name="auto_tag_frequency_days" value="{{ dist_settings.auto_tag_frequency_days }}" min="0" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">How often to regenerate tags. 0 = never update</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Max Auto Tags</label><input type="number" name="max_auto_tags" value="{{ dist_settings.max_auto_tags }}" min="1" max="50" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">⚠️ Over-tagging reduces content quality. Recommended: 10-15</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Auto-Tag Frequency (days)</label><input type="number" name="auto_tag_frequency_days" value="{{ dist_settings.auto_tag_frequency_days }}" min="0" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">How often to regenerate tags. 0 = never update</p></div>
       </div>
     </div>
 
     {# Retry & Error Handling #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:4" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-4"><i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2 text-red-400"></i>Retry &amp; Error Handling</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-4"><i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2 text-red-400"></i>Retry &amp; Error Handling</h3>
       <div class="grid sm:grid-cols-2 gap-4">
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Max Retries</label><input type="number" name="max_retries" value="{{ dist_settings.max_retries }}" min="0" max="10" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Max retry attempts per failed job</p></div>
-        <div><label class="block text-xs font-medium text-[var(--color-text-muted)] mb-1">Retry Backoff (seconds)</label><input type="number" name="retry_backoff_seconds" value="{{ dist_settings.retry_backoff_seconds }}" min="60" class="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] focus:border-[var(--color-accent)] focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-[var(--color-text-muted)]">Wait time before retrying. 1800s = 30 min</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Max Retries</label><input type="number" name="max_retries" value="{{ dist_settings.max_retries }}" min="0" max="10" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">Max retry attempts per failed job</p></div>
+        <div><label class="block text-xs font-medium text-(--color-text-muted) mb-1">Retry Backoff (seconds)</label><input type="number" name="retry_backoff_seconds" value="{{ dist_settings.retry_backoff_seconds }}" min="60" class="w-full px-3 py-2 rounded-lg bg-(--color-bg-tertiary) border border-(--color-border) text-sm text-(--color-text-primary) focus:border-(--color-accent) focus:outline-none transition-colors"><p class="mt-1 text-[10px] text-(--color-text-muted)">Wait time before retrying. 1800s = 30 min</p></div>
       </div>
     </div>
   </div>
@@ -76,34 +76,34 @@
   <div class="space-y-4">
     {# Advanced Features #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:5" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3"><i data-lucide="zap" class="w-4 h-4 inline mr-2 text-amber-400"></i>Advanced</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-3"><i data-lucide="zap" class="w-4 h-4 inline mr-2 text-amber-400"></i>Advanced</h3>
       <div class="space-y-3">
-        <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50">
-          <div><p class="text-xs font-medium text-[var(--color-text-primary)]">Indexing Jobs</p><p class="text-[10px] text-[var(--color-text-muted)]">Submit to Google/Bing</p></div>
-          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="allow_indexing_jobs" class="sr-only peer" {% if dist_settings.allow_indexing_jobs %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-[var(--color-accent)] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50">
+          <div><p class="text-xs font-medium text-(--color-text-primary)">Indexing Jobs</p><p class="text-[10px] text-(--color-text-muted)">Submit to Google/Bing</p></div>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="allow_indexing_jobs" class="sr-only peer" {% if dist_settings.allow_indexing_jobs %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-(--color-accent) transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
         </div>
-        <div class="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-tertiary)]/50">
-          <div><p class="text-xs font-medium text-[var(--color-text-primary)]">Admin Approval</p><p class="text-[10px] text-[var(--color-text-muted)]">Require approval before distributing</p></div>
-          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="require_admin_approval" class="sr-only peer" {% if dist_settings.require_admin_approval %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-[var(--color-accent)] transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-(--color-bg-tertiary)/50">
+          <div><p class="text-xs font-medium text-(--color-text-primary)">Admin Approval</p><p class="text-[10px] text-(--color-text-muted)">Require approval before distributing</p></div>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" name="require_admin_approval" class="sr-only peer" {% if dist_settings.require_admin_approval %}checked{% endif %}><div class="w-9 h-5 bg-zinc-700 rounded-full peer peer-checked:bg-(--color-accent) transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label>
         </div>
       </div>
     </div>
 
     {# Current Limits Summary #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:6" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-3"><i data-lucide="bar-chart-3" class="w-4 h-4 inline mr-2 text-blue-400"></i>Current Limits</h3>
+      <h3 class="text-sm font-semibold text-(--color-text-primary) mb-3"><i data-lucide="bar-chart-3" class="w-4 h-4 inline mr-2 text-blue-400"></i>Current Limits</h3>
       <div class="space-y-2 text-xs">
-        <div class="flex justify-between p-2 rounded bg-[var(--color-bg-tertiary)]/50"><span class="text-[var(--color-text-muted)]">Platforms/content</span><span class="font-mono text-[var(--color-text-primary)]">{{ dist_settings.max_platforms_per_content }}</span></div>
-        <div class="flex justify-between p-2 rounded bg-[var(--color-bg-tertiary)]/50"><span class="text-[var(--color-text-muted)]">Frequency</span><span class="font-mono text-[var(--color-text-primary)]">{{ dist_settings.distribution_frequency_hours }}h</span></div>
-        <div class="flex justify-between p-2 rounded bg-[var(--color-bg-tertiary)]/50"><span class="text-[var(--color-text-muted)]">SEO tags</span><span class="font-mono text-[var(--color-text-primary)]">{{ dist_settings.max_seo_tags }}</span></div>
-        <div class="flex justify-between p-2 rounded bg-[var(--color-bg-tertiary)]/50"><span class="text-[var(--color-text-muted)]">Auto tags</span><span class="font-mono text-[var(--color-text-primary)]">{{ dist_settings.max_auto_tags }}</span></div>
-        <div class="flex justify-between p-2 rounded bg-[var(--color-bg-tertiary)]/50"><span class="text-[var(--color-text-muted)]">Max retries</span><span class="font-mono text-[var(--color-text-primary)]">{{ dist_settings.max_retries }}</span></div>
+        <div class="flex justify-between p-2 rounded bg-(--color-bg-tertiary)/50"><span class="text-(--color-text-muted)">Platforms/content</span><span class="font-mono text-(--color-text-primary)">{{ dist_settings.max_platforms_per_content }}</span></div>
+        <div class="flex justify-between p-2 rounded bg-(--color-bg-tertiary)/50"><span class="text-(--color-text-muted)">Frequency</span><span class="font-mono text-(--color-text-primary)">{{ dist_settings.distribution_frequency_hours }}h</span></div>
+        <div class="flex justify-between p-2 rounded bg-(--color-bg-tertiary)/50"><span class="text-(--color-text-muted)">SEO tags</span><span class="font-mono text-(--color-text-primary)">{{ dist_settings.max_seo_tags }}</span></div>
+        <div class="flex justify-between p-2 rounded bg-(--color-bg-tertiary)/50"><span class="text-(--color-text-muted)">Auto tags</span><span class="font-mono text-(--color-text-primary)">{{ dist_settings.max_auto_tags }}</span></div>
+        <div class="flex justify-between p-2 rounded bg-(--color-bg-tertiary)/50"><span class="text-(--color-text-muted)">Max retries</span><span class="font-mono text-(--color-text-primary)">{{ dist_settings.max_retries }}</span></div>
       </div>
     </div>
 
     {# Save Button #}
     <div class="glass rounded-xl p-6 animate-in" style="--stagger:7" x-intersect.once="$el.classList.add('animate-in-visible')">
-      <button type="submit" name="action" value="save_settings" class="w-full px-6 py-3 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save All Settings</button>
+      <button type="submit" name="action" value="save_settings" class="w-full px-6 py-3 rounded-lg bg-(--color-accent) text-(--color-accent-text) text-sm font-semibold btn-press hover:shadow-lg transition-all"><i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save All Settings</button>
     </div>
   </div>
 </div>

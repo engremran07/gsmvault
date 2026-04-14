@@ -1,0 +1,191 @@
+name: CD — Staging
+
+on:
+  push:
+    branches: [develop]
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12"
+  DJANGO_SETTINGS_MODULE: app.settings_production
+  DB_ENGINE: django.db.backends.postgresql
+  DB_NAME: test_gsmvault
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  DB_HOST: localhost
+  DB_PORT: "5432"
+
+jobs:
+  build:
+    name: Build & Validate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_gsmvault
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ruff check
+        run: python -m ruff check .
+
+      - name: Ruff format check
+        run: python -m ruff format --check .
+
+      - name: Django system check
+        run: python manage.py check --settings=app.settings_dev
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_dev
+
+  test:
+    name: Run Tests
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: test_gsmvault
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate --settings=app.settings_dev
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_dev
+
+      - name: Run tests
+        run: python -m pytest --tb=short -q
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_dev
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput --settings=app.settings_production
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_ALLOWED_HOSTS: ${{ vars.STAGING_HOST }}
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ vars.STAGING_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.venv' \
+            --exclude='media/' \
+            --exclude='storage_credentials/' \
+            --exclude='.env' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            ./ ${{ secrets.STAGING_USER }}@${{ vars.STAGING_HOST }}:${{ vars.STAGING_DEPLOY_PATH }}/
+
+      - name: Run remote migrations
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.STAGING_USER }}@${{ vars.STAGING_HOST }} \
+            "cd ${{ vars.STAGING_DEPLOY_PATH }} && \
+             source .venv/bin/activate && \
+             python manage.py migrate --settings=app.settings_production --noinput"
+
+      - name: Restart staging services
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.STAGING_USER }}@${{ vars.STAGING_HOST }} \
+            "sudo systemctl restart gunicorn-staging && \
+             sudo systemctl restart celery-staging"
+
+      - name: Smoke test
+        run: |
+          sleep 10
+          curl --fail --silent --show-error \
+            "${{ vars.STAGING_URL }}/api/v1/health/" \
+            -o /dev/null -w "HTTP %{http_code}\n" || exit 1
+          echo "Staging deployment smoke test passed"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

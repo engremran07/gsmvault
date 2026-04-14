@@ -1,0 +1,195 @@
+name: Governance Check
+
+on:
+  push:
+    paths:
+      - '.claude/**'
+      - '.github/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-governance:
+    name: Validate Governance File Integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Count rules (min 50)
+        run: |
+          count=$(find .claude/rules -name '*.md' -type f 2>/dev/null | wc -l)
+          echo "Rules found: $count"
+          if [ "$count" -lt 50 ]; then
+            echo "::error::Governance rules count ($count) is below minimum threshold (50)"
+            exit 1
+          fi
+          echo "✓ Rules count: $count (threshold: 50)"
+
+      - name: Count hooks (min 30)
+        run: |
+          count=$(find .claude/hooks -type f 2>/dev/null | wc -l)
+          echo "Hooks found: $count"
+          if [ "$count" -lt 30 ]; then
+            echo "::error::Governance hooks count ($count) is below minimum threshold (30)"
+            exit 1
+          fi
+          echo "✓ Hooks count: $count (threshold: 30)"
+
+      - name: Count commands (min 50)
+        run: |
+          count=$(find .claude/commands -type f 2>/dev/null | wc -l)
+          echo "Commands found: $count"
+          if [ "$count" -lt 50 ]; then
+            echo "::error::Governance commands count ($count) is below minimum threshold (50)"
+            exit 1
+          fi
+          echo "✓ Commands count: $count (threshold: 50)"
+
+      - name: Count agents (min 50)
+        run: |
+          count=$(find .github/agents -name '*.agent.md' -type f 2>/dev/null | wc -l)
+          echo "Agents found: $count"
+          if [ "$count" -lt 50 ]; then
+            echo "::error::Governance agents count ($count) is below minimum threshold (50)"
+            exit 1
+          fi
+          echo "✓ Agents count: $count (threshold: 50)"
+
+      - name: Count skills (min 400)
+        run: |
+          count=$(find .github/skills -name 'SKILL.md' -type f 2>/dev/null | wc -l)
+          echo "Skills found: $count"
+          if [ "$count" -lt 400 ]; then
+            echo "::error::Governance skills count ($count) is below minimum threshold (400)"
+            exit 1
+          fi
+          echo "✓ Skills count: $count (threshold: 400)"
+
+      - name: Verify file naming conventions
+        run: |
+          errors=0
+
+          echo "--- Checking rule files (must be kebab-case .md) ---"
+          for f in $(find .claude/rules -type f 2>/dev/null); do
+            basename=$(basename "$f")
+            if ! echo "$basename" | grep -qE '^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.md$'; then
+              echo "::warning::Rule file does not follow kebab-case.md convention: $f"
+              errors=$((errors + 1))
+            fi
+          done
+
+          echo "--- Checking agent files (must be *.agent.md) ---"
+          for f in $(find .github/agents -type f -name '*.md' 2>/dev/null); do
+            basename=$(basename "$f")
+            if ! echo "$basename" | grep -qE '\.agent\.md$'; then
+              echo "::warning::Agent file does not follow *.agent.md convention: $f"
+              errors=$((errors + 1))
+            fi
+          done
+
+          echo "--- Checking skill directories (must have SKILL.md) ---"
+          for d in $(find .github/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null); do
+            if [ ! -f "$d/SKILL.md" ]; then
+              echo "::warning::Skill directory missing SKILL.md: $d"
+              errors=$((errors + 1))
+            fi
+          done
+
+          if [ "$errors" -gt 0 ]; then
+            echo "::warning::Found $errors naming convention issues"
+          else
+            echo "✓ All files follow naming conventions"
+          fi
+
+      - name: Check for orphaned files
+        run: |
+          orphans=0
+
+          echo "--- Checking for non-.md files in rules ---"
+          for f in $(find .claude/rules -type f ! -name '*.md' 2>/dev/null); do
+            echo "::warning::Orphaned non-markdown file in rules: $f"
+            orphans=$((orphans + 1))
+          done
+
+          echo "--- Checking for empty governance directories ---"
+          for d in .claude/rules .claude/hooks .claude/commands .github/agents .github/skills; do
+            if [ -d "$d" ] && [ -z "$(ls -A "$d" 2>/dev/null)" ]; then
+              echo "::error::Empty governance directory: $d"
+              orphans=$((orphans + 1))
+            fi
+          done
+
+          echo "--- Checking for instruction files referencing missing paths ---"
+          for f in $(find .github/instructions -name '*.md' -type f 2>/dev/null); do
+            echo "Validated instruction file: $f"
+          done
+
+          if [ "$orphans" -gt 0 ]; then
+            echo "::warning::Found $orphans orphaned/empty items"
+          else
+            echo "✓ No orphaned files or empty directories found"
+          fi
+
+      - name: Enforce no versioned file patterns
+        run: |
+          violations=$(find . -type f \( -name '*_v[0-9]*.py' -o -name '*_new.py' -o -name '*_old.py' -o -name '*_backup.py' -o -name '*_copy.py' -o -name '*_updated.py' -o -name '*_refactored.py' \) \
+            ! -path './.git/*' \
+            ! -path './.venv/*' \
+            ! -path './**/migrations/*' 2>/dev/null)
+
+          if [ -n "$violations" ]; then
+            echo "::error::Versioned/duplicate-pattern files are forbidden:"
+            echo "$violations"
+            exit 1
+          fi
+          echo "✓ No forbidden versioned file patterns found"
+
+      - name: Enforce in-place SEO/Distribution/Ads upgrades
+        run: |
+          violations=$(find apps/seo apps/distribution apps/ads -type f \( -name '*_v[0-9]*.py' -o -name '*_new.py' -o -name '*_old.py' -o -name '*_backup.py' -o -name '*_copy.py' -o -name '*_updated.py' -o -name '*_refactored.py' \) 2>/dev/null)
+
+          if [ -n "$violations" ]; then
+            echo "::error::SEO/Distribution/Ads must be upgraded in-place; parallel files are forbidden:"
+            echo "$violations"
+            exit 1
+          fi
+          echo "✓ SEO/Distribution/Ads policy check passed"
+
+      - name: Enforce static asset discipline
+        run: |
+          if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+            added_static=$(git diff --name-status HEAD~1 HEAD -- static/ | awk '$1 == "A" {print $2}')
+            deleted_static=$(git diff --name-status HEAD~1 HEAD -- static/ | awk '$1 == "D" {print $2}')
+
+            if [ -n "$added_static" ] && [ -z "$deleted_static" ]; then
+              echo "::error::New static files are restricted. Additions without cleanup/split replacement are forbidden."
+              echo "$added_static"
+              exit 1
+            fi
+          fi
+          echo "✓ Static asset discipline check passed"
+
+      - name: Enforce static size budgets
+        run: |
+          oversized=$(find static -type f \( -name '*.css' -o -name '*.js' \) -size +250k 2>/dev/null)
+
+          if [ -n "$oversized" ]; then
+            echo "::error::Static file exceeds 250KB budget. Split large assets into coherent modules:"
+            echo "$oversized"
+            exit 1
+          fi
+          echo "✓ Static size budget check passed"
+
+      - name: Summary
+        run: |
+          echo "## Governance Inventory" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Component | Count |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rules | $(find .claude/rules -name '*.md' -type f 2>/dev/null | wc -l) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Hooks | $(find .claude/hooks -type f 2>/dev/null | wc -l) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commands | $(find .claude/commands -type f 2>/dev/null | wc -l) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Agents | $(find .github/agents -name '*.agent.md' -type f 2>/dev/null | wc -l) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Skills | $(find .github/skills -name 'SKILL.md' -type f 2>/dev/null | wc -l) |" >> "$GITHUB_STEP_SUMMARY"

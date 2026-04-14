@@ -81,7 +81,7 @@ class ReferralClick(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Click on {self.code.code} [{'converted' if self.converted else 'pending'}]"
+        return f"Click on {self.code.code} [{'converted' if self.converted else 'pending'}]"  # type: ignore[union-attr]
 
 
 class Commission(models.Model):
@@ -115,4 +115,4 @@ class Commission(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"Commission {self.amount} for {self.referral_code.code} [{self.status}]"
+        return f"Commission {self.amount} for {self.referral_code.code} [{self.status}]"  # type: ignore[union-attr]

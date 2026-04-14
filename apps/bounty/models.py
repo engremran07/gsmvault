@@ -223,6 +223,7 @@ class BountyEscrow(models.Model):
 
     class Meta:
         verbose_name = "Bounty Escrow"
+        verbose_name_plural = "Bounty Escrows"
 
     def __str__(self) -> str:
         return f"Escrow {self.amount} for Bounty#{self.request_id} [{self.status}]"  # type: ignore[attr-defined]
@@ -241,6 +242,7 @@ class FraudCheck(models.Model):
 
     class Meta:
         verbose_name = "Fraud Check"
+        verbose_name_plural = "Fraud Checks"
 
     def __str__(self) -> str:
         return f"FraudCheck score={self.score} {'OK' if self.passed else 'FLAGGED'}"

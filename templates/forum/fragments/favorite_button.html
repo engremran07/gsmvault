@@ -1,4 +1,4 @@
 {# templates/forum/fragments/favorite_button.html — Favorite toggle (HTMX swappable) #}
-<button type="submit" class="p-2 rounded-lg hover:bg-[var(--color-bg-tertiary)] transition-colors" title="{% if is_favorited %}Remove from favorites{% else %}Add to favorites{% endif %}">
-  <i data-lucide="star" class="w-5 h-5 {% if is_favorited %}text-yellow-400 fill-current{% else %}text-[var(--color-text-secondary)]{% endif %}"></i>
+<button type="submit" class="p-2 rounded-lg hover:bg-(--color-bg-tertiary) transition-colors" title="{% if is_favorited %}Remove from favorites{% else %}Add to favorites{% endif %}">
+  <i data-lucide="star" class="w-5 h-5 {% if is_favorited %}text-yellow-400 fill-current{% else %}text-(--color-text-secondary){% endif %}"></i>
 </button>

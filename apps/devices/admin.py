@@ -3,7 +3,17 @@ from __future__ import annotations
 from django.contrib import admin, messages
 from solo.admin import SingletonModelAdmin
 
-from apps.devices.models import AppPolicy, Device, DeviceConfig, DeviceEvent
+from apps.devices.models import (
+    AppPolicy,
+    BehaviorInsight,
+    Device,
+    DeviceConfig,
+    DeviceEvent,
+    DeviceFingerprint,
+    QuotaTier,
+    RegistryEvent,
+    TrustScore,
+)
 
 
 @admin.register(Device)
@@ -168,3 +178,61 @@ class DeviceEventAdmin(admin.ModelAdmin[DeviceEvent]):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(DeviceFingerprint)
+class DeviceFingerprintAdmin(admin.ModelAdmin[DeviceFingerprint]):
+    list_display = (
+        "fingerprint_hash",
+        "trust_level",
+        "browser",
+        "os",
+        "device_type",
+        "is_bot",
+        "visit_count",
+        "last_seen",
+    )
+    list_filter = ("trust_level", "is_bot", "device_type")
+    search_fields = ("fingerprint_hash", "browser", "os", "ip")
+    readonly_fields = ("first_seen", "last_seen", "visit_count")
+
+
+@admin.register(TrustScore)
+class TrustScoreAdmin(admin.ModelAdmin[TrustScore]):
+    list_display = (
+        "fingerprint",
+        "score",
+        "signals_passed",
+        "signals_failed",
+        "last_updated",
+    )
+    readonly_fields = ("last_updated",)
+
+
+@admin.register(QuotaTier)
+class QuotaTierAdmin(admin.ModelAdmin[QuotaTier]):
+    list_display = (
+        "name",
+        "min_trust_score",
+        "max_trust_score",
+        "daily_download_limit",
+        "hourly_download_limit",
+        "requires_ad",
+        "can_bypass_captcha",
+    )
+
+
+@admin.register(RegistryEvent)
+class RegistryEventAdmin(admin.ModelAdmin[RegistryEvent]):
+    list_display = ("fingerprint", "action", "user", "ip", "created_at")
+    list_filter = ("action", "created_at")
+    search_fields = ("fingerprint__fingerprint_hash", "ip")
+    readonly_fields = ("created_at",)
+
+
+@admin.register(BehaviorInsight)
+class BehaviorInsightAdmin(admin.ModelAdmin[BehaviorInsight]):
+    list_display = ("fingerprint", "severity", "status", "related_user", "created_at")
+    list_filter = ("severity", "status")
+    search_fields = ("fingerprint__fingerprint_hash", "recommendation")
+    readonly_fields = ("created_at", "updated_at")

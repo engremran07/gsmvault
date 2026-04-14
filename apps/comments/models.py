@@ -172,6 +172,8 @@ class Comment(TimestampedModel, SoftDeleteModel):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Comment"
+        verbose_name_plural = "Comments"
         indexes = [
             models.Index(fields=["content_type", "object_id", "status"]),
             models.Index(

@@ -1,0 +1,82 @@
+name: Deploy Static Assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "static/**"
+      - "templates/**"
+  workflow_dispatch:
+
+concurrency:
+  group: static-deploy
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+  TAILWIND_VERSION: "4.1.4"
+
+jobs:
+  build-static:
+    name: Build & Deploy Static Assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Tailwind CSS standalone CLI
+        run: |
+          curl -sLO "https://github.com/tailwindlabs/tailwindcss/releases/download/v${TAILWIND_VERSION}/tailwindcss-linux-x64"
+          chmod +x tailwindcss-linux-x64
+          mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
+
+      - name: Compile Tailwind CSS
+        run: |
+          tailwindcss \
+            -i static/css/src/main.scss \
+            -o static/css/dist/main.css \
+            --minify
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput --settings=app.settings_dev
+        env:
+          DJANGO_SETTINGS_MODULE: app.settings_dev
+          DJANGO_SECRET_KEY: ci-static-build-key
+
+      - name: Upload static artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-assets-${{ github.sha }}
+          path: |
+            staticfiles/
+            static/css/dist/
+          retention-days: 30
+
+      - name: Deploy static to CDN (optional)
+        if: vars.STATIC_CDN_BUCKET != ''
+        run: |
+          echo "Deploying static assets to CDN bucket: ${{ vars.STATIC_CDN_BUCKET }}"
+          # Example: aws s3 sync staticfiles/ s3://${{ vars.STATIC_CDN_BUCKET }}/ --delete
+          # Uncomment and configure when CDN is provisioned
+
+      - name: Summary
+        run: |
+          echo "### Static Asset Build Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Commit**: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **CSS compiled**: static/css/dist/main.css" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Artifact**: static-assets-${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          CSS_SIZE=$(stat -c%s static/css/dist/main.css 2>/dev/null || echo "unknown")
+          echo "- **CSS size**: ${CSS_SIZE} bytes" >> "$GITHUB_STEP_SUMMARY"

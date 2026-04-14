@@ -4,8 +4,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Marketplace</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">{{ subtitle }}</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Marketplace</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">{{ subtitle }}</p>
   </div>
 </div>
 {% endblock %}
@@ -29,26 +29,26 @@
 
 {# Quick Nav #}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <a href="{% url 'admin_suite:marketplace_sellers' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+  <a href="{% url 'admin_suite:marketplace_sellers' %}" class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) p-6 hover:border-accent/30 transition group">
     <div class="flex items-center gap-3 mb-3">
       <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10"><i data-lucide="store" class="w-5 h-5 text-blue-400"></i></span>
-      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Sellers</h3>
+      <h3 class="font-semibold text-(--color-text-primary) group-hover:text-(--color-accent) transition">Sellers</h3>
     </div>
-    <p class="text-sm text-[var(--color-text-muted)]">Manage seller profiles, verification status, and payout methods.</p>
+    <p class="text-sm text-(--color-text-muted)">Manage seller profiles, verification status, and payout methods.</p>
   </a>
-  <a href="{% url 'admin_suite:marketplace_listings' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+  <a href="{% url 'admin_suite:marketplace_listings' %}" class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) p-6 hover:border-accent/30 transition group">
     <div class="flex items-center gap-3 mb-3">
       <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/10"><i data-lucide="package" class="w-5 h-5 text-emerald-400"></i></span>
-      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Listings</h3>
+      <h3 class="font-semibold text-(--color-text-primary) group-hover:text-(--color-accent) transition">Listings</h3>
     </div>
-    <p class="text-sm text-[var(--color-text-muted)]">View all marketplace listings, featured items, and pricing.</p>
+    <p class="text-sm text-(--color-text-muted)">View all marketplace listings, featured items, and pricing.</p>
   </a>
-  <a href="{% url 'admin_suite:marketplace_verifications' %}" class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 hover:border-[var(--color-accent)]/30 transition group">
+  <a href="{% url 'admin_suite:marketplace_verifications' %}" class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) p-6 hover:border-accent/30 transition group">
     <div class="flex items-center gap-3 mb-3">
       <span class="flex items-center justify-center w-10 h-10 rounded-lg bg-amber-500/10"><i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i></span>
-      <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition">Verifications</h3>
+      <h3 class="font-semibold text-(--color-text-primary) group-hover:text-(--color-accent) transition">Verifications</h3>
     </div>
-    <p class="text-sm text-[var(--color-text-muted)]">Review and approve/reject seller verification requests.</p>
+    <p class="text-sm text-(--color-text-muted)">Review and approve/reject seller verification requests.</p>
   </a>
 </div>
 

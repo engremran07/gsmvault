@@ -7,18 +7,18 @@
 {% block page_header %}
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
   <div>
-    <h1 class="text-3xl font-bold text-[var(--color-text-primary)] flex items-center gap-3">
-      <i data-lucide="crown" class="w-8 h-8 text-[var(--color-accent)]"></i>
+    <h1 class="text-3xl font-bold text-(--color-text-primary) flex items-center gap-3">
+      <i data-lucide="crown" class="w-8 h-8 text-(--color-accent)"></i>
       My Subscription
     </h1>
   </div>
   <div class="flex gap-3">
     <a href="{% url 'shop_public:pricing' %}"
-       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors">
       <i data-lucide="credit-card" class="w-4 h-4"></i> View Plans
     </a>
     <a href="{% url 'shop_public:order_history' %}"
-       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors">
+       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-primary) hover:border-(--color-accent) hover:text-(--color-accent) transition-colors">
       <i data-lucide="receipt" class="w-4 h-4"></i> Order History
     </a>
   </div>
@@ -27,16 +27,16 @@
 
 {% block page_content %}
 {% if user_package %}
-<div class="rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-bg-secondary)] p-6 mb-8">
+<div class="rounded-xl border border-accent/30 bg-(--color-bg-secondary) p-6 mb-8">
   <div class="flex items-center justify-between mb-4">
     <div>
-      <h2 class="text-xl font-bold text-[var(--color-text-primary)]">{{ user_package.package.name }}</h2>
+      <h2 class="text-xl font-bold text-(--color-text-primary)">{{ user_package.package.name }}</h2>
       <span class="inline-flex items-center gap-1 mt-1 text-xs font-medium rounded-full
-        {% if user_package.status == 'active' %}bg-[var(--color-success)]/10 text-[var(--color-success)]{% elif user_package.status == 'trialing' %}bg-[var(--color-warning)]/10 text-[var(--color-warning)]{% else %}bg-[var(--color-text-muted)]/10 text-[var(--color-text-muted)]{% endif %} px-2.5 py-0.5 capitalize">
+        {% if user_package.status == 'active' %}bg-(--color-success)/10 text-(--color-success){% elif user_package.status == 'trialing' %}bg-(--color-warning)/10 text-(--color-warning){% else %}bg-(--color-text-muted)/10 text-(--color-text-muted){% endif %} px-2.5 py-0.5 capitalize">
         {{ user_package.get_status_display }}
       </span>
     </div>
-    <span class="text-sm text-[var(--color-text-muted)]">{{ user_package.get_billing_cycle_display }}</span>
+    <span class="text-sm text-(--color-text-muted)">{{ user_package.get_billing_cycle_display }}</span>
   </div>
 
   {# Usage stats #}
@@ -50,36 +50,36 @@
   {# Feature flags #}
   <div class="flex flex-wrap gap-2">
     {% if user_package.package.ad_free %}
-    <span class="text-xs rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)] px-2.5 py-1 flex items-center gap-1">
+    <span class="text-xs rounded-full bg-(--color-success)/10 text-(--color-success) px-2.5 py-1 flex items-center gap-1">
       <i data-lucide="shield-check" class="w-3 h-3"></i> Ad-Free
     </span>
     {% endif %}
     {% if user_package.package.priority_queue %}
-    <span class="text-xs rounded-full bg-[var(--color-warning)]/10 text-[var(--color-warning)] px-2.5 py-1 flex items-center gap-1">
+    <span class="text-xs rounded-full bg-(--color-warning)/10 text-(--color-warning) px-2.5 py-1 flex items-center gap-1">
       <i data-lucide="zap" class="w-3 h-3"></i> Priority Queue
     </span>
     {% endif %}
     {% if user_package.package.api_access %}
-    <span class="text-xs rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] px-2.5 py-1 flex items-center gap-1">
+    <span class="text-xs rounded-full bg-accent/10 text-(--color-accent) px-2.5 py-1 flex items-center gap-1">
       <i data-lucide="code" class="w-3 h-3"></i> API Access
     </span>
     {% endif %}
     {% if user_package.package.direct_links %}
-    <span class="text-xs rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] px-2.5 py-1 flex items-center gap-1">
+    <span class="text-xs rounded-full bg-accent/10 text-(--color-accent) px-2.5 py-1 flex items-center gap-1">
       <i data-lucide="link" class="w-3 h-3"></i> Direct Links
     </span>
     {% endif %}
   </div>
 </div>
 {% else %}
-<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-8 text-center mb-8">
-  <div class="w-16 h-16 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-4">
-    <i data-lucide="crown" class="w-8 h-8 text-[var(--color-accent)]"></i>
+<div class="rounded-xl border border-(--color-border) bg-(--color-bg-secondary) p-8 text-center mb-8">
+  <div class="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+    <i data-lucide="crown" class="w-8 h-8 text-(--color-accent)"></i>
   </div>
-  <h2 class="text-xl font-bold text-[var(--color-text-primary)] mb-2">No Active Subscription</h2>
-  <p class="text-[var(--color-text-secondary)] mb-6">Upgrade your account to unlock premium downloads and features.</p>
+  <h2 class="text-xl font-bold text-(--color-text-primary) mb-2">No Active Subscription</h2>
+  <p class="text-(--color-text-secondary) mb-6">Upgrade your account to unlock premium downloads and features.</p>
   <a href="{% url 'shop_public:pricing' %}"
-     class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] font-semibold hover:bg-[var(--color-accent-hover)] transition-colors">
+     class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-(--color-accent) text-(--color-accent-text) font-semibold hover:bg-(--color-accent-hover) transition-colors">
     <i data-lucide="arrow-up-circle" class="w-4 h-4"></i> View Plans
   </a>
 </div>

@@ -1,0 +1,484 @@
+AC TECHS — ULTIMATE MASTER AUDIT REPORT v6
+Date: 2026-04-04
+Repo Baseline: main @ 93d5afc
+Audit Mode: fresh repo-first audit, cross-referenced against prior hardening work but not dependent on prior summaries
+
+======================================================================
+1. AUDIT METHOD
+======================================================================
+
+This audit was run as a fresh pass over the current repository.
+
+Parallel specialist passes actually used:
+- code-reviewer
+- backend-engineer
+- security-auditor
+- qa-engineer
+- architect
+- Explore with a chartered-accountant / ERP-controls lens
+
+Important honesty note:
+- I cannot truthfully claim that hundreds of distinct real agents or skills were actually invoked, because the environment does not expose that many named specialist agents.
+- Instead, I used the strongest available parallel specialists and expanded them into a broader domain matrix during synthesis.
+
+Effective domain matrix covered during synthesis:
+- Flutter architecture
+- feature boundary hygiene
+- repository/provider separation
+- Riverpod lifecycle and invalidation
+- Firestore query design
+- Firestore rules correctness
+- Firestore index coverage
+- auth provisioning semantics
+- disabled user containment
+- privilege escalation paths
+- approval workflow correctness
+- bulk approval behavior
+- approval history integrity
+- audit trail completeness
+- shared-install aggregate correctness
+- duplicate invoice control
+- concurrency/race conditions
+- destructive maintenance safety
+- data flush/reset semantics
+- AC install workflow integrity
+- expense workflow integrity
+- earning workflow integrity
+- export/report parity
+- PDF generation coverage
+- Excel generation coverage
+- branding propagation risks
+- web compatibility
+- Android APK regression risk
+- CI/CD workflow safety
+- secret handling in workflows
+- offline/cache leakage risk
+- Firestore cost scaling
+- performance/read amplification
+- localization and RTL risk
+- test coverage depth
+- routing and guard regressions
+- ERP close/period locking controls
+- accounting immutability controls
+- ledger mutation risks
+- reconciliation/reporting controls
+- operational segregation-of-duties gaps
+- regression-prediction blind spots
+
+Direct validation performed in addition to subagents:
+- current repo structure and instructions read
+- Firestore rules re-read directly
+- key repositories re-read directly
+- routing and AC-install surfaces re-read directly
+- test baseline executed: flutter test
+- test result: 299 passed, 0 failed
+- test tree inventory verified
+
+======================================================================
+2. EXECUTIVE SUMMARY
+======================================================================
+
+Overall state:
+- Visual/UI direction appears largely aligned with current product intent.
+- Core backend and workflow hardening has improved versus earlier repo states.
+- The repo is not broadly broken, but it is not yet “fully safe” for backend integrity, approval correctness, or accounting-grade auditability.
+
+Top conclusion:
+- The most serious remaining issues are not cosmetic. They are backend-control, approval-cycle, permission, and audit-trail problems.
+- Several of these can directly explain APK-level breakage around approval cycles, shared installations, and admin review confidence.
+
+Current confidence by area:
+- UI alignment: medium-high confidence
+- basic unit/model stability: medium-high confidence
+- approval-cycle correctness: low-medium confidence
+- shared-install ledger integrity: low-medium confidence
+- Firestore permission hardening: low-medium confidence
+- ERP/accounting controls: low confidence
+- regression prediction via tests: low confidence
+- web-target viability: low confidence, with one confirmed blocker
+
+Test baseline status:
+- flutter test passes
+- but the suite is concentrated in low-risk units and does not cover the highest-risk workflows
+
+======================================================================
+3. CONFIRMED FINDINGS
+======================================================================
+
+Severity: CRITICAL
+
+1. Web build is currently at risk of compile failure because dart:io is imported in app-path files that are part of the Flutter app graph.
+Files:
+- lib/core/services/excel_export.dart
+- lib/features/admin/presentation/historical_import_screen.dart
+Why this is confirmed:
+- Both files import dart:io directly.
+- This is incompatible with Flutter web compilation unless isolated behind conditional imports or platform-specific split files.
+Impact:
+- Web target can fail at build time even if Android works.
+Risk type:
+- confirmed build/platform defect
+
+2. Disabled/deleted-user containment is only partially enforced in the client, not in Firestore rules.
+Files:
+- firestore.rules
+- lib/features/auth/data/auth_repository.dart
+Why this is confirmed:
+- Rules for jobs/expenses/earnings/ac_installs rely on authenticated uid ownership and do not require an active users document.
+- Sign-in code blocks non-provisioned/inactive users in the app, but a custom client can bypass app UX logic if Firebase Auth still succeeds.
+Impact:
+- deleted or inactive technicians can retain backend access to their own operational documents
+- this is a real backend control failure, not just a UI mismatch
+Risk type:
+- confirmed security/authorization defect
+
+3. User “deactivation” currently deletes the Firestore profile instead of preserving an inactive user state.
+Files:
+- lib/features/admin/data/user_repository.dart
+- lib/features/auth/data/auth_repository.dart
+Why this is confirmed:
+- toggleUserActive(false) deletes the document
+- allUsers/allTechnicians only query active users
+- sign-in expects a provisioned profile document and treats missing doc differently from disabled account
+Impact:
+- admin semantics are inconsistent
+- deactivated users disappear from team context/history linkage
+- login behavior becomes missing-profile behavior instead of proper disabled-account behavior
+Risk type:
+- confirmed backend/domain defect
+
+4. Shared-install aggregate documents are writable by any authenticated user who can satisfy the monotonic update shape.
+Files:
+- firestore.rules
+- lib/features/jobs/data/job_repository.dart
+Why this is confirmed:
+- shared_install_aggregates update rule does not tie mutation to createdBy or the caller’s own reservation/job identity
+- aggregate ids are derivable from group keys
+Impact:
+- one technician can poison or exhaust another shared-install aggregate
+- legitimate shared submissions can be blocked or corrupted
+Risk type:
+- confirmed security/data-integrity defect
+
+5. AC installs have materially weaker approval controls than jobs/expenses/earnings.
+Files:
+- firestore.rules
+- lib/features/expenses/data/ac_install_repository.dart
+- lib/features/expenses/providers/ac_install_providers.dart
+Why this is confirmed:
+- ac_installs update rule allows technicians to change status/approvedBy/adminNote/reviewedAt
+- repository approve/reject methods exist but the rules do not restrict those fields to admin-only transitions
+Impact:
+- technicians can self-approve or tamper with install approval state
+- AC-install approval evidence is weaker than other approval entities
+Risk type:
+- confirmed security/workflow defect
+
+6. AC installs do not have the same immutable approval history model as jobs, expenses, and earnings.
+Files:
+- lib/features/expenses/data/ac_install_repository.dart
+- firestore.rules
+Why this is confirmed:
+- jobs, expenses, and earnings have history subcollections
+- ac_installs do not
+Impact:
+- approval disputes on AC installs have weaker forensic evidence
+- audit consistency across entity types is broken
+Risk type:
+- confirmed audit-trail defect
+
+Severity: HIGH
+
+7. Shared-install approval state is asymmetric: reject releases capacity, but later approval paths do not re-reserve or revalidate that capacity.
+Files:
+- lib/features/jobs/data/job_repository.dart
+Why this is confirmed:
+- rejection path releases shared aggregate reservation
+- approveJob and bulkApproveJobs only flip status and write history
+Impact:
+- stale-client or multi-admin races can create approved shared jobs with released capacity
+- later shared jobs can over-admit against the invoice total
+Risk type:
+- confirmed approval-cycle defect
+
+8. Flush/reset operations are not recursive and will leave history subcollections behind.
+Files:
+- lib/features/admin/data/user_repository.dart
+- lib/features/jobs/data/job_repository.dart
+- lib/features/expenses/data/expense_repository.dart
+- lib/features/expenses/data/earning_repository.dart
+Why this is confirmed:
+- flush code deletes parent docs only
+- approval history lives in subcollections and Firestore does not cascade parent deletes into subcollections
+Impact:
+- stale audit history survives “flush”
+- imports after flush can inherit or coexist with stale history semantics
+Risk type:
+- confirmed maintenance/data-reset defect
+
+9. Technician-only flush does not clear shared-install aggregates.
+Files:
+- lib/features/admin/data/user_repository.dart
+- lib/features/jobs/data/job_repository.dart
+Why this is confirmed:
+- technician flush removes ac_installs/jobs/expenses/earnings by techId
+- shared_install_aggregates are not keyed by techId and are not cleaned
+Impact:
+- deleted technician participation can leave stale aggregate consumption
+- future shared installs can fail or validate against stale capacity
+Risk type:
+- confirmed maintenance/shared-ledger defect
+
+10. Duplicate invoice protection is race-prone.
+Files:
+- lib/features/jobs/data/job_repository.dart
+Why this is confirmed:
+- preflight duplicate query happens before a later write using auto-id documents for normal job submission
+- uniqueness is not transactionally enforced
+Impact:
+- concurrent double-submit or retries can create duplicates
+- totals, approvals, exports, and shared metrics can all inflate
+Risk type:
+- confirmed concurrency/integrity defect
+
+11. Admin summaries still rely on full-collection reads in the repository.
+Files:
+- lib/features/jobs/data/job_repository.dart
+- lib/features/jobs/providers/job_providers.dart
+Why this is confirmed:
+- fetchAllAdminJobs and fetchAdminJobSummary still read the full jobs collection
+Impact:
+- scaling and Firestore read-cost risk remains for admin summary/analytics paths
+- improved from live-stream everywhere, but not fully solved
+Risk type:
+- confirmed performance/cost defect
+
+12. Approved shared-install forensic query likely lacks its required composite index.
+Files:
+- lib/features/jobs/data/job_repository.dart
+- firestore.indexes.json
+Why this is marked high-confidence confirmed:
+- approvedSharedInstalls() filters on status and isSharedInstall and orders by submittedAt
+- no jobs composite index including status + isSharedInstall + submittedAt is present in the index manifest
+Impact:
+- runtime failed-precondition/index error is likely in that flow
+Risk type:
+- confirmed index coverage gap unless Firestore serves it from an already-created console-only index
+
+13. Admin analytics merges technician totals by techName, not by stable techId.
+Files:
+- lib/core/models/admin_job_summary.dart
+- lib/features/admin/presentation/analytics_screen.dart
+Why this is confirmed:
+- summary buckets are keyed by display name
+Impact:
+- duplicate names merge together
+- renamed technicians split their own historical bars across names
+Risk type:
+- confirmed reporting correctness defect
+
+14. AC-install workflow is only partially integrated into reachable UI/admin review surfaces.
+Files:
+- lib/features/expenses/presentation/ac_installations_screen.dart
+- lib/routing/app_router.dart
+- lib/features/admin/presentation/approvals_screen.dart
+Why this is confirmed:
+- dedicated AC-install screen exists
+- current router excerpt does not expose it on tech routes
+- admin approvals screen watches jobs, earnings, and expenses, but not pending AC installs
+Impact:
+- users may have orphaned install functionality
+- admins may not review AC installs from the main approvals surface
+Risk type:
+- confirmed feature-integration gap
+
+======================================================================
+4. HIGH-CONFIDENCE RISKS REQUIRING LIVE OR EMULATOR VALIDATION
+======================================================================
+
+These are highly plausible and important, but I am labeling them slightly below “confirmed code defect” because final proof needs emulator/live workflow execution.
+
+1. Reject-and-correct resubmission for the same invoice may be effectively blocked.
+Files:
+- lib/features/jobs/data/job_repository.dart
+Reason:
+- duplicate invoice guard appears to reject same tech/company/invoice regardless of prior rejection state
+Likely impact:
+- technicians may be unable to correct rejected jobs via clean resubmission
+
+2. Approved operational records remain too mutable for accounting-grade trust.
+Files:
+- firestore.rules
+- expense/earning/job repositories and screens
+Reason:
+- admins can change approved records in place; technicians retain deletes on several entity types
+Likely impact:
+- approved totals can drift after the fact without reversal-style accounting
+
+3. No period locking or close controls exist.
+Files:
+- repo-wide absence, especially settings and rules
+Reason:
+- no collection or rule model for OPEN/LOCKED/CLOSED accounting periods
+Likely impact:
+- month-end and payroll/report reconciliation can drift after period close
+
+4. Shared-install financial attribution lacks reconciliation-grade controls.
+Files:
+- lib/features/jobs/data/job_repository.dart
+- exports
+Reason:
+- shared splits are sophisticated but there is no dedicated reconciliation report proving invoice-level balance across team shares and delivery splits over time
+Likely impact:
+- finance/admin disputes will be difficult to resolve cleanly
+
+======================================================================
+5. TESTING AUDIT
+======================================================================
+
+Current automated test facts:
+- flutter test: PASS (299 assertions)
+- test files discovered: 12
+- coverage style: mostly unit-level utility/model tests plus one widget smoke test
+
+Current test tree is concentrated in:
+- models
+- constants
+- exceptions
+- app_formatters/category_translator
+- pdf helper tests
+- one flush exception-level test
+- one generic widget smoke test
+
+What is notably NOT covered:
+- approval-cycle end-to-end behavior
+- shared-install aggregate reservation/release/reapproval correctness
+- duplicate-invoice concurrency
+- Firestore rules behavior via emulator/rules tests
+- router redirect matrix
+- AC-install navigation and admin approval path
+- Excel workbook content and locale correctness
+- Urdu/Arabic widget/RTL regression paths
+- offline/cache session isolation behavior
+- real PDF rendering correctness
+- web compilation safety of export/import features
+
+Test quality conclusion:
+- Passing tests are real, but they do not prove the highest-risk product behaviors.
+- The current suite is too shallow to predict feature breakage after policy or repository changes.
+
+Highest-value tests to add next:
+- repository test: reject -> correct -> resubmit same invoice
+- repository/emulator test: shared install multi-tech reservation, reject, re-approve, over-capacity attempt
+- rules tests: disabled user cannot write own records; technician cannot self-approve ac_install
+- widget/router tests: admin/tech/inactive/update-required redirect matrix
+- widget/integration tests: approvals screen covers AC installs if that feature is intended
+- export tests: Excel content, headers, shared-install share columns, locale-sensitive output
+- RTL tests: approvals, submit job, exports launcher surfaces in Urdu/Arabic
+- web smoke or compile guard for files with platform-specific imports
+
+======================================================================
+6. REGRESSION-PREDICTION MAP
+======================================================================
+
+Most likely break zones if future changes are made carelessly:
+
+1. Approval policies
+- because rules, repositories, and screens each carry pieces of approval semantics
+- one change can silently desync the others
+
+2. Shared installs
+- because capacity logic, approval state, aggregate counters, and exports all depend on each other
+- this area has the highest hidden-cascade risk in the repo
+
+3. Admin summaries/analytics
+- because summary semantics now live partly in repositories and partly in screen assumptions
+- cost optimization changes can easily skew totals if shared-install semantics are not preserved exactly
+
+4. Auth/session/data isolation
+- because logout still depends on a long manual invalidation list
+- provider graph growth will make this brittle over time
+
+5. Reporting/export
+- because the app has multiple report entry points and not enough content-level tests
+- a small change can fix one report and quietly regress another, as happened previously with PDF branding propagation
+
+======================================================================
+7. ROOT-CAUSE THEMES
+======================================================================
+
+Across the confirmed issues, the recurring root causes are:
+- domain rules split across UI, providers, repositories, and Firestore rules instead of one canonical command model
+- security rules authorize on auth ownership more often than on provisioned active-user state
+- accounting/audit concerns are partially implemented rather than consistently modeled
+- high-risk workflows lack integration or emulator tests
+- feature-rich areas such as shared installs and exports evolved faster than their regression harness
+
+======================================================================
+8. RECOMMENDED PRIORITY ORDER
+======================================================================
+
+Priority 0 — immediate blockers and safety
+1. Remove direct dart:io from web-app graph via conditional imports or platform split files.
+2. Lock Firestore rules to require an active provisioned user document on technician collections.
+3. Restrict AC-install approval metadata to admin-only transitions.
+4. Tighten shared_install_aggregates update permissions so only the legitimate owning submitter flow can mutate reservations.
+
+Priority 1 — approval-cycle correctness
+5. Enforce pending-only state transitions for approve/reject and make reapproval of shared jobs revalidate/re-reserve capacity.
+6. Decide the intended reject/correct/resubmit story and encode it explicitly in repository + tests.
+7. Add recursive flush cleanup for history subcollections and shared aggregates where appropriate.
+
+Priority 2 — regression prevention
+8. Add emulator/rules tests for security-sensitive flows.
+9. Add repository tests for shared installs and duplicate invoice races.
+10. Add router/widget tests for auth/update/role flows.
+11. Add Excel/PDF content tests.
+
+Priority 3 — architecture and finance controls
+12. Introduce a single approval ledger abstraction for all approvable entities, including AC installs.
+13. Move toward immutable approved records plus reversal/correction workflows.
+14. Add period locking / close control if the app is intended to support finance-grade reporting.
+15. Replace remaining full-scan admin summaries with scoped or maintained summary documents.
+
+======================================================================
+9. FINAL JUDGMENT
+======================================================================
+
+If the question is “does the app look aligned with the intended UX?”, the answer is mostly yes.
+
+If the question is “is the backend and approval/reporting behavior now fully safe and exhaustively protected against breakage?”, the answer is no.
+
+The repo is currently in this state:
+- usable
+- improving
+- not broadly unstable
+- but still carrying several serious backend-control and workflow-integrity defects
+
+The most important message from this audit is this:
+- the next gains will not come from more UI polish
+- they will come from tightening domain invariants, Firestore authorization, approval-state transitions, and test depth around shared installs and approvals
+
+======================================================================
+10. APPENDIX — AUDIT LIMITS
+======================================================================
+
+This report is intentionally evidence-based.
+
+What was done:
+- real repo reading
+- parallel specialist review
+- direct code cross-checking
+- current test execution
+
+What was NOT done in this pass:
+- Firestore emulator rule execution
+- Android emulator runtime session walkthrough
+- flutter build web or web runtime smoke
+- live Firebase backend mutation tests
+
+That means:
+- findings labeled confirmed are grounded in code-level evidence
+- findings labeled high-confidence risk should be validated next with emulator/runtime tests
+
+End of report.

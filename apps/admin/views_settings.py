@@ -9,12 +9,33 @@ from .views_shared import _ADMIN_DISABLED, _make_breadcrumb, _render_admin
 # Extracted views_settings views from legacy views.py
 @staff_member_required  # noqa: F405
 def admin_suite_settings(request: HttpRequest) -> HttpResponse:  # noqa: F405
-    """Settings and security flags overview."""
+    """Settings hub with inline editing, feature toggles, and operational status."""
     if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
         raise _ADMIN_DISABLED  # noqa: F405
 
     site_snapshot: dict[str, Any] = {}  # noqa: F405
+    operations_status: dict[str, int] = {
+        "seo_pending_suggestions": 0,
+        "seo_locked_suggestions": 0,
+        "seo_active_batches": 0,
+        "ads_pending_discoveries": 0,
+        "ads_active_campaigns": 0,
+    }
     message = ""
+
+    class SettingsForm(forms.Form):  # noqa: F405
+        site_name = forms.CharField(max_length=100, required=True)  # noqa: F405
+        site_header = forms.CharField(max_length=100, required=False)  # noqa: F405
+        site_description = forms.CharField(max_length=500, required=False)  # noqa: F405
+        primary_color = forms.CharField(max_length=7, required=False)  # noqa: F405
+        secondary_color = forms.CharField(max_length=7, required=False)  # noqa: F405
+        enable_signup = forms.BooleanField(required=False)  # noqa: F405
+        maintenance_mode = forms.BooleanField(required=False)  # noqa: F405
+        force_https = forms.BooleanField(required=False)  # noqa: F405
+        cache_ttl_seconds = forms.IntegerField(  # noqa: F405
+            required=False, min_value=60, max_value=86400
+        )
+
     _ALLOWED_TOGGLES = {
         "seo_enabled",
         "ads_enabled",
@@ -32,22 +53,68 @@ def admin_suite_settings(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "gamification_enabled",
         "marketplace_enabled",
     }
+    instance = None
+    initial: dict[str, Any] = {}  # noqa: F405
+    form: SettingsForm
+
+    try:
+        from apps.site_settings.models import SiteSettings
+
+        instance = SiteSettings.get_solo()
+        initial = {
+            "site_name": getattr(instance, "site_name", ""),
+            "site_header": getattr(instance, "site_header", ""),
+            "site_description": getattr(instance, "site_description", ""),
+            "primary_color": getattr(instance, "primary_color", "") or "",
+            "secondary_color": getattr(instance, "secondary_color", "") or "",
+            "enable_signup": bool(getattr(instance, "enable_signup", True)),
+            "maintenance_mode": bool(getattr(instance, "maintenance_mode", False)),
+            "force_https": bool(getattr(instance, "force_https", False)),
+            "cache_ttl_seconds": getattr(instance, "cache_ttl_seconds", 600),
+        }
+    except Exception as exc:
+        logger.warning("Admin suite site settings load failed: %s", exc)  # noqa: F405
+
     if request.method == "POST":
         action = request.POST.get("action")
-        try:
-            from apps.site_settings.models import AppRegistry
+        if action == "save_settings":
+            form = SettingsForm(request.POST)
+            if form.is_valid() and instance:
+                cleaned = form.cleaned_data
+                for field, value in cleaned.items():
+                    setattr(instance, field, value)
+                try:
+                    instance.save()
+                    try:
+                        from apps.core.cache import DistributedCacheManager
 
-            reg = AppRegistry.get_solo()
-            if action and action in _ALLOWED_TOGGLES and hasattr(reg, action):
-                current = bool(getattr(reg, action))
-                setattr(reg, action, not current)
-                reg.save(update_fields=[action])
-                message = f"{action} set to {not current}"
-            elif action and action not in _ALLOWED_TOGGLES:
-                message = f"Toggle '{action}' is not allowed."
-        except Exception as exc:
-            logger.warning("Admin suite registry toggle failed: %s", exc)  # noqa: F405
-            message = "Toggle failed."
+                        DistributedCacheManager.invalidate_site_settings()
+                    except Exception:  # noqa: S110
+                        pass
+                    message = "Settings saved."
+                except Exception as exc:
+                    form.add_error(None, f"Save failed: {exc}")
+            elif not instance:
+                message = "Settings model unavailable."
+        else:
+            try:
+                from apps.site_settings.models import AppRegistry
+
+                reg = AppRegistry.get_solo()
+                if action and action in _ALLOWED_TOGGLES and hasattr(reg, action):
+                    current = bool(getattr(reg, action))
+                    setattr(reg, action, not current)
+                    reg.save(update_fields=[action])
+                    message = f"{action} set to {not current}"
+                elif action and action not in _ALLOWED_TOGGLES:
+                    message = f"Toggle '{action}' is not allowed."
+            except Exception as exc:
+                logger.warning("Admin suite registry toggle failed: %s", exc)  # noqa: F405
+                message = "Toggle failed."
+            form = SettingsForm(initial=initial)
+    else:
+        form = SettingsForm(initial=initial)
+
     try:
         from apps.site_settings.models import SiteSettings
 
@@ -131,9 +198,38 @@ def admin_suite_settings(request: HttpRequest) -> HttpResponse:  # noqa: F405
         "ai_enabled": "AI Behavior",
     }
     security_modules = [
-        {"label": label, "enabled": bool(security_status.get(key, False))}
+        {
+            "key": key,
+            "label": label,
+            "enabled": bool(security_status.get(key, False)),
+        }
         for key, label in _MODULE_LABELS.items()
     ]
+
+    try:
+        from apps.ads.models import Campaign, ScanDiscovery
+        from apps.seo.models import BatchOperation, LinkSuggestion
+
+        operations_status["seo_pending_suggestions"] = LinkSuggestion.objects.filter(
+            is_active=True, is_applied=False
+        ).count()
+        operations_status["seo_locked_suggestions"] = LinkSuggestion.objects.filter(
+            is_active=True, locked=True
+        ).count()
+        operations_status["seo_active_batches"] = BatchOperation.objects.filter(
+            status__in=[
+                BatchOperation.Status.PENDING,
+                BatchOperation.Status.RUNNING,
+            ]
+        ).count()
+        operations_status["ads_pending_discoveries"] = ScanDiscovery.objects.filter(
+            status="pending"
+        ).count()
+        operations_status["ads_active_campaigns"] = Campaign.objects.filter(
+            is_active=True
+        ).count()
+    except Exception as exc:
+        logger.debug("Admin suite operational status snapshot failed: %s", exc)  # noqa: F405
 
     return _render_admin(
         request,
@@ -142,7 +238,9 @@ def admin_suite_settings(request: HttpRequest) -> HttpResponse:  # noqa: F405
             "site_snapshot": site_snapshot,
             "security_status": security_status,
             "security_modules": security_modules,
+            "operations_status": operations_status,
             "message": message,
+            "form": form,
         },
         nav_active="settings",
         breadcrumb=_make_breadcrumb(
@@ -153,76 +251,10 @@ def admin_suite_settings(request: HttpRequest) -> HttpResponse:  # noqa: F405
 
 @staff_member_required  # noqa: F405
 def admin_suite_settings_edit(request: HttpRequest) -> HttpResponse:  # noqa: F405
-    """Edit SiteSettings with a constrained form and cache invalidation."""
+    """Legacy route redirect to the unified inline settings page."""
     if not getattr(settings, "ADMIN_SUITE_ENABLED", True):  # noqa: F405
         raise _ADMIN_DISABLED  # noqa: F405
-
-    class SettingsForm(forms.Form):  # noqa: F405
-        site_name = forms.CharField(max_length=100, required=True)  # noqa: F405
-        site_header = forms.CharField(max_length=100, required=False)  # noqa: F405
-        site_description = forms.CharField(max_length=500, required=False)  # noqa: F405
-        primary_color = forms.CharField(max_length=7, required=False)  # noqa: F405
-        secondary_color = forms.CharField(max_length=7, required=False)  # noqa: F405
-        enable_signup = forms.BooleanField(required=False)  # noqa: F405
-        maintenance_mode = forms.BooleanField(required=False)  # noqa: F405
-        force_https = forms.BooleanField(required=False)  # noqa: F405
-        cache_ttl_seconds = forms.IntegerField(  # noqa: F405
-            required=False, min_value=60, max_value=86400
-        )
-
-    instance = None
-    initial = {}
-    try:
-        from apps.site_settings.models import SiteSettings
-
-        instance = SiteSettings.get_solo()
-        initial = {
-            "site_name": getattr(instance, "site_name", ""),
-            "site_header": getattr(instance, "site_header", ""),
-            "site_description": getattr(instance, "site_description", ""),
-            "primary_color": getattr(instance, "primary_color", ""),
-            "secondary_color": getattr(instance, "secondary_color", ""),
-            "enable_signup": bool(getattr(instance, "enable_signup", True)),
-            "maintenance_mode": bool(getattr(instance, "maintenance_mode", False)),
-            "force_https": bool(getattr(instance, "force_https", False)),
-            "cache_ttl_seconds": getattr(instance, "cache_ttl_seconds", 600),
-        }
-    except Exception as exc:
-        logger.warning("Admin suite settings load failed: %s", exc)  # noqa: F405
-
-    if request.method == "POST":
-        form = SettingsForm(request.POST)
-        if form.is_valid() and instance:
-            cleaned = form.cleaned_data
-            for field, value in cleaned.items():
-                setattr(instance, field, value)
-            try:
-                instance.save()
-                try:
-                    from apps.core.cache import DistributedCacheManager
-
-                    DistributedCacheManager.invalidate_site_settings()
-                except Exception:  # noqa: S110
-                    pass
-                return redirect("admin_suite:settings")  # noqa: F405
-            except Exception as exc:
-                form.add_error(None, f"Save failed: {exc}")
-    else:
-        form = SettingsForm(initial=initial)
-
-    return _render_admin(
-        request,
-        "admin_suite/settings_edit.html",
-        {
-            "form": form,
-        },
-        nav_active="settings",
-        breadcrumb=_make_breadcrumb(
-            ("Admin Home", "admin_suite:admin_suite"),
-            ("Settings", "admin_suite:admin_suite_settings"),
-            ("Edit", None),
-        ),
-    )
+    return redirect("admin_suite:settings")  # noqa: F405
 
 
 @staff_member_required  # noqa: F405

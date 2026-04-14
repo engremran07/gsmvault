@@ -4,10 +4,10 @@
 {% block title %}500 — Server Error{% endblock %}
 
 {% block error_content %}
-<div class="text-6xl font-bold text-[var(--color-error)] mb-4">500</div>
+<div class="text-6xl font-bold text-(--color-error) mb-4">500</div>
 <h1 class="text-2xl font-semibold mb-2">Something Went Wrong</h1>
-<p class="text-[var(--color-text-secondary)] mb-6">An internal error occurred. Our team has been notified.</p>
-<a href="{% url 'home' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition-colors">
+<p class="text-(--color-text-secondary) mb-6">An internal error occurred. Our team has been notified.</p>
+<a href="{% url 'home' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-(--color-accent) text-(--color-accent-text) hover:bg-(--color-accent-hover) transition-colors">
   <i data-lucide="home" class="w-4 h-4"></i> Go Home
 </a>
 {% endblock %}

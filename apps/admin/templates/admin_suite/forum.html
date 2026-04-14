@@ -6,8 +6,8 @@
 {% block page_header %}
 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Forum</h1>
-    <p class="mt-1 text-sm text-[var(--color-text-muted)]">Manage categories, topics, and moderation flags</p>
+    <h1 class="text-2xl font-bold text-(--color-text-primary) tracking-tight">Forum</h1>
+    <p class="mt-1 text-sm text-(--color-text-muted)">Manage categories, topics, and moderation flags</p>
   </div>
 </div>
 {% endblock %}
@@ -24,23 +24,23 @@
   </div>
 
   {# ── Categories Overview ── #}
-  <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl p-5">
-    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
-      <i data-lucide="folder" class="w-5 h-5 text-[var(--color-accent)]"></i>
+  <div class="bg-(--color-card) border border-(--color-border) rounded-xl p-5">
+    <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+      <i data-lucide="folder" class="w-5 h-5 text-(--color-accent)"></i>
       Categories
     </h2>
     {% if categories %}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {% for cat in categories %}
-      <div class="border border-[var(--color-border)]/50 rounded-lg p-3 hover:bg-[var(--color-sidebar-hover)] transition-colors">
+      <div class="border border-(--color-border)/50 rounded-lg p-3 hover:bg-(--color-sidebar-hover) transition-colors">
         <div class="flex items-center gap-2 mb-1">
-          {% if cat.icon %}<i data-lucide="{{ cat.icon }}" class="w-4 h-4 text-[var(--color-accent)]"></i>{% endif %}
-          <span class="font-medium text-[var(--color-text-primary)]">{{ cat.title }}</span>
+          {% if cat.icon %}<i data-lucide="{{ cat.icon }}" class="w-4 h-4 text-(--color-accent)"></i>{% endif %}
+          <span class="font-medium text-(--color-text-primary)">{{ cat.title }}</span>
         </div>
         {% if cat.description %}
-        <p class="text-xs text-[var(--color-text-muted)] line-clamp-2">{{ cat.description }}</p>
+        <p class="text-xs text-(--color-text-muted) line-clamp-2">{{ cat.description }}</p>
         {% endif %}
-        <div class="mt-2 flex items-center gap-3 text-xs text-[var(--color-text-muted)]">
+        <div class="mt-2 flex items-center gap-3 text-xs text-(--color-text-muted)">
           <span>{{ cat.topic_count }} topics</span>
           {% if not cat.is_visible %}<span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 text-[10px] font-bold">HIDDEN</span>{% endif %}
         </div>
@@ -54,32 +54,32 @@
 
   {# ── Pending Flags ── #}
   {% if pending_flags %}
-  <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl p-5">
-    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
+  <div class="bg-(--color-card) border border-(--color-border) rounded-xl p-5">
+    <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
       <i data-lucide="flag" class="w-5 h-5 text-red-400"></i>
       Pending Flags
-      <span class="ml-auto text-xs text-[var(--color-text-muted)]">{{ open_flags }} unresolved</span>
+      <span class="ml-auto text-xs text-(--color-text-muted)">{{ open_flags }} unresolved</span>
     </h2>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="text-left text-[var(--color-text-muted)] border-b border-[var(--color-border)]/30">
+          <tr class="text-left text-(--color-text-muted) border-b border-(--color-border)/30">
             <th class="pb-2 pr-4 font-medium">Reporter</th>
             <th class="pb-2 pr-4 font-medium">Reason</th>
             <th class="pb-2 pr-4 font-medium">Target</th>
             <th class="pb-2 pr-4 font-medium">Date</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[var(--color-border)]/20">
+        <tbody class="divide-y divide-(--color-border)/20">
           {% for flag in pending_flags %}
-          <tr class="hover:bg-[var(--color-sidebar-hover)] transition-colors">
-            <td class="py-2 pr-4 text-[var(--color-text-primary)]">{{ flag.user }}</td>
-            <td class="py-2 pr-4 text-[var(--color-text-secondary)]">{{ flag.get_reason_display }}</td>
-            <td class="py-2 pr-4 text-[var(--color-text-secondary)]">
+          <tr class="hover:bg-(--color-sidebar-hover) transition-colors">
+            <td class="py-2 pr-4 text-(--color-text-primary)">{{ flag.user }}</td>
+            <td class="py-2 pr-4 text-(--color-text-secondary)">{{ flag.get_reason_display }}</td>
+            <td class="py-2 pr-4 text-(--color-text-secondary)">
               {% if flag.topic %}Topic: {{ flag.topic.title|truncatechars:40 }}{% endif %}
               {% if flag.reply %}Reply #{{ flag.reply.pk }}{% endif %}
             </td>
-            <td class="py-2 pr-4 text-[var(--color-text-muted)]">{{ flag.created_at|naturaltime }}</td>
+            <td class="py-2 pr-4 text-(--color-text-muted)">{{ flag.created_at|naturaltime }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -94,16 +94,16 @@
   {% endif %}
 
   {# ── Recent Topics ── #}
-  <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl p-5">
-    <h2 class="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
-      <i data-lucide="message-square" class="w-5 h-5 text-[var(--color-accent)]"></i>
+  <div class="bg-(--color-card) border border-(--color-border) rounded-xl p-5">
+    <h2 class="text-lg font-semibold text-(--color-text-primary) mb-4 flex items-center gap-2">
+      <i data-lucide="message-square" class="w-5 h-5 text-(--color-accent)"></i>
       Recent Topics
     </h2>
     {% if recent_topics %}
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="text-left text-[var(--color-text-muted)] border-b border-[var(--color-border)]/30">
+          <tr class="text-left text-(--color-text-muted) border-b border-(--color-border)/30">
             <th class="pb-2 pr-4 font-medium">Title</th>
             <th class="pb-2 pr-4 font-medium">Category</th>
             <th class="pb-2 pr-4 font-medium">Author</th>
@@ -113,20 +113,20 @@
             <th class="pb-2 pr-4 font-medium">Created</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[var(--color-border)]/20">
+        <tbody class="divide-y divide-(--color-border)/20">
           {% for topic in recent_topics %}
-          <tr class="hover:bg-[var(--color-sidebar-hover)] transition-colors">
+          <tr class="hover:bg-(--color-sidebar-hover) transition-colors">
             <td class="py-2 pr-4">
-              <a href="{% url 'forum:topic_detail' pk=topic.pk slug=topic.slug %}" class="text-[var(--color-accent)] hover:underline" target="_blank">
+              <a href="{% url 'forum:topic_detail' pk=topic.pk slug=topic.slug %}" class="text-(--color-accent) hover:underline" target="_blank">
                 {{ topic.title|truncatechars:50 }}
               </a>
               {% if topic.is_pinned %}<span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400">PIN</span>{% endif %}
               {% if topic.is_closed %}<span class="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/15 text-red-400">CLOSED</span>{% endif %}
             </td>
-            <td class="py-2 pr-4 text-[var(--color-text-secondary)]">{{ topic.category.title|truncatechars:20 }}</td>
-            <td class="py-2 pr-4 text-[var(--color-text-secondary)]">{{ topic.user }}</td>
-            <td class="py-2 pr-4 text-[var(--color-text-muted)] tabular-nums">{{ topic.reply_count }}</td>
-            <td class="py-2 pr-4 text-[var(--color-text-muted)] tabular-nums">{{ topic.view_count|intcomma }}</td>
+            <td class="py-2 pr-4 text-(--color-text-secondary)">{{ topic.category.title|truncatechars:20 }}</td>
+            <td class="py-2 pr-4 text-(--color-text-secondary)">{{ topic.user }}</td>
+            <td class="py-2 pr-4 text-(--color-text-muted) tabular-nums">{{ topic.reply_count }}</td>
+            <td class="py-2 pr-4 text-(--color-text-muted) tabular-nums">{{ topic.view_count|intcomma }}</td>
             <td class="py-2 pr-4">
               {% if topic.is_removed %}
               <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/15 text-red-400">REMOVED</span>
@@ -136,7 +136,7 @@
               <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400">OPEN</span>
               {% endif %}
             </td>
-            <td class="py-2 pr-4 text-[var(--color-text-muted)]">{{ topic.created_at|naturaltime }}</td>
+            <td class="py-2 pr-4 text-(--color-text-muted)">{{ topic.created_at|naturaltime }}</td>
           </tr>
           {% endfor %}
         </tbody>

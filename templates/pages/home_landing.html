@@ -29,72 +29,72 @@
 {# ── Hero Section ── #}
 <section class="text-center" style="padding-top: 4rem; padding-bottom: 6rem;">
   <div class="container-md">
-    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-[var(--color-text-primary)] leading-tight">
-      Firmware Distribution <span class="text-[var(--color-accent)]">Platform</span>
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-(--color-text-primary) leading-tight">
+      Firmware Distribution <span class="text-(--color-accent)">Platform</span>
     </h1>
-    <p class="text-lg md:text-xl text-[var(--color-text-secondary)] mb-2 leading-relaxed">
+    <p class="text-lg md:text-xl text-(--color-text-secondary) mb-2 leading-relaxed">
       Download official, engineering, and modified firmware for thousands of devices.
     </p>
-    <p class="text-sm text-[var(--color-text-muted)] mb-12">
+    <p class="text-sm text-(--color-text-muted) mb-12">
       Fast, secure, and always up to date.
     </p>
 
     {# Search bar — wide and prominent #}
     <div class="container-sm" style="margin-bottom: 3rem;">
       <div class="relative">
-        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)]"></i>
+        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-(--color-text-muted)"></i>
         <input type="text"
                placeholder="Search firmware, devices, brands..."
                hx-get="/api/v1/search/"
                hx-trigger="input changed delay:300ms"
                hx-target="#search-results"
                name="q"
-               class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition text-base shadow-sm">
+               class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-(--color-border) bg-(--color-bg-secondary) text-(--color-text-primary) placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-(--color-accent) focus:border-transparent transition text-base shadow-sm">
       </div>
       <div id="search-results"></div>
     </div>
 
     {# ── Stats Grid ── #}
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-      <a href="{% url 'firmwares:brand_list' %}" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="building-2" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.brands_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Brands</div>
+      <a href="{% url 'firmwares:brand_list' %}" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="building-2" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.brands_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Brands</div>
       </a>
-      <a href="{% url 'firmwares:browse' %}" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="smartphone" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.models_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Models</div>
+      <a href="{% url 'firmwares:browse' %}" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="smartphone" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.models_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Models</div>
       </a>
-      <a href="{% url 'firmwares:browse' %}" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="hard-drive-download" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.firmwares_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Firmwares</div>
+      <a href="{% url 'firmwares:browse' %}" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="hard-drive-download" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.firmwares_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Firmwares</div>
       </a>
-      <a href="{% url 'firmwares:browse' %}" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="download" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.total_downloads|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Downloads</div>
+      <a href="{% url 'firmwares:browse' %}" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="download" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.total_downloads|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Downloads</div>
       </a>
-      <a href="{% url 'blog:post_list' %}" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="bot" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.auto_blogs_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Auto Blogs</div>
+      <a href="{% url 'blog:post_list' %}" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="bot" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.auto_blogs_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Auto Blogs</div>
       </a>
-      <a href="{% url 'blog:post_list' %}" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="pen-tool" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.manual_blogs_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Manual Blogs</div>
+      <a href="{% url 'blog:post_list' %}" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="pen-tool" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.manual_blogs_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Manual Blogs</div>
       </a>
-      <a href="{% url 'bounty:bounty_list' %}?tab=firmware" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="target" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.fw_bounties_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">FW Bounties</div>
+      <a href="{% url 'bounty:bounty_list' %}?tab=firmware" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="target" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.fw_bounties_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">FW Bounties</div>
       </a>
-      <a href="{% url 'bounty:bounty_list' %}?tab=support" class="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-5 text-center hover-lift transition-all hover:border-[var(--color-accent)] cursor-pointer block">
-        <i data-lucide="life-buoy" class="w-5 h-5 text-[var(--color-accent)] mx-auto mb-2"></i>
-        <div class="text-2xl font-bold text-[var(--color-accent)]">{{ stats.support_bounties_count|default:"0" }}</div>
-        <div class="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wide">Support Forum</div>
+      <a href="{% url 'bounty:bounty_list' %}?tab=support" class="bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-5 text-center hover-lift transition-all hover:border-(--color-accent) cursor-pointer block">
+        <i data-lucide="life-buoy" class="w-5 h-5 text-(--color-accent) mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-(--color-accent)">{{ stats.support_bounties_count|default:"0" }}</div>
+        <div class="text-xs text-(--color-text-muted) mt-1 uppercase tracking-wide">Support Forum</div>
       </a>
     </div>
   </div>
@@ -104,31 +104,31 @@
 <section style="padding-top: 2.5rem; padding-bottom: 2.5rem; border-top: 1px solid var(--color-border);">
   <div class="container-md">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-      <a href="{% url 'blog:post_list' %}" class="group flex items-center gap-4 bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-6 hover:border-[var(--color-accent)] hover-lift transition-all">
-        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-[var(--color-accent-soft)] flex items-center justify-center">
-          <i data-lucide="file-text" class="w-6 h-6 text-[var(--color-accent)]"></i>
+      <a href="{% url 'blog:post_list' %}" class="group flex items-center gap-4 bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-6 hover:border-(--color-accent) hover-lift transition-all">
+        <div class="shrink-0 w-12 h-12 rounded-lg bg-(--color-accent-soft) flex items-center justify-center">
+          <i data-lucide="file-text" class="w-6 h-6 text-(--color-accent)"></i>
         </div>
         <div>
-          <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">Read Blog</h3>
-          <p class="text-sm text-[var(--color-text-muted)]">Guides, tutorials, and firmware news</p>
+          <h3 class="font-semibold text-(--color-text-primary) group-hover:text-(--color-accent) transition-colors">Read Blog</h3>
+          <p class="text-sm text-(--color-text-muted)">Guides, tutorials, and firmware news</p>
         </div>
       </a>
-      <a href="{% url 'users:account_signup' %}" class="group flex items-center gap-4 bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-6 hover:border-[var(--color-accent)] hover-lift transition-all">
-        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-[var(--color-accent-soft)] flex items-center justify-center">
-          <i data-lucide="user-plus" class="w-6 h-6 text-[var(--color-accent)]"></i>
+      <a href="{% url 'users:account_signup' %}" class="group flex items-center gap-4 bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-6 hover:border-(--color-accent) hover-lift transition-all">
+        <div class="shrink-0 w-12 h-12 rounded-lg bg-(--color-accent-soft) flex items-center justify-center">
+          <i data-lucide="user-plus" class="w-6 h-6 text-(--color-accent)"></i>
         </div>
         <div>
-          <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">Join Free</h3>
-          <p class="text-sm text-[var(--color-text-muted)]">Create account for faster downloads</p>
+          <h3 class="font-semibold text-(--color-text-primary) group-hover:text-(--color-accent) transition-colors">Join Free</h3>
+          <p class="text-sm text-(--color-text-muted)">Create account for faster downloads</p>
         </div>
       </a>
-      <a href="{% url 'bounty:bounty_list' %}" class="group flex items-center gap-4 bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] p-6 hover:border-[var(--color-accent)] hover-lift transition-all">
-        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-[var(--color-accent-soft)] flex items-center justify-center">
-          <i data-lucide="trophy" class="w-6 h-6 text-[var(--color-accent)]"></i>
+      <a href="{% url 'bounty:bounty_list' %}" class="group flex items-center gap-4 bg-(--color-bg-secondary) rounded-xl border border-(--color-border) p-6 hover:border-(--color-accent) hover-lift transition-all">
+        <div class="shrink-0 w-12 h-12 rounded-lg bg-(--color-accent-soft) flex items-center justify-center">
+          <i data-lucide="trophy" class="w-6 h-6 text-(--color-accent)"></i>
         </div>
         <div>
-          <h3 class="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">Bounty Board</h3>
-          <p class="text-sm text-[var(--color-text-muted)]">Request firmware or earn by helping</p>
+          <h3 class="font-semibold text-(--color-text-primary) group-hover:text-(--color-accent) transition-colors">Bounty Board</h3>
+          <p class="text-sm text-(--color-text-muted)">Request firmware or earn by helping</p>
         </div>
       </a>
     </div>
@@ -144,14 +144,14 @@
       <div class="lg:col-span-2 space-y-8">
         {% if left_column.latest_firmwares %}
         <div>
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-            <i data-lucide="download" class="w-5 h-5 text-[var(--color-accent)]"></i> Latest Firmwares
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+            <i data-lucide="download" class="w-5 h-5 text-(--color-accent)"></i> Latest Firmwares
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {% for fw in left_column.latest_firmwares %}
-            <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
-              <h3 class="font-semibold text-sm mb-1 text-[var(--color-text-primary)]">{{ fw.name|default:fw.title|truncatewords:8 }}</h3>
-              <p class="text-xs text-[var(--color-text-muted)]">{{ fw.brand_name|default:"" }} {{ fw.model_name|default:"" }}</p>
+            <div class="bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
+              <h3 class="font-semibold text-sm mb-1 text-(--color-text-primary)">{{ fw.name|default:fw.title|truncatewords:8 }}</h3>
+              <p class="text-xs text-(--color-text-muted)">{{ fw.brand_name|default:"" }} {{ fw.model_name|default:"" }}</p>
             </div>
             {% endfor %}
           </div>
@@ -160,14 +160,14 @@
 
         {% if left_column.trending_firmwares %}
         <div>
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-            <i data-lucide="trending-up" class="w-5 h-5 text-[var(--color-accent)]"></i> Trending Firmwares
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+            <i data-lucide="trending-up" class="w-5 h-5 text-(--color-accent)"></i> Trending Firmwares
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {% for fw in left_column.trending_firmwares %}
-            <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
-              <h3 class="font-semibold text-sm mb-1 text-[var(--color-text-primary)]">{{ fw.name|default:fw.title|truncatewords:8 }}</h3>
-              <p class="text-xs text-[var(--color-text-muted)]">{{ fw.brand_name|default:"" }}</p>
+            <div class="bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
+              <h3 class="font-semibold text-sm mb-1 text-(--color-text-primary)">{{ fw.name|default:fw.title|truncatewords:8 }}</h3>
+              <p class="text-xs text-(--color-text-muted)">{{ fw.brand_name|default:"" }}</p>
             </div>
             {% endfor %}
           </div>
@@ -176,14 +176,14 @@
 
         {% if left_column.most_requested %}
         <div>
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-            <i data-lucide="star" class="w-5 h-5 text-[var(--color-accent)]"></i> Most Requested
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+            <i data-lucide="star" class="w-5 h-5 text-(--color-accent)"></i> Most Requested
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {% for fw in left_column.most_requested %}
-            <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
-              <h3 class="font-semibold text-sm mb-1 text-[var(--color-text-primary)]">{{ fw.name|default:fw.title|truncatewords:8 }}</h3>
-              <p class="text-xs text-[var(--color-text-muted)]">{{ fw.brand_name|default:"" }}</p>
+            <div class="bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
+              <h3 class="font-semibold text-sm mb-1 text-(--color-text-primary)">{{ fw.name|default:fw.title|truncatewords:8 }}</h3>
+              <p class="text-xs text-(--color-text-muted)">{{ fw.brand_name|default:"" }}</p>
             </div>
             {% endfor %}
           </div>
@@ -195,14 +195,14 @@
       <div class="space-y-8">
         {% if right_column.latest_blogs %}
         <div>
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-            <i data-lucide="file-text" class="w-5 h-5 text-[var(--color-accent)]"></i> Latest Blog Posts
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+            <i data-lucide="file-text" class="w-5 h-5 text-(--color-accent)"></i> Latest Blog Posts
           </h2>
           <div class="space-y-3">
             {% for post in right_column.latest_blogs %}
-            <a href="{{ post.get_absolute_url|default:'#' }}" class="block bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
-              <h3 class="font-semibold text-sm mb-1 text-[var(--color-text-primary)]">{{ post.title|truncatewords:10 }}</h3>
-              <p class="text-xs text-[var(--color-text-muted)]">{{ post.published_at|date:"M d, Y"|default:"" }}</p>
+            <a href="{{ post.get_absolute_url|default:'#' }}" class="block bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
+              <h3 class="font-semibold text-sm mb-1 text-(--color-text-primary)">{{ post.title|truncatewords:10 }}</h3>
+              <p class="text-xs text-(--color-text-muted)">{{ post.published_at|date:"M d, Y"|default:"" }}</p>
             </a>
             {% endfor %}
           </div>
@@ -211,13 +211,13 @@
 
         {% if right_column.trending_blogs %}
         <div>
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-            <i data-lucide="flame" class="w-5 h-5 text-[var(--color-accent)]"></i> Trending Posts
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+            <i data-lucide="flame" class="w-5 h-5 text-(--color-accent)"></i> Trending Posts
           </h2>
           <div class="space-y-3">
             {% for post in right_column.trending_blogs %}
-            <a href="{{ post.get_absolute_url|default:'#' }}" class="block bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
-              <h3 class="font-semibold text-sm mb-1 text-[var(--color-text-primary)]">{{ post.title|truncatewords:10 }}</h3>
+            <a href="{{ post.get_absolute_url|default:'#' }}" class="block bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
+              <h3 class="font-semibold text-sm mb-1 text-(--color-text-primary)">{{ post.title|truncatewords:10 }}</h3>
             </a>
             {% endfor %}
           </div>
@@ -236,24 +236,24 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {# Firmware Bounty Requests #}
       <div>
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-          <i data-lucide="target" class="w-5 h-5 text-[var(--color-accent)]"></i> Firmware Bounties
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+          <i data-lucide="target" class="w-5 h-5 text-(--color-accent)"></i> Firmware Bounties
         </h2>
         {% if bounty_firmware_requests %}
         <div class="space-y-3">
           {% for b in bounty_firmware_requests %}
-          <a href="{% url 'bounty:bounty_detail' pk=b.pk %}" class="block bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
+          <a href="{% url 'bounty:bounty_detail' pk=b.pk %}" class="block bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1 min-w-0">
-                <h3 class="font-semibold text-sm mb-1 text-[var(--color-text-primary)] truncate">{{ b.title }}</h3>
-                <p class="text-xs text-[var(--color-text-muted)]">
+                <h3 class="font-semibold text-sm mb-1 text-(--color-text-primary) truncate">{{ b.title }}</h3>
+                <p class="text-xs text-(--color-text-muted)">
                   {% if b.brand %}{{ b.brand.name }}{% endif %}
                   {% if b.fw_version_wanted %} · {{ b.fw_version_wanted }}{% endif %}
                   · {{ b.created_at|timesince }} ago
                 </p>
               </div>
               {% if b.reward_amount > 0 %}
-              <span class="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+              <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-(--color-accent-soft) text-(--color-accent)">
                 <i data-lucide="coins" class="w-3 h-3"></i> {{ b.reward_amount|floatformat:0 }}
               </span>
               {% endif %}
@@ -261,34 +261,34 @@
           </a>
           {% endfor %}
         </div>
-        <a href="{% url 'bounty:bounty_list' %}?tab=firmware" class="inline-flex items-center gap-1 text-sm text-[var(--color-accent)] hover:underline mt-3">
+        <a href="{% url 'bounty:bounty_list' %}?tab=firmware" class="inline-flex items-center gap-1 text-sm text-(--color-accent) hover:underline mt-3">
           View all firmware bounties <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </a>
         {% else %}
-        <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-6 text-center">
-          <p class="text-sm text-[var(--color-text-muted)]">No firmware bounties yet.</p>
+        <div class="bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-6 text-center">
+          <p class="text-sm text-(--color-text-muted)">No firmware bounties yet.</p>
         </div>
         {% endif %}
       </div>
 
       {# Support Forum (Bounty Blogs) #}
       <div>
-        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-text-primary)]">
-          <i data-lucide="life-buoy" class="w-5 h-5 text-[var(--color-accent)]"></i> Support Forum
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-(--color-text-primary)">
+          <i data-lucide="life-buoy" class="w-5 h-5 text-(--color-accent)"></i> Support Forum
         </h2>
         {% if bounty_support_requests %}
         <div class="space-y-3">
           {% for b in bounty_support_requests %}
-          <a href="{% url 'bounty:bounty_detail' pk=b.pk %}" class="block bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-4 hover:border-[var(--color-accent)] hover-lift transition-all">
+          <a href="{% url 'bounty:bounty_detail' pk=b.pk %}" class="block bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-4 hover:border-(--color-accent) hover-lift transition-all">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1">
-                  <h3 class="font-semibold text-sm text-[var(--color-text-primary)] truncate">{{ b.title }}</h3>
+                  <h3 class="font-semibold text-sm text-(--color-text-primary) truncate">{{ b.title }}</h3>
                   {% if b.status == "fulfilled" %}
-                  <span class="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/20 text-green-400">Solved</span>
+                  <span class="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/20 text-green-400">Solved</span>
                   {% endif %}
                 </div>
-                <p class="text-xs text-[var(--color-text-muted)]">
+                <p class="text-xs text-(--color-text-muted)">
                   {{ b.user.username|default:b.user.email }}
                   {% if b.brand %} · {{ b.brand.name }}{% endif %}
                   · {{ b.submissions_count }} solution{{ b.submissions_count|pluralize }}
@@ -296,7 +296,7 @@
                 </p>
               </div>
               {% if b.reward_amount > 0 %}
-              <span class="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+              <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-(--color-accent-soft) text-(--color-accent)">
                 <i data-lucide="coins" class="w-3 h-3"></i> {{ b.reward_amount|floatformat:0 }}
               </span>
               {% endif %}
@@ -304,12 +304,12 @@
           </a>
           {% endfor %}
         </div>
-        <a href="{% url 'bounty:bounty_list' %}?tab=support" class="inline-flex items-center gap-1 text-sm text-[var(--color-accent)] hover:underline mt-3">
+        <a href="{% url 'bounty:bounty_list' %}?tab=support" class="inline-flex items-center gap-1 text-sm text-(--color-accent) hover:underline mt-3">
           View all support threads <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
         </a>
         {% else %}
-        <div class="bg-[var(--color-bg-secondary)] rounded-lg border border-[var(--color-border)] p-6 text-center">
-          <p class="text-sm text-[var(--color-text-muted)]">No support threads yet.</p>
+        <div class="bg-(--color-bg-secondary) rounded-lg border border-(--color-border) p-6 text-center">
+          <p class="text-sm text-(--color-text-muted)">No support threads yet.</p>
         </div>
         {% endif %}
       </div>
@@ -321,35 +321,35 @@
 {# ── Features Section — always visible ── #}
 <section style="padding-top: 4rem; padding-bottom: 4rem; border-top: 1px solid var(--color-border);">
   <div class="container-md">
-    <h2 class="text-2xl font-bold text-center mb-10 text-[var(--color-text-primary)]">Why Choose Us?</h2>
+    <h2 class="text-2xl font-bold text-center mb-10 text-(--color-text-primary)">Why Choose Us?</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <div class="text-center p-6">
-        <div class="w-14 h-14 rounded-xl bg-[var(--color-accent-soft)] flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="shield-check" class="w-7 h-7 text-[var(--color-accent)]"></i>
+        <div class="w-14 h-14 rounded-xl bg-(--color-accent-soft) flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="shield-check" class="w-7 h-7 text-(--color-accent)"></i>
         </div>
-        <h3 class="font-semibold mb-2 text-[var(--color-text-primary)]">Verified Files</h3>
-        <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">Every firmware verified by our trusted tester program</p>
+        <h3 class="font-semibold mb-2 text-(--color-text-primary)">Verified Files</h3>
+        <p class="text-sm text-(--color-text-muted) leading-relaxed">Every firmware verified by our trusted tester program</p>
       </div>
       <div class="text-center p-6">
-        <div class="w-14 h-14 rounded-xl bg-[var(--color-accent-soft)] flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="zap" class="w-7 h-7 text-[var(--color-accent)]"></i>
+        <div class="w-14 h-14 rounded-xl bg-(--color-accent-soft) flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="zap" class="w-7 h-7 text-(--color-accent)"></i>
         </div>
-        <h3 class="font-semibold mb-2 text-[var(--color-text-primary)]">Fast Downloads</h3>
-        <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">High-speed servers with resume support</p>
+        <h3 class="font-semibold mb-2 text-(--color-text-primary)">Fast Downloads</h3>
+        <p class="text-sm text-(--color-text-muted) leading-relaxed">High-speed servers with resume support</p>
       </div>
       <div class="text-center p-6">
-        <div class="w-14 h-14 rounded-xl bg-[var(--color-accent-soft)] flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="refresh-cw" class="w-7 h-7 text-[var(--color-accent)]"></i>
+        <div class="w-14 h-14 rounded-xl bg-(--color-accent-soft) flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="refresh-cw" class="w-7 h-7 text-(--color-accent)"></i>
         </div>
-        <h3 class="font-semibold mb-2 text-[var(--color-text-primary)]">Always Updated</h3>
-        <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">Automated OEM scraping keeps files current</p>
+        <h3 class="font-semibold mb-2 text-(--color-text-primary)">Always Updated</h3>
+        <p class="text-sm text-(--color-text-muted) leading-relaxed">Automated OEM scraping keeps files current</p>
       </div>
       <div class="text-center p-6">
-        <div class="w-14 h-14 rounded-xl bg-[var(--color-accent-soft)] flex items-center justify-center mx-auto mb-4">
-          <i data-lucide="globe" class="w-7 h-7 text-[var(--color-accent)]"></i>
+        <div class="w-14 h-14 rounded-xl bg-(--color-accent-soft) flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="globe" class="w-7 h-7 text-(--color-accent)"></i>
         </div>
-        <h3 class="font-semibold mb-2 text-[var(--color-text-primary)]">All Major Brands</h3>
-        <p class="text-sm text-[var(--color-text-muted)] leading-relaxed">Samsung, Xiaomi, Oppo, Vivo, Huawei, and more</p>
+        <h3 class="font-semibold mb-2 text-(--color-text-primary)">All Major Brands</h3>
+        <p class="text-sm text-(--color-text-muted) leading-relaxed">Samsung, Xiaomi, Oppo, Vivo, Huawei, and more</p>
       </div>
     </div>
   </div>

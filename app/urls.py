@@ -171,6 +171,7 @@ urlpatterns = [
         include(("apps.moderation.urls", "moderation"), namespace="moderation"),
     ),
     path("api/v1/shop/", include(("apps.shop.urls", "shop"), namespace="shop")),
+    path("api/v1/seo/", include(("apps.seo.urls", "seo"), namespace="seo")),
     path("api/v1/wallet/", include(("apps.wallet.urls", "wallet"), namespace="wallet")),
     path(
         "api/v1/bounty/",

@@ -22,6 +22,8 @@ from .models import (
     PlacementAssignment,
     RewardedAdConfig,
     RewardedAdView,
+    ScanDiscovery,
+    TemplateAdExclusion,
 )
 
 
@@ -848,3 +850,33 @@ class AdsSettingsAdmin(SingletonModelAdmin):
     def has_add_permission(self, request):
         # Singleton – always edit existing row
         return False
+
+
+# ==================== SCAN DISCOVERY ADMIN ====================
+
+
+@admin.register(ScanDiscovery)
+class ScanDiscoveryAdmin(admin.ModelAdmin[ScanDiscovery]):
+    list_display = (
+        "placement_code",
+        "placement_name",
+        "zone",
+        "confidence",
+        "status",
+        "reviewed_by",
+        "reviewed_at",
+    )
+    list_filter = ("status", "zone")
+    search_fields = ("placement_code", "placement_name", "description")
+    readonly_fields = ("scan_result", "reviewed_by", "reviewed_at", "placement")
+    list_editable = ("status",)
+
+
+# ==================== TEMPLATE AD EXCLUSION ADMIN ====================
+
+
+@admin.register(TemplateAdExclusion)
+class TemplateAdExclusionAdmin(admin.ModelAdmin[TemplateAdExclusion]):
+    list_display = ("template_path", "reason", "excluded_by", "created_at")
+    search_fields = ("template_path", "reason")
+    readonly_fields = ("excluded_by",)

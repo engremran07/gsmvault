@@ -6,7 +6,7 @@
   <div class="w-10 h-10 rounded-xl bg-{{ color|default:'blue' }}-500/15 flex items-center justify-center mb-3">
     <i data-lucide="{{ icon|default:'activity' }}" class="w-5 h-5 text-{{ color|default:'blue' }}-400"></i>
   </div>
-  <div class="text-2xl font-bold text-[var(--color-text-primary)]"
+  <div class="text-2xl font-bold text-(--color-text-primary)"
        x-data="animatedCounter({{ value|default:'0' }})" x-text="display.toLocaleString()">{{ value|default:"0" }}</div>
-  <p class="text-xs text-[var(--color-text-muted)] mt-1">{{ label|default:"—" }}</p>
+  <p class="text-xs text-(--color-text-muted) mt-1">{{ label|default:"—" }}</p>
 </div>

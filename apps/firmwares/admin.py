@@ -4,24 +4,49 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from .models import (
+    AdGateLog,
     Brand,
     BrandCreationRequest,
     BrandSchema,
     ChangelogEntry,
+    DownloadSession,
+    DownloadToken,
     EngineeringFirmware,
     FirmwareDiff,
+    FlashingGuideTemplate,
+    FlashingTool,
+    FlashingToolCategory,
+    GeneratedFlashingGuide,
+    GSMArenaDevice,
+    HotlinkBlock,
+    IngestionJob,
     Model,
     ModelCreationRequest,
     ModifiedFirmware,
+    OEMSource,
     OfficialFirmware,
     OtherFirmware,
     PendingFirmware,
     ReadbackFirmware,
     ReleaseNote,
     SchemaUpdateProposal,
+    ScraperConfig,
+    ScraperRun,
+    SyncConflict,
+    SyncRun,
+    TestResult,
+    TrustedTester,
     UnclassifiedFirmware,
     Variant,
     VariantCreationRequest,
+    VerificationCredit,
+    VerificationReport,
+)
+from .tracking_models import (
+    FirmwareDownloadAttempt,
+    FirmwareRequest,
+    FirmwareStats,
+    FirmwareView,
 )
 
 
@@ -455,3 +480,279 @@ class ChangelogEntryAdmin(admin.ModelAdmin[ChangelogEntry]):
 class FirmwareDiffAdmin(admin.ModelAdmin[FirmwareDiff]):
     list_display = ["old_firmware", "new_firmware", "generated_at"]
     readonly_fields = ["generated_at"]
+
+
+# ---------------------------------------------------------------------------
+# GSMArena Sync — absorbed from apps.gsmarena_sync
+# ---------------------------------------------------------------------------
+
+
+@admin.register(GSMArenaDevice)
+class GSMArenaDeviceAdmin(admin.ModelAdmin[GSMArenaDevice]):
+    list_display = [
+        "gsmarena_id",
+        "brand",
+        "model_name",
+        "review_status",
+        "last_synced_at",
+    ]
+    list_filter = ["review_status", "brand"]
+    search_fields = ["gsmarena_id", "brand", "model_name"]
+    readonly_fields = ["last_synced_at", "reviewed_at"]
+
+
+@admin.register(SyncRun)
+class SyncRunAdmin(admin.ModelAdmin[SyncRun]):
+    list_display = [
+        "pk",
+        "status",
+        "devices_checked",
+        "devices_updated",
+        "devices_created",
+        "started_at",
+    ]
+    list_filter = ["status"]
+    readonly_fields = ["started_at", "completed_at"]
+
+    def has_add_permission(self, request):  # type: ignore[override]
+        return False
+
+
+@admin.register(SyncConflict)
+class SyncConflictAdmin(admin.ModelAdmin[SyncConflict]):
+    list_display = ["gsmarena_device", "field_name", "status", "resolved"]
+    list_filter = ["status", "resolved"]
+    search_fields = ["gsmarena_device__model_name", "field_name"]
+
+
+# ---------------------------------------------------------------------------
+# FW Verification — absorbed from apps.fw_verification
+# ---------------------------------------------------------------------------
+
+
+@admin.register(TrustedTester)
+class TrustedTesterAdmin(admin.ModelAdmin[TrustedTester]):
+    list_display = ["user", "fw_count", "avg_rating", "is_active", "approved_at"]
+    list_filter = ["is_active"]
+    search_fields = ["user__email", "user__username"]
+
+
+@admin.register(VerificationReport)
+class VerificationReportAdmin(admin.ModelAdmin[VerificationReport]):
+    list_display = ["pk", "firmware", "tester", "verdict", "status", "created_at"]
+    list_filter = ["verdict", "status"]
+    search_fields = ["tester__user__email"]
+    readonly_fields = ["created_at", "updated_at"]
+
+
+@admin.register(TestResult)
+class TestResultAdmin(admin.ModelAdmin[TestResult]):
+    list_display = ["report", "test_name", "result"]
+    list_filter = ["result"]
+    search_fields = ["test_name"]
+
+
+@admin.register(VerificationCredit)
+class VerificationCreditAdmin(admin.ModelAdmin[VerificationCredit]):
+    list_display = ["user", "firmware", "credits_earned", "created_at"]
+    readonly_fields = ["created_at"]
+
+
+# ---------------------------------------------------------------------------
+# OEM Scraper — absorbed from apps.fw_scraper
+# ---------------------------------------------------------------------------
+
+
+@admin.register(OEMSource)
+class OEMSourceAdmin(admin.ModelAdmin[OEMSource]):
+    list_display = ["name", "base_url", "brand", "auth_type", "is_active"]
+    list_filter = ["is_active", "auth_type"]
+    search_fields = ["name", "slug"]
+
+
+@admin.register(ScraperConfig)
+class ScraperConfigAdmin(admin.ModelAdmin[ScraperConfig]):
+    list_display = ["source", "schedule_cron", "is_active", "last_run", "next_run"]
+    list_filter = ["is_active"]
+
+
+@admin.register(ScraperRun)
+class ScraperRunAdmin(admin.ModelAdmin[ScraperRun]):
+    list_display = [
+        "pk",
+        "config",
+        "status",
+        "items_found",
+        "items_ingested",
+        "started_at",
+    ]
+    list_filter = ["status"]
+    readonly_fields = ["started_at", "finished_at"]
+
+    def has_add_permission(self, request):  # type: ignore[override]
+        return False
+
+
+@admin.register(IngestionJob)
+class IngestionJobAdmin(admin.ModelAdmin[IngestionJob]):
+    list_display = ["pk", "run", "status", "reviewed_by", "created_at"]
+    list_filter = ["status"]
+    readonly_fields = ["created_at", "reviewed_at"]
+
+
+# ---------------------------------------------------------------------------
+# Download Links — absorbed from apps.download_links
+# ---------------------------------------------------------------------------
+
+
+@admin.register(DownloadToken)
+class DownloadTokenAdmin(admin.ModelAdmin[DownloadToken]):
+    list_display = [
+        "token_short",
+        "firmware",
+        "user",
+        "status",
+        "ad_gate_completed",
+        "expires_at",
+    ]
+    list_filter = ["status", "ad_gate_required"]
+    search_fields = ["token", "user__email"]
+    readonly_fields = ["created_at", "used_at"]
+
+    def token_short(self, obj: DownloadToken) -> str:
+        return f"{obj.token[:12]}…"
+
+    token_short.short_description = "Token"  # type: ignore[attr-defined]
+
+
+@admin.register(DownloadSession)
+class DownloadSessionAdmin(admin.ModelAdmin[DownloadSession]):
+    list_display = ["pk", "token", "user", "status", "bytes_delivered", "started_at"]
+    list_filter = ["status"]
+    readonly_fields = ["started_at", "completed_at"]
+
+    def has_add_permission(self, request):  # type: ignore[override]
+        return False
+
+
+@admin.register(AdGateLog)
+class AdGateLogAdmin(admin.ModelAdmin[AdGateLog]):
+    list_display = [
+        "session",
+        "ad_type",
+        "watched_seconds",
+        "completed",
+        "credits_earned",
+    ]
+    list_filter = ["ad_type", "completed"]
+    readonly_fields = ["created_at"]
+
+
+@admin.register(HotlinkBlock)
+class HotlinkBlockAdmin(admin.ModelAdmin[HotlinkBlock]):
+    list_display = ["domain", "is_active", "blocked_count", "created_at"]
+    list_filter = ["is_active"]
+    search_fields = ["domain"]
+
+
+# ---------------------------------------------------------------------------
+# Flashing Tools & Guides
+# ---------------------------------------------------------------------------
+
+
+@admin.register(FlashingToolCategory)
+class FlashingToolCategoryAdmin(admin.ModelAdmin[FlashingToolCategory]):
+    list_display = ["name", "slug", "sort_order", "is_active"]
+    list_filter = ["is_active"]
+    prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(FlashingTool)
+class FlashingToolAdmin(admin.ModelAdmin[FlashingTool]):
+    list_display = [
+        "name",
+        "category",
+        "tool_type",
+        "platform",
+        "risk_level",
+        "is_active",
+        "is_featured",
+    ]
+    list_filter = ["tool_type", "platform", "risk_level", "is_active", "is_featured"]
+    search_fields = ["name", "slug"]
+    prepopulated_fields = {"slug": ("name",)}
+
+
+@admin.register(FlashingGuideTemplate)
+class FlashingGuideTemplateAdmin(admin.ModelAdmin[FlashingGuideTemplate]):
+    list_display = [
+        "title_template",
+        "guide_type",
+        "brand",
+        "auto_generate",
+        "is_active",
+        "generated_count",
+    ]
+    list_filter = ["guide_type", "auto_generate", "is_active"]
+
+
+@admin.register(GeneratedFlashingGuide)
+class GeneratedFlashingGuideAdmin(admin.ModelAdmin[GeneratedFlashingGuide]):
+    list_display = ["template", "brand", "model", "created_at"]
+    list_filter = ["brand"]
+    readonly_fields = ["created_at"]
+
+
+# ---------------------------------------------------------------------------
+# Tracking Models (FirmwareView, etc.)
+# ---------------------------------------------------------------------------
+
+
+@admin.register(FirmwareView)
+class FirmwareViewAdmin(admin.ModelAdmin[FirmwareView]):
+    list_display = ["content_type", "object_id", "user", "viewed_at"]
+    list_filter = ["content_type"]
+    readonly_fields = ["viewed_at"]
+
+    def has_add_permission(self, request):  # type: ignore[override]
+        return False
+
+
+@admin.register(FirmwareDownloadAttempt)
+class FirmwareDownloadAttemptAdmin(admin.ModelAdmin[FirmwareDownloadAttempt]):
+    list_display = ["content_type", "object_id", "user", "status", "initiated_at"]
+    list_filter = ["status"]
+    readonly_fields = ["initiated_at", "completed_at", "failed_at"]
+
+    def has_add_permission(self, request):  # type: ignore[override]
+        return False
+
+
+@admin.register(FirmwareRequest)
+class FirmwareRequestAdmin(admin.ModelAdmin[FirmwareRequest]):
+    list_display = [
+        "brand",
+        "model",
+        "firmware_type",
+        "status",
+        "request_count",
+        "created_at",
+    ]
+    list_filter = ["status", "firmware_type", "urgency"]
+    search_fields = ["brand__name", "model__name", "variant_name"]
+
+
+@admin.register(FirmwareStats)
+class FirmwareStatsAdmin(admin.ModelAdmin[FirmwareStats]):
+    list_display = [
+        "content_type",
+        "object_id",
+        "date",
+        "view_count",
+        "successful_downloads",
+    ]
+    list_filter = ["date"]
+    readonly_fields = ["date"]
+
+    def has_add_permission(self, request):  # type: ignore[override]
+        return False

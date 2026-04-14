@@ -13,7 +13,7 @@
     {% include "components/_breadcrumb.html" with label="Blog" %}
   </div>
   {% if allow_user_posts %}
-  <a href="{% url 'blog:post_create' %}" class="inline-flex items-center gap-2 rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm text-[var(--color-accent-text)] hover:bg-[var(--color-accent-hover)] transition">
+  <a href="{% url 'blog:post_create' %}" class="inline-flex items-center gap-2 rounded-lg bg-(--color-accent) px-4 py-2 text-sm text-(--color-accent-text) hover:bg-(--color-accent-hover) transition">
     <i data-lucide="plus" class="w-4 h-4"></i> New Post
   </a>
   {% endif %}
@@ -24,8 +24,8 @@
 {# ── Inline Search ── #}
 <div class="mb-8" x-data="{ query: '', showResults: false }" x-cloak>
   <div class="relative">
-    <div class="flex items-center bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-border)] px-4 py-3 gap-3 focus-within:border-[var(--color-accent)] transition-colors">
-      <i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i>
+    <div class="flex items-center bg-(--color-bg-secondary) rounded-xl border border-(--color-border) px-4 py-3 gap-3 focus-within:border-(--color-accent) transition-colors">
+      <i data-lucide="search" class="w-5 h-5 text-(--color-text-secondary) shrink-0"></i>
       <input type="text" name="q" placeholder="Search posts, tags, categories…" autocomplete="off"
              x-model="query"
              @focus="showResults = query.length > 1"
@@ -37,16 +37,16 @@
              hx-target="#inline-search-results"
              hx-swap="innerHTML"
              hx-include="this"
-             class="flex-1 bg-transparent text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] focus:outline-none">
-      <a href="{% url 'blog:blog_search' %}" class="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] whitespace-nowrap">
+             class="flex-1 bg-transparent text-(--color-text-primary) placeholder-[var(--color-text-secondary)] focus:outline-none">
+      <a href="{% url 'blog:blog_search' %}" class="text-xs text-(--color-text-secondary) hover:text-(--color-accent) whitespace-nowrap">
         Advanced
       </a>
     </div>
     <div x-show="showResults && query.length > 1" x-cloak
          @click.outside="showResults = false"
-         class="absolute z-20 left-0 right-0 mt-2 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl shadow-xl max-h-96 overflow-y-auto">
+         class="absolute z-20 left-0 right-0 mt-2 bg-(--color-bg-secondary) border border-(--color-border) rounded-xl shadow-xl max-h-96 overflow-y-auto">
       <div id="inline-search-results" class="p-3">
-        <p class="text-sm text-[var(--color-text-secondary)] text-center py-4">Type to search…</p>
+        <p class="text-sm text-(--color-text-secondary) text-center py-4">Type to search…</p>
       </div>
     </div>
   </div>
@@ -57,11 +57,11 @@
   <div class="lg:col-span-3 space-y-6">
     {# Filters #}
     <div class="flex flex-wrap gap-2 items-center">
-      <span class="text-sm text-[var(--color-text-secondary)]">Sort:</span>
+      <span class="text-sm text-(--color-text-secondary)">Sort:</span>
       {% for key, label in sort_options %}
       <a href="?sort={{ key }}{% if active_category %}&category={{ active_category }}{% endif %}{% if active_tag %}&tag={{ active_tag }}{% endif %}"
          class="rounded-full px-3 py-1 text-xs border transition
-                {% if sort == key %}bg-[var(--color-accent)] text-[var(--color-accent-text)] border-[var(--color-accent)]{% else %}border-[var(--color-border)] hover:border-[var(--color-accent)] text-[var(--color-text-secondary)]{% endif %}">
+                {% if sort == key %}bg-(--color-accent) text-(--color-accent-text) border-(--color-accent){% else %}border-(--color-border) hover:border-(--color-accent) text-(--color-text-secondary){% endif %}">
         {{ label }}
       </a>
       {% endfor %}
@@ -76,17 +76,17 @@
   {# Sidebar #}
   <div class="lg:col-span-1 space-y-6">
     {# Categories #}
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4"
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-4"
          x-data="{ showAll: false }">
       <h3 class="font-semibold mb-3 flex items-center gap-2">
-        <i data-lucide="folder" class="w-4 h-4 text-[var(--color-accent)]"></i> Categories
+        <i data-lucide="folder" class="w-4 h-4 text-(--color-accent)"></i> Categories
       </h3>
       {% if categories %}
       <div class="space-y-1">
         {% for cat in categories %}
         <a href="?category={{ cat.slug }}"
            {% if forloop.counter > 4 %}x-show="showAll" x-cloak{% endif %}
-           class="flex items-center justify-between text-sm py-1 hover:text-[var(--color-accent)] {% if active_category == cat.slug %}text-[var(--color-accent)] font-medium{% else %}text-[var(--color-text-secondary)]{% endif %}">
+           class="flex items-center justify-between text-sm py-1 hover:text-(--color-accent) {% if active_category == cat.slug %}text-(--color-accent) font-medium{% else %}text-(--color-text-secondary){% endif %}">
           <span>{{ cat.name }}</span>
           <span class="text-xs">{{ cat.post_count }}</span>
         </a>
@@ -94,50 +94,50 @@
       </div>
       {% if categories|length > 4 %}
       <button @click="showAll = !showAll"
-              class="mt-3 w-full text-center text-xs font-medium text-[var(--color-accent)] hover:underline">
+              class="mt-3 w-full text-center text-xs font-medium text-(--color-accent) hover:underline">
         <span x-text="showAll ? 'Show Less' : 'View All ({{ categories|length }})'"></span>
       </button>
       {% endif %}
       {% else %}
-      <p class="text-xs text-[var(--color-text-muted)]">No categories yet.</p>
+      <p class="text-xs text-(--color-text-muted)">No categories yet.</p>
       {% endif %}
     </div>
 
     {# Trending Tags #}
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-4">
       <h3 class="font-semibold mb-3 flex items-center gap-2">
-        <i data-lucide="hash" class="w-4 h-4 text-[var(--color-accent)]"></i> Trending Tags
+        <i data-lucide="hash" class="w-4 h-4 text-(--color-accent)"></i> Trending Tags
       </h3>
       {% if trending_tags %}
       <div class="flex flex-wrap gap-2">
         {% for tag in trending_tags %}
         <a href="?tag={{ tag.slug }}"
-           class="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition">
+           class="rounded-full border border-(--color-border) px-3 py-1 text-xs hover:border-(--color-accent) hover:text-(--color-accent) transition">
           #{{ tag.name }}
         </a>
         {% endfor %}
       </div>
       {% else %}
-      <p class="text-xs text-[var(--color-text-muted)]">No tags yet.</p>
+      <p class="text-xs text-(--color-text-muted)">No tags yet.</p>
       {% endif %}
     </div>
 
     {# Trending Posts #}
-    <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4">
+    <div class="rounded-lg border border-(--color-border) bg-(--color-bg-secondary) p-4">
       <h3 class="font-semibold mb-3 flex items-center gap-2">
-        <i data-lucide="trending-up" class="w-4 h-4 text-[var(--color-accent)]"></i> Trending
+        <i data-lucide="trending-up" class="w-4 h-4 text-(--color-accent)"></i> Trending
       </h3>
       {% if trending_posts %}
       <div class="space-y-3">
         {% for tp in trending_posts %}
-        <a href="{% url 'blog:post_detail' slug=tp.slug %}" class="block text-sm hover:text-[var(--color-accent)]">
+        <a href="{% url 'blog:post_detail' slug=tp.slug %}" class="block text-sm hover:text-(--color-accent)">
           {{ tp.title }}
-          <span class="text-xs text-[var(--color-text-muted)] block">{{ tp.published_at|date:"M d" }}</span>
+          <span class="text-xs text-(--color-text-muted) block">{{ tp.published_at|date:"M d" }}</span>
         </a>
         {% endfor %}
       </div>
       {% else %}
-      <p class="text-xs text-[var(--color-text-muted)]">No trending posts yet.</p>
+      <p class="text-xs text-(--color-text-muted)">No trending posts yet.</p>
       {% endif %}
     </div>
 
